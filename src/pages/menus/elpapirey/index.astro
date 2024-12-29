@@ -120,17 +120,23 @@ const contactInfo = {
       const copyButton = document.getElementById('copyButton');
       const copyMessage = document.getElementById('copyMessage');
       let timeoutId;
-
+    
       function showCopyMessage() {
+        if (!copyMessage) return; // Early return si copyMessage es null
+        
         copyMessage.style.opacity = '1';
         if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
-          copyMessage.style.opacity = '0';
+          if (copyMessage) { // Verificar nuevamente dentro del timeout
+            copyMessage.style.opacity = '0';
+          }
         }, 2000);
       }
-
+    
       async function copyClabe() {
-        const clabe = clabeNumber.textContent.trim();
+        if (!clabeNumber) return; // Early return si clabeNumber es null
+        
+        const clabe = clabeNumber.textContent?.trim() || '';
         try {
           await navigator.clipboard.writeText(clabe);
           showCopyMessage();
@@ -138,12 +144,14 @@ const contactInfo = {
           console.error('Error al copiar:', err);
         }
       }
-
-      clabeNumber.addEventListener('click', copyClabe);
-      copyButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        copyClabe();
-      });
+    
+      if (clabeNumber && copyButton) {
+        clabeNumber.addEventListener('click', copyClabe);
+        copyButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          copyClabe();
+        });
+      }
     </script>
   </body>
 </html>
