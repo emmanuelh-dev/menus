@@ -1,0 +1,161 @@
+---
+import { Image } from "astro:assets";
+import logo from './logo.jpg'
+const menuItems = [
+  { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
+  { name: "Especial", price: 50, color: "text-white" },
+  { name: "Doble", price: 80, color: "text-white" },
+  { name: "Hawaiana", price: 70, color: "text-white" },
+  { name: "Salchiburger", price: 70, color: "text-white" },
+  { name: "HOT DOG", category: true, color: "text-cyan-400" },
+  { name: "Chico", price: 30, color: "text-white" },
+  { name: "Grande", price: 40, color: "text-white" },
+  { name: "PAPAS A LA FRANCESA", category: true, price: 40, color: "text-red-500" },
+  { name: "TORTA", category: true, price: 80, color: "text-purple-500" },
+  { name: "TACOS DORADOS", category: true, price: 80, color: "text-green-400" },
+  { name: "CHILES", category: true, price: 25, color: "text-pink-400" },
+  { name: "SALCHIPAPAS", category: true, price: 55, color: "text-blue-500" }
+];
+
+const socialMedia = {
+  instagram: "Elpapi_rey_05",
+  facebook: "EL papi rey"
+};
+
+const contactInfo = {
+  clabe: "6465801464028449945",
+  delivery: 20,
+  hours: "Jueves a Martes de 6:30pm-12:30am",
+  address: "Calzada Union #231, Talaverna Croc",
+  whatsapp: "8133906548"
+};
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>El Papi Rey - Menú</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  </head>
+  <body>
+    <div class="min-h-screen bg-black flex items-center justify-center p-8">
+      <div class="w-full max-w-2xl bg-black p-6 rounded-lg">
+        <!-- Header with Logo and Social Media -->
+        <div class="flex flex-col items-center mb-8">
+          <div class="flex items-center gap-4 mb-4">
+            <Image src={logo} alt="El Papi Rey Logo" width="250" height="250" />
+          </div>
+          <div class="flex gap-4 text-white mb-4">
+            <a href={`https://instagram.com/${socialMedia.instagram}`} class="flex items-center gap-2">
+              <i class="fab fa-instagram text-pink-500"></i>
+              {socialMedia.instagram}
+            </a>
+            <a href={`https://facebook.com/${socialMedia.facebook}`} class="flex items-center gap-2">
+              <i class="fab fa-facebook text-blue-500"></i>
+              {socialMedia.facebook}
+            </a>
+          </div>
+          <h1 class="text-orange-500 text-4xl font-bold text-center mb-2">EL PAPI REY</h1>
+          <p class="text-orange-500 text-xl">DEJATE CAYETANO</p>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="space-y-6 mb-8">
+          {menuItems.map((item) => (
+            <div class={`flex justify-between items-center ${item.category ? 'mt-6' : 'pl-4'}`}>
+              <span class={`${item.color} ${item.category ? 'text-xl font-bold' : 'text-lg'} font-medium tracking-wide`}>
+                {item.name}
+              </span>
+              <span class="text-yellow-400 text-xl font-bold">
+                {item.price ? `$${item.price}` : null}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <!-- Contact Information -->
+        <div class="space-y-4 text-center">
+          <div class="bg-purple-900 rounded-lg p-3 mb-4 relative group">
+            <p class="text-white font-bold">TRANSFERENCIA CLABE:</p>
+            <div class="relative">
+              <p id="clabeNumber" class="text-yellow-400 font-mono cursor-pointer">
+                {contactInfo.clabe}
+              </p>
+              <button 
+                id="copyButton"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Copiar CLABE"
+              >
+                <i class="fas fa-copy"></i>
+              </button>
+              <div 
+                id="copyMessage" 
+                class="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-green-500 text-white px-3 py-1 rounded-md text-sm opacity-0 transition-opacity"
+              >
+                ¡Copiado al portapapeles!
+              </div>
+            </div>
+          </div>
+
+          <div class="text-white space-y-2">
+            <p class="text-xl">Servicio a Domicilio ${contactInfo.delivery}</p>
+            <p>{contactInfo.hours}</p>
+            <p>{contactInfo.address}</p>
+            <a 
+              href={`https://wa.me/${contactInfo.whatsapp}`}
+              class="inline-flex items-center gap-2 text-green-500 text-xl mt-4"
+            >
+              <i class="fab fa-whatsapp"></i>
+              {contactInfo.whatsapp}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Copy functionality
+      const clabeNumber = document.getElementById('clabeNumber');
+      const copyButton = document.getElementById('copyButton');
+      const copyMessage = document.getElementById('copyMessage');
+      let timeoutId;
+
+      function showCopyMessage() {
+        copyMessage.style.opacity = '1';
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          copyMessage.style.opacity = '0';
+        }, 2000);
+      }
+
+      async function copyClabe() {
+        const clabe = clabeNumber.textContent.trim();
+        try {
+          await navigator.clipboard.writeText(clabe);
+          showCopyMessage();
+        } catch (err) {
+          console.error('Error al copiar:', err);
+        }
+      }
+
+      clabeNumber.addEventListener('click', copyClabe);
+      copyButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyClabe();
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+  body {
+    background-color: black;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+</style>
+
