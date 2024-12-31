@@ -1,6 +1,16 @@
 ---
+import RestaurantLayout from '../../../layouts/RestaurantLayout.astro';
 import { wines } from './wines';
 import { ArrowLeft } from 'lucide-react';
+
+const restaurantData = {
+  name: 'Astoria La Bodega',
+  address: 'Av. de la Constitución, 100, Madrid',
+  phone: '+34 600 00 00 00',
+  email: 'astoria@example.com',
+  website: 'https://menus.bysmax.com/menus/astoria',
+}
+
 const WineItem = ({ wine }) => {
   return `
     <div class="mb-8 flex justify-between items-start last:mb-0">
@@ -45,45 +55,30 @@ const WineBottle = () => {
   `;
 }
 ---
-
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astoria La Bodega - Menú de Vinos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Arial', sans-serif;
-      }
-      .font-serif {
-        font-family: 'Cinzel', serif;
-      }
-    </style>
-  </head>
-  <body class="min-h-screen bg-black text-white p-6 md:p-12">
-   <main class="max-w-2xl mx-auto">
-    <Fragment set:html={WineBottle()} />
-    <div class="max-w-4xl mx-auto relative">
-      <header class="mb-16 text-center">
-        <h1 class="text-4xl md:text-5xl font-serif mb-2">ASTORIA</h1>
-        <p class="text-xl tracking-widest">LA BODEGA</p>
-      </header>
-
-      <div class="max-w-xl mx-auto ">
-        <Fragment set:html={WineSection({ title: "VINOS BLANCOS", wines: wines.blancos })} />
-        <Fragment set:html={WineSection({ title: "VINOS TINTOS", wines: wines.tintos })} />
-        <Fragment set:html={WineSection({ title: "ESPUMOSOS", wines: wines.espumosos })} />
-        <Fragment set:html={WineSection({ title: "ROSADOS", wines: wines.rosados })} />
-        <Fragment set:html={WineSection({ title: "VINOS DE POSTRE", wines: wines.postres })} />
-      </div>
-      <div class="text-center mt-16">
-        <a href="/" >Obtener una demo <ArrowLeft className="inline-block h-4 w-4" /></a>
-      </div>
-    </div>
-   </main>
-  </body>
-</html>
-
+<RestaurantLayout
+title={restaurantData.name}
+description={restaurantData.name}
+>
+  <div class="min-h-screen bg-black text-white p-6 md:p-12">
+    <main class="max-w-2xl mx-auto">
+     <Fragment set:html={WineBottle()} />
+     <div class="max-w-4xl mx-auto relative">
+       <header class="mb-16 text-center">
+         <h1 class="text-4xl md:text-5xl font-serif mb-2">ASTORIA</h1>
+         <p class="text-xl tracking-widest">LA BODEGA</p>
+       </header>
+ 
+       <div class="max-w-xl mx-auto ">
+         <Fragment set:html={WineSection({ title: "VINOS BLANCOS", wines: wines.blancos })} />
+         <Fragment set:html={WineSection({ title: "VINOS TINTOS", wines: wines.tintos })} />
+         <Fragment set:html={WineSection({ title: "ESPUMOSOS", wines: wines.espumosos })} />
+         <Fragment set:html={WineSection({ title: "ROSADOS", wines: wines.rosados })} />
+         <Fragment set:html={WineSection({ title: "VINOS DE POSTRE", wines: wines.postres })} />
+       </div>
+       <div class="text-center mt-16">
+         <a href="/" >Obtener una demo <ArrowLeft className="inline-block h-4 w-4" /></a>
+       </div>
+     </div>
+    </main>
+   </div>
+</RestaurantLayout>
