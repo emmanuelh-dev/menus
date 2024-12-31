@@ -1,5 +1,6 @@
 ---
 import { ViewTransitions } from "astro:transitions";
+import Header from "../components/Header.astro";
 
 // Interfaces for different schema types
 interface Address {
@@ -36,6 +37,8 @@ export interface Props {
     description: string;
     image?: string;
     type?: "Restaurant" | "Menu" | "Event";
+    textWhite?: boolean;
+    backgroundColor?: string;
     // Schema enrichment props
     schemaEnrichment?: {
         address?: Address;
@@ -62,6 +65,8 @@ const {
     description, 
     image, 
     type = "Restaurant",
+    textWhite = false,
+    backgroundColor ='bg-white',
     schemaEnrichment = {}
 } = Astro.props;
 
@@ -195,6 +200,7 @@ const menuItems = [
         </style>
     </head>
     <body>
+        <Header textWhite={textWhite} backgroundColor={backgroundColor} />
         <slot />
     </body>
 </html>
