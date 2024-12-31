@@ -26,13 +26,14 @@ const navItems = [
             <button
                 id="menuButton"
                 class="ml-auto lg:hidden transition-transform duration-300 ease-in-out"
+                aria-label="Menu"
             >
                 <Menu className="h-6 w-6" id="menuIcon" />
                 <X className="h-6 w-6 hidden" id="closeIcon" />
             </button>
             <nav
                 id="mobileNav"
-                class=`hidden lg:flex lg:ml-auto lg:gap-6 fixed lg:relative max-sm:top-14 left-0 right-0 ${backgroundColor} ${textWhite ? 'text-white' : 'text-black'} lg:bg-transparent p-4 lg:p-0 shadow-lg lg:shadow-none transform transition-all duration-300 ease-in-out translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100`
+                class="hidden lg:flex lg:ml-auto lg:gap-6 fixed lg:relative max-sm:top-14 left-0 right-0 bg-inherit p-4 lg:p-0 shadow-lg lg:shadow-none transform transition-all duration-300 ease-in-out"
             >
                 {
                     navItems.map((item) => (
@@ -50,36 +51,31 @@ const navItems = [
 </header>
 
 <script>
-    function toggleMenu() {
+    const setupMenu = () => {
         const menuButton = document.getElementById("menuButton");
         const mobileNav = document.getElementById("mobileNav");
         const menuIcon = document.getElementById("menuIcon");
         const closeIcon = document.getElementById("closeIcon");
 
-        if (menuButton && mobileNav && menuIcon && closeIcon) {
-            menuButton.classList.toggle("rotate-180");
-            mobileNav.classList.toggle("hidden");
-            mobileNav.classList.toggle("translate-x-full");
-            mobileNav.classList.toggle("opacity-0");
-            menuIcon.classList.toggle("hidden");
-            closeIcon.classList.toggle("hidden");
-
-            if (!mobileNav.classList.contains("hidden")) {
-                setTimeout(() => {
-                    mobileNav?.classList.remove(
-                        "translate-x-full",
-                        "opacity-0",
-                    );
-                }, 10);
+        const toggleMenu = () => {
+            if (menuButton && mobileNav && menuIcon && closeIcon) {
+                menuButton.classList.toggle("rotate-180");
+                menuIcon.classList.toggle("hidden");
+                closeIcon.classList.toggle("hidden");
+                mobileNav.classList.toggle("hidden");
+                
+                if (!mobileNav.classList.contains("hidden")) {
+                    mobileNav.classList.add("translate-x-0", "opacity-100");
+                } else {
+                    mobileNav.classList.remove("translate-x-0", "opacity-100");
+                }
             }
-        }
-    }
+        };
 
-    // Agregar el evento click al botón
-    document.addEventListener("astro:page-load", () => {
-        const menuButton = document.getElementById("menuButton");
-        if (menuButton) {
-            menuButton.addEventListener("click", toggleMenu);
-        }
-    });
+        menuButton?.addEventListener("click", toggleMenu);
+    };
+
+    // Setup on initial load and after navigation
+    setupMenu();
+    document.addEventListener("astro:page-load", setupMenu);
 </script>
