@@ -6,7 +6,7 @@ const { textWhite, backgroundColor } = Astro.props;
 const navItems = [
     { name: "Características", href: "#" },
     { name: "Precios", href: "#" },
-    { name: "Contacto", href: "https://forms.gle/Y4ZFXyS4KhsoQT5D6" },
+    { name: "Contacto", href: "#" },
     {
         name: "¿Hay un problema o tienes una sugerencia?",
         href: "https://forms.gle/ZfzxRPGhh2BahKph6",
@@ -33,7 +33,7 @@ const navItems = [
             </button>
             <nav
                 id="mobileNav"
-                class="hidden lg:flex lg:ml-auto lg:gap-6 fixed lg:relative max-sm:top-14 left-0 right-0 bg-inherit p-4 lg:p-0 shadow-lg lg:shadow-none transform transition-all duration-300 ease-in-out"
+                class={`hidden lg:flex lg:ml-auto lg:gap-6 fixed lg:relative max-sm:top-14 left-0 right-0 ${backgroundColor} p-4 lg:p-0 shadow-lg lg:shadow-none transform transition-all duration-300 ease-in-out`}
             >
                 {
                     navItems.map((item) => (
@@ -57,7 +57,18 @@ const navItems = [
         const menuIcon = document.getElementById("menuIcon");
         const closeIcon = document.getElementById("closeIcon");
 
-        const toggleMenu = () => {
+        const closeMenu = () => {
+            if (menuButton && mobileNav && menuIcon && closeIcon) {
+                menuButton.classList.remove("rotate-180");
+                menuIcon.classList.remove("hidden");
+                closeIcon.classList.add("hidden");
+                mobileNav.classList.add("hidden");
+                mobileNav.classList.remove("translate-x-0", "opacity-100");
+            }
+        };
+
+        const toggleMenu = (event: Event) => {
+            event.stopPropagation();
             if (menuButton && mobileNav && menuIcon && closeIcon) {
                 menuButton.classList.toggle("rotate-180");
                 menuIcon.classList.toggle("hidden");
@@ -71,6 +82,29 @@ const navItems = [
                 }
             }
         };
+
+        // Cerrar menú al hacer click fuera
+        document.addEventListener("click", (event) => {
+            const isMenuOpen = !mobileNav?.classList.contains("hidden");
+            if (isMenuOpen && !mobileNav?.contains(event.target as Node)) {
+                closeMenu();
+            }
+        });
+
+        // Cerrar menú al hacer scroll
+        let lastScroll = window.scrollY;
+        window.addEventListener("scroll", () => {
+            const currentScroll = window.scrollY;
+            if (Math.abs(currentScroll - lastScroll) > 10) { // Umbral de 10px para evitar cierres accidentales
+                closeMenu();
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Prevenir que los clicks dentro del nav cierren el menú
+        mobileNav?.addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
 
         menuButton?.addEventListener("click", toggleMenu);
     };
