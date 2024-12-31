@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import logo from './logo.jpg'
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 const menuItems = [
   { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
   { name: "Especial", price: 50, color: "text-white" },
@@ -29,132 +30,164 @@ const contactInfo = {
   address: "Calzada Union #231, Talaverna Croc",
   whatsapp: "8133906548"
 };
+const restaurantData = {
+    name: "El Papi Rey",
+    description: "Hamburguesas, Hot Dogs y Antojitos Mexicanos",
+};
+
+const schemaEnrichment = {
+    address: {
+        streetAddress: "Calzada Union #231",
+        addressLocality: "San Nicolás de los Garza",
+        addressRegion: "N.L.",
+        postalCode: "66473",
+        addressCountry: "MX",
+    },
+    telephone: "+52 81 3390 6548",
+    priceRange: "$",
+    servesCuisine: [
+        "Hamburguesas",
+        "Hot Dogs",
+        "Papas a la Francesa",
+        "Tortas",
+        "Tacos Dorados",
+        "Salchipapas"
+    ],
+    openingHours: "Jueves a Martes 18:30-00:30",
+    acceptsReservations: false,
+    paymentAccepted: ["Cash", "Bank Transfer"],
+    currenciesAccepted: ["MXN"],
+    delivery: {
+        available: true,
+        cost: "25-35"
+    },
+    socialMedia: {
+        instagram: "https://instagram.com/Elpapi_rey_05",
+        facebook: "https://www.facebook.com/profile.php?id=100090381744195"
+    }
+};
 ---
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>El Papi Rey - Menú</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  </head>
-  <body>
-    <div class="min-h-screen bg-black flex items-center justify-center p-8">
-      <div class="w-full max-w-2xl bg-black p-6 rounded-lg">
-        <!-- Header with Logo and Social Media -->
-        <div class="flex flex-col items-center mb-8">
-          <div class="flex items-center gap-4 mb-4">
-            <Image src={logo} alt="El Papi Rey Logo" width="250" height="250" />
-          </div>
-          <div class="flex gap-4 text-white mb-4">
-            <a href={socialMedia.instagram.url} class="flex items-center gap-2">
-              <i class="fab fa-instagram text-pink-500"></i>
-              {socialMedia.instagram.name}
-            </a>
-            <a href={socialMedia.facebook.url} class="flex items-center gap-2">
-              <i class="fab fa-facebook text-blue-500"></i>
-              {socialMedia.facebook.name}
-            </a>
-          </div>
-          <h1 class="sr-ony hidden text-orange-500 text-4xl font-bold text-center mb-2">EL PAPI REY</h1>
-          <p class="sr-ony hidden text-orange-500 text-xl">DEJATE CAYETANO</p>
+<RestaurantLayout
+title={restaurantData.name}
+description={restaurantData.name}
+schemaEnrichment={schemaEnrichment}
+>
+  <div class="min-h-screen bg-black flex items-center justify-center p-8">
+    <div class="w-full max-w-2xl bg-black p-6 rounded-lg">
+      <!-- Header with Logo and Social Media -->
+      <div class="flex flex-col items-center mb-8">
+        <div class="flex items-center gap-4 mb-4">
+          <Image src={logo} alt="El Papi Rey Logo" width="250" height="250" />
         </div>
-
-        <!-- Menu Items -->
-        <div class="space-y-6 mb-8">
-          {menuItems.map((item) => (
-            <div class={`flex justify-between items-center ${item.category ? 'mt-6' : 'pl-4'}`}>
-              <span class={`${item.color} ${item.category ? 'text-xl font-bold' : 'text-lg'} font-medium tracking-wide`}>
-                {item.name}
-              </span>
-              <span class="text-yellow-400 text-xl font-bold">
-                {item.price ? `$${item.price}` : null}
-              </span>
-            </div>
-          ))}
+        <div class="flex gap-4 text-white mb-4">
+          <a href={socialMedia.instagram.url} class="flex items-center gap-2">
+            <i class="fab fa-instagram text-pink-500"></i>
+            {socialMedia.instagram.name}
+          </a>
+          <a href={socialMedia.facebook.url} class="flex items-center gap-2">
+            <i class="fab fa-facebook text-blue-500"></i>
+            {socialMedia.facebook.name}
+          </a>
         </div>
+        <h1 class="sr-ony hidden text-orange-500 text-4xl font-bold text-center mb-2">EL PAPI REY</h1>
+        <p class="sr-ony hidden text-orange-500 text-xl">DEJATE CAYETANO</p>
+      </div>
 
-        <!-- Contact Information -->
-        <div class="space-y-4 text-center">
-          <div class="bg-purple-900 rounded-lg p-3 mb-4 relative group">
-            <p class="text-white font-bold">TRANSFERENCIA CLABE:</p>
-            <div class="relative">
-              <p id="clabeNumber" class="text-yellow-400 font-mono cursor-pointer">
-                {contactInfo.clabe}
-              </p>
-              <button 
-                id="copyButton"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Copiar CLABE"
-              >
-                <i class="fas fa-copy"></i>
-              </button>
-              <div 
-                id="copyMessage" 
-                class="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-green-500 text-white px-3 py-1 rounded-md text-sm opacity-0 transition-opacity"
-              >
-                ¡Copiado al portapapeles!
-              </div>
-            </div>
+      <!-- Menu Items -->
+      <div class="space-y-6 mb-8">
+        {menuItems.map((item) => (
+          <div class={`flex justify-between items-center ${item.category ? 'mt-6' : 'pl-4'}`}>
+            <span class={`${item.color} ${item.category ? 'text-xl font-bold' : 'text-lg'} font-medium tracking-wide`}>
+              {item.name}
+            </span>
+            <span class="text-yellow-400 text-xl font-bold">
+              {item.price ? `$${item.price}` : null}
+            </span>
           </div>
+        ))}
+      </div>
 
-          <div class="text-white space-y-2">
-            <p class="text-xl">Servicio a Domicilio {contactInfo.delivery}</p>
-            <p>{contactInfo.hours}</p>
-            <p>{contactInfo.address}</p>
-            <a 
-              href={`https://wa.me/${contactInfo.whatsapp}`}
-              class="inline-flex items-center gap-2 text-green-500 text-xl mt-4"
+      <!-- Contact Information -->
+      <div class="space-y-4 text-center">
+        <div class="bg-purple-900 rounded-lg p-3 mb-4 relative group">
+          <p class="text-white font-bold">TRANSFERENCIA CLABE:</p>
+          <div class="relative">
+            <p id="clabeNumber" class="text-yellow-400 font-mono cursor-pointer">
+              {contactInfo.clabe}
+            </p>
+            <button 
+              id="copyButton"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Copiar CLABE"
             >
-              <i class="fab fa-whatsapp"></i>
-              {contactInfo.whatsapp}
-            </a>
+              <i class="fas fa-copy"></i>
+            </button>
+            <div 
+              id="copyMessage" 
+              class="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-green-500 text-white px-3 py-1 rounded-md text-sm opacity-0 transition-opacity"
+            >
+              ¡Copiado al portapapeles!
+            </div>
           </div>
+        </div>
+
+        <div class="text-white space-y-2">
+          <p class="text-xl">Servicio a Domicilio {contactInfo.delivery}</p>
+          <p>{contactInfo.hours}</p>
+          <p>{contactInfo.address}</p>
+          <a 
+            href={`https://wa.me/${contactInfo.whatsapp}`}
+            class="inline-flex items-center gap-2 text-green-500 text-xl mt-4"
+          >
+            <i class="fab fa-whatsapp"></i>
+            {contactInfo.whatsapp}
+          </a>
         </div>
       </div>
     </div>
+  </div>
 
-    <script>
-      // Copy functionality
-      const clabeNumber = document.getElementById('clabeNumber');
-      const copyButton = document.getElementById('copyButton');
-      const copyMessage = document.getElementById('copyMessage');
-      let timeoutId;
-    
-      function showCopyMessage() {
-        if (!copyMessage) return; // Early return si copyMessage es null
-        
-        copyMessage.style.opacity = '1';
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          if (copyMessage) { // Verificar nuevamente dentro del timeout
-            copyMessage.style.opacity = '0';
-          }
-        }, 2000);
-      }
-    
-      async function copyClabe() {
-        if (!clabeNumber) return; // Early return si clabeNumber es null
-        
-        const clabe = clabeNumber.textContent?.trim() || '';
-        try {
-          await navigator.clipboard.writeText(clabe);
-          showCopyMessage();
-        } catch (err) {
-          console.error('Error al copiar:', err);
+  <script>
+    // Copy functionality
+    const clabeNumber = document.getElementById('clabeNumber');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+    let timeoutId;
+  
+    function showCopyMessage() {
+      if (!copyMessage) return; // Early return si copyMessage es null
+      
+      copyMessage.style.opacity = '1';
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (copyMessage) { // Verificar nuevamente dentro del timeout
+          copyMessage.style.opacity = '0';
         }
+      }, 2000);
+    }
+  
+    async function copyClabe() {
+      if (!clabeNumber) return; // Early return si clabeNumber es null
+      
+      const clabe = clabeNumber.textContent?.trim() || '';
+      try {
+        await navigator.clipboard.writeText(clabe);
+        showCopyMessage();
+      } catch (err) {
+        console.error('Error al copiar:', err);
       }
-    
-      if (clabeNumber && copyButton) {
-        clabeNumber.addEventListener('click', copyClabe);
-        copyButton.addEventListener('click', (e) => {
-          e.stopPropagation();
-          copyClabe();
-        });
-      }
-    </script>
-  </body>
-</html>
+    }
+  
+    if (clabeNumber && copyButton) {
+      clabeNumber.addEventListener('click', copyClabe);
+      copyButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyClabe();
+      });
+    }
+  </script>
+</RestaurantLayout>
 
 <style>
   @tailwind base;
