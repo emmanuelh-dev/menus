@@ -1,37 +1,127 @@
 ---
 import { ViewTransitions } from "astro:transitions";
 
+// Interfaces for different schema types
+interface Address {
+    streetAddress?: string;
+    addressLocality?: string;
+    postalCode?: string;
+    addressCountry?: string;
+}
+
+interface MenuItem {
+    "@type": "MenuItem";
+    name: string;
+    description?: string;
+    price?: string;
+    image?: string;
+}
+
+interface MenuSection {
+    "@type": "MenuSection";
+    name: string;
+    description?: string;
+    items?: MenuItem[];
+}
+
+interface OpeningHoursSpecification {
+    "@type": "OpeningHoursSpecification";
+    dayOfWeek: string[];
+    opens: string;
+    closes: string;
+}
+
 export interface Props {
     title: string;
     description: string;
     image?: string;
     type?: "Restaurant" | "Menu" | "Event";
+    // Schema enrichment props
+    schemaEnrichment?: {
+        address?: Address;
+        telephone?: string;
+        email?: string;
+        priceRange?: string;
+        servesCuisine?: string | string[];
+        menu?: MenuSection[];
+        openingHours?: string | OpeningHoursSpecification[];
+        acceptsReservations?: boolean;
+        paymentAccepted?: string[];
+        currenciesAccepted?: string[];
+        aggregateRating?: {
+            ratingValue: number;
+            reviewCount: number;
+        };
+        awards?: string[];
+        suitableForDiet?: string[];
+    };
 }
 
-const { title, description, image, type = "Restaurant" } = Astro.props;
+const { 
+    title, 
+    description, 
+    image, 
+    type = "Restaurant",
+    schemaEnrichment = {}
+} = Astro.props;
 
-const schema = {
+// Base schema
+const schema: any = {
     "@context": "https://schema.org",
     "@type": type,
-    name: "Astoria La Bodega",
-    image: image ? new URL(image, Astro.url) : undefined,
+    name: title,
     description: description,
-    address: {
-        "@type": "PostalAddress",
-        streetAddress: "123 Calle Principal",
-        addressLocality: "Madrid",
-        postalCode: "28001",
-        addressCountry: "ES",
-    },
-    telephone: "+34 912 345 678",
-    servesCuisine: "Spanish, Mediterranean",
-    priceRange: "€€€",
-    openingHours: "Mo-Su 12:00-23:00",
 };
 
-if (type === "Menu") {
-    schema["@type"] = "Menu";
-    schema["hasMenuSection"] = [];
+// Add image if provided
+if (image) {
+    schema.image = new URL(image, Astro.url);
+}
+
+// Add address if provided
+if (schemaEnrichment.address) {
+    schema.address = {
+        "@type": "PostalAddress",
+        ...schemaEnrichment.address
+    };
+}
+
+// Add other optional properties
+if (schemaEnrichment.telephone) schema.telephone = schemaEnrichment.telephone;
+if (schemaEnrichment.email) schema.email = schemaEnrichment.email;
+if (schemaEnrichment.priceRange) schema.priceRange = schemaEnrichment.priceRange;
+if (schemaEnrichment.servesCuisine) schema.servesCuisine = schemaEnrichment.servesCuisine;
+if (schemaEnrichment.openingHours) schema.openingHours = schemaEnrichment.openingHours;
+if (schemaEnrichment.acceptsReservations) schema.acceptsReservations = schemaEnrichment.acceptsReservations;
+if (schemaEnrichment.paymentAccepted) schema.paymentAccepted = schemaEnrichment.paymentAccepted;
+if (schemaEnrichment.currenciesAccepted) schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
+
+// Add aggregate rating if provided
+if (schemaEnrichment.aggregateRating) {
+    schema.aggregateRating = {
+        "@type": "AggregateRating",
+        ...schemaEnrichment.aggregateRating
+    };
+}
+
+// Add menu sections if type is Menu and sections are provided
+if (type === "Menu" && schemaEnrichment.menu) {
+    schema.hasMenuSection = schemaEnrichment.menu;
+}
+
+// Add awards if provided
+if (schemaEnrichment.awards) {
+    schema.awards = schemaEnrichment.awards.map(award => ({
+        "@type": "MonetaryAmount",
+        name: award
+    }));
+}
+
+// Add dietary restrictions if provided
+if (schemaEnrichment.suitableForDiet) {
+    schema.suitableForDiet = schemaEnrichment.suitableForDiet.map(diet => 
+        `http://schema.org/${diet}`
+    );
 }
 
 const menuItems = [

@@ -1,0 +1,415 @@
+---
+import { Image } from "astro:assets";
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import placeholder from "../placeholder.svg";
+const restaurantData = {
+    name: "Antojitos Doña Guille",
+    description: "El Auténtico Sabor Tapatío",
+};
+
+const schemaEnrichment = {
+    address: {
+        streetAddress: "C. Tauro 1400A. Nueva Linda Visata, 67110",
+        addressLocality: "Guadalupe, N.L.",
+        postalCode: "67119",
+        addressCountry: "MX",
+    },
+    telephone: "+52  81 2732 3416",
+    email: "info@bysmax.com",
+    priceRange: "$$",
+    servesCuisine: [
+        "Tapatía",
+        "Asado",
+        "Flautas",
+        "Sopes",
+        "Pozole",
+        "Tostadas",
+    ],
+    openingHours: "Viernes-Domingo 12:00-23:00",
+    acceptsReservations: true,
+    paymentAccepted: ["Cash", "Credit Card"],
+    currenciesAccepted: ["MXN", "USD"],
+    aggregateRating: {
+        ratingValue: 4.5,
+        reviewCount: 123,
+    },
+};
+---
+
+<RestaurantLayout
+    title={restaurantData.name}
+    description={restaurantData.name}
+    schemaEnrichment={schemaEnrichment}
+>
+    <div class="bg-red-700 lg:space-y-10">
+        <div
+            class="w-full max-w-2xl mx-auto bg-gradient-to-b from-yellow-600 via-amber-700 to-amber-800 lg:p-8 text-white"
+        >
+            {/* Border decoration */}
+            <div class="border-8 border-double border-yellow-500/30 p-6">
+                {/* Logo section */}
+                <div class="flex justify-center mb-8">
+                    <div
+                        class="bg-white/90 rounded-full p-4 w-48 h-48 flex items-center justify-center"
+                    >
+                        <div class="text-amber-800 text-center">
+                            <h1 class="font-serif text-xl mb-1">
+                                Antojitos Doña Guille
+                            </h1>
+                            <p class="text-sm italic">
+                                El Auténtico Sabor Tapatío
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tacos section */}
+                <div class="mb-8">
+                    <h2 class="text-3xl font-serif text-center mb-4">TACOS</h2>
+                    <p class="text-center text-sm mb-4">
+                        Tacos en tortilla de harina o maíz
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-lg">
+                        <div class="flex justify-between">
+                            <span>Chicharrón</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Frijol adobado</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Picadillo</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>c/queso</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Rajas c/queso</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Birria</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Deshebrada</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Chile relleno de queso</span>
+                            <span>$20.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Asado</span>
+                            <span>$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Plato de birria</span>
+                            <span>$95.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Specialty items section */}
+                <div class="space-y-6 mb-8">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                            >
+                                <Image
+                                    src={placeholder}
+                                    alt="Tortas Ahogadas"
+                                    width={64}
+                                    height={64}
+                                    class="object-cover"
+                                />
+                            </div>
+                            <span class="text-2xl font-serif"
+                                >Tortas Ahogadas</span
+                            >
+                        </div>
+                        <span class="text-2xl">$90.00</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                            >
+                                <Image
+                                    src={placeholder}
+                                    alt="Tacos Dorados"
+                                    width={64}
+                                    height={64}
+                                    class="object-cover"
+                                />
+                            </div>
+                            <div>
+                                <span class="text-2xl font-serif"
+                                    >Tacos Dorados</span
+                                >
+                                <p class="text-sm">c/carne (5pz)</p>
+                            </div>
+                        </div>
+                        <span class="text-2xl">$100.00</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                            >
+                                <Image
+                                    src={placeholder}
+                                    alt="Pozole"
+                                    width={64}
+                                    height={64}
+                                    class="object-cover"
+                                />
+                            </div>
+                            <div>
+                                <span class="text-2xl font-serif">Pozole</span>
+                                <div class="space-y-1">
+                                    <p>Grande $110.00</p>
+                                    <p>Mediano $90.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Drinks section */}
+                <div class="grid grid-cols-2 gap-4 text-center mb-8">
+                    <div>
+                        <p class="text-lg">Agua embotellada</p>
+                        <p>$25.00 c/u</p>
+                    </div>
+                    <div>
+                        <p class="text-lg">Refrescos</p>
+                        <p>$25.00 c/u</p>
+                    </div>
+                </div>
+
+                {/* Hours section */}
+                <div class="text-center">
+                    <h2 class="text-3xl font-serif mb-2">Por las mañanas</h2>
+                    <p class="text-lg">Horario</p>
+                    <p>Sábado y Domingo 8:30 a.m. a 1:30 p.m.</p>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="w-full max-w-2xl mx-auto bg-gradient-to-b from-yellow-600 via-amber-700 to-amber-800 lg:p-8 text-white"
+        >
+            {/* Border decoration */}
+            <div class="border-8 border-double border-yellow-500/30 p-6">
+                {/* Logo section */}
+                <div class="flex justify-center mb-8">
+                    <div
+                        class="bg-white/90 rounded-full p-4 w-48 h-48 flex items-center justify-center"
+                    >
+                        <div class="text-amber-800 text-center">
+                            <h1 class="font-serif text-xl mb-1">
+                                Antojitos Doña Guille
+                            </h1>
+                            <p class="text-sm italic">
+                                El Auténtico Sabor Tapatic
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main dishes section */}
+                <div class="space-y-8 mb-8">
+                    {/* Enchiladas */}
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                            >
+                                <Image
+                                    src={placeholder}
+                                    alt="Enchiladas"
+                                    width={64}
+                                    height={64}
+                                    class="object-cover"
+                                />
+                            </div>
+                            <div>
+                                <span class="text-2xl font-serif"
+                                    >Enchiladas</span
+                                >
+                                <div class="space-y-1">
+                                    <p>c/3 $57.00</p>
+                                    <p>c/5 $95.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Huaraches */}
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                                >
+                                    <Image
+                                        src={placeholder}
+                                        alt="Huaraches"
+                                        width={64}
+                                        height={64}
+                                        class="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <span class="text-2xl font-serif"
+                                        >Huaraches</span
+                                    >
+                                    <p>$85.00 c/u</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-yellow-200">
+                            En tortilla de maíz (chicharrón, asado, picadillo y
+                            bistek)
+                        </p>
+                    </div>
+
+                    {/* Flautas and Sopes */}
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                                >
+                                    <Image
+                                        src={placeholder}
+                                        alt="Flautas"
+                                        width={64}
+                                        height={64}
+                                        class="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <span class="text-xl font-serif"
+                                        >Flautas</span
+                                    >
+                                    <p>$26.00 c/u</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                                >
+                                    <Image
+                                        src={placeholder}
+                                        alt="Sopes"
+                                        width={64}
+                                        height={64}
+                                        class="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <span class="text-xl font-serif">Sopes</span
+                                    >
+                                    <p>$24.00 c/u</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-yellow-200">
+                        (chicharrón, asado, picadillo y Frijol)
+                    </p>
+
+                    {/* Pozole section */}
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                                >
+                                    <Image
+                                        src={placeholder}
+                                        alt="Pozole"
+                                        width={64}
+                                        height={64}
+                                        class="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <span class="text-2xl font-serif"
+                                        >Pozole</span
+                                    >
+                                    <p class="text-sm text-yellow-200">
+                                        (estilo Guadalajara, pierna, cabeza y/o
+                                        mixto)
+                                    </p>
+                                    <div class="space-y-1">
+                                        <p>Grande $110.00</p>
+                                        <p>Mediano $90.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tostadas */}
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                                >
+                                    <Image
+                                        src={placeholder}
+                                        alt="Tostadas"
+                                        width={64}
+                                        height={64}
+                                        class="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <span class="text-2xl font-serif"
+                                        >Tostadas</span
+                                    >
+                                    <p class="text-sm text-yellow-200">
+                                        (pata, pierna y/o mixta)
+                                    </p>
+                                    <p>$55.00 c/u</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Drinks section */}
+                <div class="grid grid-cols-2 gap-4 text-center mb-8">
+                    <div>
+                        <p class="text-lg">Agua embotellada</p>
+                        <p>$25.00 c/u</p>
+                    </div>
+                    <div>
+                        <p class="text-lg">Refrescos</p>
+                        <p>$25.00 c/u</p>
+                    </div>
+                </div>
+
+                {/* Hours section */}
+                <div class="text-center">
+                    <h2 class="text-3xl font-serif mb-2">Por las noches</h2>
+                    <p class="text-lg">Horario</p>
+                    <p>Viernes y Sábado 7:30 p.m. a 11:30 p.m.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</RestaurantLayout>
