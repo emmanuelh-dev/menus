@@ -1,11 +1,19 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import menu from "./menu.jpg";
+import {
+	Utensils,
+	QrCode,
+	Smartphone,
+	Clock,
+	Zap,
+	ArrowRight,
+} from "lucide-react";
 
-import { Utensils, QrCode, Smartphone } from 'lucide-react';
-
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { Image } from "astro:assets";
 ---
 
 <!doctype html>
@@ -16,71 +24,164 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	<body>
 		<header class="px-4 lg:px-6 h-14 flex items-center mx-auto">
 			<a class="flex items-center justify-center" href="/">
-				<Utensils className="h-6 w-6" /> 
-			  <span class="sr-only">MenuDigital</span>
+				<Utensils className="h-6 w-6" />
+				<span class="sr-only">MenuDigital</span>
 			</a>
 			<nav class="ml-auto flex gap-4 sm:gap-6">
-			  <a class="text-sm font-medium hover:underline underline-offset-4" href="#">
-				Características
-			  </a>
-			  <a class="text-sm font-medium hover:underline underline-offset-4" href="#">
-				Precios
-			  </a>
-			  <a class="text-sm font-medium hover:underline underline-offset-4" href="#">
-				Contacto
-			  </a>
+				<a
+					class="text-sm font-medium hover:underline underline-offset-4"
+					href="#"
+				>
+					Características
+				</a>
+				<a
+					class="text-sm font-medium hover:underline underline-offset-4"
+					href="#"
+				>
+					Precios
+				</a>
+				<a
+					class="text-sm font-medium hover:underline underline-offset-4"
+					href="#"
+				>
+					Contacto
+				</a>
 			</nav>
-		  </header>
-		  <main class="flex-1">
+		</header>
+		<main class="flex-1">
 			<section class="mx-auto py-12 md:py-24 lg:py-32 xl:py-48">
-			  <div class="container px-4 md:px-6 mx-auto">
-				<div class="flex flex-col items-center space-y-4 text-center">
-				  <div class="space-y-2">
-					<h1 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-					  Menús digitales
-					</h1>
-					<p class="mx-auto max-w-[700px] text-gray-500 md:text-xl">
-					  Olvídate de los PDFs lentos y pesados. Accede a menús digitales instantáneos escaneando un simple código QR.
-					</p>
-				  </div>
-				  <div class="space-x-4">
-					<a href="/scan">
-					  <button>
-						Escanear menú
-					  </button>
-					</a>
-				  </div>
+				<div class="container px-4 md:px-6 mx-auto">
+					<div>
+						<div
+							class="flex flex-col items-center space-y-4 text-center"
+						>
+							<div class="space-y-2">
+								<h1
+									class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none"
+								>
+									Menús digitales
+								</h1>
+								<p
+									class="mx-auto max-w-[700px] text-neutral-500 md:text-xl"
+								>
+									Olvídate de los PDFs lentos y pesados.
+									Accede a menús digitales instantáneos
+									escaneando un simple código QR.
+								</p>
+							</div>
+							<div>
+								<a href="/scan">
+									<button>Escanear menú</button>
+								</a>
+							</div>
+						</div>
+					</div>
 				</div>
-			  </div>
 			</section>
-			<section class="mx-auto py-12 md:py-24 lg:py-32 bg-gray-100">
-			  <div class="px-4 md:px-6">
-				<div class="grid gap-10 sm:grid-cols-3">
-				  <div class="flex flex-col items-center space-y-3 text-center">
-					<QrCode className="h-12 w-12 text-primary" />
-										<h2 class="text-xl font-bold">Escanea</h2>
-					<p class="text-sm text-gray-500">
-					  Apunta tu cámara al código QR del restaurante
-					</p>
-				  </div>
-				  <div class="flex flex-col items-center space-y-3 text-center">
-					<Smartphone className="h-12 w-12 text-primary" />
-					<p class="text-sm text-gray-500">
-					  Navega por el menú digital de forma intuitiva
-					</p>
-				  </div>
-				  <div class="flex flex-col items-center space-y-3 text-center">
-					<Utensils className="h-12 w-12 text-primary" />
-					<h2 class="text-xl font-bold">Ordena</h2>
-					<p class="text-sm text-gray-500">
-					  Visualiza los platillos con fotos y descripciones detalladas
-					</p>
-				  </div>
+			<section class="mx-auto py-12 md:py-24 lg:py-32 bg-neutral-100">
+				<div class="px-4 md:px-6">
+					<div class="grid gap-10 sm:grid-cols-3">
+						<div
+							class="flex flex-col items-center space-y-3 text-center"
+						>
+							<QrCode className="h-12 w-12 text-primary" />
+							<h2 class="text-xl font-bold">Escanea</h2>
+							<p class="text-sm text-neutral-500">
+								Apunta tu cámara al código QR del restaurante
+							</p>
+						</div>
+						<div
+							class="flex flex-col items-center space-y-3 text-center"
+						>
+							<Smartphone className="h-12 w-12 text-primary" />
+							<h2 class="text-xl font-bold">Explora</h2>
+							<p class="text-sm text-neutral-500">
+								Navega por el menú digital de forma intuitiva
+							</p>
+						</div>
+						<div
+							class="flex flex-col items-center space-y-3 text-center"
+						>
+							<Utensils className="h-12 w-12 text-primary" />
+							<h2 class="text-xl font-bold">Ordena</h2>
+							<p class="text-sm text-neutral-500">
+								Visualiza los platillos con fotos y
+								descripciones detalladas
+							</p>
+						</div>
+					</div>
 				</div>
-			  </div>
 			</section>
-		  </main>
-
+			<section class="py-12 md:py-24 lg:py-32 text-left">
+				<div class="text-center">
+					<h2 class="text-3xl font-bold tracking-tighter md:text-4xl">
+						¿Por qué elegir nuestros menús digitales?
+					</h2>
+					<p class="max-w-[700px] mx-auto text-gray-500 md:text-xl">
+						Los PDFs descargables son cosa del pasado. Atrasan los
+						tiempos de carga, ocupan espacio en los dispositivos y
+						son difíciles de actualizar.
+					</p>
+				</div>
+				<div class="container mx-auto mt-4">
+					<div class="flex flex-col-reverse lg:flex-row">
+						<div class="flex flex-col lg:w-1/2">
+							<div class="space-y-20">
+								<div
+									class="bg-white py-12 flex flex-col items-center space-y-3 text-center sticky top-0 z-10"
+								>
+									<Zap className="h-10 w-10 text-primary" />
+									<h2 class="text-2xl font-bold">
+										Carga ultrarrápida
+									</h2>
+									<p class="text-xl text-balance max-w-[500px] text-gray-500">
+										Nuestros menús digitales cargan en
+										milisegundos, mejorando la experiencia
+										del usuario.
+									</p>
+								</div>
+								<div
+									class="bg-white py-12 flex flex-col items-center space-y-3 text-center sticky top-0 z-10"
+								>
+									<Smartphone
+										className="h-10 w-10 text-primary"
+									/>
+									<h2 class="text-2xl font-bold">
+										Diseño responsivo
+									</h2>
+									<p class="text-xl text-balance max-w-[500px] text-gray-500">
+										Se adapta perfectamente a cualquier
+										dispositivo, desde móviles hasta
+										tablets.
+									</p>
+								</div>
+								<div
+									class="bg-white py-12 flex flex-col items-center space-y-3 text-center sticky top-0 z-10"
+								>
+									<Clock className="h-10 w-10 text-primary" />
+									<h2 class="text-2xl font-bold">
+										Actualización en tiempo real
+									</h2>
+									<p class="text-xl text-balance max-w-[500px] text-gray-500">
+										Cambia precios o platos al instante, sin
+										necesidad de recargar o descargar nuevos
+										PDFs.
+									</p>
+								</div>
+							</div>
+						</div>
+						<Image
+							class="w-full lg:w-1/2"
+							src={menu}
+							alt="menú de café"
+						/>
+					</div>
+				</div>
+			</section>
+			<section class="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+				<div class="px-4 md:px-6"></div>
+			</section>
+		</main>
 		<Footer />
 	</body>
 </html>
