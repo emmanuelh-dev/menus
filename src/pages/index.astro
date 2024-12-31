@@ -2,6 +2,9 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+import { Utensils, QrCode, Smartphone } from 'lucide-react';
+
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
 
@@ -11,40 +14,73 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
+		<header class="px-4 lg:px-6 h-14 flex items-center mx-auto">
+			<a class="flex items-center justify-center" href="/">
+				<Utensils className="h-6 w-6" /> 
+			  <span class="sr-only">MenuDigital</span>
+			</a>
+			<nav class="ml-auto flex gap-4 sm:gap-6">
+			  <a class="text-sm font-medium hover:underline underline-offset-4" href="#">
+				Características
+			  </a>
+			  <a class="text-sm font-medium hover:underline underline-offset-4" href="#">
+				Precios
+			  </a>
+			  <a class="text-sm font-medium hover:underline underline-offset-4" href="#">
+				Contacto
+			  </a>
+			</nav>
+		  </header>
+		  <main class="flex-1">
+			<section class="mx-auto py-12 md:py-24 lg:py-32 xl:py-48">
+			  <div class="container px-4 md:px-6 mx-auto">
+				<div class="flex flex-col items-center space-y-4 text-center">
+				  <div class="space-y-2">
+					<h1 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+					  Menús digitales inteligentes
+					</h1>
+					<p class="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+					  Olvídate de los PDFs lentos y pesados. Accede a menús digitales instantáneos escaneando un simple código QR.
+					</p>
+				  </div>
+				  <div class="space-x-4">
+					<a href="/scan">
+					  <button>
+						Escanear menú
+					  </button>
+					</a>
+				  </div>
+				</div>
+			  </div>
+			</section>
+			<section class="mx-auto py-12 md:py-24 lg:py-32 bg-gray-100">
+			  <div class="px-4 md:px-6">
+				<div class="grid gap-10 sm:grid-cols-3">
+				  <div class="flex flex-col items-center space-y-3 text-center">
+					<QrCode className="h-12 w-12 text-primary" />
+										<h2 class="text-xl font-bold">Escanea</h2>
+					<p class="text-sm text-gray-500">
+					  Apunta tu cámara al código QR del restaurante
+					</p>
+				  </div>
+				  <div class="flex flex-col items-center space-y-3 text-center">
+					<Smartphone className="h-12 w-12 text-primary" />
+					<p class="text-sm text-gray-500">
+					  Navega por el menú digital de forma intuitiva
+					</p>
+				  </div>
+				  <div class="flex flex-col items-center space-y-3 text-center">
+					<Utensils className="h-12 w-12 text-primary" />
+					<h2 class="text-xl font-bold">Ordena</h2>
+					<p class="text-sm text-gray-500">
+					  Visualiza los platillos con fotos y descripciones detalladas
+					</p>
+				  </div>
+				</div>
+			  </div>
+			</section>
+		  </main>
+
 		<Footer />
 	</body>
 </html>
