@@ -15,7 +15,7 @@ const navItems = [
 ---
 
 <header
-    class={`${backgroundColor} ${textWhite ? "text-white" : "text-blacks"}`}
+    class={`${backgroundColor} ${textWhite ? "text-white" : "text-black"}`}
 >
     <div class="lg:max-w-[85%] mx-auto">
         <div class="flex p-4 items-center sticky top-0 z-10"> 
@@ -32,7 +32,7 @@ const navItems = [
             </button>
             <nav
                 id="mobileNav"
-                class=`hidden lg:flex lg:ml-auto lg:gap-6 fixed lg:relative top-14 lg:top-0 left-0 right-0 ${backgroundColor} ${textWhite ? 'text-white' : 'text-black'} lg:bg-transparent p-4 lg:p-0 shadow-lg lg:shadow-none transform transition-all duration-300 ease-in-out translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100`
+                class=`hidden lg:flex lg:ml-auto lg:gap-6 fixed lg:relative max-sm:top-14 left-0 right-0 ${backgroundColor} ${textWhite ? 'text-white' : 'text-black'} lg:bg-transparent p-4 lg:p-0 shadow-lg lg:shadow-none transform transition-all duration-300 ease-in-out translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100`
             >
                 {
                     navItems.map((item) => (
@@ -83,9 +83,3 @@ const navItems = [
         }
     });
 </script>
-
-<style>
-    body {
-        padding-top: 3.5rem;
-    }
-</style>
