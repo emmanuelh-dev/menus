@@ -3,6 +3,7 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import menu from "./menu.jpg";
+import main_menu from "./phone_with_menu.png";
 import {
 	Utensils,
 	QrCode,
@@ -29,30 +30,35 @@ description={restaurantData.name}
 >
 	<div>
 		<main class="flex-1">
-			<section class="mx-auto py-12 md:py-24 lg:py-32 xl:py-48">
+			<section class="mx-auto py-12 md:py-24 ">
 				<div class="container px-4 md:px-6 mx-auto">
 					<div>
 						<div
 							class="flex flex-col items-center space-y-4 text-center"
 						>
-							<div class="space-y-2">
+							<Image src={main_menu} alt="Menú de teléfono con menú digital" class="sticky top-0 lg:top-10 z-0" />
+							<div class="space-y-2 max-w-[700px] mx-auto sticky top-0 lg:top-10 z-10 bg-white p-4 lg:p-8 rounded-lg">
 								<h1
-									class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none"
+									class="text-5xl lg:text-6xl font-semibold tracking-tighter sm:text-4xl md:text-5xl py-4 text-balance"
 								>
-									Menús digitales
+									Menús que crean experiencias
 								</h1>
 								<p
-									class="mx-auto max-w-[700px] text-neutral-500 md:text-xl text-balance"
+									class="mx-auto max-w-[700px] text-neutral-500 md:text-xl text-balance py-4"
 								>
 									Olvídate de los PDFs lentos y pesados.
 									Accede a menús digitales instantáneos
 									escaneando un simple código QR.
 								</p>
-							</div>
-							<div>
-								<a href="/scan">
-									<button>Escanear menú</button>
-								</a>
+								<a
+								href="https://forms.gle/Y4ZFXyS4KhsoQT5D6"
+								class="inline-block text-black hover:underline hover:text-black/80"
+							>
+								<span class="flex items-center">
+									Obtener más información
+									<ArrowRight className="ml-2" />
+								</span>
+							</a>
 							</div>
 						</div>
 					</div>
