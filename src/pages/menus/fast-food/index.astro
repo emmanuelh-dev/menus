@@ -1,0 +1,112 @@
+---
+import { Image } from "astro:assets";
+import hoja from "./hoja.png";
+import pizza from "./pizza.png";
+
+---
+
+<div class="min-h-screen bg-zinc-950 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat p-4 md:p-8">
+    <div class="mx-auto max-w-3xl">
+        <div class="mx-auto max-w-3xl">
+            {/* Orange brush stroke top */}
+            <div class="relative">
+              <Image
+                src={hoja}
+                alt=""
+                width={200}
+                height={100}
+                class="absolute right-[50px] -top-10 rotate-[70deg] opacity-80 blur-[2px]"
+              />
+            </div>
+      
+            {/* Main Content */}
+            <div class="relative z-10 p-6">
+              {/* Title */}
+              <div class="mb-16 text-center">
+                <h1 class="text-6xl font-black tracking-wider text-white [text-shadow:_2px_2px_4px_rgb(0_0_0_/_80%)]">
+                  FAST FOOD
+                  <span class="mt-2 block text-7xl">MENU</span>
+                </h1>
+              </div>
+      
+              {/* Hamburger Section */}
+              <div class="mb-16">
+                <div class="mb-8 flex items-center justify-between">
+                  <h2 class="text-4xl font-black text-orange-500">HAMBURGER</h2>
+                </div>
+      
+                <div class="space-y-6">
+                  {[
+                    { name: "Cheeseburger", price: "16.00" },
+                    { name: "Bacon Burger", price: "12.50" },
+                    { name: "Veggie Burger", price: "14.00" },
+                    { name: "Chicken Burger", price: "13.50" },
+                  ].map((item) => (
+                    <div class="flex items-center text-white">
+                      <span class="text-2xl font-bold">{item.name}</span>
+                      <div class="mx-4 flex-1 border-b-2 border-dashed border-gray-600" />
+                      <span class="text-2xl font-bold text-orange-500">${item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+      
+              {/* Featured Image Section */}
+              <div class="relative mb-16">
+                {/* Featured dish image */}
+                <div class="relative flex justify-center">
+                  <Image
+                    src={pizza}
+                    alt="Featured dish"
+                    width={400}
+                    height={400}
+                    class=" w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              <div class="relative">
+                <Image
+                  src={hoja}
+                  alt=""
+                  width={200}
+                  height={100}
+                  class="absolute left-[50px] -top-10 rotate-[70deg] opacity-80 blur-[2px]"
+                />
+              </div>
+              {/* Burrito Section */}
+              <div class="relative">
+                <div class="mb-8 flex items-center justify-between">
+                  <h2 class="text-4xl font-black text-orange-500">BURRITO</h2>
+                </div>
+      
+                <div class="space-y-6">
+                  {[
+                    { name: "Beef Burrito", price: "14.00" },
+                    { name: "Chicken Burrito", price: "13.50" },
+                    { name: "Carnitas Burrito", price: "15.00" },
+                    { name: "Shrimp Burrito", price: "13.50" },
+                  ].map((item) => (
+                    <div class="flex items-center text-white">
+                      <span class="text-2xl font-bold">{item.name}</span>
+                      <div class="mx-4 flex-1 border-b-2 border-dashed border-gray-600" />
+                      <span class="text-2xl font-bold text-orange-500">${item.price}</span>
+                    </div>
+                  ))}
+                </div>
+      
+                {/* Orange brush stroke bottom */}
+                <!-- <div class="absolute -bottom-20 -right-10">
+                  <Image
+                    src="/placeholder.svg?height=200&width=400"
+                    alt=""
+                    width={400}
+                    height={200}
+                    class="-rotate-45 opacity-80"
+                  />
+                </div> -->
+              </div>
+            </div>
+          </div>
+    </div>
+    
+  </div>
