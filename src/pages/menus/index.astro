@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import tacos from './quesabirrias.laregia.mty/tacos.jpg';
 import pizza from './fast-food/pizza.png';
 import antojitosdonaguillelogo from './antojitosdonaguille/logo.jpg';
+import alchemycoffeelablogo from './alchemycoffeelab/espuma.jpg';
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
@@ -19,7 +20,6 @@ interface Restaurant {
     restaurantLink: string;
     industry: Industry;
     type: BusinessType;
-    capacity: Capacity;
 }
 
 // Add filter options with type safety
@@ -36,7 +36,6 @@ const case_studies: Restaurant[] = [
         link: "/menus/quesabirrias.laregia.mty",
         industry: "Restaurante",
         type: "Casual",
-        capacity: "51-100"
     },
     {
         name: "FastFood",
@@ -46,7 +45,6 @@ const case_studies: Restaurant[] = [
         link: "/menus/fast-food",
         industry: "Restaurante",
         type: "Casual",
-        capacity: "0-50"
     },
     {
         name: "Antojitos Doña Guille",
@@ -56,8 +54,16 @@ const case_studies: Restaurant[] = [
         link: "/menus/antojitosdonaguille",
         industry: "Bar",
         type: "Formal",
-        capacity: "101-200"
     },
+    {
+        name: "AlchemistCoffeLab",
+        description: "AlchemistCoffeLab",
+        restaurantLink: "/menus/alchemycoffeelab",
+        image: alchemycoffeelablogo,
+        link: "/menus/alchemycoffeelab",
+        industry: "Café",
+        type: "Formal",
+    }
 ];
 ---
 
@@ -95,7 +101,6 @@ const case_studies: Restaurant[] = [
                         class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
                         data-industry={study.industry}
                         data-type={study.type}
-                        data-capacity={study.capacity}
                     >
                         <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
                             <Image
