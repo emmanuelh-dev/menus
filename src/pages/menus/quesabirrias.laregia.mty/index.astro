@@ -122,12 +122,40 @@ const imagenes = [
     },
 
 ];
+const schemaEnrichment = {
+    address: {
+        streetAddress: "C. Tauro 550. Nueva Linda Vista, 67110",
+        addressLocality: "Guadalupe, N.L.",
+        postalCode: "67119",
+        addressCountry: "MX",
+    },
+    telephone: "+52  81 2732 3416",
+    email: "info@bysmax.com",
+    priceRange: "$$",
+    servesCuisine: [
+        "Tapatía",
+        "Asado",
+        "Flautas",
+        "Sopes",
+        "Pozole",
+        "Tostadas",
+    ],
+    openingHours: "Viernes-Domingo 12:00-23:00",
+    acceptsReservations: true,
+    paymentAccepted: ["Cash", "Credit Card"],
+    currenciesAccepted: ["MXN", "USD"],
+    aggregateRating: {
+        ratingValue: 4.5,
+        reviewCount: 123,
+    },
+};
 
 ---
 
 <RestaurantLayout
     title={restaurantData.name}
     description={restaurantData.description}
+    schemaEnrichment={schemaEnrichment}
     textWhite={false}
     backgroundColor="bg-[#f6f6f6]"
 >

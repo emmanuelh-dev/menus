@@ -2,11 +2,17 @@
 import { Image } from "astro:assets";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import placeholder from "../placeholder.svg";
+import logo from "./logo.jpg";
+import logoPng from "./logo.png";
 import pozole from "./pozole.jpg";
 import flauta from "./flauta.jpg";
+import tacosDorados from "./tacosDorados.jpg";
+import enchiladas from "./enchiladas.jpg";
+import tostadas from "./tostadas.jpg";
 import menu_dia from "./menu-dia.jpg";
 import menu_noche from "./menu-noche.jpg";
 import Gallery from "../../../components/Gallery.astro";
+
 const restaurantData = {
     name: "Antojitos Doña Guille",
     description: "El Auténtico Sabor Tapatío",
@@ -41,6 +47,7 @@ const schemaEnrichment = {
 };
 
 const imagenes = [
+    { src: logo, alt: "Logo", title: "Logo" },
     {
         src: menu_dia,
         alt: "Menu Dia",
@@ -56,8 +63,27 @@ const imagenes = [
         alt: "Pozole",
         title: "Pozole",
     },
+    {
+        src: flauta,
+        alt: "Flauta",
+        title: "Flauta",
+    },
+    {
+        src: tacosDorados,
+        alt: "Tacos Dorados",
+        title: "Tacos Dorados",
+    },
+    {
+        src: enchiladas,
+        alt: "Enchiladas",
+        title: "Enchiladas",
+    },
+    {
+        src: tostadas,
+        alt: "Tostadas",
+        title: "Tostadas",
+    }
 ];
-
 ---
 
 <RestaurantLayout
@@ -65,7 +91,7 @@ const imagenes = [
     description={restaurantData.name}
     schemaEnrichment={schemaEnrichment}
     textWhite={true}
-    backgroundColor="bg-[#fcc02a]" 
+    backgroundColor="bg-[#fcc02a]"
 >
     <div class="bg-red-700 lg:space-y-10">
         <div
@@ -74,19 +100,8 @@ const imagenes = [
             {/* Border decoration */}
             <div class="border-8 border-double border-yellow-500/30 p-6">
                 {/* Logo section */}
-                <div class="flex justify-center mb-8">
-                    <div
-                        class="bg-white/90 rounded-full p-4 w-48 h-48 flex items-center justify-center"
-                    >
-                        <div class="text-amber-800 text-center">
-                            <h1 class="font-serif text-xl mb-1">
-                                Antojitos Doña Guille
-                            </h1>
-                            <p class="text-sm italic">
-                                El Auténtico Sabor Tapatío
-                            </p>
-                        </div>
-                    </div>
+                <div class="flex justify-center">
+                    <Image src={logoPng} alt="Logo" width={250} height={250} />
                 </div>
 
                 {/* Tacos section */}
@@ -168,7 +183,7 @@ const imagenes = [
                                 class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                             >
                                 <Image
-                                    src={placeholder}
+                                    src={tacosDorados}
                                     alt="Tacos Dorados"
                                     width={64}
                                     height={64}
@@ -187,7 +202,8 @@ const imagenes = [
 
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                            <div
+                                class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                             >
                                 <Image
                                     src={pozole}
@@ -235,19 +251,8 @@ const imagenes = [
             {/* Border decoration */}
             <div class="border-8 border-double border-yellow-500/30 p-6">
                 {/* Logo section */}
-                <div class="flex justify-center mb-8">
-                    <div
-                        class="bg-white/90 rounded-full p-4 w-48 h-48 flex items-center justify-center"
-                    >
-                        <div class="text-amber-800 text-center">
-                            <h1 class="font-serif text-xl mb-1">
-                                Antojitos Doña Guille
-                            </h1>
-                            <p class="text-sm italic">
-                                El Auténtico Sabor Tapatic
-                            </p>
-                        </div>
-                    </div>
+                <div class="flex justify-center">
+                    <Image src={logoPng} alt="Logo" width={250} height={250} />
                 </div>
 
                 {/* Main dishes section */}
@@ -259,7 +264,7 @@ const imagenes = [
                                 class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                             >
                                 <Image
-                                    src={placeholder}
+                                    src={enchiladas}
                                     alt="Enchiladas"
                                     width={64}
                                     height={64}
@@ -362,13 +367,13 @@ const imagenes = [
                                 <div
                                     class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                                 >
-                                <Image
-                                    src={pozole}
-                                    alt="Pozole"
-                                    width={64}
-                                    height={64}
-                                    class="object-cover object-bottom"
-                                />
+                                    <Image
+                                        src={pozole}
+                                        alt="Pozole"
+                                        width={64}
+                                        height={64}
+                                        class="object-cover object-bottom"
+                                    />
                                 </div>
                                 <div>
                                     <span class="text-2xl font-serif"
@@ -395,7 +400,7 @@ const imagenes = [
                                     class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                                 >
                                     <Image
-                                        src={placeholder}
+                                        src={tostadas}
                                         alt="Tostadas"
                                         width={64}
                                         height={64}
@@ -438,7 +443,9 @@ const imagenes = [
         </div>
         <div class="text-center max-w-5xl mx-auto">
             {/* Image gallery */}
-            <h2 class="text-5xl py-6 text-white font-serif mb-2 font-bold">Galeria</h2>
+            <h2 class="text-5xl py-6 text-white font-serif mb-2 font-bold">
+                Galeria
+            </h2>
             <Gallery images={imagenes} />
         </div>
     </div>
