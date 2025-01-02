@@ -1,7 +1,215 @@
 ---
+import { Image } from "astro:assets";
+import main_menu from "../phone_with_menu.png";
+import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import { ArrowRight } from "lucide-react";
+
+type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
+type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
+type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
+
+interface Restaurant {
+    name: string;
+    description: string;
+    image: ImageMetadata;
+    link: string;
+    industry: Industry;
+    type: BusinessType;
+    capacity: Capacity;
+}
+
+// Add filter options with type safety
+const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"];
+const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet"];
+const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
+
+const case_studies: Restaurant[] = [
+    {
+        name: "MenuDigital",
+        description: "¡Disfruta de nuestros menús digitales!",
+        image: main_menu,
+        link: "/menus/astoria",
+        industry: "Restaurante",
+        type: "Casual",
+        capacity: "51-100"
+    },
+    {
+        name: "MenuDigital",
+        description: "¡Disfruta de nuestros menús digitales!",
+        image: main_menu,
+        link: "/menus/astoria",
+        industry: "Café",
+        type: "Casual",
+        capacity: "0-50"
+    },
+    {
+        name: "MenuDigital",
+        description: "¡Disfruta de nuestros menús digitales!",
+        image: main_menu,
+        link: "/menus/astoria",
+        industry: "Bar",
+        type: "Formal",
+        capacity: "101-200"
+    },
+];
 ---
 
-<div>
+<RestaurantLayout title="Menus" description="Menus">
+    <div class="bg-gradient-to-b from-gray-50 to-white min-h-screen py-16">
+        <div class="max-w-[85%] mx-auto">
+            <h2 class="text-4xl font-bold text-gray-900 mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                Los restaurantes que usan nuestros menús.
+            </h2>
 
-    Hola mundo
-</div>
+            <!-- Filtros -->
+            <div class="mb-8 flex flex-wrap gap-4 justify-center">
+                <select 
+                    id="industry-filter" 
+                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                >
+                    {industries.map((industry) => (
+                        <option value={industry}>{industry}</option>
+                    ))}
+                </select>
+
+                <select 
+                    id="type-filter" 
+                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                >
+                    {types.map((type) => (
+                        <option value={type}>{type}</option>
+                    ))}
+                </select>
+
+                <select 
+                    id="capacity-filter" 
+                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+                >
+                    {capacities.map((capacity) => (
+                        <option value={capacity}>{capacity}</option>
+                    ))}
+                </select>
+            </div>
+
+            <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+                {case_studies.map((study) => (
+                    <div 
+                        class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
+                        data-industry={study.industry}
+                        data-type={study.type}
+                        data-capacity={study.capacity}
+                    >
+                        <div class="aspect-video relative overflow-hidden rounded-lg mb-6">
+                            <Image
+                                src={study.image}
+                                alt={study.name}
+                                class="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                            {study.name}
+                        </h3>
+                        <p class="text-gray-600">{study.description}</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.industry}</span>
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.type}</span>
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.capacity} personas</span>
+                        </div>
+                        <a href={study.link} class="group mt-4 block">
+                            <span class="flex items-center justify-between">
+                                Leer la historia completa
+                                <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
+                                    <ArrowRight />
+                                </div>
+                            </span>
+                        </a>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+</RestaurantLayout>
+
+<script>
+    type FilterValue = string | null;
+
+    interface HTMLElementWithDataset extends HTMLElement {
+        dataset: {
+            industry: string;
+            type: string;
+            capacity: string;
+        };
+    }
+
+    class RestaurantFilter {
+        private industryFilter: HTMLSelectElement;
+        private typeFilter: HTMLSelectElement;
+        private capacityFilter: HTMLSelectElement;
+
+        constructor() {
+            // Initialize with null checks
+            const industryElement = document.getElementById('industry-filter');
+            const typeElement = document.getElementById('type-filter');
+            const capacityElement = document.getElementById('capacity-filter');
+
+            if (!industryElement || !typeElement || !capacityElement) {
+                throw new Error('Required filter elements not found');
+            }
+
+            this.industryFilter = industryElement as HTMLSelectElement;
+            this.typeFilter = typeElement as HTMLSelectElement;
+            this.capacityFilter = capacityElement as HTMLSelectElement;
+
+            this.initializeEventListeners();
+        }
+
+        private initializeEventListeners(): void {
+            this.industryFilter.addEventListener('change', () => this.filterRestaurants());
+            this.typeFilter.addEventListener('change', () => this.filterRestaurants());
+            this.capacityFilter.addEventListener('change', () => this.filterRestaurants());
+        }
+
+        private getFilterValue(element: HTMLSelectElement): FilterValue {
+            return element.value || null;
+        }
+
+        private filterRestaurants(): void {
+            const industryValue = this.getFilterValue(this.industryFilter);
+            const typeValue = this.getFilterValue(this.typeFilter);
+            const capacityValue = this.getFilterValue(this.capacityFilter);
+
+            const restaurants = document.querySelectorAll('.restaurant-card');
+
+            restaurants.forEach((restaurant) => {
+                try {
+                    const element = restaurant as HTMLElementWithDataset;
+                    const industry = element.dataset.industry;
+                    const type = element.dataset.type;
+                    const capacity = element.dataset.capacity;
+
+                    if (!industry || !type || !capacity) {
+                        console.error('Missing data attributes on restaurant card');
+                        return;
+                    }
+
+                    const matchIndustry = industryValue === 'Todos' || industry === industryValue;
+                    const matchType = typeValue === 'Todos' || type === typeValue;
+                    const matchCapacity = capacityValue === 'Todos' || capacity === capacityValue;
+
+                    element.style.display = (matchIndustry && matchType && matchCapacity) ? 'block' : 'none';
+                } catch (error) {
+                    console.error('Error filtering restaurant:', error);
+                }
+            });
+        }
+    }
+
+    // Initialize the filter when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            new RestaurantFilter();
+        } catch (error) {
+            console.error('Failed to initialize restaurant filter:', error);
+        }
+    });
+</script>

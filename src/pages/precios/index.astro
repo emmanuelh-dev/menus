@@ -1,0 +1,78 @@
+---
+import { ArrowRight, X } from "lucide-react";
+import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+
+const comparativeFeatures = [
+  { name: "Menú digital", free: "Básico", pro: "Avanzado", enterprise: "Personalizado" },
+  { name: "Productos", free: "Ilimitados", pro: "Ilimitados", enterprise: "Ilimitados" },
+  { name: "Soporte", free: "Sin soporte", pro: "Prioritario", enterprise: "Dedicado 24/7" },
+  { name: "Dominio propio", free: "No", pro: "Sí", enterprise: "Sí" },
+  { name: "Análisis de popularidad", free: "No", pro: "Sí", enterprise: "Sí" },
+  { name: "Diseño personalizado", free: "No", pro: "No", enterprise: "Sí" },
+  { name: "Fotografía profesional", free: "No", pro: "No", enterprise: "20 platillos" },
+  { name: "Segmentación por sucursal", free: "No", pro: "No", enterprise: "Sí" },
+  { name: "Integración POS", free: "No", pro: "No", enterprise: "Sí" },
+  { name: "API personalizada", free: "No", pro: "No", enterprise: "Sí" },
+  { name: "Solicitud de funciones", free: "No", pro: "No", enterprise: "Sí" },
+]
+---
+<RestaurantLayout
+title="Precios y características de MenuDigital"
+description="Precios y características de MenuDigital"
+textWhite={false}
+>
+    <div class="mt-24 max-w-[85%] mx-auto">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">
+          Comparativa de planes
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th class="w-[200px] p-4 text-left">Característica</th>
+                <th class="p-4 text-center">Gratis</th>
+                <th class="p-4 text-center">Pro</th>
+                <th class="p-4 text-center">Empresarial</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparativeFeatures.map((feature) => (
+                <tr class="border-b border-gray-200 hover:bg-gray-100 last:border-b-0"> 
+                  <td class="font-medium p-4">{feature.name}</td>
+                  <td class="p-4 text-center">{feature.free === "No" ? <X className="text-red-500 mx-auto" /> : feature.free}</td>
+                  <td class="p-4 text-center">{feature.pro === "No" ? <X className="text-red-500 mx-auto" /> : feature.pro}</td>
+                  <td class="p-4 text-center">{feature.enterprise === "No" ? <X className="text-red-500 mx-auto" /> : feature.enterprise}</td>
+                </tr>
+              ))}
+              <tr>
+                <td></td>
+                <td class="p-4 text-center justify-center">
+                    <a href="/registro">
+                        <span class="flex items-center justify-center">
+                        Comenzar Ahora
+                        <ArrowRight className="ml-2" />
+                        </span>
+                    </a>
+                </td>
+                <td class="p-4 text-center">
+                    <a href="/registro">
+                        <span class="flex items-center justify-center">
+                            Comenzar Ahora
+                            <ArrowRight className="ml-2" />
+                        </span>
+                    </a>
+                </td>
+                <td class="p-4 text-center">
+                    <a href="/registro">
+                        <span class="flex items-center justify-center">
+                            Comenzar Ahora
+                            <ArrowRight className="ml-2" />
+                        </span>
+                    </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+</RestaurantLayout>
