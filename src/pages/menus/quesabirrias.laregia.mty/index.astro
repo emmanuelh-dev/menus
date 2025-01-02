@@ -1,0 +1,186 @@
+---
+import Gallery from "../../../components/Gallery.astro";
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import MenuItem from "./MenuItem.astro";
+import tacos from "./tacos.jpg";
+
+const restaurantData = {
+    name: "Quesabirrias “La Regia”",
+    description: "Tacos, empalmes, quesadillas, birrias y mas...",
+};
+
+const menuItems = [
+    {
+        title: "Menú Principal",
+        items: [
+            {
+                title: "TACO DE BIRRIA",
+                price: "30.00",
+                description:
+                    "El clásico taco de birria de res, puede ser en tortilla de maíz o harina.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "QUESABIRRIA",
+                price: "35.00",
+                description:
+                    "Deliciosa quesadilla de birria en tortilla de harina o maíz y queso gratinado.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "TOSTADA DE BIRRIA",
+                price: "30.00",
+                description:
+                    "Crujiente tostada de maíz con birria de res y queso.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "CONSOMÉ",
+                prices: [
+                    { size: "CH", value: "15.00" },
+                    { size: "GDE", value: "20.00" },
+                ],
+                description:
+                    "Delicioso consomé de birria para sumergir tu taco, puro caldo.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "LITRO - 1/2 LITRO",
+                prices: [{ value: "100.00" }, { value: "190.00" }],
+                description: "Consomé con trozos de birria.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "TORTA DE BIRRIA",
+                price: "120.00",
+                description: "Pan francés acompañado de birria y queso.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "EMPALME DE BIRRIA",
+                price: "60.00",
+                description:
+                    "Dos tortillas empalmadas con birria y queso, puede ser en tortilla de maíz o harina.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+            {
+                title: "GREÑUDA",
+                price: "150.00",
+                description:
+                    "1 litro de consomé con maruchan, birria y queso gratinado.",
+                note: "*Se sirve con cebolla morada y cilantro.",
+            },
+        ],
+    },
+    {
+        title: "COMBOS",
+        items: [
+            {
+                title: "COMBO 1",
+                price: "130.00",
+                description:
+                    "3 quesabirrias, 1 consomé chico y 1 refresco de tu elección.",
+            },
+            {
+                title: "COMBO 2",
+                price: "190.00",
+                description:
+                    "2 tacos de birria, 2 empalmes y 2 consomés chicos.",
+            },
+            {
+                title: "COMBO 3",
+                price: "390.00",
+                description:
+                    "9 quesabirrias, 3 consomés chicos y 1 empalme en harina o maíz.",
+            },
+        ],
+    },
+    {
+        title: "BEBIDAS",
+        items: [
+            {
+                title: "REFRESCO",
+                price: "25.00",
+            },
+            {
+                title: "AGUA",
+                price: "10.00",
+            },
+            {
+                title: "CAFÉ",
+                price: "15.00",
+            },
+        ],
+    },
+];
+
+const imagenes = [
+    {
+        src: tacos,
+        alt: "Menu Dia",
+        title: "Menu Dia",
+    },
+
+];
+
+---
+
+<RestaurantLayout
+    title={restaurantData.name}
+    description={restaurantData.description}
+    textWhite={false}
+    backgroundColor="bg-[#f6f6f6]"
+>
+    <div class="bg-[#f6f6f6] min-h-screen">
+        <div class="max-w-4xl mx-auto px-4">
+            <header class="text-center mb-12">
+                <!-- <img
+                    src="/logo.svg"
+                    alt="Quesabirrias La Regia"
+                    class="max-w-[300px] mx-auto"
+                /> -->
+                <h1 class="text-6xl font-oswald">
+                    {restaurantData.name}
+                </h1>
+            </header>
+            <div class="grid md:grid-cols-2 gap-8">
+                {
+                    menuItems.map((section, index) => (
+                        <div class={index === 0 ? "md:col-span-2" : ""}>
+                            {index !== 0 && (
+                                <h2 class="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10">
+                                    {section.title}
+                                </h2>
+                            )}
+                            <div
+                                class={
+                                    index === 0
+                                        ? "grid md:grid-cols-2 gap-8"
+                                        : ""
+                                }
+                            >
+                                {section.items.map((item) => (
+                                    <MenuItem {...item} />
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+        <div class="text-center max-w-4xl mx-auto">
+            {/* Image gallery */}
+            <h2 class="text-4xl py-6 font-oswald text-[#f61519] mb-2 font-bold">Galeria</h2>
+            <Gallery images={imagenes} />
+        </div>
+    </div>
+   
+</RestaurantLayout>
+
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
+
+    .font-oswald {
+        font-family: "Oswald", sans-serif;
+    }
+</style>

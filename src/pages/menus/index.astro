@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import main_menu from "../phone_with_menu.png";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight } from "lucide-react";
+import tacos from './quesabirrias.laregia.mty/tacos.jpg';
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
@@ -25,10 +26,10 @@ const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
 const case_studies: Restaurant[] = [
     {
-        name: "MenuDigital",
-        description: "¡Disfruta de nuestros menús digitales!",
-        image: main_menu,
-        link: "/menus/astoria",
+        name: "Quesabirrias “La Regia”",
+        description: "Tacos, empalmes, quesadillas, birrias y mas...",
+        image: tacos,
+        link: "/menus/quesabirrias.laregia.mty",
         industry: "Restaurante",
         type: "Casual",
         capacity: "51-100"
@@ -80,15 +81,6 @@ const case_studies: Restaurant[] = [
                         <option value={type}>{type}</option>
                     ))}
                 </select>
-
-                <select 
-                    id="capacity-filter" 
-                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
-                >
-                    {capacities.map((capacity) => (
-                        <option value={capacity}>{capacity}</option>
-                    ))}
-                </select>
             </div>
 
             <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
@@ -99,11 +91,11 @@ const case_studies: Restaurant[] = [
                         data-type={study.type}
                         data-capacity={study.capacity}
                     >
-                        <div class="aspect-video relative overflow-hidden rounded-lg mb-6">
+                        <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
                             <Image
                                 src={study.image}
                                 alt={study.name}
-                                class="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                                class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -113,7 +105,6 @@ const case_studies: Restaurant[] = [
                         <div class="mt-4 flex flex-wrap gap-2">
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.industry}</span>
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.type}</span>
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.capacity} personas</span>
                         </div>
                         <a href={study.link} class="group mt-4 block">
                             <span class="flex items-center justify-between">

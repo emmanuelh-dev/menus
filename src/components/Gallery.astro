@@ -46,8 +46,10 @@ const { images } = Astro.props;
   >
     &times;
   </button>
-  <img id="modalImage" src="" alt="" class="max-w-[90%] max-h-[90vh] mx-auto object-contain" />
+  <div class="flex flex-col items-center justify-center">
+    <img id="modalImage" src="" alt="" class="max-w-[90%] max-h-[90vh] mx-auto object-contain" />
   <p id="modalTitle" class="text-center text-white mt-3"></p>
+  </div>
 </div>
 
 <script>
