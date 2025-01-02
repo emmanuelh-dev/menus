@@ -4,6 +4,8 @@ import main_menu from "../phone_with_menu.png";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight } from "lucide-react";
 import tacos from './quesabirrias.laregia.mty/tacos.jpg';
+import pizza from './fast-food/pizza.png';
+import antojitosdonaguillelogo from './antojitosdonaguille/logo.jpg';
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
@@ -35,19 +37,19 @@ const case_studies: Restaurant[] = [
         capacity: "51-100"
     },
     {
-        name: "MenuDigital",
-        description: "¡Disfruta de nuestros menús digitales!",
-        image: main_menu,
-        link: "/menus/astoria",
-        industry: "Café",
+        name: "FastFood",
+        description: "Fast food",
+        image: pizza,
+        link: "/menus/fast-food",
+        industry: "Restaurante",
         type: "Casual",
         capacity: "0-50"
     },
     {
-        name: "MenuDigital",
-        description: "¡Disfruta de nuestros menús digitales!",
-        image: main_menu,
-        link: "/menus/astoria",
+        name: "Antojitos Doña Guille",
+        description: "El Auténtico Sabor Tapatío",
+        image: antojitosdonaguillelogo,
+        link: "/menus/antojitosdonaguille",
         industry: "Bar",
         type: "Formal",
         capacity: "101-200"

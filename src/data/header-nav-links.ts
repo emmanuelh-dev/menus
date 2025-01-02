@@ -1,5 +1,6 @@
 export const navItems = [
     { name: "Características", href: "#" },
+    { name: "Menús", href: "/menus" },
     { name: "Precios", href: "/precios" },
     { name: "Contacto", href: "https://forms.gle/Y4ZFXyS4KhsoQT5D6" },
     {
