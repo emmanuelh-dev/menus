@@ -1,0 +1,117 @@
+---
+// ImageGallery.astro
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface ImageData {
+  src: ImageMetadata;
+  alt: string;
+  title?: string;
+}
+
+interface Props {
+  images: ImageData[];
+}
+
+const { images } = Astro.props;
+---
+
+<div class="max-w-7xl mx-auto p-5">
+  <div class=`grid grid-cols-1 sm:grid-cols-2 gap-6 ${images.length > 3 ? 'md:grid-cols-3 ' : images.length > 4 ? 'lg:grid-cols-4' : ''}` >
+    {
+      images.map((image: ImageData) => (
+        <div class="relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-[1.03] group">
+          <Image
+            src={image.src}
+            alt={image.alt}
+            class="w-full aspect-square object-cover object-center"
+            quality="mid"
+          />
+          {image.title && (
+            <p class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 m-0 text-sm text-center">
+              {image.title}
+            </p>
+          )}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="imageModal" class="hidden fixed inset-0 z-50 p-5 bg-black/90 items-center justify-center">
+  <button 
+    class="absolute top-4 right-6 text-white text-4xl font-bold cursor-pointer hover:text-gray-300 z-50"
+    aria-label="Cerrar modal"
+  >
+    &times;
+  </button>
+  <img id="modalImage" src="" alt="" class="max-w-[90%] max-h-[90vh] mx-auto object-contain" />
+  <p id="modalTitle" class="text-center text-white mt-3"></p>
+</div>
+
+<script>
+  interface HTMLImageElement extends HTMLElement {
+    src: string;
+    alt: string;
+  }
+
+  function initGallery(): void {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage') as HTMLImageElement;
+    const modalTitle = document.getElementById('modalTitle');
+    const closeButton = modal?.querySelector('button');
+    
+    // Agregar listeners a todas las imágenes de la galería
+    document.querySelectorAll<HTMLElement>('.grid > div').forEach(item => {
+      item.addEventListener('click', function() {
+        const img = this.querySelector('img');
+        const title = this.querySelector('p');
+        
+        if (modal && modalImg && modalTitle && img) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+          modalImg.src = img.src;
+          modalImg.alt = img.alt;
+          
+          if (title) {
+            modalTitle.textContent = title.textContent;
+            modalTitle.classList.remove('hidden');
+          } else {
+            modalTitle.classList.add('hidden');
+          }
+        }
+      });
+    });
+
+    const closeModal = (): void => {
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
+
+    // Cerrar modal con el botón
+    closeButton?.addEventListener('click', closeModal);
+
+    // Cerrar modal haciendo clic fuera de la imagen
+    modal?.addEventListener('click', (e: Event) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Cerrar modal con la tecla ESC
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && modal?.classList.contains('flex')) {
+        closeModal();
+      }
+    });
+  }
+
+  // Inicializar la galería cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', initGallery);
+
+  // Para Astro: reinicializar cuando se navegue entre páginas
+  document.addEventListener('astro:page-load', initGallery);
+</script>

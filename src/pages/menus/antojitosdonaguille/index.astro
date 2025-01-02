@@ -2,6 +2,11 @@
 import { Image } from "astro:assets";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import placeholder from "../placeholder.svg";
+import pozole from "./pozole.jpg";
+import flauta from "./flauta.jpg";
+import menu_dia from "./menu-dia.jpg";
+import menu_noche from "./menu-noche.jpg";
+import Gallery from "../../../components/Gallery.astro";
 const restaurantData = {
     name: "Antojitos Doña Guille",
     description: "El Auténtico Sabor Tapatío",
@@ -34,6 +39,25 @@ const schemaEnrichment = {
         reviewCount: 123,
     },
 };
+
+const imagenes = [
+    {
+        src: menu_dia,
+        alt: "Menu Dia",
+        title: "Menu Dia",
+    },
+    {
+        src: menu_noche,
+        alt: "Menu Noche",
+        title: "Menu Noche",
+    },
+    {
+        src: pozole,
+        alt: "Pozole",
+        title: "Pozole",
+    },
+];
+
 ---
 
 <RestaurantLayout
@@ -41,11 +65,11 @@ const schemaEnrichment = {
     description={restaurantData.name}
     schemaEnrichment={schemaEnrichment}
     textWhite={true}
-    backgroundColor="bg-yellow-600" 
+    backgroundColor="bg-[#fcc02a]" 
 >
     <div class="bg-red-700 lg:space-y-10">
         <div
-            class="w-full max-w-2xl mx-auto bg-gradient-to-b from-yellow-600 via-amber-700 to-amber-800 lg:p-8 text-white"
+            class="w-full max-w-2xl mx-auto bg-gradient-to-b from-[#fcc02a] via-[#ef3737] to-[#fcc02a] lg:p-8 text-white"
         >
             {/* Border decoration */}
             <div class="border-8 border-double border-yellow-500/30 p-6">
@@ -163,15 +187,14 @@ const schemaEnrichment = {
 
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-4">
-                            <div
-                                class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
+                            <div class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                             >
                                 <Image
-                                    src={placeholder}
+                                    src={pozole}
                                     alt="Pozole"
                                     width={64}
                                     height={64}
-                                    class="object-cover"
+                                    class="object-cover object-bottom"
                                 />
                             </div>
                             <div>
@@ -207,7 +230,7 @@ const schemaEnrichment = {
         </div>
 
         <div
-            class="w-full max-w-2xl mx-auto bg-gradient-to-b from-yellow-600 via-amber-700 to-amber-800 lg:p-8 text-white"
+            class="w-full max-w-2xl mx-auto bg-gradient-to-b from-[#fcc02a] via-[#ef3737] to-[#fcc02a] lg:p-8 text-white"
         >
             {/* Border decoration */}
             <div class="border-8 border-double border-yellow-500/30 p-6">
@@ -292,7 +315,7 @@ const schemaEnrichment = {
                                     class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                                 >
                                     <Image
-                                        src={placeholder}
+                                        src={flauta}
                                         alt="Flautas"
                                         width={64}
                                         height={64}
@@ -339,13 +362,13 @@ const schemaEnrichment = {
                                 <div
                                     class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden"
                                 >
-                                    <Image
-                                        src={placeholder}
-                                        alt="Pozole"
-                                        width={64}
-                                        height={64}
-                                        class="object-cover"
-                                    />
+                                <Image
+                                    src={pozole}
+                                    alt="Pozole"
+                                    width={64}
+                                    height={64}
+                                    class="object-cover object-bottom"
+                                />
                                 </div>
                                 <div>
                                     <span class="text-2xl font-serif"
@@ -412,6 +435,11 @@ const schemaEnrichment = {
                     <p>Viernes y Sábado 7:30 p.m. a 11:30 p.m.</p>
                 </div>
             </div>
+        </div>
+        <div class="text-center max-w-5xl mx-auto">
+            {/* Image gallery */}
+            <h2 class="text-5xl py-6 text-white font-serif mb-2 font-bold">Galeria</h2>
+            <Gallery images={imagenes} />
         </div>
     </div>
 </RestaurantLayout>
