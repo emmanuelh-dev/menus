@@ -153,9 +153,45 @@ const featuredItems = [
     image: coffe4
   }
 ]
+
+
+const schemaEnrichment = {
+    address: {
+        streetAddress: "Bruselas 902, Monterrey, Nuevo Leon, Mexico 64070",
+        addressLocality: " Monterrey, N.L.",
+        postalCode: "64070 ",
+        addressCountry: "MX",
+    },
+    telephone: "+52 81 3269 5700",
+    email: "info@bysmax.com",
+    priceRange: "$$",
+    servesCuisine: [
+        "Tapatía",
+        "Asado",
+        "Flautas",
+        "Sopes",
+        "Pozole",
+        "Tostadas",
+    ],
+    openingHours: "Viernes-Domingo 12:00-23:00",
+    acceptsReservations: true,
+    paymentAccepted: ["Cash", "Credit Card"],
+    currenciesAccepted: ["MXN", "USD"],
+    aggregateRating: {
+        ratingValue: 4.5,
+        reviewCount: 123,
+    },
+};
+
 ---
 
-<RestaurantLayout title="AlchemistCoffeLab Cafetería de Especialidad" description="AlchemistCoffeLab Cafetería de Especialidad">
+<RestaurantLayout
+title="AlchemistCoffeLab Cafetería de Especialidad"
+description="AlchemistCoffeLab Cafetería de Especialidad"
+schemaEnrichment={schemaEnrichment}
+textWhite={true}
+backgroundColor="bg-black"
+>
   <main>
     <section class="">
       <div
@@ -276,6 +312,12 @@ const featuredItems = [
         </div>
       </div>
     </div>
+  </section>
+  <section id="about" class="py-20 bg-white text-center">
+    <h2 class="font-serif text-4xl mb-6">Ubicación</h2>
+    <p class="text-gray-600 mb-12">
+      {schemaEnrichment.address.streetAddress}
+    </p>
   </section>
   </div>
 </RestaurantLayout>
