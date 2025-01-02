@@ -16,6 +16,7 @@ interface Restaurant {
     description: string;
     image: ImageMetadata;
     link: string;
+    restaurantLink: string;
     industry: Industry;
     type: BusinessType;
     capacity: Capacity;
@@ -30,6 +31,7 @@ const case_studies: Restaurant[] = [
     {
         name: "Quesabirrias “La Regia”",
         description: "Tacos, empalmes, quesadillas, birrias y mas...",
+        restaurantLink: "/menus/quesabirrias.laregia.mty",
         image: tacos,
         link: "/menus/quesabirrias.laregia.mty",
         industry: "Restaurante",
@@ -39,6 +41,7 @@ const case_studies: Restaurant[] = [
     {
         name: "FastFood",
         description: "Fast food",
+        restaurantLink: "/menus/fast-food",
         image: pizza,
         link: "/menus/fast-food",
         industry: "Restaurante",
@@ -48,6 +51,7 @@ const case_studies: Restaurant[] = [
     {
         name: "Antojitos Doña Guille",
         description: "El Auténtico Sabor Tapatío",
+        restaurantLink: "/menus/antojitosdonaguille",
         image: antojitosdonaguillelogo,
         link: "/menus/antojitosdonaguille",
         industry: "Bar",
@@ -100,9 +104,9 @@ const case_studies: Restaurant[] = [
                                 class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                            {study.name}
-                        </h3>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">
+                            <a href={study.restaurantLink}>{study.name}</a>
+                        </h2>
                         <p class="text-gray-600">{study.description}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.industry}</span>
