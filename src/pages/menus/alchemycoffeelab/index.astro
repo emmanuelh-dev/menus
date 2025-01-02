@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 import Layout from "../../../layouts/Menus.astro";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import coffe from "./coffe.jpg";
-import { Coffee, Heart, Star } from 'lucide-react'
+import { Coffee, Heart, Star } from "lucide-react";
 
 import coffe1 from "./media/coffe1.jpg";
 import coffe2 from "./media/coffe2.jpg";
@@ -132,65 +132,56 @@ const featuredItems = [
     name: "Whipped Mocha Dream",
     description: "Espresso con crema de chocolate",
     price: "$5.50",
-    image: coffe1
+    image: coffe1,
   },
   {
     name: "Holiday Hot Chocolate - Chocolate con crema de chocolate",
     description: "Chocolate con crema de chocolate",
     price: "$4.95",
-    image: coffe2
+    image: coffe2,
   },
-  {   
+  {
     name: "Hot Cake",
     description: "Un balance perfecto de café con café de olla y café de leche",
     price: "$4.50",
-    image: coffe3
+    image: coffe3,
   },
   {
     name: "Hot Cake",
     description: "Latte con crema de chocolate",
     price: "$5.95",
-    image: coffe4
-  }
-]
-
+    image: coffe4,
+  },
+];
 
 const schemaEnrichment = {
-    address: {
-        streetAddress: "Bruselas 902, Monterrey, Nuevo Leon, Mexico 64070",
-        addressLocality: " Monterrey, N.L.",
-        postalCode: "64070 ",
-        addressCountry: "MX",
-    },
-    telephone: "+52 81 3269 5700",
-    email: "info@bysmax.com",
-    priceRange: "$$",
-    servesCuisine: [
-        "Tapatía",
-        "Asado",
-        "Flautas",
-        "Sopes",
-        "Pozole",
-        "Tostadas",
-    ],
-    openingHours: "Viernes-Domingo 12:00-23:00",
-    acceptsReservations: true,
-    paymentAccepted: ["Cash", "Credit Card"],
-    currenciesAccepted: ["MXN", "USD"],
-    aggregateRating: {
-        ratingValue: 4.5,
-        reviewCount: 123,
-    },
+  address: {
+    streetAddress: "Bruselas 902, Monterrey, Nuevo Leon, Mexico 64070",
+    addressLocality: " Monterrey, N.L.",
+    postalCode: "64070 ",
+    addressCountry: "MX",
+  },
+  telephone: "+52 81 3269 5700",
+  email: "info@bysmax.com",
+  priceRange: "$$",
+  servesCuisine: ["Tapatía", "Asado", "Flautas", "Sopes", "Pozole", "Tostadas"],
+  openingHours: "Viernes-Domingo 12:00-23:00",
+  acceptsReservations: true,
+  paymentAccepted: ["Cash", "Credit Card"],
+  currenciesAccepted: ["MXN", "USD"],
+  aggregateRating: {
+    ratingValue: 4.5,
+    reviewCount: 123,
+  },
 };
-
 ---
 
 <RestaurantLayout
-title="AlchemistCoffeLab Cafetería de Especialidad"
-description="AlchemistCoffeLab Cafetería de Especialidad"
-schemaEnrichment={schemaEnrichment}
-textWhite={true}
-backgroundColor="bg-black"
+  title="AlchemistCoffeLab Cafetería de Especialidad"
+  description="AlchemistCoffeLab Cafetería de Especialidad"
+  schemaEnrichment={schemaEnrichment}
+  textWhite={true}
+  backgroundColor="bg-black"
 >
   <main>
     <section class="">
@@ -222,30 +213,37 @@ backgroundColor="bg-black"
     </section>
     <section id="menu" class="py-20 bg-gray-50">
       <div class="container mx-auto px-4">
-        <h2 class="font-serif text-4xl text-center mb-12">Platillos populares</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 ">
-          {featuredItems.map((item, index) => (
-            <div class="overflow-hidden hover:shadow-lg transition-shadow ">
-              <div class="aspect-square relative">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  class="object-cover w-full h-full"
-                />
+        <h2 class="font-serif text-4xl text-center mb-12">
+          Platillos populares
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {
+            featuredItems.map((item, index) => (
+              <div class="overflow-hidden hover:shadow-lg transition-shadow ">
+                <div class="aspect-square relative">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    class="object-cover w-full h-full"
+                  />
+                </div>
+                <div class="p-6">
+                  <h3 class="font-serif text-xl mb-2">{item.name}</h3>
+                  <p class="text-gray-600 mb-4">{item.description}</p>
+                  <p class="text-lg font-semibold">{item.price}</p>
+                </div>
               </div>
-              <div class="p-6">
-                <h3 class="font-serif text-xl mb-2">{item.name}</h3>
-                <p class="text-gray-600 mb-4">{item.description}</p>
-                <p class="text-lg font-semibold">{item.price}</p>
-              </div>
-            </div>
-          ))}
+            ))
+          }
         </div>
       </div>
     </section>
     <section class="bg-black text-white py-20 sticky top-0 lg:top-10 z-10">
       <div class="container mx-auto px-6">
-        <h1 class="text-4xl lg:text-6xl text-center py-4 mb-12 font-serif ">{data.name} <br> Menú</h1> 
+        <h1 class="text-4xl lg:text-6xl text-center py-4 mb-12 font-serif">
+          {data.name}
+          <br /> Menú
+        </h1>
         <div class="grid gap-6 grid-cols-1 lg:grid-cols-2">
           {
             menu.map((section, sectionIndex) => (
@@ -275,49 +273,63 @@ backgroundColor="bg-black"
           }
         </div>
       </div>
-  </main>
-  <section id="about" class="py-20 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 class="font-serif text-4xl mb-6">Nuestra pasión por el café</h2>
-        <p class="text-gray-600 mb-12">
-          Cada taza nos cuenta una historia. Desde los beans seleccionados cuidadosamente hasta las bebidas meticulosamente creadas,
-          nosotros nos entrenamos en crear momentos de alegría y calor para nuestra comunidad.
-        </p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="text-center">
-            <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full">
-              <Coffee className="h-6 w-6" />
+    </section>
+    <section id="about" class="py-20 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="font-serif text-4xl mb-6">Nuestra pasión por el café</h2>
+          <p class="text-gray-600 mb-12">
+            Cada taza nos cuenta una historia. Desde los beans seleccionados
+            cuidadosamente hasta las bebidas meticulosamente creadas, nosotros
+            nos entrenamos en crear momentos de alegría y calor para nuestra
+            comunidad.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+              <div
+                class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full"
+              >
+                <Coffee className="h-6 w-6" />
+              </div>
+              <h3 class="font-serif text-xl mb-2">Calidad Artisanal</h3>
+              <p class="text-gray-600">
+                Ingredientes de alta calidad y creaciones meticulosas
+              </p>
             </div>
-            <h3 class="font-serif text-xl mb-2">Calidad Artisanal</h3>
-            <p class="text-gray-600">Ingredientes de alta calidad y creaciones meticulosas</p>
-          </div>
-          
-          <div class="text-center">
-            <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full">
-              <Heart className="h-6 w-6" />
+
+            <div class="text-center">
+              <div
+                class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full"
+              >
+                <Heart className="h-6 w-6" />
+              </div>
+              <h3 class="font-serif text-xl mb-2">Hecho con amor</h3>
+              <p class="text-gray-600">
+                Cada ingrediente es creado con cuidado y atención a detalles
+              </p>
             </div>
-            <h3 class="font-serif text-xl mb-2">Hecho con amor</h3>
-            <p class="text-gray-600">Cada ingrediente es creado con cuidado y atención a detalles</p>
-          </div>
-          
-          <div class="text-center">
-            <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full">
-              <Star className="h-6 w-6" />
+
+            <div class="text-center">
+              <div
+                class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full"
+              >
+                <Star className="h-6 w-6" />
+              </div>
+              <h3 class="font-serif text-xl mb-2">Experiencia Única</h3>
+              <p class="text-gray-600">
+                Creando momentos memorables con cada visita
+              </p>
             </div>
-            <h3 class="font-serif text-xl mb-2">Experiencia Única</h3>
-            <p class="text-gray-600">Creando momentos memorables con cada visita</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-  <section id="about" class="py-20 bg-white text-center">
-    <h2 class="font-serif text-4xl mb-6">Ubicación</h2>
-    <p class="text-gray-600 mb-12">
-      {schemaEnrichment.address.streetAddress}
-    </p>
-  </section>
-  </div>
+    </section>
+    <section id="about" class="py-20 bg-white text-center">
+      <h2 class="font-serif text-4xl mb-6">Ubicación</h2>
+      <p class="text-gray-600 mb-12">
+        {schemaEnrichment.address.streetAddress}
+      </p>
+    </section>
+  </main>
 </RestaurantLayout>
