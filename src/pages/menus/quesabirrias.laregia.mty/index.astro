@@ -1,8 +1,10 @@
 ---
+import { Image } from "astro:assets";
 import Gallery from "../../../components/Gallery.astro";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import MenuItem from "./MenuItem.astro";
 import QuesabirriasGallery from "./QuesabirriasGallery.astro";
+import logo from "./logo.png";
 
 
 const restaurantData = {
@@ -156,12 +158,12 @@ const schemaEnrichment = {
     <div class="bg-[#f6f6f6] min-h-screen">
         <div class="max-w-4xl mx-auto px-10 lg:px-4">
             <header class="text-center mb-12">
-                <!-- <img
-                    src="/logo.svg"
+                <Image
+                    src={logo}
                     alt="Quesabirrias La Regia"
-                    class="max-w-[300px] mx-auto"
-                /> -->
-                <h1 class="text-6xl font-oswald">
+                    class="max-w-[300px] mx-auto py-4"
+                />
+                <h1 class="text-sm font-oswald">
                     {restaurantData.name}
                 </h1>
             </header>
