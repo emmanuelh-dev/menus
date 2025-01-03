@@ -5,6 +5,7 @@ import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import MenuItem from "./MenuItem.astro";
 import QuesabirriasGallery from "./QuesabirriasGallery.astro";
 import logo from "./logo.png";
+import menu from "./media/menu.jpg";
 
 
 const restaurantData = {
@@ -144,6 +145,8 @@ const schemaEnrichment = {
         ratingValue: 4.5,
         reviewCount: 123,
     },
+
+
 };
 
 ---
@@ -154,6 +157,7 @@ const schemaEnrichment = {
     schemaEnrichment={schemaEnrichment}
     textWhite={false}
     backgroundColor="bg-[#f6f6f6]"
+    image={menu.src}
 >
     <div class="bg-[#f6f6f6] min-h-screen">
         <div class="max-w-4xl mx-auto px-10 lg:px-4">
