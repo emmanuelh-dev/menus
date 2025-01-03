@@ -2,7 +2,8 @@
 import Gallery from "../../../components/Gallery.astro";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import MenuItem from "./MenuItem.astro";
-import tacos from "./tacos.jpg";
+import QuesabirriasGallery from "./QuesabirriasGallery.astro";
+
 
 const restaurantData = {
     name: "Quesabirrias “La Regia”",
@@ -114,14 +115,7 @@ const menuItems = [
     },
 ];
 
-const imagenes = [
-    {
-        src: tacos,
-        alt: "Menu Dia",
-        title: "Menu Dia",
-    },
 
-];
 const schemaEnrichment = {
     address: {
         streetAddress: "C. Tauro 550. Nueva Linda Vista, 67110",
@@ -196,11 +190,7 @@ const schemaEnrichment = {
                 }
             </div>
         </div>
-        <div class="text-center max-w-4xl mx-auto px-10">
-            {/* Image gallery */}
-            <h2 class="text-4xl py-6 font-oswald text-[#f61519] mb-2 font-bold">Galeria</h2>
-            <Gallery images={imagenes} />
-        </div>
+        <QuesabirriasGallery/>
     </div>
    
 </RestaurantLayout>
