@@ -10,9 +10,10 @@ interface ImageData {
 
 interface Props {
   images: ImageData[];
+  buttonClasses?: string;
 }
 
-const { images } = Astro.props;
+const { images, buttonClasses } = Astro.props;
 ---
 
 <div class="mx-auto">
@@ -43,7 +44,7 @@ const { images } = Astro.props;
     <div class="text-center mt-8">
       <button
         id="loadMoreBtn"
-        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        class={buttonClasses ? buttonClasses : 'bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'}
       >
         Cargar más
       </button>
