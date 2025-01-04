@@ -16,7 +16,7 @@ const { title, description, image, prices, variant = 'purple', subtitle } = Astr
   <div class="aspect-[4/3] relative overflow-hidden">
     <Image
       src={image}
-      alt={title}
+      alt={title ? `${title} image` : 'Menu image'}
       class="w-full h-full object-cover"
     />
   </div>
