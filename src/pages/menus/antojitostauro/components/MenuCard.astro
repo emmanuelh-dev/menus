@@ -1,0 +1,44 @@
+---
+import { Image } from "astro:assets";
+
+interface MenuCardProps {
+    title: string;
+    description: string;
+    image: string;
+    prices?: string[];
+    variant?: 'purple' | 'pink';
+    subtitle?: string;
+  }
+  
+const { title, description, image, prices, variant = 'purple', subtitle } = Astro.props;
+---
+<div class={`overflow-hidden ${variant === 'pink' ? 'bg-[#ec4899]' : 'bg-transparent'}`}>
+  <div class="aspect-[4/3] relative overflow-hidden">
+    <Image
+      src={image}
+      alt={title}
+      class="w-full h-full object-cover"
+    />
+  </div>
+  <div class="p-3 text-white text-center">
+    <h3 class="text-xl font-bold uppercase mb-1 tracking-wide">{title}</h3>
+    {subtitle && (
+      <p class="text-sm mb-1 text-yellow-300">{subtitle}</p>
+    )}
+    <p class="text-sm opacity-90 mb-2">{description}</p>
+    {prices && (
+      <div class="flex gap-2 justify-center">
+        {prices.map((price, i) => (
+          <div class="flex items-center gap-1">
+            <span class="bg-[#22c55e] text-white px-2 py-0.5 rounded text-sm">
+              ${price}
+            </span>
+            <span class="bg-[#0ea5e9] text-white px-2 py-0.5 rounded text-sm">
+              ORDEN
+            </span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>

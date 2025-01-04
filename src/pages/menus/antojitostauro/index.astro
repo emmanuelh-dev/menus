@@ -1,0 +1,198 @@
+---
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import MenuCard from "./components/MenuCard.astro";
+import { menuItems, bottomSection, additionalItems, guisos } from "./data";
+
+const restaurantData = {
+    name: "Antojitos Tauro",
+    description: "La Autentica Comida Mexicana",
+};
+
+const schemaEnrichment = {
+    address: {
+        streetAddress: "C. Tauro 550. Nueva Linda Vista, 67110",
+        addressLocality: "Guadalupe, N.L.",
+        postalCode: "67119",
+        addressCountry: "MX",
+    },
+    telephone: "+52 81 3269 5700",
+    email: "info@bysmax.com",
+    priceRange: "$$",
+    servesCuisine: [
+        "Tapatía",
+        "Asado",
+        "Flautas",
+        "Sopes",
+        "Pozole",
+        "Tostadas",
+    ],
+    openingHours: "Viernes-Domingo 12:00-23:00",
+    acceptsReservations: true,
+    paymentAccepted: ["Cash", "Credit Card"],
+    currenciesAccepted: ["MXN", "USD"],
+    aggregateRating: {
+        ratingValue: 4.5,
+        reviewCount: 123,
+    },
+};
+---
+
+<RestaurantLayout
+    title={restaurantData.name}
+    description={restaurantData.name}
+    schemaEnrichment={schemaEnrichment}
+>
+    <div
+        class="min-h-screen pb-8"
+        style={{
+            background: `repeating-linear-gradient(
+                    90deg,
+                    #4a1d96,
+                    #4a1d96 30px,
+                    #5925a9 30px,
+                    #5925a9 60px,
+                    #4a1d96 60px
+                    )`,
+        }}
+    >
+        <!-- Header -->
+        <div class="max-w-6xl mx-auto text-center pt-8 pb-6 px-4">
+            <img
+                src="/placeholder.svg?height=100&width=200"
+                alt="Taco Logo"
+                class="mx-auto mb-4 h-20 object-contain"
+            />
+            <div class="bg-[#ec4899] py-2 px-4 rounded-md inline-block">
+                <h1 class="text-white text-2xl font-bold tracking-wider">
+                    LA AUTENTICA COMIDA MEXICANA
+                </h1>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div
+            class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 mb-8"
+        >
+            {menuItems.map((item) => <MenuCard {...item} />)}
+        </div>
+
+        <!-- Bottom Section with Guisos -->
+        <div class="bg-[#e4007d]">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="p-4">
+                        <div class="aspect-video relative mb-3">
+                            <img
+                                src="/placeholder.svg?height=200&width=300"
+                                alt="Tacos enchilados"
+                                class="w-full h-full object-cover rounded"
+                            />
+                        </div>
+                        <div class="text-center text-white">
+                            <h3 class="text-xl font-bold mb-2">
+                                Tacos enchilados
+                            </h3>
+                            <p class="text-sm mb-2">
+                                Bañados de chile colorado dorados al comal,
+                                guiso a elegir y queso fundido.
+                            </p>
+                            <div class="flex justify-center gap-2">
+                                <span
+                                    class="bg-[#22c55e] px-2 py-0.5 rounded text-sm"
+                                    >$25</span
+                                >
+                                <span
+                                    class="bg-[#0ea5e9] px-2 py-0.5 rounded text-sm"
+                                    >PIEZA</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guisos Section -->
+                    <div class="p-4">
+                        <div
+                            class="border-4 border-[#4a1d96] rounded p-4 h-full"
+                        >
+                            <div class="relative">
+                                <div
+                                    class="absolute -top-12 left-1/2 -translate-x-1/2"
+                                >
+                                    <div
+                                        class="bg-[#4cd964] text-white rounded-full p-4 w-24 h-24 flex items-center justify-center text-center leading-tight"
+                                    >
+                                        Guisos a elegir
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="text-white text-center text-sm mt-8 space-y-1"
+                            >
+                                {guisos.map((guiso) => <p>{guiso}</p>)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="aspect-video relative mb-3">
+                            <img
+                                src="/placeholder.svg?height=200&width=300"
+                                alt="Tostadas"
+                                class="w-full h-full object-cover rounded"
+                            />
+                        </div>
+                        <div class="text-center text-white">
+                            <h3 class="text-xl font-bold mb-2">Tostadas</h3>
+                            <p class="text-sm mb-2">
+                                Cama de frijoles, guiso a elegir, lechuga,
+                                tomate, queso panela, aguacate y curitos.
+                            </p>
+                            <div class="flex justify-center gap-2">
+                                <span
+                                    class="bg-[#22c55e] px-2 py-0.5 rounded text-sm"
+                                    >$45</span
+                                >
+                                <span
+                                    class="bg-[#0ea5e9] px-2 py-0.5 rounded text-sm"
+                                    >PIEZA</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Items Grid -->
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                    {
+                        additionalItems.map((item) => (
+                            <div class="p-4">
+                                <div class="text-center text-white">
+                                    <h3 class="text-xl font-bold mb-2">
+                                        {item.title}
+                                    </h3>
+                                    <p class="text-sm mb-3">
+                                        {item.description}
+                                    </p>
+                                    <div class="flex justify-center gap-2">
+                                        <span class="bg-[#22c55e] px-2 py-0.5 rounded text-sm">
+                                            ${item.price}
+                                        </span>
+                                        {item.secondPrice && (
+                                            <span class="bg-[#22c55e] px-2 py-0.5 rounded text-sm">
+                                                ${item.secondPrice}
+                                            </span>
+                                        )}
+                                        <span class="bg-[#0ea5e9] px-2 py-0.5 rounded text-sm">
+                                            {item.priceLabel}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</RestaurantLayout>

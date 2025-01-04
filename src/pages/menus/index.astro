@@ -7,6 +7,7 @@ import tacos from './quesabirrias.laregia.mty/tacos.jpg';
 import pizza from './fast-food/pizza.png';
 import antojitosdonaguillelogo from './antojitosdonaguille/logo.jpg';
 import alchemycoffeelablogo from './alchemycoffeelab/espuma.jpg';
+import antojitostauro from './antojitostauro/logo.jpg';
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
@@ -34,6 +35,15 @@ const case_studies: Restaurant[] = [
         restaurantLink: "/menus/quesabirrias.laregia.mty",
         image: tacos,
         link: "/menus/quesabirrias.laregia.mty",
+        industry: "Restaurante",
+        type: "Casual",
+    },
+    {
+        name: "Antojitos Tauro",
+        description: "Tacos, empalmes, quesadillas, birrias y mas...",
+        restaurantLink: "/menus/antojitostauro",
+        image: antojitostauro,
+        link: "/menus/antojitostauro",
         industry: "Restaurante",
         type: "Casual",
     },
