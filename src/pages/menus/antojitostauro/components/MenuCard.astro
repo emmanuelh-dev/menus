@@ -1,6 +1,4 @@
 ---
-import { Image } from "astro:assets";
-
 interface MenuCardProps {
     title: string;
     description: string;
@@ -14,9 +12,9 @@ const { title, description, image, prices, variant = 'purple', subtitle } = Astr
 ---
 <div class={`overflow-hidden ${variant === 'pink' ? 'bg-[#ec4899]' : 'bg-transparent'}`}>
   <div class="aspect-[4/3] relative overflow-hidden">
-    <Image
-      src={image}
-      alt={title ? `${title} image` : 'Menu image'}
+    <img
+      src="/placeholder.svg?height=100&width=200"
+      alt="Tacos enchilados"
       class="w-full h-full object-cover"
     />
   </div>

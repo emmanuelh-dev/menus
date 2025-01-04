@@ -1,59 +1,18 @@
-import enchiladas from "./media/enchiladas.jpg";
-import flautas from "./media/flautas.jpg";
-export const menuItems = [
-    {
-        title: "ENCHILADAS TRADICIONALES",
-        subtitle: "Con o sin cebolla.",
-        description: "Tortilla blanca o roja con chile colorado.",
-        image: enchiladas,
-        prices: ["24", "29"],
-    },
-    {
-        title: "ENCHILADAS SUIZAS",
-        description: "De pollo, incluye papa dorada.",
-        image: flautas,
-        prices: ["30"],
-    },
-    {
-        title: "FLAUTAS",
-        description: "Carne de res, pídalas crujientes o suaves.",
-        image: flautas,
-        prices: ["24", "29"],
-    },
-    {
-        title: "ENTOMATADAS",
-        description: "Con aguacate, papitas doradas, frijoles y crema.",
-        subtitle: "De queso • De pollo",
-        image: enchiladas,
-        prices: ["20", "25"],
-    },
-    {
-        title: "TACOS DE DESHEBRADA",
-        description: "Dorados o suaves.",
-        image: enchiladas,
-        prices: ["22", "35"],
-    },
-    {
-        title: "ENFRIJOLADAS",
-        description: "Con aguacate, papitas doradas, crema y cebolla morada.",
-        image: enchiladas,
-        prices: ["35"],
-    },
-];
+
 
 export const bottomSection = [
     {
         title: "Tacos enchilados",
         description:
             "Bañados de chile colorado dorados al comal, guiso a elegir y queso fundido.",
-        image: enchiladas,
+        image: '/placeholder.svg?height=200&width=300',
         price: "25",
     },
     {
         title: "Tostadas",
         description:
             "Cama de frijoles, guiso a elegir, lechuga, tomate, queso panela, aguacate y curitos.",
-        image: enchiladas,
+        image: '/placeholder.svg?height=200&width=300',
         price: "45",
     },
 ];

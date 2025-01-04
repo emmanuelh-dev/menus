@@ -1,8 +1,50 @@
 ---
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import MenuCard from "./components/MenuCard.astro";
-import { menuItems, bottomSection, additionalItems, guisos } from "./data";
+import {  bottomSection, additionalItems, guisos } from "./data";
+import enchiladas from "./media/enchiladas.jpg";
+import flautas from "./media/enchiladas.jpg";
 
+const menuItems = [
+    {
+        title: "ENCHILADAS TRADICIONALES",
+        subtitle: "Con o sin cebolla.",
+        description: "Tortilla blanca o roja con chile colorado.",
+        image: enchiladas,
+        prices: ["24", "29"],
+    },
+    {
+        title: "ENCHILADAS SUIZAS",
+        description: "De pollo, incluye papa dorada.",
+        image: enchiladas,
+        prices: ["30"],
+    },
+    {
+        title: "enchiladas",
+        description: "Carne de res, pídalas crujientes o suaves.",
+        image: flautas,
+        prices: ["24", "29"],
+    },
+    {
+        title: "ENTOMATADAS",
+        description: "Con aguacate, papitas doradas, frijoles y crema.",
+        subtitle: "De queso • De pollo",
+        image: enchiladas,
+        prices: ["20", "25"],
+    },
+    {
+        title: "TACOS DE DESHEBRADA",
+        description: "Dorados o suaves.",
+        image: enchiladas,
+        prices: ["22", "35"],
+    },
+    {
+        title: "ENFRIJOLADAS",
+        description: "Con aguacate, papitas doradas, crema y cebolla morada.",
+        image: enchiladas,
+        prices: ["35"],
+    },
+];
 const restaurantData = {
     name: "Antojitos Tauro",
     description: "La Autentica Comida Mexicana",
