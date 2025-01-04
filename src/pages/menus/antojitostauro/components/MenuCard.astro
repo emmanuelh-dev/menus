@@ -1,20 +1,26 @@
 ---
+import type { ImageMetadata } from 'astro';
+import antojitostauro from '../logo.jpg';
+import { Image } from 'astro:assets';
+
 interface MenuCardProps {
     title: string;
     description: string;
-    image: string;
+    image: ImageMetadata;
     prices?: string[];
     variant?: 'purple' | 'pink';
     subtitle?: string;
   }
   
-const { title, description, image, prices, variant = 'purple', subtitle } = Astro.props;
+const { title, description, image, prices, variant = 'purple', subtitle } = Astro.props as MenuCardProps;
+
+const optimicedImage = image ? image : antojitostauro;
 ---
 <div class={`overflow-hidden ${variant === 'pink' ? 'bg-[#ec4899]' : 'bg-transparent'}`}>
   <div class="aspect-[4/3] relative overflow-hidden">
-    <img
-      src="/placeholder.svg?height=100&width=200"
-      alt="Tacos enchilados"
+    <Image
+      src={optimicedImage}
+      alt={title ? `${title} image` : 'Menu image'}
       class="w-full h-full object-cover"
     />
   </div>
