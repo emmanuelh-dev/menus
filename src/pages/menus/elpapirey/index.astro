@@ -3,6 +3,8 @@ import { Image } from "astro:assets";
 import logo from "./logo.jpg";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import { Facebook, Instagram } from "lucide-react";
+import menu from "./menu.jpg";
+
 const menuItems = [
   { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
   { name: "Especial", price: 50, color: "text-white" },
@@ -84,6 +86,7 @@ const schemaEnrichment = {
   title={restaurantData.name}
   description={restaurantData.name}
   schemaEnrichment={schemaEnrichment}
+  image={menu.src}
   textWhite={true}
   backgroundColor="bg-black"
 >
