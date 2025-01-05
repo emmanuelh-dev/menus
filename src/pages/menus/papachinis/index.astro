@@ -103,10 +103,10 @@ const menuSections = [
 
             {menuSections.map((section) => (
                 <div class="mb-8">
-                    <div class="mb-4 bg-yellow-500 px-3 py-1">
+                    <div class="bg-yellow-500 px-3 py-1">
                         <h2 class="font-bold text-black text-2xl uppercase">{section.title}</h2>
                     </div>
-                    <ul class="space-y-10 mt-8">
+                    <ul class="space-y-10 py-10">
                         {section.items.map((item) => (
                             <li class="flex justify-between">
                                 <span>{item.name}<br/>
@@ -117,7 +117,7 @@ const menuSections = [
                         ))}
                     </ul>
                     {section.image && (
-                        <div class="flex justify-center">
+                        <div class="flex justify-center mt-8">
                             <Image src={section.image} alt={section.title} class="w-full max-w-lg rounded-lg shadow-2xl" />
                         </div>
                     )}
