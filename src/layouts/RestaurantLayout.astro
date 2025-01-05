@@ -39,6 +39,7 @@ export interface Props {
     type?: "Restaurant" | "Menu" | "Event";
     textWhite?: boolean;
     backgroundColor?: string;
+    favicon?: string;
     // Schema enrichment props
     schemaEnrichment?: {
         address?: Address;
@@ -64,6 +65,7 @@ const {
     title, 
     description, 
     image, 
+    favicon,
     type = "Restaurant",
     textWhite = false,
     backgroundColor ='bg-white',
@@ -144,7 +146,7 @@ const menuItems = [
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/svg+xml" href={favicon ? favicon : '/favicon.ico'} />
         <meta name="generator" content={Astro.generator} />
         <title>Menú - {title} | {schemaEnrichment?.address?.streetAddress}</title>  
         <meta name="description" content={description} />
