@@ -4,6 +4,7 @@ import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 
 import nachos from "./media/nachos.png";
 import hamburger from "./media/hamburger.png";
+import logo from "./logo.jpg";
 import { Image } from "astro:assets";
 
 const restaurantData = {
@@ -21,13 +22,10 @@ const restaurantData = {
 
     <div class="min-h-screen bg-black p-4 font-sans text-xl">
         <div class="mx-auto max-w-4xl  text-white shadow-2xl space-y-10">
-          {/* Header */}
-          <div class="mb-8 flex items-center justify-between">
-            <h1 class="text-5xl font-bold tracking-wider">MENU</h1>
-            <div class="rounded-full border-2 border-yellow-400 p-4">
-              <span class="text-xl font-semibold">PAPACHINIS</span>
-            </div>
-          </div>
+            <header class="w-full flex flex-col justify-center items-center">
+                <Image src={logo} alt="Logo" class="w-full max-w-lg rounded-lg shadow-2xl" />
+                <h1 class="text-sm font-bold tracking-wider">{restaurantData.name}</h1>
+            </header>
 
           {/* Nachos Section */}
           <div class="mb-8">
