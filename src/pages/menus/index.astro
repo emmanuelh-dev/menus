@@ -8,7 +8,7 @@ import pizza from './fast-food/pizza.png';
 import antojitosdonaguillelogo from './antojitosdonaguille/logo.jpg';
 import alchemycoffeelablogo from './alchemycoffeelab/espuma.jpg';
 import antojitostauro from './antojitostauro/logo.jpg';
-
+import papachinislogo from './papachinis/logo.jpg';
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
 type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
@@ -73,11 +73,20 @@ const case_studies: Restaurant[] = [
         link: "/menus/alchemycoffeelab",
         industry: "Café",
         type: "Formal",
+    },
+    {
+        name: "Papachinis Zona de Snack",
+        description: "Elotes, nachos, hot dogs hamburguesas tostadas tostitos y más...",
+        restaurantLink: "/menus/papachinis",
+        image: papachinislogo,
+        link: "/menus/papachinis",
+        industry: "Restaurante",
+        type: "Fast Food",
     }
 ];
 ---
 
-<RestaurantLayout title="Menus" description="Menus">
+<RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">
     <div class="bg-gradient-to-b from-gray-50 to-white min-h-screen py-16">
         <div class="max-w-[85%] mx-auto">
             <h2 class="text-4xl font-bold text-gray-900 mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
