@@ -3,6 +3,7 @@ import { Pencil } from "lucide-react";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 
 import nachos from "./media/nachos.png";
+import hamburger from "./media/hamburger.png";
 import { Image } from "astro:assets";
 
 const restaurantData = {
@@ -19,7 +20,7 @@ const restaurantData = {
 >
 
     <div class="min-h-screen bg-black p-4 font-sans text-xl">
-        <div class="mx-auto max-w-4xl  text-white shadow-2xl">
+        <div class="mx-auto max-w-4xl  text-white shadow-2xl space-y-10">
           {/* Header */}
           <div class="mb-8 flex items-center justify-between">
             <h1 class="text-5xl font-bold tracking-wider">MENU</h1>
@@ -27,7 +28,59 @@ const restaurantData = {
               <span class="text-xl font-semibold">PAPACHINIS</span>
             </div>
           </div>
-  
+
+          {/* Nachos Section */}
+          <div class="mb-8">
+            <div class="mb-4 bg-yellow-500 px-3 py-1">
+              <h2 class="font-bold text-black text-2xl uppercase">Hamburguesas</h2>
+            </div>
+            <ul class="space-y-3">
+              <li class="flex justify-between">
+                <span>Sencilla <br/>
+                  <span class="text-sm text-gray-400">Carne 100% de res, mayonesa, qcatsup, mostaza, cebolla morada lechiga jamon, queso gouda, queso amarillo y aguacate, Acompañado de una bolsa de papas con topping.</span>
+                </span>
+                <span class="font-bold">$100</span>
+              </li>
+              <li class="flex justify-between">
+                <span>Doble<br/>
+                    <span class="text-sm text-gray-400">Carne 100% de res, mayonesa, qcatsup, mostaza, cebolla morada lechiga jamon, queso gouda, queso amarillo y aguacate, Acompañado de una bolsa de papas con topping.</span>
+                </span>
+                <span class="font-bold">$140</span>
+              </li>
+            </ul>
+            <div class="flex justify-center">
+              <Image src={hamburger} alt="nachos" class="w-full max-w-lg rounded-lg shadow-2xl" />
+            </div>
+          </div>
+        {/* Nachos Section */}
+        <div class="mb-8">
+            <div class="mb-4 bg-yellow-500 px-3 py-1">
+            <h2 class="font-bold text-black text-2xl">NACHOS</h2>
+            </div>
+            <ul class="space-y-3">
+            <li class="flex justify-between">
+                <span>Nachos Sencillos <br/>
+                <span class="text-sm text-gray-400">queso amarillo, queso blanco y jalapeños</span>
+                </span>
+                <span class="font-bold">$70</span>
+            </li>
+            <li class="flex justify-between">
+                <span>Nachos Medianos <br/>
+                <span class="text-sm text-gray-400">Con elote o chili beans, queso amarillo elote o chili, queso blanco y jalapeños</span>
+                </span>
+                <span class="font-bold">$90</span>
+            </li>
+            <li class="flex justify-between">
+                <span>Nachos Grandes <br/>
+                <span class="text-sm text-gray-400">con elote y chile toreado, chipotle, queso amarillo y jalapeños</span>
+                </span>
+                <span class="font-bold">$130</span>
+            </li>
+            </ul>
+            <div class="flex justify-center">
+            <Image src={nachos} alt="nachos" class="w-full max-w-lg rounded-lg shadow-2xl" />
+            </div>
+        </div>
           {/* Duritos Section */}
           <div class="mb-8">
             <div class="mb-4 bg-yellow-500 px-3 py-1">
@@ -56,35 +109,7 @@ const restaurantData = {
                   </li>
                 </ul>
               </div>
-          {/* Nachos Section */}
-          <div class="mb-8">
-            <div class="mb-4 bg-yellow-500 px-3 py-1">
-              <h2 class="font-bold text-black text-2xl">NACHOS</h2>
-            </div>
-            <ul class="space-y-3">
-              <li class="flex justify-between">
-                <span>Nachos Sencillos <br/>
-                  <span class="text-sm text-gray-400">queso amarillo, queso blanco y jalapeños</span>
-                </span>
-                <span class="font-bold">$70</span>
-              </li>
-              <li class="flex justify-between">
-                <span>Nachos Medianos <br/>
-                  <span class="text-sm text-gray-400">Con elote o chili beans, queso amarillo elote o chili, queso blanco y jalapeños</span>
-                </span>
-                <span class="font-bold">$90</span>
-              </li>
-              <li class="flex justify-between">
-                <span>Nachos Grandes <br/>
-                  <span class="text-sm text-gray-400">con elote y chile toreado, chipotle, queso amarillo y jalapeños</span>
-                </span>
-                <span class="font-bold">$130</span>
-              </li>
-            </ul>
-            <div class="flex justify-center">
-              <Image src={nachos} alt="nachos" class="w-full max-w-lg rounded-lg shadow-2xl" />
-            </div>
-          </div>
+        
   
           {/* Papas Section */}
           <div class="mb-8">
@@ -104,23 +129,6 @@ const restaurantData = {
                 </span>
                 <span class="font-bold">$65</span>
               </li>
-            </ul>
-          </div>
-  
-          {/* Original Menu Sections */}
-          <div class="mb-8">
-            <div class="mb-4 bg-yellow-500 px-3 py-1">
-              <h2 class="font-bold text-black text-2xl">SNACKS</h2>
-            </div>
-            <ul class="space-y-2">
-              <li>Elotes</li>
-              <li>Duritos</li>
-              <li>Tostadas</li>
-              <li>Nachos</li>
-              <li>Charola Preparada</li>
-              <li>Tostilos Preparados</li>
-              <li>Hotdogs</li>
-              <li>Chilidogs</li>
             </ul>
           </div>
   
