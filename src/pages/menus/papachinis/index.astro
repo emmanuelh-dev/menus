@@ -1,7 +1,6 @@
 ---
 import { Pencil } from "lucide-react";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
-
 import nachos from "./media/nachos.png";
 import hamburger from "./media/hamburger.png";
 import logo from "./logo.jpg";
@@ -12,7 +11,82 @@ const restaurantData = {
     description: "Elotes, nachos, hot dogs hamburguesas tostadas tostitos y más...",
 };
 
+const menuSections = [
+    {
+        title: "Hamburguesas",
+        items: [
+            {
+                name: "Sencilla",
+                description: "Carne 100% de res, mayonesa, qcatsup, mostaza, cebolla morada lechiga jamon, queso gouda, queso amarillo y aguacate, Acompañado de una bolsa de papas con topping.",
+                price: "$100"
+            },
+            {
+                name: "Doble",
+                description: "Carne 100% de res, mayonesa, qcatsup, mostaza, cebolla morada lechiga jamon, queso gouda, queso amarillo y aguacate, Acompañado de una bolsa de papas con topping.",
+                price: "$140"
+            }
+        ],
+        image: hamburger
+    },
+    {
+        title: "NACHOS",
+        items: [
+            {
+                name: "Nachos Sencillos",
+                description: "queso amarillo, queso blanco y jalapeños",
+                price: "$70"
+            },
+            {
+                name: "Nachos Medianos",
+                description: "Con elote o chili beans, queso amarillo elote o chili, queso blanco y jalapeños",
+                price: "$90"
+            },
+            {
+                name: "Nachos Grandes",
+                description: "con elote y chile toreado, chipotle, queso amarillo y jalapeños",
+                price: "$130"
+            }
+        ],
+        image: nachos
+    },
+    {
+        title: "Duritos",
+        items: [
+            {
+                name: "Durito",
+                description: "Frijoles, repollo, cueritos, queso blanco, crema, sal, queso amarillo y elote.",
+                price: "$45 $55"
+            }
+        ]
+    },
+    {
+        title: "Nieves Estilo Jalisco",
+        items: [
+            {
+                name: "Sabores",
+                description: "Mango, oreo, pulparindo, picafresa, coco, mango chamoy, choco banana, vainilla azul, limon chamoy, chocolate y tamarindo.",
+                price: "$30 $40 $50 $60 $70 litro $110"
+            }
+        ]
+    },
+    {
+        title: "PAPAS PREPARADAS",
+        items: [
+            {
+                name: "Papas Sencillas",
+                description: "mayonesa, queso, toppings",
+                price: "$50"
+            },
+            {
+                name: "Papas Preparadas",
+                description: "queso amarillo, queso blanco, elote, mayonesa y toppings",
+                price: "$65"
+            }
+        ]
+    }
+];
 ---
+
 <RestaurantLayout
     title={restaurantData.name}
     description={restaurantData.description}
@@ -20,127 +94,46 @@ const restaurantData = {
     image={logo.src}
     backgroundColor="bg-black"
 >
-
     <div class="min-h-screen bg-black p-4 font-sans text-xl">
-        <div class="mx-auto max-w-4xl  text-white shadow-2xl space-y-10">
+        <div class="mx-auto max-w-4xl text-white shadow-2xl space-y-10">
             <header class="w-full flex flex-col justify-center items-center">
                 <Image src={logo} alt="Logo" class="w-full max-w-lg rounded-lg shadow-2xl" />
                 <h1 class="text-sm font-bold tracking-wider">{restaurantData.name}</h1>
             </header>
 
-          {/* Nachos Section */}
-          <div class="mb-8">
-            <div class="mb-4 bg-yellow-500 px-3 py-1">
-              <h2 class="font-bold text-black text-2xl uppercase">Hamburguesas</h2>
-            </div>
-            <ul class="space-y-3">
-              <li class="flex justify-between">
-                <span>Sencilla <br/>
-                  <span class="text-sm text-gray-400">Carne 100% de res, mayonesa, qcatsup, mostaza, cebolla morada lechiga jamon, queso gouda, queso amarillo y aguacate, Acompañado de una bolsa de papas con topping.</span>
-                </span>
-                <span class="font-bold">$100</span>
-              </li>
-              <li class="flex justify-between">
-                <span>Doble<br/>
-                    <span class="text-sm text-gray-400">Carne 100% de res, mayonesa, qcatsup, mostaza, cebolla morada lechiga jamon, queso gouda, queso amarillo y aguacate, Acompañado de una bolsa de papas con topping.</span>
-                </span>
-                <span class="font-bold">$140</span>
-              </li>
-            </ul>
-            <div class="flex justify-center">
-              <Image src={hamburger} alt="nachos" class="w-full max-w-lg rounded-lg shadow-2xl" />
-            </div>
-          </div>
-        {/* Nachos Section */}
-        <div class="mb-8">
-            <div class="mb-4 bg-yellow-500 px-3 py-1">
-            <h2 class="font-bold text-black text-2xl">NACHOS</h2>
-            </div>
-            <ul class="space-y-3">
-            <li class="flex justify-between">
-                <span>Nachos Sencillos <br/>
-                <span class="text-sm text-gray-400">queso amarillo, queso blanco y jalapeños</span>
-                </span>
-                <span class="font-bold">$70</span>
-            </li>
-            <li class="flex justify-between">
-                <span>Nachos Medianos <br/>
-                <span class="text-sm text-gray-400">Con elote o chili beans, queso amarillo elote o chili, queso blanco y jalapeños</span>
-                </span>
-                <span class="font-bold">$90</span>
-            </li>
-            <li class="flex justify-between">
-                <span>Nachos Grandes <br/>
-                <span class="text-sm text-gray-400">con elote y chile toreado, chipotle, queso amarillo y jalapeños</span>
-                </span>
-                <span class="font-bold">$130</span>
-            </li>
-            </ul>
-            <div class="flex justify-center">
-            <Image src={nachos} alt="nachos" class="w-full max-w-lg rounded-lg shadow-2xl" />
-            </div>
-        </div>
-          {/* Duritos Section */}
-          <div class="mb-8">
-            <div class="mb-4 bg-yellow-500 px-3 py-1">
-              <h2 class="font-bold text-black text-2xl uppercase">Duritos</h2>
-            </div>
-            <ul class="space-y-3">
-              <li class="flex justify-between">
-                <span>Durito<br/>
-                  <span class="text-sm text-gray-400">Frijoles, repollo, cueritos, queso blanco, crema, sal, queso amarillo y elote.</span>
-                </span>
-                <span class="font-bold">$45 $55</span>
-              </li>
-            </ul>
-          </div>
-            {/* Burritos Section */}
-            <div class="mb-8">
-                <div class="mb-4 bg-yellow-500 px-3 py-1">
-                  <h2 class="font-bold text-black text-2xl uppercase">Nieves Estilo Jalisco</h2>
+            {menuSections.map((section) => (
+                <div class="mb-8">
+                    <div class="mb-4 bg-yellow-500 px-3 py-1">
+                        <h2 class="font-bold text-black text-2xl uppercase">{section.title}</h2>
+                    </div>
+                    <ul class="space-y-10">
+                        {section.items.map((item) => (
+                            <li class="flex justify-between">
+                                <span>{item.name}<br/>
+                                    <span class="text-sm text-gray-400">{item.description}</span>
+                                </span>
+                                <span class="font-bold">{item.price}</span>
+                            </li>
+                        ))}
+                    </ul>
+                    {section.image && (
+                        <div class="flex justify-center">
+                            <Image src={section.image} alt={section.title} class="w-full max-w-lg rounded-lg shadow-2xl" />
+                        </div>
+                    )}
                 </div>
-                <ul class="space-y-3">
-                  <li class="flex justify-between">
-                    <span>Sabores <br/>
-                      <span class="text-sm text-gray-400 text-pretty max-w-lg">Mango, oreo, pulparindo, picafresa, coco, mango chamoy, choco banana, vainilla azul, limon chamoy, chocolate y tamarindo.</span>
-                    </span>
-                    <span class="font-bold">$30 $40 $50 $60 $70 litro $110</span>
-                  </li>
-                </ul>
-              </div>
-        
-  
-          {/* Papas Section */}
-          <div class="mb-8">
-            <div class="mb-4 bg-yellow-500 px-3 py-1">
-              <h2 class="font-bold text-black text-2xl">PAPAS PREPARADAS</h2>
+            ))}
+
+            {/* Footer */}
+            <div class="mt-12 space-y-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="bg-green-500 px-3 py-1 text-black">
+                        <a class="text-2xl font-bold" href="https://wa.me/8116408521" target="_blank">
+                            81 1640 8521
+                        </a>
+                    </div>
+                </div>
             </div>
-            <ul class="space-y-3">
-              <li class="flex justify-between">
-                <span>Papas Sencillas <br/>
-                  <span class="text-sm text-gray-400">mayonesa, queso, toppings</span>
-                </span>
-                <span class="font-bold">$50</span>
-              </li>
-              <li class="flex justify-between">
-                <span>Papas Preparadas <br/>
-                  <span class="text-sm text-gray-400">queso amarillo, queso blanco, elote, mayonesa y toppings</span>
-                </span>
-                <span class="font-bold">$65</span>
-              </li>
-            </ul>
-          </div>
-  
-          {/* Footer */}
-          <div class="mt-12 space-y-4 text-sm">
-            <div class="flex items-center gap-2">
-              <div class="bg-green-500 px-3 py-1 text-black">
-                <a class="text-2xl font-bold" href="https://wa.me/8116408521" target="_blank">
-                   81 1640 8521
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
 </RestaurantLayout>
