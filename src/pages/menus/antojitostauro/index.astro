@@ -1,7 +1,7 @@
 ---
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import MenuCard from "./components/MenuCard.astro";
-import {  bottomSection, additionalItems, guisos } from "./data";
+import { bottomSection, additionalItems, guisos } from "./data";
 import enchiladas from "./media/enchiladas.jpg";
 import flautas from "./media/enchiladas.jpg";
 
@@ -104,7 +104,7 @@ const schemaEnrichment = {
                 alt="Taco Logo"
                 class="mx-auto mb-4 h-20 object-contain"
             />
-            <div class="bg-[#ec4899] py-2 px-4 rounded-md inline-block">
+            <div class="bg-[#ec4899] py-2 px-4 inline-block">
                 <h1 class="text-white text-2xl font-bold tracking-wider">
                     LA AUTENTICA COMIDA MEXICANA
                 </h1>
@@ -153,20 +153,8 @@ const schemaEnrichment = {
 
                     <!-- Guisos Section -->
                     <div class="p-4">
-                        <div
-                            class="border-4 border-[#4a1d96] rounded p-4 h-full"
-                        >
-                            <div class="relative">
-                                <div
-                                    class="absolute -top-12 left-1/2 -translate-x-1/2"
-                                >
-                                    <div
-                                        class="bg-[#4cd964] text-white rounded-full p-4 w-24 h-24 flex items-center justify-center text-center leading-tight"
-                                    >
-                                        Guisos a elegir
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="border-4 bg-[#46244d] rounded p-4 h-full text-center font-semibold text-white">
+                            <h2 class="text-xl">Guisos a elegir</h2>
                             <div
                                 class="text-white text-center text-sm mt-8 space-y-1"
                             >
