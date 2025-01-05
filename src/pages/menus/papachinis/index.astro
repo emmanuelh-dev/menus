@@ -4,6 +4,7 @@ import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import nachos from "./media/nachos.png";
 import hamburger from "./media/hamburger.png";
 import logo from "./logo.jpg";
+import tostitos from "./media/tostitos.png";
 import { Image } from "astro:assets";
 
 const restaurantData = {
@@ -29,11 +30,27 @@ const menuSections = [
         image: hamburger
     },
     {
+        title: "Tostitos Preparados",
+        items: [
+            {
+                name: "Sencillos",
+                description: "Queso amarillo, queso blanco y jalapeños",
+                price: "$50"
+            },
+            {
+                name: "Preparados",
+                description: "Queso amarillo, queso blanco, elote, mayonesa y toppings",
+                price: "$50"
+            }
+        ],
+        image: tostitos
+    },
+    {
         title: "NACHOS",
         items: [
             {
                 name: "Nachos Sencillos",
-                description: "queso amarillo, queso blanco y jalapeños",
+                description: "Queso amarillo, queso blanco y jalapeños",
                 price: "$70"
             },
             {
