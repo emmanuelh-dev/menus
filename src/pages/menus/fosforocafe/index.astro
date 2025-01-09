@@ -4,23 +4,42 @@ import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 
 import vaso from "./media/vaso.jpg";
 import menu from "./media/menu.jpg";
-
+import cafetera from "./media/cafetera.jpg";
+import pared from "./media/pared.jpg";
+import latte from "./media/latte.jpg";
+import helado from "./media/helado.jpg";
 const galleryImages = [
     {
         src: menu,
         alt: "Menu",
         title: "Menu",
     },
+    { src: cafetera, alt: "Cafetera", title: "Cafetera" },
     {
         src: vaso,
         alt: "Drink",
         title: "Drink",
     },
+    {
+        src: pared,
+        alt: "Pared",
+        title: "Pared",
+    },
+    {
+        src: latte,
+        alt: "Latte",
+        title: "Latte",
+    },
+    {
+        src: helado,
+        alt: "Helado",
+        title: "Helado",
+    }
 ];
 
 const restaurantData = {
-    name: "FOSFORO",
-    description: "La mejor comida de la zona",
+    name: "FOSFORO CAFÉ",
+    description: "Tu nueva cafetería favorita en barrio antiguo",
 };
 
 const schemaEnrichment = {
@@ -64,7 +83,7 @@ const schemaEnrichment = {
             {/* Logo and Brand */}
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center mb-2">
-                    <h1 class="text-[#9d2235] text-4xl font-bold">FOSFORO</h1>
+                    <h1 class="text-[#9d2235] text-4xl font-bold">{restaurantData.name}</h1>
                     <div class="w-6 h-6 ml-2">
                         <div class="w-3 h-3 bg-[#9d2235] transform rotate-45">
                         </div>
@@ -74,7 +93,7 @@ const schemaEnrichment = {
                         </div>
                     </div>
                 </div>
-                <p class={`text-xl text-[#9d2235]`}>CAFÉ</p>
+                <p class={`text-xl text-[#9d2235]`}>{restaurantData.description}</p>
             </div>
 
             {/* Menu Section - CAFÉ */}
@@ -239,8 +258,6 @@ const schemaEnrichment = {
                     </h2>
                     <Gallery
                         images={galleryImages}
-                        imagesClass="w-full"
-                        imagesContainerClass="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-1 mb-8" 
                     />
                 </div>
             </div>
