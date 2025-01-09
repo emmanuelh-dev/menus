@@ -11,17 +11,19 @@ interface ImageData {
 interface Props {
   images: ImageData[];
   buttonClasses?: string;
+  imagesClass?: string;
+  imagesContainerClass?: string;
 }
 
-const { images, buttonClasses } = Astro.props;
+const { images, buttonClasses, imagesClass, imagesContainerClass } = Astro.props;
 ---
 
 <div class="mx-auto">
-  <div class=`grid grid-cols-1 grid-cols-2 gap-6 ${images.length > 3 ? 'md:grid-cols-3 ' : images.length > 4 ? 'lg:grid-cols-4' : ''}` >
+  <div class={imagesContainerClass ? imagesContainerClass : `grid grid-cols-2 gap-6 ${images.length > 3 ? 'md:grid-cols-3 ' : images.length > 4 ? 'lg:grid-cols-4' : ''}`} >
     {
       images.map((image: ImageData, index: number) => (
         <div 
-          class="relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-[1.03] group"
+          class='relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-[1.03] group'
           data-visible={index < 6 ? 'true' : 'false'}
           style={index >= 6 ? 'display: none;' : ''}
         >
@@ -29,7 +31,7 @@ const { images, buttonClasses } = Astro.props;
             src={image.src}
             alt={image.alt}
             width={800}
-            class="w-full aspect-square object-cover object-center"
+            class={`${imagesClass ? imagesClass : 'w-full aspect-square object-cover object-center'}}`}
             quality="mid"
           />
           {image.title && (
