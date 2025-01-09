@@ -9,6 +9,8 @@ import antojitosdonaguillelogo from './antojitosdonaguille/logo.jpg';
 import alchemycoffeelablogo from './alchemycoffeelab/espuma.jpg';
 import antojitostauro from './antojitostauro/logo.jpg';
 import papachinislogo from './papachinis/logo.jpg';
+import fosforo from './fosforocafe/media/menu.jpg';
+
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
 type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
@@ -80,6 +82,15 @@ const case_studies: Restaurant[] = [
         restaurantLink: "/menus/papachinis",
         image: papachinislogo,
         link: "/menus/papachinis",
+        industry: "Restaurante",
+        type: "Fast Food",
+    },
+    {
+        name: "FOSFORO",
+        description: "La mejor comida de la zona",
+        restaurantLink: "/menus/fosforocafe",
+        image: fosforo,
+        link: "/menus/fosforocafe",
         industry: "Restaurante",
         type: "Fast Food",
     }
