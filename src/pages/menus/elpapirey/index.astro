@@ -38,12 +38,16 @@ const socialMedia = {
 };
 
 const contactInfo = {
-  clabe: "728969000034765417",
+  clabe: "646180321700000012", // CLABE existente
+  clabe2: "646015206825470152", // Nueva CLABE
+  beneficiary2: "Yazmin Yala", // Nuevo beneficiario
+  bank2: "STP", // Nuevo banco
   delivery: "$25 - $35",
   hours: "Jueves a Martes de 6:30pm-12:30am",
   address: "Calzada Union #231, Talaverna Croc",
   whatsapp: "8133906548",
 };
+
 const restaurantData = {
   name: "El Papi Rey",
   description: "Hamburguesas, Hot Dogs y Antojitos Mexicanos",
@@ -91,7 +95,9 @@ const schemaEnrichment = {
   textWhite={true}
   backgroundColor="bg-black"
 >
-  <div class="min-h-screen bg-black flex items-center justify-center p-8 permanent-marker-regular">
+  <div
+    class="min-h-screen bg-black flex items-center justify-center p-8 permanent-marker-regular"
+  >
     <div class="w-full max-w-2xl bg-black p-6 rounded-lg">
       <!-- Header with Logo and Social Media -->
       <div class="flex flex-col items-center mb-8">
@@ -137,87 +143,126 @@ const schemaEnrichment = {
       </div>
 
       <!-- Contact Information -->
-      <div class="space-y-4 text-center">
-        <div class="bg-purple-900 rounded-lg p-3 mb-4 relative group">
-          <p class="text-white font-bold">TRANSFERENCIA CLABE:</p>
-          <div class="relative">
-            <p
-              id="clabeNumber"
-              class="text-yellow-400 font-mono cursor-pointer"
-            >
-              {contactInfo.clabe}
+
+      <div class="max-w-2xl mx-auto p-4">
+        <div class="space-y-4 text-center">
+          <!-- Segunda CLABE -->
+          <div class="bg-purple-900 rounded-lg p-3 mb-4 relative group">
+            <p class="text-white font-bold">
+              TRANSFERENCIA {contactInfo.bank2}:
             </p>
-            <button
-              id="copyButton"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-label="Copiar CLABE"
-            >
-              <i class="fas fa-copy"></i>
-            </button>
-            <div
-              id="copyMessage"
-              class="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-green-500 text-white px-3 py-1 rounded-md text-sm opacity-0 transition-opacity"
-            >
-              ¡Copiado al portapapeles!
+            <p class="text-white text-sm mb-2">
+              Beneficiario: {contactInfo.beneficiary2}
+            </p>
+            <div class="relative">
+              <p
+                id="clabeNumber"
+                class="text-yellow-400 font-mono cursor-pointer"
+              >
+                {contactInfo.clabe}
+              </p>
+              <button
+                id="copyButton"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Copiar CLABE"
+              >
+                <i class="fas fa-copy"></i>
+              </button>
+              <div
+                id="copyMessage"
+                class="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-green-500 text-white px-3 py-1 rounded-md text-sm opacity-0 transition-opacity"
+              >
+                ¡Copiado al portapapeles!
+              </div>
+              <div class="relative">
+                <p
+                  id="clabeNumber2"
+                  class="text-yellow-400 font-mono cursor-pointer"
+                >
+                  {contactInfo.clabe2}
+                </p>
+                <button
+                  id="copyButton2"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Copiar CLABE"
+                >
+                  <i class="fas fa-copy"></i>
+                </button>
+                <div
+                  id="copyMessage2"
+                  class="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-green-500 text-white px-3 py-1 rounded-md text-sm opacity-0 transition-opacity"
+                >
+                  ¡Copiado al portapapeles!
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="text-white space-y-2">
+            <p class="text-xl">Servicio a Domicilio {contactInfo.delivery}</p>
+            <p>{contactInfo.hours}</p>
+            <p>{contactInfo.address}</p>
+            <a
+              href={`https://wa.me/${contactInfo.whatsapp}`}
+              class="inline-flex items-center gap-2 text-green-500 text-xl mt-4"
+            >
+              <i class="fab fa-whatsapp"></i>
+              {contactInfo.whatsapp}
+            </a>
           </div>
         </div>
 
-        <div class="text-white space-y-2">
-          <p class="text-xl">Servicio a Domicilio {contactInfo.delivery}</p>
-          <p>{contactInfo.hours}</p>
-          <p>{contactInfo.address}</p>
-          <a
-            href={`https://wa.me/${contactInfo.whatsapp}`}
-            class="inline-flex items-center gap-2 text-green-500 text-xl mt-4"
-          >
-            <i class="fab fa-whatsapp"></i>
-            {contactInfo.whatsapp}
-          </a>
-        </div>
+        <script>
+          function showCopyMessage(messageElement) {
+            if (!messageElement) return;
+
+            messageElement.style.opacity = "1";
+            setTimeout(() => {
+              messageElement.style.opacity = "0";
+            }, 2000);
+          }
+
+          async function copyClabe(clabeElement, messageElement) {
+            if (!clabeElement) return;
+
+            const clabe = clabeElement.textContent?.trim() || "";
+            try {
+              await navigator.clipboard.writeText(clabe);
+              showCopyMessage(messageElement);
+            } catch (err) {
+              console.error("Error al copiar:", err);
+            }
+          }
+
+          const clabeNumber = document.getElementById("clabeNumber");
+          const copyButton = document.getElementById("copyButton");
+          const copyMessage = document.getElementById("copyMessage");
+
+          if (clabeNumber && copyButton) {
+            clabeNumber.addEventListener("click", () =>
+              copyClabe(clabeNumber, copyMessage)
+            );
+            copyButton.addEventListener("click", (e) => {
+              e.stopPropagation();
+              copyClabe(clabeNumber, copyMessage);
+            });
+          }
+
+          // Segunda CLABE
+          const clabeNumber2 = document.getElementById("clabeNumber2");
+          const copyButton2 = document.getElementById("copyButton2");
+          const copyMessage2 = document.getElementById("copyMessage2");
+
+          if (clabeNumber2 && copyButton2) {
+            clabeNumber2.addEventListener("click", () =>
+              copyClabe(clabeNumber2, copyMessage2)
+            );
+            copyButton2.addEventListener("click", (e) => {
+              e.stopPropagation();
+              copyClabe(clabeNumber2, copyMessage2);
+            });
+          }
+        </script>
       </div>
     </div>
   </div>
-
-  <script>
-    // Copy functionality
-    const clabeNumber = document.getElementById("clabeNumber");
-    const copyButton = document.getElementById("copyButton");
-    const copyMessage = document.getElementById("copyMessage");
-    let timeoutId;
-
-    function showCopyMessage() {
-      if (!copyMessage) return; // Early return si copyMessage es null
-
-      copyMessage.style.opacity = "1";
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        if (copyMessage) {
-          // Verificar nuevamente dentro del timeout
-          copyMessage.style.opacity = "0";
-        }
-      }, 2000);
-    }
-
-    async function copyClabe() {
-      if (!clabeNumber) return; // Early return si clabeNumber es null
-
-      const clabe = clabeNumber.textContent?.trim() || "";
-      try {
-        await navigator.clipboard.writeText(clabe);
-        showCopyMessage();
-      } catch (err) {
-        console.error("Error al copiar:", err);
-      }
-    }
-
-    if (clabeNumber && copyButton) {
-      clabeNumber.addEventListener("click", copyClabe);
-      copyButton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        copyClabe();
-      });
-    }
-  </script>
 </RestaurantLayout>
-
