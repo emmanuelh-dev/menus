@@ -8,11 +8,21 @@ import cafetera from "./media/cafetera.jpg";
 import pared from "./media/pared.jpg";
 import latte from "./media/latte.jpg";
 import helado from "./media/helado.jpg";
+import logo from "./media/logo.png";
+import { Image } from "astro:assets";
+import icon from "./media/icon.png";
+
+
 const galleryImages = [
     {
         src: menu,
         alt: "Menu",
         title: "Menu",
+    },
+    {
+        src: icon,
+        alt: "Instagram",
+        title: "Instagram",
     },
     { src: cafetera, alt: "Cafetera", title: "Cafetera" },
     {
@@ -77,29 +87,22 @@ const schemaEnrichment = {
     schemaEnrichment={schemaEnrichment}
     backgroundColor="bg-[#faf7f2]"
     image={menu.src}
+    favicon={icon.src}
 >
     <div class="bg-[#faf7f2]">
         <div class="max-w-2xl mx-auto p-8">
             {/* Logo and Brand */}
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center mb-2">
-                    <h1 class="text-[#9d2235] text-4xl font-bold">{restaurantData.name}</h1>
-                    <div class="w-6 h-6 ml-2">
-                        <div class="w-3 h-3 bg-[#9d2235] transform rotate-45">
-                        </div>
-                        <div
-                            class="w-3 h-3 bg-[#9d2235] transform -translate-y-1"
-                        >
-                        </div>
-                    </div>
+                    <Image src={logo} alt="Logo FOSFORO Cafe" />
                 </div>
-                <p class={`text-xl text-[#9d2235]`}>{restaurantData.description}</p>
+                <p class={`text-xl text-[#AE1836]`}>{restaurantData.name} {restaurantData.description}</p>
             </div>
 
             {/* Menu Section - CAFÉ */}
             <div class="mb-8">
                 <h2
-                    class={`text-2xl text-[#9d2235] border-b-2 border-[#9d2235] mb-4`}
+                    class={`text-2xl text-[#AE1836] border-b-2 border-[#AE1836] mb-4`}
                 >
                     CAFÉ
                 </h2>
@@ -190,7 +193,7 @@ const schemaEnrichment = {
             {/* Menu Section - NO CAFÉ */}
             <div>
                 <h2
-                    class={`text-2xl text-[#9d2235] border-b-2 border-[#9d2235] mb-4`}
+                    class={`text-2xl text-[#AE1836] border-b-2 border-[#AE1836] mb-4`}
                 >
                     NO CAFÉ
                 </h2>
@@ -252,7 +255,7 @@ const schemaEnrichment = {
                 <div class="text-center max-w-5xl mx-auto">
                     {/* Image gallery */}
                     <h2
-                        class="text-5xl py-6 text-[#9d2235] font-serif mb-2 font-bold"
+                        class="text-5xl py-6 text-[#AE1836] font-serif mb-2 font-bold"
                     >
                         Galeria
                     </h2>
