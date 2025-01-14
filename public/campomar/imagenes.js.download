@@ -1,0 +1,103 @@
+
+    let ubicacionPrincipal = window.pageYOffset;
+    let  numSpan = 0;
+    let  numSpan2 = 0;
+    let  numSpan3 = 0;
+    let  numSpan4 = 0;
+    let  numSpan5 = 0;
+    let  numSpan6 = 0;
+    let  numSpan7 = 0;
+    let  numSpan8 = 0;
+    let  numSpan9 = 0;
+    let  numSpan10 = 0;
+    let  numSpan11 = 0;
+    let  numSpan12 = 0;
+    window.onscroll = function(){
+      let Desplazamiento = window.pageYOffset;
+
+      ubicacionPrincipal = Desplazamiento;
+      
+      if (screen.width < 1400){
+        if(ubicacionPrincipal <= 401){
+          if( numSpan2 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_izq img_4' src='../assets/public/img/campomar/4.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_izq img_4' src='../../../assets/public/img/campomar/4.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_izq img_4' src='../../assets/public/img/campomar/4.jpg'>" );
+            numSpan2 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 770){
+          if( numSpan3 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_dere img_5' src='../assets/public/img/campomar/5.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_dere img_5' src='../../../assets/public/img/campomar/5.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_dere img_5' src='../../assets/public/img/campomar/5.jpg'>" );
+            numSpan3 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 1300){
+          if( numSpan4 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_izq img_8' src='../assets/public/img/campomar/7.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_izq img_8' src='../../../assets/public/img/campomar/7.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_izq img_8' src='../../assets/public/img/campomar/7.jpg'>" );
+            numSpan4 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 1830){
+          if( numSpan5 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_dere img_9' src='../assets/public/img/campomar/3.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_dere img_9' src='../../../assets/public/img/campomar/3.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_dere img_9' src='../../assets/public/img/campomar/3.jpg'>" );
+            numSpan5 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 2380){
+          if( numSpan6 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_izq img_12' src='../assets/public/img/campomar/1.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_izq img_12' src='../../../assets/public/img/campomar/1.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_izq img_12' src='../../assets/public/img/campomar/1.jpg'>" );
+            numSpan6 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 2830){
+          if( numSpan7 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_dere img_13' src='../assets/public/img/campomar/3.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_dere img_13' src='../../../assets/public/img/campomar/3.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_dere img_13' src='../../assets/public/img/campomar/3.jpg'>" );
+            numSpan7 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 3380){
+          if( numSpan8 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_izq img_16' src='../assets/public/img/campomar/2.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_izq img_16' src='../../../assets/public/img/campomar/2.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_izq img_16' src='../../assets/public/img/campomar/2.jpg'>" );
+            numSpan8 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 3830){
+          if( numSpan9 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_dere img_17' src='../assets/public/img/campomar/6.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_dere img_17' src='../../../assets/public/img/campomar/6.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_dere img_17' src='../../assets/public/img/campomar/6.jpg'>" );
+            numSpan9 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 4380){
+          if( numSpan10 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_izq img_20' src='../assets/public/img/campomar/10.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_izq img_20' src='../../../assets/public/img/campomar/10.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_izq img_20' src='../../assets/public/img/campomar/10.jpg'>" );
+            numSpan10 = 1;
+          } 
+        }
+        else if(ubicacionPrincipal <= 4830){
+          if( numSpan11 == 0 ){
+            $( ".imagenes_fondo_home" ).append( "<img class='img_fondo_dere img_21' src='../assets/public/img/campomar/11.jpg'>" );
+            $( ".imagenes_fondo_cat" ).append( "<img class='img_fondo_dere img_21' src='../../../assets/public/img/campomar/11.jpg'>" );
+            $( ".imagenes_fondo" ).append( "<img class='img_fondo_dere img_21' src='../../assets/public/img/campomar/11.jpg'>" );
+            numSpa11 = 1;
+          } 
+        }
+      }
+
+    }
