@@ -11,7 +11,7 @@ const schemaEnrichment = {
     addressLocality: "San Pedro Garza García",
     addressRegion: "N.L.",
     postalCode: "66266",
-    addressCountry: "MX"
+    addressCountry: "MX",
   },
   telephone: "+52 81 3675 1161",
   priceRange: "$$$",
@@ -22,21 +22,19 @@ const schemaEnrichment = {
   currenciesAccepted: ["MXN"],
   email: "",
   delivery: {
-    available: false
+    available: false,
   },
   socialMedia: {
-    website: "grupomandala.com.mx"
-  }
+    website: "grupomandala.com.mx",
+  },
 };
-
-
 ---
 
 <RestaurantLayout
   title={restaurantData.name}
   description={restaurantData.description}
   schemaEnrichment={schemaEnrichment}
-  backgroundColor="bg-[#ebebeb]"
+  backgroundColor="bg-black"
   textWhite={false}
 >
   <!-- saved from url=(0069)https://grupocampomar.com/menu/monterrey/campomar/categoria/alimentos -->
@@ -74,7 +72,6 @@ const schemaEnrichment = {
       <link rel="stylesheet" href="/campomar/swiper.min.css" />
       <link rel="stylesheet" href="/campomar/photoswipe.min.css" />
       <link rel="stylesheet" href="/campomar/default-skin.min.css" />
-      <link rel="stylesheet" href="/campomar/style.min.css" />
       <link rel="stylesheet" href="/campomar/productos-estilos.css" />
       <link rel="stylesheet" href="/campomar/estilos_campomar_planti7.css" />
       <link rel="stylesheet" href="/campomar/wow.css" />
@@ -130,16 +127,9 @@ const schemaEnrichment = {
         }
       </style>
       <!-- HEADER -->
-      <div
-        class="pag_contenido pag_cont_alimentos"
-        style="background: #fff !important;"
-      >
-        <div
-          class="container-fluid ver cat_campomar"
-          style="padding: 0px !important;padding-top: 0px !important;"
-        >
+      <div>
+        <div>
           <div id="tmpWrapper" style="height: 80px;"></div><div id="tmpWrapper">
-          </div><div id="tmpWrapper"></div>
 
           <table
             class="rwd_auto fontsize container-fluid fondo_p7"
@@ -154,9 +144,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >ENTRADAS<br /></span
-                    >
+                    <span class="font_3 campom_prod">ENTRADAS<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -175,7 +163,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Consome de camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>70 grs</span>
+                            ><span class="aster">*</span>70 grs</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -208,7 +197,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>250 gr. camarón cocido,
                             camarón curtido, atún y callo perla con un toque de
-                            clamato.</span>
+                            clamato.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -240,7 +230,8 @@ const schemaEnrichment = {
                             >Aguachile verde <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>230 gr. de camarón
-                            fresco curtido en una salsa de chile serrano.</span>
+                            fresco curtido en una salsa de chile serrano.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -272,7 +263,8 @@ const schemaEnrichment = {
                             >Aguachile negro <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>230 gr. camarón curtido
-                            en salsa artesanal de chiles tatemados</span>
+                            en salsa artesanal de chiles tatemados</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -303,7 +295,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Ceviche de róbalo el tigre <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>230 gr.</span>
+                            ><span class="aster">*</span>230 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -335,7 +328,8 @@ const schemaEnrichment = {
                             >Ceviche de camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>230 gr. camarón
-                            curtido, jitomate, cebolla, pepino y cilantro</span>
+                            curtido, jitomate, cebolla, pepino y cilantro</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -368,7 +362,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>230 gr. camarón
                             curtido, jitomate cebolla, cilantro con un toque de
-                            chiltepin</span>
+                            chiltepin</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -399,7 +394,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Ceviche de pescado acaponeta <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 grs</span>
+                            ><span class="aster">*</span>500 grs</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -431,7 +427,8 @@ const schemaEnrichment = {
                             >Botana de mariscos <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>540 gr. camarón, pulpo
-                            y atún</span>
+                            y atún</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -463,7 +460,8 @@ const schemaEnrichment = {
                             >Botana mixta salseada <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>350 gr. camarón, pulpo
-                            y atún</span>
+                            y atún</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -496,7 +494,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>400 gr. camarón cocido,
                             camarón crudo, atún, pulpo, callo de almeja y callo
-                            perla.</span>
+                            perla.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -527,7 +526,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pulpo a la gallega <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr.</span>
+                            ><span class="aster">*</span>400 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -559,9 +559,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >LO FRESCO<br /></span
-                    >
+                    <span class="font_3 campom_prod">LO FRESCO<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -582,7 +580,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>120 gr. láminas de atún
                             fresco, en aceite perfumado y balsámico, perejil y
-                            cebollín.</span>
+                            cebollín.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -615,7 +614,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>120 gr. láminas de
                             salmón fresco, en aceite perfumado y balsámico ,
-                            queso parmesano y alcaparra</span>
+                            queso parmesano y alcaparra</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -645,7 +645,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Almeja reina <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza</span>
+                            ><span class="aster">*</span>1 pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -676,7 +677,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Almeja mantequilla <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1pza</span>
+                            ><span class="aster">*</span>1pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -707,7 +709,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Almeja chocolata <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1pza</span>
+                            ><span class="aster">*</span>1pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -738,7 +741,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Ostión pesca del dia <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>6 pza.</span>
+                            ><span class="aster">*</span>6 pza.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -770,9 +774,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >TOSTADAS<br /></span
-                    >
+                    <span class="font_3 campom_prod">TOSTADAS<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -792,7 +794,8 @@ const schemaEnrichment = {
                             >Tost. cokinera <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza, 130 gr pulpo
-                            camarón y paté de marlín</span>
+                            camarón y paté de marlín</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -824,7 +827,8 @@ const schemaEnrichment = {
                             >Tost. paté de marlín <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza, 110 gr a base de
-                            paté de marlín</span>
+                            paté de marlín</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -856,7 +860,8 @@ const schemaEnrichment = {
                             >Tost. ceviche de pescado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. el original
-                            acaponeta con zanahoria rallada y chile serrano.</span>
+                            acaponeta con zanahoria rallada y chile serrano.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -888,7 +893,8 @@ const schemaEnrichment = {
                             >Tost. ceviche de camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza, 110 gr. camarón
-                            curtido, jitomate, cebolla, pepino y cilantro</span>
+                            curtido, jitomate, cebolla, pepino y cilantro</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -921,7 +927,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. 115 gr *de
                             camarón fresco curtido en una salsa de chile
-                            serrano.</span>
+                            serrano.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -953,7 +960,8 @@ const schemaEnrichment = {
                             >Tost. aguachile negro <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza, 115 gr. camarón
-                            curtido en salsa artesanal de chiles tatemados</span>
+                            curtido en salsa artesanal de chiles tatemados</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1018,7 +1026,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>195 gr. ceviche de
                             pescado, camarón, pulpo, callo perla con mayonesa de
-                            ceniza de habanero</span>
+                            ceniza de habanero</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1051,7 +1060,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. base de paté de
                             marlín con camarón cocido curtido, atún en clamato y
-                            chiltepín</span>
+                            chiltepín</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1082,7 +1092,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;">Tost. mixta <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1pza,150 gr. pulpo y
-                            camarón</span>
+                            camarón</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1113,7 +1124,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Tost. pulpo zarandeado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza</span>
+                            ><span class="aster">*</span>1 pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1146,7 +1158,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>90 gr. láminas de atún,
                             poro frito, chips de camote bañana en nuestra salsa
-                            ponzu</span>
+                            ponzu</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1179,7 +1192,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>130 gr .cubos de atún
                             marinados en nuestra salsa de jengibre, cilantro y
-                            un toque de habanero</span>
+                            un toque de habanero</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1212,7 +1226,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>90 gr. cubos de atún,
                             pepino, cebolla, jitomate y cilantro preparado en
-                            nuestra salsa chiltepín</span>
+                            nuestra salsa chiltepín</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1245,7 +1260,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza - 150 gr. base de
                             frijol con camarón, pulpo a las brazas y un gratín
-                            de queso.</span>
+                            de queso.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1276,7 +1292,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Tost. mixta de camarón y pulpo <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza 120 gr</span>
+                            ><span class="aster">*</span>1 pza 120 gr</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1327,7 +1344,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Empanada de camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1pza</span>
+                            ><span class="aster">*</span>1pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1358,7 +1376,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco de frijol <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza</span>
+                            ><span class="aster">*</span>1 pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1389,7 +1408,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco de marlín <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza, a las brazas</span>
+                            ><span class="aster">*</span>1 pieza, a las brazas</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1420,7 +1440,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco chicharrón de pescado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza</span>
+                            ><span class="aster">*</span>1 pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1451,7 +1472,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco chicharrón de camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza</span>
+                            ><span class="aster">*</span>1 pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1483,7 +1505,8 @@ const schemaEnrichment = {
                             >Taco gobernador de mariscos <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. pulpo, camarón y
-                            pescado.</span>
+                            pescado.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1514,7 +1537,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco azul de jaiba <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1pza</span>
+                            ><span class="aster">*</span>1pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1545,7 +1569,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco gobernador <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza</span>
+                            ><span class="aster">*</span>1 pza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1576,7 +1601,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;">Taco vaquero <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. tortilla de
-                            harina con queso planchado y camaron zarandeado.</span>
+                            harina con queso planchado y camaron zarandeado.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1608,7 +1634,8 @@ const schemaEnrichment = {
                             >Taco vaquero de pulpo <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. tortilla de
-                            harina con queso planchado y pulpo zarandeado.</span>
+                            harina con queso planchado y pulpo zarandeado.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1640,7 +1667,8 @@ const schemaEnrichment = {
                             >Chorreada de camarón y pulpo <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>1 pza. asientos de
-                            chicharrón, pulpo y camarón al tifi tifi.</span>
+                            chicharrón, pulpo y camarón al tifi tifi.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1671,7 +1699,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco de arrachera <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>3 pzs</span>
+                            ><span class="aster">*</span>3 pzs</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1702,7 +1731,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco doña concha <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza, zarandeado.</span>
+                            ><span class="aster">*</span>1 pza, zarandeado.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1733,7 +1763,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco de diezmillo <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>3 pza.</span>
+                            ><span class="aster">*</span>3 pza.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1764,7 +1795,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco gaonera de rib eye <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>3 pza.</span>
+                            ><span class="aster">*</span>3 pza.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1794,7 +1826,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Taco de vacio <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1825,7 +1858,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco de frijol c/chicharron <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza.</span>
+                            ><span class="aster">*</span>1 pza.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1856,7 +1890,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Taco vaquero con chicharron <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pza.</span>
+                            ><span class="aster">*</span>1 pza.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1905,7 +1940,8 @@ const schemaEnrichment = {
                             >Coctel campechano grande <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>180 gr. camarón 75g.
-                            pulpo 75g.</span>
+                            pulpo 75g.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1937,7 +1973,8 @@ const schemaEnrichment = {
                             >Coctel campechano mediano <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>145 gr camarón 60g.
-                            pulpo 45gr.</span>
+                            pulpo 45gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -1969,7 +2006,8 @@ const schemaEnrichment = {
                             >Sopa de mariscos <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>350 gr. pescado, pulpo,
-                            camarón, callo de almeja, jaiba y mejillón.</span>
+                            camarón, callo de almeja, jaiba y mejillón.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2056,7 +2094,8 @@ const schemaEnrichment = {
                             >Camarones campomar zarandeados <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>650 gr. con arroz
-                            frito.</span>
+                            frito.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2087,7 +2126,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones zarandeados <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr, con cascara.</span>
+                            ><span class="aster">*</span>500 gr, con cascara.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2118,7 +2158,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones zarandeados <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr, pelados</span>
+                            ><span class="aster">*</span>500 gr, pelados</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2149,7 +2190,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Ostión piedra zarandeado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>6 piezas</span>
+                            ><span class="aster">*</span>6 piezas</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2180,7 +2222,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Salmón zarandeado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr.</span>
+                            ><span class="aster">*</span>400 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2211,7 +2254,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pulpo zarandeado con camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr. con cáscara</span>
+                            ><span class="aster">*</span>400 gr. con cáscara</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2242,7 +2286,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pescado zarandeado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>Precio por kg</span>
+                            ><span class="aster">*</span>Precio por kg</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2274,9 +2319,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >NUESTRA COCINA<br /></span
-                    >
+                    <span class="font_3 campom_prod">NUESTRA COCINA<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -2294,7 +2337,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Pescado frito <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>Precio por kg</span>
+                            ><span class="aster">*</span>Precio por kg</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2325,7 +2369,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Chicharrón de pescado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr.</span>
+                            ><span class="aster">*</span>400 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2356,7 +2401,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Chicharrón camarón <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2387,7 +2433,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Chicharrón mixto <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2418,7 +2465,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Mejillones mixteados <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2449,7 +2497,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Meillones al vino blanco <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr</span>
+                            ><span class="aster">*</span>500 gr</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2480,7 +2529,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Tentaculos de pulpo al tifi tifi <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>350 gr</span>
+                            ><span class="aster">*</span>350 gr</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2530,12 +2580,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones mixteados<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2562,12 +2614,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones al tifi tifi<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>300 gr.</span>
+                            ><span class="aster">*</span>300 gr.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2594,12 +2648,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones al mojo de ajo<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2626,12 +2682,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones a la diabla<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2658,12 +2716,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones a la negra<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr.</span>
+                            ><span class="aster">*</span>500 gr.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2692,12 +2752,14 @@ const schemaEnrichment = {
                             camarones pelados<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>300 gr. sin cabeza.
-                            sazón a elegir.</span>
+                            sazón a elegir.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2724,12 +2786,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones empanizados<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>300 gr, orden completa</span>
+                            ><span class="aster">*</span>300 gr, orden completa</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2756,12 +2820,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones empanizados<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>200 gr, 1/2 orden</span>
+                            ><span class="aster">*</span>200 gr, 1/2 orden</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2788,12 +2854,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones al coco<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>300 gr. orden completa</span>
+                            ><span class="aster">*</span>300 gr. orden completa</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2820,12 +2888,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones al coco<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>200 gr, media orden.</span>
+                            ><span class="aster">*</span>200 gr, media orden.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2852,12 +2922,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarón y pulpo al tifi<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>300 gr.</span>
+                            ><span class="aster">*</span>300 gr.</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2884,12 +2956,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones c/c y pulpo al tifi tifi<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>300 gr</span>
+                            ><span class="aster">*</span>300 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2920,9 +2994,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >PESCADOS<br /></span
-                    >
+                    <span class="font_3 campom_prod">PESCADOS<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -2942,7 +3014,8 @@ const schemaEnrichment = {
                             >Medallón de atún <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>400 gr. medallones de
-                            atún en costra de ajonjolí, aderezo con balsámico.</span>
+                            atún en costra de ajonjolí, aderezo con balsámico.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -2973,7 +3046,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Salmón a las finas hierbas <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr. por temporada</span>
+                            ><span class="aster">*</span>400 gr. por temporada</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3036,7 +3110,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Salmón con camarón zarandeado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr, por temporada</span>
+                            ><span class="aster">*</span>400 gr, por temporada</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3068,9 +3143,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >LO PREMIUM<br /></span
-                    >
+                    <span class="font_3 campom_prod">LO PREMIUM<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -3091,7 +3164,8 @@ const schemaEnrichment = {
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3119,12 +3193,14 @@ const schemaEnrichment = {
                             >Botana campomar<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>900gr. camarón, pulpo y
-                            callo de hacha <br /> media orden</span>
+                            callo de hacha <br /> media orden</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3148,7 +3224,8 @@ const schemaEnrichment = {
                         </div>
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3171,12 +3248,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Lonja de robalo zarandeada<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>300 gr</span>
+                            ><span class="aster">*</span>300 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3203,12 +3282,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Lonja de robalo con camarón<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr</span>
+                            ><span class="aster">*</span>400 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3236,12 +3317,14 @@ const schemaEnrichment = {
                             >Pulpos preparados<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>Orden completamojo de
-                            ajo, tifi tifi, mixteado o diabla <br /> media orden</span>
+                            ajo, tifi tifi, mixteado o diabla <br /> media orden</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3265,7 +3348,8 @@ const schemaEnrichment = {
                         </div>
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3289,12 +3373,14 @@ const schemaEnrichment = {
                             >Pulpo zarandeado<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>Orden completa <br /> media
-                            orden</span>
+                            orden</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3318,7 +3404,8 @@ const schemaEnrichment = {
                         </div>
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3341,12 +3428,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pulpo y camarón zarandeado<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr</span>
+                            ><span class="aster">*</span>400 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3372,12 +3461,14 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Langosta maine<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>Viva</span>
+                            ><span class="aster">*</span>Viva</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3405,12 +3496,14 @@ const schemaEnrichment = {
                             >Tenaza king crab<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>Al mojo de ajo,
-                            mixteada o mantequilla</span>
+                            mixteada o mantequilla</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3437,12 +3530,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camaron azul zarandeado<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>500 gr</span>
+                            ><span class="aster">*</span>500 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3473,8 +3568,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod">PASTAS<br /></span
-                    >
+                    <span class="font_3 campom_prod">PASTAS<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -3495,7 +3589,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>280 gr. fetuccini con
                             camarón, mejillón, almeja y pulpo, salsa de pomodoro
-                            con chile de árbol.</span>
+                            con chile de árbol.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3528,7 +3623,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>350 gr. fetuccini en
                             salsa cremosa de queso parmesano con camarón
-                            arandeado a la mantequilla.</span>
+                            arandeado a la mantequilla.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3560,7 +3656,8 @@ const schemaEnrichment = {
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>350 gr. fetuccini
                             salteada con almeja y mejillones, en una salsa
-                            cítrica de vino blanco.</span>
+                            cítrica de vino blanco.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3591,7 +3688,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;">Pasta alfredo <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>300 gr. fetuccini en
-                            salsa cremosa de queso parmesano.</span>
+                            salsa cremosa de queso parmesano.</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3623,8 +3721,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >NUESTROS CORTES<br /></span
+                    <span class="font_3 campom_prod">NUESTROS CORTES<br /></span
                     >
                     <br />
                   </div></td
@@ -3640,12 +3737,14 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Rib eye<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr</span>
+                            ><span class="aster">*</span>400 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3671,12 +3770,14 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Arrachera<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 gr</span>
+                            ><span class="aster">*</span>400 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3724,12 +3825,14 @@ const schemaEnrichment = {
                             >Pizza de fruto de mar<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>250 gr. camarón, pulpo
-                            y mejillón</span>
+                            y mejillón</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3756,12 +3859,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pizza hawaiana de camarón<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>270 gr</span>
+                            ><span class="aster">*</span>270 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3788,12 +3893,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pizza de pepperoni<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>100 gr</span>
+                            ><span class="aster">*</span>100 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3821,12 +3928,14 @@ const schemaEnrichment = {
                             >Pizza de marlín a la mexicana<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
                             ><span class="aster">*</span>280 gr. marlín de la
-                            casa, jitomate, chile jalapeño y aguacate</span>
+                            casa, jitomate, chile jalapeño y aguacate</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3853,12 +3962,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Camarones empanizados infantil<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>200 gr</span>
+                            ><span class="aster">*</span>200 gr</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3885,12 +3996,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Filete empanizado infantil<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>200 grs</span>
+                            ><span class="aster">*</span>200 grs</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3917,12 +4030,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Verduras al grill<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>120 grs</span>
+                            ><span class="aster">*</span>120 grs</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3949,12 +4064,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Coliflor al horno<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>400 grs</span>
+                            ><span class="aster">*</span>400 grs</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -3989,7 +4106,8 @@ const schemaEnrichment = {
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4016,12 +4134,14 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Betabel a las brasas<br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>450 grs</span>
+                            ><span class="aster">*</span>450 grs</span
+                          >
                         </div>
 
                         <div class="prod_camp_t2">
                           <span class="font_4"
-                            ><span class="font_camp_precio2"></span></span>
+                            ><span class="font_camp_precio2"></span></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4052,9 +4172,7 @@ const schemaEnrichment = {
               <tr
                 ><td class="td_prod"
                   ><div class="font_3 centrar_texto">
-                    <span class="font_3 campom_prod"
-                      >POSTRES<br /></span
-                    >
+                    <span class="font_3 campom_prod">POSTRES<br /></span>
                     <br />
                   </div></td
                 ></tr
@@ -4073,7 +4191,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Brownie de chocolate <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4104,7 +4223,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Plátanos fritos <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4135,7 +4255,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pay de guayaba <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4166,7 +4287,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Flan napolitano <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4197,7 +4319,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Plátanos con dulce de leche <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza *con brandy</span>
+                            ><span class="aster">*</span>1 pieza *con brandy</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4226,7 +4349,8 @@ const schemaEnrichment = {
                           <span
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;"
-                            >Plátanos tatemados <br /></span>
+                            >Plátanos tatemados <br /></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4256,7 +4380,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Pan de elote <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4287,7 +4412,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Pastel de 3 leches <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4318,7 +4444,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Nieve de vainilla <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>1 pieza</span>
+                            ><span class="aster">*</span>1 pieza</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4363,7 +4490,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Espresso <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>60 ml</span>
+                            ><span class="aster">*</span>60 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4394,7 +4522,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Espresso cortado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>60 ml</span>
+                            ><span class="aster">*</span>60 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4425,7 +4554,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Espresso doble <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>120 ml</span>
+                            ><span class="aster">*</span>120 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4456,7 +4586,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Espresso doble cortado <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>120 ml</span>
+                            ><span class="aster">*</span>120 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4486,7 +4617,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Capuccino <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>200 ml</span>
+                            ><span class="aster">*</span>200 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4517,7 +4649,8 @@ const schemaEnrichment = {
                             style="margin-top: -3px;"
                             >Americano nespresso <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>200 ml</span>
+                            ><span class="aster">*</span>200 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4547,7 +4680,8 @@ const schemaEnrichment = {
                             class="font_3 campom_prod_cat"
                             style="margin-top: -3px;">Carajillo <br /></span
                           ><span class="font_5" style="margin-top: -3px;"
-                            ><span class="aster">*</span>120 ml</span>
+                            ><span class="aster">*</span>120 ml</span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4575,7 +4709,8 @@ const schemaEnrichment = {
                         <div class="prod_camp_t">
                           <span
                             class="font_3 campom_prod_cat"
-                            style="margin-top: -3px;">Carajilla <br /></span>
+                            style="margin-top: -3px;">Carajilla <br /></span
+                          >
                         </div>
                         <div class="prod_precio_cam">
                           <span class="font_4"
@@ -4606,8 +4741,8 @@ const schemaEnrichment = {
               </h1>
             </div>
           </div>
-    
         </div>
-      </div></body>
+      </div></body
+    >
   </html>
 </RestaurantLayout>
