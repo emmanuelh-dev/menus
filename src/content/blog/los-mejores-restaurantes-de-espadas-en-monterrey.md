@@ -37,13 +37,13 @@ La **barra de ensaladas es otro de sus puntos fuertes**, con opciones que van de
 
 Finalmente, **el ambiente de Mr. Pampas es familiar y cálido**, con música en vivo en ciertos días que añade un toque especial a la experiencia. Incluso, ofrecen áreas para niños, lo que lo convierte en una excelente opción para familias.
 
-## 4. Fogo de Chπo Monterrey
+## 4. Fogo de Chão Monterrey
 
-Fogo de Chπo, **ubicado en San Pedro Garza García**, es sinónimo de excelencia en churrascarías brasileñas. Este restaurante de alta categoría destaca por su ambiente sofisticado y su selección premium de cortes de carne.
+Fogo de Chão, **ubicado en San Pedro Garza García**, es sinónimo de excelencia en churrascarías brasileñas. Este restaurante de alta categoría destaca por su ambiente sofisticado y su selección premium de cortes de carne.
 
 **Cada pieza es asada a la perfección** y servida directamente desde las espadas, ofreciendo una experiencia única a los comensales. Pero, además de las carnes, cuentan con una impresionante barra de ensaladas que incluye ingredientes frescos y platillos gourmet como quesos importados y mariscos.
 
-Este restaurante es una opción ideal para ocasiones especiales, ya que **el servicio es impecable y el ambiente elegante** asegura una experiencia inolvidable. Por lo tanto, si buscas un lugar para impresionar a alguien o celebrar un momento importante, Fogo de Chπo es el lugar perfecto.
+Este restaurante es una opción ideal para ocasiones especiales, ya que **el servicio es impecable y el ambiente elegante** asegura una experiencia inolvidable. Por lo tanto, si buscas un lugar para impresionar a alguien o celebrar un momento importante, Fogo de Chão es el lugar perfecto.
 
 ### 5. Galpπo do Brasil Monterrey
 
