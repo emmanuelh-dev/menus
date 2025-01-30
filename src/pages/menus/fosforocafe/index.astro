@@ -11,267 +11,362 @@ import helado from "./media/helado.jpg";
 import logo from "./media/logo.png";
 import { Image } from "astro:assets";
 import icon from "./media/icon.png";
-
+import { Flame, Snowflake } from "lucide-react";
 
 const galleryImages = [
-    {
-        src: menu,
-        alt: "Menu",
-        title: "Menu",
-    },
-    {
-        src: icon,
-        alt: "Instagram",
-        title: "Instagram",
-    },
-    { src: cafetera, alt: "Cafetera", title: "Cafetera" },
-    {
-        src: vaso,
-        alt: "Drink",
-        title: "Drink",
-    },
-    {
-        src: pared,
-        alt: "Pared",
-        title: "Pared",
-    },
-    {
-        src: latte,
-        alt: "Latte",
-        title: "Latte",
-    },
-    {
-        src: helado,
-        alt: "Helado",
-        title: "Helado",
-    }
+  {
+    src: menu,
+    alt: "Menu",
+    title: "Menu",
+  },
+  {
+    src: icon,
+    alt: "Instagram",
+    title: "Instagram",
+  },
+  { src: cafetera, alt: "Cafetera", title: "Cafetera" },
+  {
+    src: vaso,
+    alt: "Drink",
+    title: "Drink",
+  },
+  {
+    src: pared,
+    alt: "Pared",
+    title: "Pared",
+  },
+  {
+    src: latte,
+    alt: "Latte",
+    title: "Latte",
+  },
+  {
+    src: helado,
+    alt: "Helado",
+    title: "Helado",
+  },
 ];
 
 const restaurantData = {
-    name: "FOSFORO CAFÉ",
-    description: "Tu nueva cafetería favorita en barrio antiguo",
+  name: "FOSFORO CAFÉ",
+  description: "Tu nueva cafetería favorita en barrio antiguo",
 };
 
 const schemaEnrichment = {
-    address: {
-        streetAddress: "Calle Diego de Montemayor #751-A",
-        addressLocality: "Monterrey, N.L.",
-        postalCode: "75000",
-        addressCountry: "MX",
-    },
-    telephone: "+52 81 3269 5700",
-    email: "info@bysmax.com",
-    priceRange: "$$",
-    servesCuisine: [
-        "Tapatía",
-        "Asado",
-        "Flautas",
-        "Sopes",
-        "Pozole",
-        "Tostadas",
-    ],
-    openingHours: "Viernes-Domingo 12:00-23:00",
-    acceptsReservations: true,
-    paymentAccepted: ["Cash", "Credit Card"],
-    currenciesAccepted: ["MXN", "USD"],
-    aggregateRating: {
-        ratingValue: 4.5,
-        reviewCount: 123,
-    },
+  address: {
+    streetAddress: "Calle Diego de Montemayor #751-A",
+    addressLocality: "Monterrey, N.L.",
+    postalCode: "75000",
+    addressCountry: "MX",
+  },
+  telephone: "+52 81 3269 5700",
+  email: "info@bysmax.com",
+  priceRange: "$$",
+  servesCuisine: ["Tapatía", "Asado", "Flautas", "Sopes", "Pozole", "Tostadas"],
+  openingHours: "Viernes-Domingo 12:00-23:00",
+  acceptsReservations: true,
+  paymentAccepted: ["Cash", "Credit Card"],
+  currenciesAccepted: ["MXN", "USD"],
+  aggregateRating: {
+    ratingValue: 4.5,
+    reviewCount: 123,
+  },
 };
 ---
 
 <RestaurantLayout
-    title={restaurantData.name}
-    description={restaurantData.description}
-    schemaEnrichment={schemaEnrichment}
-    backgroundColor="bg-[#faf7f2]"
-    image={menu.src}
-    favicon={icon.src}
+  title={restaurantData.name}
+  description={restaurantData.description}
+  schemaEnrichment={schemaEnrichment}
+  backgroundColor="bg-[#FDF5E6]"
+  image={menu.src}
+  favicon={icon.src}
 >
-    <div class="bg-[#faf7f2]">
-        <div class="max-w-2xl mx-auto p-8">
-            {/* Logo and Brand */}
-            <div class="text-center mb-8">
-                <div class="flex items-center justify-center mb-2">
-                    <Image src={logo} alt="Logo FOSFORO Cafe" />
-                </div>
-                <p class={`text-xl text-[#AE1836]`}>{restaurantData.name} {restaurantData.description}</p>
-            </div>
+  <div class="bg-[#FDF5E6]">
+    <div class="max-w-5xl mx-auto">
+      {/* Logo and Brand */}
 
-            {/* Menu Section - CAFÉ */}
-            <div class="mb-8">
-                <h2
-                    class={`text-2xl text-[#AE1836] border-b-2 border-[#AE1836] mb-4`}
-                >
-                    CAFÉ
-                </h2>
-                <div class="space-y-3">
-                    {
-                        [
-                            {
-                                name: "AMERICANO",
-                                description:
-                                    "Doble shot de espresso, agua; leche y azúcar al gusto",
-                                priceHot: "$50",
-                                priceCold: "$55",
-                            },
-                            {
-                                name: "CAPPUCCINO",
-                                description:
-                                    "Espresso + una delicada capa de leche espumada",
-                                priceHot: "$60",
-                                priceCold: "-",
-                            },
-                            {
-                                name: "FLAT WHITE",
-                                description:
-                                    "Doble shot de espresso + leche vaporizada. Bebida 8oz.",
-                                priceHot: "$60",
-                                priceCold: "$65",
-                            },
-                            {
-                                name: "MOKA",
-                                description:
-                                    "Espresso + leche espumada + chocolate + canela + cacao",
-                                priceHot: "$65",
-                                priceCold: "$70",
-                            },
-                            {
-                                name: "DALGONA",
-                                description:
-                                    "Bebida a base de crema de café y azúcar + leche espumada",
-                                priceHot: "-",
-                                priceCold: "$60",
-                            },
-                            {
-                                name: "AFFOGATTO",
-                                description:
-                                    "Una bola de helado + espresso + galleta",
-                                priceHot: "-",
-                                priceCold: "$70",
-                            },
-                            {
-                                name: "ESPRESSO TONIC",
-                                description:
-                                    "Shot de espresso + agua tónica + twist cítrico. Bebida 8oz.",
-                                priceHot: "-",
-                                priceCold: "$70",
-                            },
-                            {
-                                name: "LATTE",
-                                description:
-                                    "Espresso + leche vaporizada + sabor de temporada opcional",
-                                priceHot: "$70",
-                                priceCold: "$75",
-                            },
-                            {
-                                name: "CARAMEL MACCIATO",
-                                description:
-                                    "Espresso + leche espumada + caramelo + vainilla",
-                                priceHot: "$75",
-                                priceCold: "$80",
-                            },
-                        ].map((item) => (
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold">{item.name}</h3>
-                                    <p class="text-sm text-gray-600">
-                                        {item.description}
-                                    </p>
-                                </div>
-                                <div class="flex gap-4 ml-4 text-right justify-end min-w-[100px]">
-                                    <span>{item.priceHot}</span>
-                                    <span>{item.priceCold}</span>
-                                </div>
-                            </div>
-                        ))
-                    }
-                </div>
+      <div class="mx-auto p-4 flex bg-[#FDF5E6]">
+        {/* Left decorative panel */}
+        <div class="w-1/4 bg-[#800020] relative hidden md:block">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div
+              class="w-48 h-[600px] border-r border-white/20 flex items-center justify-center"
+            >
+              <span
+                class="text-white/90 text-2xl font-mono tracking-widest [writing-mode:vertical-rl] rotate-180"
+              >
+                @FOSFORO.CAFE
+              </span>
             </div>
-
-            {/* Menu Section - NO CAFÉ */}
-            <div>
-                <h2
-                    class={`text-2xl text-[#AE1836] border-b-2 border-[#AE1836] mb-4`}
-                >
-                    NO CAFÉ
-                </h2>
-                <div class="space-y-3">
-                    {
-                        [
-                            {
-                                name: "CHOCOLATE",
-                                description:
-                                    "Chocolate + leche espumada + vainilla + canela + cacao",
-                                priceHot: "$65",
-                                priceCold: "$70",
-                            },
-                            {
-                                name: "CHAI",
-                                description:
-                                    "Té a base de una mezcla de especias + leche espumada",
-                                priceHot: "$70",
-                                priceCold: "$75",
-                            },
-                            {
-                                name: "MATCHA",
-                                description:
-                                    "Té verde + leche espumada + vainilla",
-                                priceHot: "$70",
-                                priceCold: "$75",
-                            },
-                            {
-                                name: "LIMONADA",
-                                description: "¡Limonada!",
-                                priceHot: "-",
-                                priceCold: "$50",
-                            },
-                            {
-                                name: "ACQUA SODA",
-                                description:
-                                    "Bebida a base de fruta natural + agua mineral + tónica",
-                                priceHot: "-",
-                                priceCold: "$70",
-                            },
-                        ].map((item) => (
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold">{item.name}</h3>
-                                    <p class="text-sm text-gray-600">
-                                        {item.description}
-                                    </p>
-                                </div>
-                                <div class="flex gap-4 ml-4 text-right justify-end min-w-[100px]">
-                                    <span>{item.priceHot}</span>
-                                    <span>{item.priceCold}</span>
-                                </div>
-                            </div>
-                        ))
-                    }
-                </div>
-            </div>
-            <div>
-                <div class="text-center max-w-5xl mx-auto">
-                    {/* Image gallery */}
-                    <h2
-                        class="text-5xl py-6 text-[#AE1836] font-serif mb-2 font-bold"
-                    >
-                        Galeria
-                    </h2>
-                    <Gallery
-                        images={galleryImages}
-                    />
-                </div>
-            </div>
-            {/* Footer */}
-            <div class="mt-8 text-center text-sm text-gray-600">
-                <p>Calle Diego de Montemayor #751-A</p>
-                <p>Barrio Antiguo, Monterrey.</p>
-                <a href="https://www.instagram.com/fosforocafe/" class="mt-2"
-                    >@FOSFOROCAFE</a
-                >
-            </div>
+          </div>
         </div>
+
+        {/* Menu content */}
+        <div class="flex-1 p-6 font-mono">
+          {/* Logo */}
+          <div class="text-center mb-8">
+            <div class="flex items-center justify-center mb-2">
+              <Image src={logo} alt="Logo FOSFORO Cafe" />
+            </div>
+            <p class={`text-xl text-[#AE1836]`}>
+              {restaurantData.name}
+              {restaurantData.description}
+            </p>
+          </div>
+
+          {/* Classico Section */}
+          <div class="mb-12">
+            <h2
+              class="text-[#800020] text-2xl font-bold mb-6 text-center tracking-wider"
+            >
+              ─── CLASSICO ───
+              <div class="flex justify-center gap-8 mt-2">
+                <div class="flex items-center gap-1">
+                  <Flame className="w-4 h-4" />
+                  <span class="text-xs">HOT</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <Snowflake className="w-4 h-4" />
+                  <span class="text-xs">ICE</span>
+                </div>
+              </div>
+            </h2>
+            <div class="space-y-6">
+              {
+                [
+                  {
+                    name: "AMERICANO",
+                    desc: "Espresso, 200ml de agua.",
+                    priceHot: 55,
+                    priceIce: 60,
+                  },
+                  {
+                    name: "CORTADO",
+                    desc: "Espresso doble + leche acremada",
+                    priceHot: 55,
+                  },
+                  {
+                    name: "CAPPUCCINO",
+                    desc: "Espresso + capa de espuma de leche",
+                    priceHot: 60,
+                    priceIce: 65,
+                  },
+                  {
+                    name: "FLAT WHITE",
+                    desc: "Doble espresso + leche acremada + espuma",
+                    priceHot: 65,
+                    priceIce: 70,
+                  },
+                  {
+                    name: "LATTE",
+                    desc: "Espresso + leche acremada + Escencia de sabor, opcional.",
+                    priceHot: 70,
+                    priceIce: 75,
+                  },
+                ].map((item) => (
+                  <div class="group">
+                    <div class="flex items-baseline justify-between gap-4">
+                      <div class="flex-1">
+                        <p class="text-[#800020] font-bold tracking-wide">
+                          {item.name}
+                        </p>
+                        <p class="text-sm italic opacity-90">{item.desc}</p>
+                      </div>
+                      <div class="flex gap-8 min-w-[120px] justify-end border-b border-dotted border-[#800020] pb-1">
+                        <span class="flex items-center gap-1">
+                          {item.priceHot && (
+                            <>
+                              <span>${item.priceHot}</span>
+                            </>
+                          )}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          {item.priceIce && (
+                            <>
+                              <span>${item.priceIce}</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          {/* Favoritas Section */}
+          <div class="mb-12">
+            <h2
+              class="text-[#800020] text-2xl font-bold mb-6 text-center tracking-wider"
+            >
+              ─── FAVORITAS ───
+              <div class="flex justify-center gap-8 mt-2">
+                <div class="flex items-center gap-1">
+                  <Flame className="w-4 h-4" />
+                  <span class="text-xs">HOT</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <Snowflake className="w-4 h-4" />
+                  <span class="text-xs">ICE</span>
+                </div>
+              </div>
+            </h2>
+            <div class="space-y-6">
+              {
+                [
+                  {
+                    name: "MOCHA",
+                    desc: "Shot de espresso con leche, chocolate amargo, canela y cacao.",
+                    priceHot: 70,
+                    priceIce: 80,
+                  },
+                  {
+                    name: "ESPRESSO TONIC",
+                    desc: "Agua tónica + shot de espresso, con romero, twist cítrico y un toque de miel. Bebida 8oz.",
+                    priceHot: 75,
+                  },
+                  {
+                    name: "DALGONA",
+                    desc: "Bebida de crema de café y azucar más leche espumada.",
+                    priceHot: 65,
+                  },
+                  {
+                    name: "AFFOGATO",
+                    desc: "Scoops de helado + shot de espresso, decorado con cacao y galletas.",
+                    priceHot: 75,
+                  },
+                  {
+                    name: "COLD BREW HONEY-LEMON",
+                    desc: "Infusión de café extraido en frío, + miel y limón.",
+                    priceHot: 80,
+                  },
+                ].map((item) => (
+                  <div class="group">
+                    <div class="flex items-baseline justify-between gap-4">
+                      <div class="flex-1">
+                        <p class="text-[#800020] font-bold tracking-wide">
+                          {item.name}
+                        </p>
+                        <p class="text-sm italic opacity-90">{item.desc}</p>
+                      </div>
+                      <div class="flex gap-8 min-w-[120px] justify-end border-b border-dotted border-[#800020] pb-1">
+                        <span class="flex items-center gap-1">
+                          {item.priceHot && (
+                            <>
+                              <span>${item.priceHot}</span>
+                            </>
+                          )}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          {item.priceIce && (
+                            <>
+                              <span>${item.priceIce}</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          {/* Sin Café Section */}
+          <div>
+            <h2
+              class="text-[#800020] text-2xl font-bold mb-6 text-center tracking-wider"
+            >
+              ─── SIN CAFÉ ───
+              <div class="flex justify-center gap-8 mt-2">
+                <div class="flex items-center gap-1">
+                  <Flame className="w-4 h-4" />
+                  <span class="text-xs">HOT</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <Snowflake className="w-4 h-4" />
+                  <span class="text-xs">ICE</span>
+                </div>
+              </div>
+            </h2>
+            <div class="space-y-6">
+              {
+                [
+                  {
+                    name: "CHOCOLATE",
+                    desc: "Chocolate + leche + canela + vainilla",
+                    priceHot: 60,
+                    priceIce: 70,
+                  },
+                  {
+                    name: "CHAI LATTE",
+                    desc: "Té de especias + leche espumada",
+                    priceHot: 70,
+                    priceIce: 80,
+                  },
+                  {
+                    name: "MATCHA LATTE",
+                    desc: "Té verde + leche espumada + vainilla",
+                    priceHot: 70,
+                    priceIce: 80,
+                  },
+                  {
+                    name: "LIMONADA/NARANJADA",
+                    desc: "Hecho con concentrado de limón natural",
+                    priceIce: 55,
+                  },
+                  {
+                    name: "FOSFORO SPECIAL",
+                    desc: "Bebida de naranja natural, jugo de arándano y romero, Agua mineral y tónica",
+                    priceHot: 75,
+                  },
+                ].map((item) => (
+                  <div class="group">
+                    <div class="flex items-baseline justify-between gap-4">
+                      <div class="flex-1">
+                        <p class="text-[#800020] font-bold tracking-wide">
+                          {item.name}
+                        </p>
+                        <p class="text-sm italic opacity-90">{item.desc}</p>
+                      </div>
+                      <div class="flex gap-8 min-w-[120px] justify-end border-b border-dotted border-[#800020] pb-1">
+                        <span class="flex items-center gap-1">
+                          {item.priceHot && (
+                            <>
+                              <span>${item.priceHot}</span>
+                            </>
+                          )}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          {item.priceIce && (
+                            <>
+                              <span>${item.priceIce}</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              }
+
+              <div>
+                <div class="text-center max-w-5xl mx-auto">
+                  {/* Image gallery */}
+                  <h2
+                    class="text-5xl py-6 text-[#AE1836] font-serif mb-2 font-bold"
+                  >
+                    Galeria
+                  </h2>
+                  <Gallery images={galleryImages} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </RestaurantLayout>
