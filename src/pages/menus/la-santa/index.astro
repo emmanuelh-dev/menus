@@ -2,16 +2,35 @@
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 
 const restaurantData = {
-    name: "La santa La Santa Kitchen bar",
-    description: "Tacos, empalmes, quesadillas, birrias y mas...",
+    name: "La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Paseo Tec 2 📍San Nicolás- Nogalar 📍 Plaza Citade",
+    description: " American - Hamburguesas - Alitas - Boneless",
 };
-
+const schemaEnrichment = {
+  address: {
+    streetAddress: "Alondra 101, San Nicolas De Los Garza, LATAM 66450",
+    addressLocality: "San Nicolas De Los Garza, N.L.",
+    postalCode: "66450 ",
+    addressCountry: "MX",
+  },
+  email: "info@bysmax.com",
+  priceRange: "$$",
+  servesCuisine: ["American", "Hamburguesas", "Alitas", "Boneless"],
+  openingHours: "Viernes-Domingo 12:00-23:00",
+  acceptsReservations: true,
+  paymentAccepted: ["Cash", "Credit Card"],
+  currenciesAccepted: ["MXN", "USD"],
+  aggregateRating: {
+    ratingValue: 4.5,
+    reviewCount: 123,
+  },
+};
 ---
 <RestaurantLayout
-    title="La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Paseo Tec 2 📍San Nicolás- Nogalar 📍 Plaza Citadel"
-    description="Tacos, empalmes, quesadillas, birrias y mas..."
+    title={restaurantData.name}
+    description={restaurantData.description}
     textWhite={true}
     backgroundColor="bg-black"
+    schemaEnrichment={schemaEnrichment}
 >
 <div class="bg-black color-white">
     <div class="min-h-screen p-4 font-serif relative overflow-hidden">
@@ -30,7 +49,7 @@ const restaurantData = {
               <!-- ENTRADAS -->
               <div class="mb-16 relative">
                 <div class="absolute -left-8 top-1/2 transform -translate-y-1/2">
-                  <h2 class="transform -rotate-90 origin-center tracking-[0.3em] text-gray-400 whitespace-nowrap text-sm">ENTRADAS</h2>
+                  <h2 class="transform -rotate-90 origin-center text-gray-400 whitespace-nowrap text-sm">ENTRADAS</h2>
                 </div>
                 
                 <div class="ml-6 space-y-6">
@@ -93,7 +112,7 @@ const restaurantData = {
               <!-- LAS TORRES -->
               <div class="mb-16 relative">
                 <div class="absolute -left-8 top-1/2 transform -translate-y-1/2">
-                  <h2 class="transform -rotate-90 origin-center tracking-[0.3em] text-gray-400 whitespace-nowrap text-sm">LAS TORRES</h2>
+                  <h2 class="transform -rotate-90 origin-center text-gray-400 whitespace-nowrap text-sm">LAS TORRES</h2>
                 </div>
                 
                 <div class="ml-6 space-y-6">
@@ -114,8 +133,8 @@ const restaurantData = {
               <!-- TACOS ARTESANALES -->
               <div class="mb-16 relative">
                 <div class="absolute -left-8 top-1/2 transform -translate-y-1/2">
-                  <h2 class="transform -rotate-90 origin-center tracking-[0.3em] text-gray-400 whitespace-nowrap text-sm">TACOS ARTESANALES</h2>
-                </div>
+                <h2 class="transform -rotate-90 origin-center  text-gray-400 whitespace-nowrap text-sm">TACOS ARTESANALES</h2>
+              </div>
                 
                 <div class="ml-6 space-y-6">
                   <div class="menu-item">
