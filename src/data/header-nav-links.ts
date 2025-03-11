@@ -9,4 +9,5 @@ export const navItems = [
         name: "Informar un problema o sugerencia",
         href: "https://forms.gle/ZfzxRPGhh2BahKph6",
     },
+    { name: "Instagram", href: "https://www.instagram.com/larutadelostragones/" },
 ];
