@@ -10,6 +10,8 @@ import alchemycoffeelablogo from './alchemycoffeelab/espuma.jpg';
 import antojitostauro from './antojitostauro/logo.jpg';
 import papachinislogo from './papachinis/logo.jpg';
 import fosforo from './fosforocafe/media/menu.jpg';
+import la_santa from './la-santa/la-santa.jpeg';
+
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
@@ -31,6 +33,15 @@ const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
 const case_studies: Restaurant[] = [
+    {
+        name: "La Santa Kitchen bar",
+        description: "American - Hamburguesas - Alitas - Boneless",
+        restaurantLink: "/menus/la-santa",
+        image: la_santa,
+        link: "/menus/la-santa",
+        industry: "Restaurante",
+        type: "Fast Food",
+    },
     {
         name: "Quesabirrias “La Regia”",
         description: "Tacos, empalmes, quesadillas, birrias y mas...",

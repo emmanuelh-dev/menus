@@ -2,7 +2,7 @@
 title: 'La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Paseo Tec 2 📍San Nicolás- Nogalar 📍 Plaza Citadel'
 description: 'American - Hamburguesas - Alitas - Boneless'
 pubDate: 'Mar 10 2025'
-heroImage: '/la-santa/hamburguesa.jpg'
+heroImage: '/la-santa/la-santa.jpeg'
 ---
 
 ¡Bienvenidos a esta nueva entrada\! Soy Emmanuel y hoy les hablaré sobre "La Santa Kitchen Bar", un restaurante de cocina americana que ha generado opiniones diversas. A continuación, les compartiré mi experiencia personal.
