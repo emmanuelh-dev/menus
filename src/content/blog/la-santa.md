@@ -1,6 +1,6 @@
 ---
 title: 'La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Paseo Tec 2 📍San Nicolás- Nogalar 📍 Plaza Citadel'
-description: 'Lorem ipsum dolor sit amet'
+description: 'American - Hamburguesas - Alitas - Boneless'
 pubDate: 'Mar 10 2025'
 heroImage: '/la-santa/hamburguesa.jpg'
 ---
