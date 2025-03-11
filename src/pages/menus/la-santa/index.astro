@@ -1,8 +1,9 @@
 ---
+import { Heart, Star } from "lucide-react";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 
 const restaurantData = {
-    name: "La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Paseo Tec 2 📍San Nicolás- Nogalar 📍 Plaza Citade",
+    name: "La santa La Santa Kitchen bar - San Pedro - Plaza SiennaMty - Paseo Tec 2 San Nicolás- Nogalar  Plaza Citade",
     description: "American - Hamburguesas - Alitas - Boneless",
 };
 const schemaEnrichment = {
@@ -32,7 +33,32 @@ const schemaEnrichment = {
     backgroundColor="bg-black"
     schemaEnrichment={schemaEnrichment}
 >
+
 <div class="bg-black color-white">
+    <div class="max-w-4xl mx-auto text-white max-sm:p-4">
+        <h1 class="text-4xl font-bold mb-4">
+            {restaurantData.name}
+            <br /> Menú
+        </h1>
+        <p class="text-gray-400 mb-4">
+            {restaurantData.description}
+        </p>
+        <p>Puntua este restaurante en la escala de 1 a 5 de la calidad del servicio y la atención al cliente.</p>
+        <div class="flex flex-wrap gap-4">
+            <div class="flex items-center gap-2">
+                <Star className="h-6 w-6" />
+                <span class="text-sm">4.5/5</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <Heart className="h-6 w-6" />
+                <span class="text-sm">123</span>
+            </div>
+
+            <div class="gap-2">
+                Lee nuestra opinión aquí 👇
+                <a class="font-bold" href="/blog/la-santa">La santa La Santa Kitchen bar</a>
+            </div>
+    </div>
     <div class="min-h-screen p-4 font-serif relative overflow-hidden">
         <div class="max-w-4xl mx-auto">
           <!-- Contenedor principal del menú -->
