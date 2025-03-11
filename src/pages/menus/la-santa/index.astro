@@ -1,0 +1,157 @@
+---
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+
+const restaurantData = {
+    name: "La santa La Santa Kitchen bar",
+    description: "Tacos, empalmes, quesadillas, birrias y mas...",
+};
+
+---
+<RestaurantLayout
+    title="La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Paseo Tec 2 📍San Nicolás- Nogalar 📍 Plaza Citadel"
+    description="Tacos, empalmes, quesadillas, birrias y mas..."
+    textWhite={true}
+    backgroundColor="bg-black"
+>
+<div class="bg-black color-white">
+    <div class="min-h-screen p-4 font-serif relative overflow-hidden">
+        <div class="max-w-4xl mx-auto">
+          <!-- Contenedor principal del menú -->
+          <div class="flex flex-col md:flex-row">
+            <!-- Columna izquierda con la imagen -->
+            <div class="w-full md:w-1/3 mb-8 md:mb-0">
+              <div class="h-80 md:h-full w-full bg-cover bg-center" 
+                   style="background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-zvoxajLzDxzxi6c0uRyVGNg8wzoWOd.png'); background-position: left center; background-size: cover;">
+              </div>
+            </div>
+            
+            <!-- Columna derecha con el menú -->
+            <div class="w-full md:w-2/3 pl-0 md:pl-8">
+              <!-- ENTRADAS -->
+              <div class="mb-16 relative">
+                <div class="absolute -left-8 top-1/2 transform -translate-y-1/2">
+                  <h2 class="transform -rotate-90 origin-center tracking-[0.3em] text-gray-400 whitespace-nowrap text-sm">ENTRADAS</h2>
+                </div>
+                
+                <div class="ml-6 space-y-6">
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">COSTILLITAS DE ELOTE</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">CON MANTEQUILLA, SALSA BUFFALO, ADEREZO PARA ELOTE & TOSTITOS</p>
+                    <p class="text-right mt-1 text-white font-bold">119 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">QUESITOS</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">3 DEDOS DE QUESO MANCHEGO, CHEDDAR EMPANIZADOS & ADEREZOS MÁGICOS</p>
+                    <p class="text-right mt-1 text-white font-bold">155 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">COLIFLOR</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">QUESO PARMESANO, PISTACHE, ADEREZO DE AJO & CHIPOTLE</p>
+                    <p class="text-right mt-1 text-white font-bold">155 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">CAMARONES ROCA</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">CAMARONES CAPEADOS, MAYO-SRIRACHA & PARMESANO</p>
+                    <p class="text-right mt-1 text-white font-bold">185 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">EL SAGRADO</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">CHICHARRÓN DE FLECHITA DE LA RAMOS CON GUACAMOLE</p>
+                    <p class="text-right mt-1 text-white font-bold">185 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">CAMARONES ZARANDEADOS</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">220 GRS DE DELICIOSOS CAMARONES ZARANDEADOS CON NUESTRO ADOBO MÁGICO</p>
+                    <p class="text-right mt-1 text-white font-bold">245 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">ATRAER EL AMOR</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">PAPAS CON MUCHOS QUESOS, ARRACHERA, GUACAMOLE & PICO DE GALLO</p>
+                    <p class="text-right mt-1 text-white font-bold">175 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">PAPAS MAMA MIA</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">PAPAS FRITAS CON SALSA DE PIZZA, MOZARELLA & PEPPERONI</p>
+                    <p class="text-right mt-1 text-white font-bold">155 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">LAS EQUIS</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">PAPAS FRITAS ASÍ SIN NADA, NI QUESO NI NADA ASÍ EQUIS</p>
+                    <p class="text-right mt-1 text-white font-bold">90 $</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- LAS TORRES -->
+              <div class="mb-16 relative">
+                <div class="absolute -left-8 top-1/2 transform -translate-y-1/2">
+                  <h2 class="transform -rotate-90 origin-center tracking-[0.3em] text-gray-400 whitespace-nowrap text-sm">LAS TORRES</h2>
+                </div>
+                
+                <div class="ml-6 space-y-6">
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">LA FREGONA</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">TORRE DE MARISCOS CON CAMARÓN, ATÚN, PULPO, PESCADO, AGUACATE, PEPINO, CEBOLLA MORADA, SALSAS CON VIBRAS ORIENTALES & SALSA MANGO SPICY</p>
+                    <p class="text-right mt-1 text-white font-bold">333 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">MAGIA NEGRA</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">TORRE DE MARISCOS BAÑADA CON NUESTRA POCIÓN MÁGICA HECHA DE SALSAS NEGRAS PARA DOMINAR A LA PERSONA QUE TÚ QUIERAS! LA TORRE LLEVA CAMARÓN, ATÚN, PULPO, PESCADO, AGUACATE, PEPINO, CEBOLLA MORADA & TOSTITOS FLAMING HOT</p>
+                    <p class="text-right mt-1 text-white font-bold">333 $</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- TACOS ARTESANALES -->
+              <div class="mb-16 relative">
+                <div class="absolute -left-8 top-1/2 transform -translate-y-1/2">
+                  <h2 class="transform -rotate-90 origin-center tracking-[0.3em] text-gray-400 whitespace-nowrap text-sm">TACOS ARTESANALES</h2>
+                </div>
+                
+                <div class="ml-6 space-y-6">
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">LOS ENSENADA</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">3 TACOS DE BUEN TAMAÑO EN TORTILLA RECIEN HECHA CAMARON CAPEADO, MANCHEGO, ENSALADA DE COL, ADEREZO DE CILANTRO, AGUACATE & PAPAS FRITAS</p>
+                    <p class="text-right mt-1 text-white font-bold">219 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">HECHIZADOS</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">3 TACOS EN TORTILLA RECIEN HECHA, CAMARONES PLANCHADOS, MANCHEGO, AGUACATE, JALAPEÑO, ARUGULA, ADEREZO DE AJO & PAPAS FRITAS</p>
+                    <p class="text-right mt-1 text-white font-bold">190 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">LOS SAGRADOS</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">ORDEN DE 3 TACOS EN TORTILLA RECIEN HECHA, ARRACHERA, QUESO MANCHEGO, AGUACATE, CEBOLLA & PAPAS FRITAS</p>
+                    <p class="text-right mt-1 text-white font-bold">219 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">LOS BENDITOS</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">ORDEN DE 3 TACOS EN TORTILLA RECIEN HECHA DE CHICHARRON DE LA RAMOS, ARRACHERA, QUESO MANCHEGO, AGUACATE, CEBOLLA & PAPAS FRITAS</p>
+                    <p class="text-right mt-1 text-white font-bold">219 $</p>
+                  </div>
+                  
+                  <div class="menu-item">
+                    <h3 class="text-xl tracking-[0.15em] font-light text-white">LA COSTRA</h3>
+                    <p class="text-xs tracking-wider text-gray-400 mt-1">TACO GIGANTE EN TORTILLA DE QUESO MANCHEGO, ARRACHERA, CHAMPIÑONES, AGUACATE, MORRON & PAPAS FRITAS</p>
+                    <p class="text-right mt-1 text-white font-bold">219 $</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+</RestaurantLayout>
