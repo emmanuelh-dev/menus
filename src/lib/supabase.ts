@@ -18,7 +18,7 @@ export interface Cafeteria {
   hours: string;
   services: string[];
   image: string;
-  link?: string;
+  menu?: string;
   distance?: string;
   closed?: boolean;
   openingTime?: string;
@@ -28,14 +28,12 @@ export interface Cafeteria {
 // Función para obtener todas las cafeterías
 export async function getCafeterias() {
   const { data, error } = await supabase
-    .from('cafeterias')
-    .select('*');
-  
+    .from('restaurants')
+    .select('*')
   if (error) {
     console.error('Error fetching cafeterias:', error);
     return [];
   }
-  
   return data as Cafeteria[];
 }
 

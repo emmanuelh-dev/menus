@@ -7,6 +7,7 @@ import { Coffee, MapPin, Clock, Star, DollarSign, Phone } from "lucide-react";
 import placeholder from "../menus/placeholder.svg";
 import alchemyCoffee from "../menus/alchemycoffeelab/espuma.jpg";
 import fosforoCafe from "../menus/fosforocafe/media/menu.jpg";
+import { getCafeterias } from "../../lib/supabase";
 
 // Definir la estructura de datos para las cafeterías
 interface CoffeeShop {
@@ -18,201 +19,19 @@ interface CoffeeShop {
   hours: string;
   services: string[];
   image: ImageMetadata;
-  link?: string;
+  menu?: string;
   distance?: string;
   closed?: boolean;
   openingTime?: string;
 }
 
-// Datos de las cafeterías
-const cafeterias: CoffeeShop[] = [
-  {
-    name: "El Cafelito Monterrey",
-    rating: 4.8,
-    reviewCount: 1300,
-    priceRange: "$1–100",
-    address: "Miguel Hidalgo y Costilla 433",
-    hours: "8:00 AM - 8:00 PM",
-    services: ["Dine-in", "Takeaway"],
-    image: placeholder,
-    distance: "9.0 km"
-  },
-  {
-    name: "Café 110 Monterrey",
-    rating: 4.6,
-    reviewCount: 343,
-    priceRange: "$100–200",
-    address: "Palestina 110",
-    hours: "7:30 AM - 9:00 PM",
-    services: ["Dine-in", "Takeaway", "No-contact delivery"],
-    image: placeholder,
-    distance: "9.8 km"
-  },
-  {
-    name: "Amor Amor Café",
-    rating: 4.6,
-    reviewCount: 665,
-    priceRange: "$100–200",
-    address: "Padre Mier 918",
-    hours: "8:00 AM - 7:00 PM",
-    services: ["Dine-in", "Takeaway", "Delivery"],
-    image: placeholder,
-    distance: "9.3 km"
-  },
-  {
-    name: "Roland Coffee Bar",
-    rating: 4.5,
-    reviewCount: 272,
-    priceRange: "$200–300",
-    address: "Francisco Javier Mina 923",
-    hours: "8:00 AM - 6:00 PM",
-    services: ["Dine-in", "Takeaway", "No delivery"],
-    image: placeholder,
-    distance: "8.8 km"
-  },
-  {
-    name: "Tierra Libre",
-    rating: 4.7,
-    reviewCount: 1500,
-    priceRange: "$100–200",
-    address: "C. Mariano Matamoros 929",
-    hours: "1:00 PM - 9:00 PM",
-    services: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
-    image: placeholder,
-    distance: "8.6 km",
-    closed: true,
-    openingTime: "1 PM Tue"
-  },
-  {
-    name: "Café Limón",
-    rating: 4.7,
-    reviewCount: 817,
-    priceRange: "$100–200",
-    address: "Av. Junco de la Vega 308",
-    hours: "7:30 AM - 8:30 PM",
-    services: ["Dine-in", "Takeaway"],
-    image: placeholder,
-    distance: "10.6 km"
-  },
-  {
-    name: "Techo a Tierra Café",
-    rating: 4.8,
-    reviewCount: 175,
-    priceRange: "$100–200",
-    address: "Degollado Sur 750",
-    hours: "8:00 AM - 7:00 PM",
-    services: ["Dine-in", "Kerbside pickup", "Delivery"],
-    image: placeholder,
-    distance: "9.7 km"
-  },
-  {
-    name: "Alchemy Coffee Lab",
-    rating: 4.7,
-    reviewCount: 1800,
-    priceRange: "$200–300",
-    address: "Bruselas 902",
-    hours: "8:00 AM - 8:00 PM",
-    services: ["Dine-in", "Takeaway", "Delivery"],
-    image: alchemyCoffee,
-    link: "/menus/alchemycoffeelab",
-    distance: "9.6 km",
-    closed: true,
-    openingTime: "8 AM Tue"
-  },
-  {
-    name: "Seltari Café",
-    rating: 4.9,
-    reviewCount: 77,
-    priceRange: "$100–200",
-    address: "Av Lázaro Cárdenas 3716",
-    hours: "7:00 AM - 9:00 PM",
-    services: ["Dine-in", "Drive-through", "No-contact delivery"],
-    image: placeholder,
-    distance: "13.4 km"
-  },
-  {
-    name: "Mille Délices",
-    rating: 4.6,
-    reviewCount: 929,
-    priceRange: "$100–200",
-    address: "Av. Eugenio Garza Sada Sur 2762",
-    hours: "8:00 AM - 8:00 PM",
-    services: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
-    image: placeholder,
-    distance: "10.6 km",
-    closed: true,
-    openingTime: "8 AM Tue"
-  },
-  {
-    name: "FOSFORO CAFÉ",
-    rating: 4.7,
-    reviewCount: 450,
-    priceRange: "$100–200",
-    address: "Calle Diego de Montemayor #751-A",
-    hours: "8:00 AM - 8:00 PM",
-    services: ["Dine-in", "Takeaway", "Delivery"],
-    image: fosforoCafe,
-    link: "/menus/fosforocafe",
-    distance: "9.2 km"
-  },
-  {
-    name: "Gunther's Coffee House",
-    rating: 4.7,
-    reviewCount: 76,
-    priceRange: "$100–200",
-    address: "Av San Jerónimo 306",
-    hours: "7:30 AM - 7:30 PM",
-    services: ["Dine-in", "Kerbside pickup", "No delivery"],
-    image: placeholder,
-    distance: "10.6 km"
-  },
-  {
-    name: "Zu Coffee Center",
-    rating: 4.5,
-    reviewCount: 396,
-    priceRange: "$100–200",
-    address: "C. Washington 112A",
-    hours: "7:00 AM - 9:00 PM",
-    services: ["Dine-in", "Takeaway", "Delivery"],
-    image: placeholder,
-    distance: "8.2 km"
-  },
-  {
-    name: "CAFÉ CACAO",
-    rating: 4.4,
-    reviewCount: 932,
-    priceRange: "$100–200",
-    address: "Av. Del Estado 203 A",
-    hours: "8:00 AM - 8:00 PM",
-    services: ["Dine-in", "Takeaway", "Delivery"],
-    image: placeholder,
-    distance: "10.4 km"
-  },
-  {
-    name: "COFFEE WITH ALIENS",
-    rating: 4.5,
-    reviewCount: 638,
-    priceRange: "$100–200",
-    address: "Blvrd Acapulco 1000",
-    hours: "8:00 AM - 8:00 PM",
-    services: ["Dine-in", "Takeaway", "Delivery"],
-    image: placeholder,
-    distance: "13.5 km"
-  },
-  {
-    name: "Café Esotérico",
-    rating: 4.5,
-    reviewCount: 843,
-    priceRange: "$100–200",
-    address: "Melchor Ocampo 222",
-    hours: "8:30 AM - 7:00 PM",
-    services: ["Dine-in", "Takeaway"],
-    image: placeholder,
-    distance: "9.2 km",
-    closed: true,
-    openingTime: "8:30 AM Tue"
-  }
-];
+
+// Obtener cafeterías
+const cafeterias_raw = await getCafeterias();
+
+const cafeterias = cafeterias_raw.map((cafeteria) => ({
+  ...cafeteria,
+}));
 
 // Configuración para SEO
 const seoData = {
@@ -284,7 +103,7 @@ const schemaEnrichment = {
             data-rating={cafe.rating}
             data-distance={cafe.distance ? cafe.distance.replace(" km", "") : "0"}
             data-closed={cafe.closed ? "true" : "false"}
-            data-has-menu={cafe.link ? "true" : "false"}
+            data-has-menu={cafe.menu ? "true" : "false"}
           >
             <!-- Imagen con overlay -->
             <div class="relative h-48 overflow-hidden">
@@ -320,7 +139,7 @@ const schemaEnrichment = {
               )}
 
               <!-- Indicador si está en el menú digital -->
-              {cafe.link && (
+              {cafe.menu && (
                 <div class="absolute top-3 left-3 bg-[#A67C52] text-white px-2 py-1 rounded-full text-xs">
                   Menú Digital
                 </div>
@@ -330,8 +149,8 @@ const schemaEnrichment = {
             <!-- Contenido de la tarjeta -->
             <div class="p-5">
               <h3 class="font-serif text-xl font-bold text-[#3A2E27] mb-2 group-hover:text-[#A67C52] transition-colors">
-                {cafe.link ? (
-                  <a href={cafe.link} class="hover:underline">{cafe.name}</a>
+                {cafe.menu ? (
+                  <a href={cafe.menu} class="hover:underline">{cafe.name}</a>
                 ) : (
                   cafe.name
                 )}
@@ -355,16 +174,16 @@ const schemaEnrichment = {
 
               <!-- Servicios disponibles -->
               <div class="flex flex-wrap gap-2 mt-4">
-                {cafe.services.map((service) => (
+                {cafe.services && cafe.services.map((service) => (
                   <span class="text-xs bg-[#F8F3E9] text-[#5F4B3B] px-2 py-1 rounded-full">{service}</span>
                 ))}
               </div>
 
               <!-- Botón de acción -->
               <div class="mt-5">
-                {cafe.link ? (
+                {cafe.menu ? (
                   <a 
-                    href={cafe.link} 
+                    href={cafe.menu} 
                     class="inline-block w-full text-center py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
                   >
                     Ver Menú
@@ -571,7 +390,7 @@ const schemaEnrichment = {
     const ratedButton = document.getElementById('filter-rated') as HTMLElement;
     if (ratedButton) {
       updateActiveButton(ratedButton);
-      filterCafes('rated');
+      filterCafes('all');
     }
   });
 </script>
