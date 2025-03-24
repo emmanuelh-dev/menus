@@ -1,0 +1,56 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import AuthForm from '../components/AuthForm.astro';
+import RestaurantLayout from '../layouts/RestaurantLayout.astro';
+
+const title = 'Iniciar Sesión | Menus';
+const description = 'Inicia sesión o regístrate en Menus para acceder a todas las funcionalidades.';
+---
+
+<RestaurantLayout
+  title={title}
+  description={description}
+>
+    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md mx-auto">
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-serif font-bold text-[#3A2E27]">
+              Bienvenido a Menus by BysMax
+            </h1>
+            <p class="mt-2 text-sm text-gray-600">
+              <span id="authText">¿No tienes una cuenta?</span>
+              <button
+                id="toggleAuth"
+                class="text-[#A67C52] hover:text-[#8C5E3B] font-medium ml-1"
+              >
+                Regístrate
+              </button>
+            </p>
+          </div>
+  
+          <AuthForm client:load />
+        </div>
+      </div>
+  
+      <script>
+        const toggleBtn = document.getElementById('toggleAuth');
+        const authText = document.getElementById('authText');
+        let isSignIn = true;
+  
+        toggleBtn?.addEventListener('click', () => {
+          isSignIn = !isSignIn;
+          if (toggleBtn && authText) {
+            toggleBtn.textContent = isSignIn ? 'Regístrate' : 'Inicia sesión';
+            authText.textContent = isSignIn 
+              ? '¿No tienes una cuenta?' 
+              : '¿Ya tienes una cuenta?';
+          }
+          
+          // Actualizar el modo del formulario
+          const form = document.querySelector('auth-form');
+          if (form) {
+            form.setAttribute('mode', isSignIn ? 'signin' : 'signup');
+          }
+        });
+      </script>
+</RestaurantLayout>

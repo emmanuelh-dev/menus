@@ -1,0 +1,28 @@
+---
+interface Props {
+  requiredRole?: 'admin' | 'owner';
+}
+
+const { requiredRole } = Astro.props;
+
+const redirectToLogin = () => {
+  return Astro.redirect('/login');
+};
+
+const redirectToHome = () => {
+  return Astro.redirect('/');
+};
+
+const { getUser } = await import('../lib/auth');
+const user = await getUser();
+
+if (!user) {
+  return redirectToLogin();
+}
+
+if (requiredRole && (!user.role || user.role !== requiredRole)) {
+  return redirectToHome();
+}
+---
+
+<slot />
