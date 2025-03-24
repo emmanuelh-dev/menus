@@ -1,0 +1,476 @@
+---
+import { Image } from "astro:assets";
+import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import { Coffee, MapPin, Clock, Star, DollarSign, Phone } from "lucide-react";
+
+// Importar imágenes para las cafeterías
+import placeholder from "../menus/placeholder.svg";
+import alchemyCoffee from "../menus/alchemycoffeelab/espuma.jpg";
+import fosforoCafe from "../menus/fosforocafe/media/menu.jpg";
+
+// Definir la estructura de datos para las cafeterías
+interface Cafeteria {
+  nombre: string;
+  calificacion: number;
+  numeroReviews: number;
+  rangoPrecio: string;
+  direccion: string;
+  horario: string;
+  servicios: string[];
+  imagen: ImageMetadata;
+  link?: string;
+  distancia?: string;
+  cerrado?: boolean;
+  horaApertura?: string;
+}
+
+// Datos de las cafeterías
+const cafeterias: Cafeteria[] = [
+  {
+    nombre: "El Cafelito Monterrey",
+    calificacion: 4.8,
+    numeroReviews: 1300,
+    rangoPrecio: "$1–100",
+    direccion: "Miguel Hidalgo y Costilla 433",
+    horario: "8:00 AM - 8:00 PM",
+    servicios: ["Dine-in", "Takeaway"],
+    imagen: placeholder,
+    distancia: "9.0 km"
+  },
+  {
+    nombre: "Café 110 Monterrey",
+    calificacion: 4.6,
+    numeroReviews: 343,
+    rangoPrecio: "$100–200",
+    direccion: "Palestina 110",
+    horario: "7:30 AM - 9:00 PM",
+    servicios: ["Dine-in", "Takeaway", "No-contact delivery"],
+    imagen: placeholder,
+    distancia: "9.8 km"
+  },
+  {
+    nombre: "Amor Amor Café",
+    calificacion: 4.6,
+    numeroReviews: 665,
+    rangoPrecio: "$100–200",
+    direccion: "Padre Mier 918",
+    horario: "8:00 AM - 7:00 PM",
+    servicios: ["Dine-in", "Takeaway", "Delivery"],
+    imagen: placeholder,
+    distancia: "9.3 km"
+  },
+  {
+    nombre: "Roland Coffee Bar",
+    calificacion: 4.5,
+    numeroReviews: 272,
+    rangoPrecio: "$200–300",
+    direccion: "Francisco Javier Mina 923",
+    horario: "8:00 AM - 6:00 PM",
+    servicios: ["Dine-in", "Takeaway", "No delivery"],
+    imagen: placeholder,
+    distancia: "8.8 km"
+  },
+  {
+    nombre: "Tierra Libre",
+    calificacion: 4.7,
+    numeroReviews: 1500,
+    rangoPrecio: "$100–200",
+    direccion: "C. Mariano Matamoros 929",
+    horario: "1:00 PM - 9:00 PM",
+    servicios: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
+    imagen: placeholder,
+    distancia: "8.6 km",
+    cerrado: true,
+    horaApertura: "1 PM Tue"
+  },
+  {
+    nombre: "Café Limón",
+    calificacion: 4.7,
+    numeroReviews: 817,
+    rangoPrecio: "$100–200",
+    direccion: "Av. Junco de la Vega 308",
+    horario: "7:30 AM - 8:30 PM",
+    servicios: ["Dine-in", "Takeaway"],
+    imagen: placeholder,
+    distancia: "10.6 km"
+  },
+  {
+    nombre: "Techo a Tierra Café",
+    calificacion: 4.8,
+    numeroReviews: 175,
+    rangoPrecio: "$100–200",
+    direccion: "Degollado Sur 750",
+    horario: "8:00 AM - 7:00 PM",
+    servicios: ["Dine-in", "Kerbside pickup", "Delivery"],
+    imagen: placeholder,
+    distancia: "9.7 km"
+  },
+  {
+    nombre: "Alchemy Coffee Lab",
+    calificacion: 4.7,
+    numeroReviews: 1800,
+    rangoPrecio: "$200–300",
+    direccion: "Bruselas 902",
+    horario: "8:00 AM - 8:00 PM",
+    servicios: ["Dine-in", "Takeaway", "Delivery"],
+    imagen: alchemyCoffee,
+    link: "/menus/alchemycoffeelab",
+    distancia: "9.6 km",
+    cerrado: true,
+    horaApertura: "8 AM Tue"
+  },
+  {
+    nombre: "Seltari Café",
+    calificacion: 4.9,
+    numeroReviews: 77,
+    rangoPrecio: "$100–200",
+    direccion: "Av Lázaro Cárdenas 3716",
+    horario: "7:00 AM - 9:00 PM",
+    servicios: ["Dine-in", "Drive-through", "No-contact delivery"],
+    imagen: placeholder,
+    distancia: "13.4 km"
+  },
+  {
+    nombre: "Mille Délices",
+    calificacion: 4.6,
+    numeroReviews: 929,
+    rangoPrecio: "$100–200",
+    direccion: "Av. Eugenio Garza Sada Sur 2762",
+    horario: "8:00 AM - 8:00 PM",
+    servicios: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
+    imagen: placeholder,
+    distancia: "10.6 km",
+    cerrado: true,
+    horaApertura: "8 AM Tue"
+  },
+  {
+    nombre: "FOSFORO CAFÉ",
+    calificacion: 4.7,
+    numeroReviews: 450,
+    rangoPrecio: "$100–200",
+    direccion: "Calle Diego de Montemayor #751-A",
+    horario: "8:00 AM - 8:00 PM",
+    servicios: ["Dine-in", "Takeaway", "Delivery"],
+    imagen: fosforoCafe,
+    link: "/menus/fosforocafe",
+    distancia: "9.2 km"
+  },
+  {
+    nombre: "Gunther's Coffee House",
+    calificacion: 4.7,
+    numeroReviews: 76,
+    rangoPrecio: "$100–200",
+    direccion: "Av San Jerónimo 306",
+    horario: "7:30 AM - 7:30 PM",
+    servicios: ["Dine-in", "Kerbside pickup", "No delivery"],
+    imagen: placeholder,
+    distancia: "10.6 km"
+  },
+  {
+    nombre: "Zu Coffee Center",
+    calificacion: 4.5,
+    numeroReviews: 396,
+    rangoPrecio: "$100–200",
+    direccion: "C. Washington 112A",
+    horario: "7:00 AM - 9:00 PM",
+    servicios: ["Dine-in", "Takeaway", "Delivery"],
+    imagen: placeholder,
+    distancia: "8.2 km"
+  },
+  {
+    nombre: "CAFÉ CACAO",
+    calificacion: 4.4,
+    numeroReviews: 932,
+    rangoPrecio: "$100–200",
+    direccion: "Av. Del Estado 203 A",
+    horario: "8:00 AM - 8:00 PM",
+    servicios: ["Dine-in", "Takeaway", "Delivery"],
+    imagen: placeholder,
+    distancia: "10.4 km"
+  },
+  {
+    nombre: "COFFEE WITH ALIENS",
+    calificacion: 4.5,
+    numeroReviews: 638,
+    rangoPrecio: "$100–200",
+    direccion: "Blvrd Acapulco 1000",
+    horario: "8:00 AM - 8:00 PM",
+    servicios: ["Dine-in", "Takeaway", "Delivery"],
+    imagen: placeholder,
+    distancia: "13.5 km"
+  },
+  {
+    nombre: "Café Esotérico",
+    calificacion: 4.5,
+    numeroReviews: 843,
+    rangoPrecio: "$100–200",
+    direccion: "Melchor Ocampo 222",
+    horario: "8:30 AM - 7:00 PM",
+    servicios: ["Dine-in", "Takeaway"],
+    imagen: placeholder,
+    distancia: "9.2 km",
+    cerrado: true,
+    horaApertura: "8:30 AM Tue"
+  }
+];
+
+// Configuración para SEO
+const seoData = {
+  title: "Cafeterías en Monterrey | Descubre los mejores cafés locales",
+  description: "Explora las mejores cafeterías de Monterrey. Encuentra tu café favorito con información detallada sobre precios, ubicación, horarios y servicios.",
+  keywords: ["cafeterías monterrey", "café local", "mejores cafés", "café monterrey", "coffee shop"],
+};
+
+// Configuración para Schema.org
+const schemaEnrichment = {
+  address: {
+    addressLocality: "Monterrey",
+    addressRegion: "Nuevo León",
+    addressCountry: "MX",
+  },
+};
+---
+
+<RestaurantLayout 
+  title={seoData.title}
+  description={seoData.description}
+  schemaEnrichment={schemaEnrichment}
+  backgroundColor="bg-[#F8F3E9]"
+>
+  <div class="min-h-screen bg-[#F8F3E9] py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Encabezado con estilo serif -->  
+      <div class="text-center mb-16">
+        <h1 class="text-5xl md:text-6xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight">Cafeterías de Monterrey</h1>
+        <p class="text-xl md:text-2xl font-serif text-[#5F4B3B] max-w-3xl mx-auto">Descubre los rincones más acogedores para disfrutar del mejor café de la ciudad</p>
+      </div>
+
+      <!-- Filtros interactivos -->
+      <div class="mb-12 flex flex-wrap justify-center gap-4">
+        <button class="px-6 py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-full font-serif hover:bg-[#BFA78E] transition-colors">Todos</button>
+        <button class="px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors">Cerca de mí</button>
+        <button class="px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors">Mejor calificados</button>
+        <button class="px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors">Abiertos ahora</button>
+      </div>
+
+      <!-- Mapa visual de cafeterías (representación estilizada) -->
+      <div class="relative mb-16 overflow-hidden rounded-xl bg-[#E6D7C3] p-4">
+        <div class="absolute top-4 left-4 bg-white/90 px-4 py-2 rounded-lg shadow-md z-10">
+          <h3 class="font-serif text-lg font-semibold text-[#3A2E27]">Mapa de Cafeterías</h3>
+          <p class="text-sm text-[#5F4B3B]">Explora visualmente las cafeterías cercanas</p>
+        </div>
+        <div class="h-[300px] md:h-[400px] bg-[#E6D7C3] rounded-lg relative overflow-hidden">
+          <!-- Aquí iría un mapa real, por ahora es decorativo -->
+          <div class="absolute inset-0 flex items-center justify-center">
+            <p class="font-serif text-[#8C7B6D] text-lg">Mapa interactivo (próximamente)</p>
+          </div>
+          <!-- Puntos decorativos representando cafeterías -->
+          {cafeterias.map((cafe, index) => (
+            <div 
+              class="absolute w-3 h-3 bg-[#A67C52] rounded-full transform hover:scale-150 transition-transform cursor-pointer"
+              style={`top: ${30 + Math.random() * 60}%; left: ${20 + Math.random() * 60}%;`}
+              title={cafe.nombre}
+            ></div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Grid de cafeterías con diseño creativo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {cafeterias.map((cafe) => (
+          <div class="group relative overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <!-- Imagen con overlay -->
+            <div class="relative h-48 overflow-hidden">
+              <Image 
+                src={cafe.imagen} 
+                alt={cafe.nombre}
+                width={500}
+                height={300}
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
+              
+              <!-- Calificación y precio -->
+              <div class="absolute bottom-3 left-3 flex items-center space-x-2">
+                <div class="flex items-center bg-white/90 px-2 py-1 rounded-full">
+                  <Star className="w-4 h-4 text-yellow-500 mr-1" />
+                  <span class="text-sm font-medium">{cafe.calificacion}</span>
+                  <span class="text-xs text-gray-600 ml-1">({cafe.numeroReviews})</span>
+                </div>
+                <div class="bg-white/90 px-2 py-1 rounded-full">
+                  <span class="text-sm font-medium">{cafe.rangoPrecio}</span>
+                </div>
+              </div>
+
+              <!-- Distancia -->
+              {cafe.distancia && (
+                <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full">
+                  <div class="flex items-center">
+                    <MapPin className="w-3 h-3 text-[#A67C52] mr-1" />
+                    <span class="text-xs">{cafe.distancia}</span>
+                  </div>
+                </div>
+              )}
+
+              <!-- Indicador si está en el menú digital -->
+              {cafe.link && (
+                <div class="absolute top-3 left-3 bg-[#A67C52] text-white px-2 py-1 rounded-full text-xs">
+                  Menú Digital
+                </div>
+              )}
+            </div>
+
+            <!-- Contenido de la tarjeta -->
+            <div class="p-5">
+              <h3 class="font-serif text-xl font-bold text-[#3A2E27] mb-2 group-hover:text-[#A67C52] transition-colors">
+                {cafe.link ? (
+                  <a href={cafe.link} class="hover:underline">{cafe.nombre}</a>
+                ) : (
+                  cafe.nombre
+                )}
+              </h3>
+
+              <!-- Estado (abierto/cerrado) -->
+              <div class="flex items-center mb-3">
+                <Clock className="w-4 h-4 text-gray-500 mr-2" />
+                {cafe.cerrado ? (
+                  <span class="text-sm text-red-500">Cerrado · Abre {cafe.horaApertura}</span>
+                ) : (
+                  <span class="text-sm text-green-600">Abierto · {cafe.horario}</span>
+                )}
+              </div>
+
+              <!-- Dirección -->
+              <div class="flex items-start mb-3">
+                <MapPin className="w-4 h-4 text-gray-500 mr-2 mt-0.5" />
+                <span class="text-sm text-gray-600">{cafe.direccion}</span>
+              </div>
+
+              <!-- Servicios disponibles -->
+              <div class="flex flex-wrap gap-2 mt-4">
+                {cafe.servicios.map((servicio) => (
+                  <span class="text-xs bg-[#F8F3E9] text-[#5F4B3B] px-2 py-1 rounded-full">{servicio}</span>
+                ))}
+              </div>
+
+              <!-- Botón de acción -->
+              <div class="mt-5">
+                {cafe.link ? (
+                  <a 
+                    href={cafe.link} 
+                    class="inline-block w-full text-center py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
+                  >
+                    Ver Menú
+                  </a>
+                ) : (
+                  <button 
+                    class="w-full py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-lg font-serif hover:bg-[#BFA78E] transition-colors"
+                  >
+                    Más Información
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Sección de destacados -->
+      <div class="mt-20 mb-16">
+        <h2 class="text-3xl md:text-4xl font-serif font-bold text-[#3A2E27] mb-8 text-center">Cafeterías Destacadas</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Cafetería destacada 1 -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
+            <div class="md:w-2/5 relative">
+              <Image 
+                src={alchemyCoffee} 
+                alt="Alchemy Coffee Lab"
+                width={400}
+                height={500}
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
+              <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
+                <div class="bg-white/90 px-2 py-1 rounded-full inline-block">
+                  <Star className="w-4 h-4 text-yellow-500 inline mr-1" />
+                  <span class="text-sm font-medium">4.7 (1.8K)</span>
+                </div>
+              </div>
+            </div>
+            <div class="md:w-3/5 p-6">
+              <h3 class="font-serif text-2xl font-bold text-[#3A2E27] mb-2">Alchemy Coffee Lab</h3>
+              <p class="text-[#5F4B3B] mb-4">Un laboratorio de café donde cada taza es una experiencia sensorial única. Especialistas en métodos de preparación alternativos y granos de especialidad.</p>
+              <div class="flex items-center mb-2">
+                <MapPin className="w-4 h-4 text-gray-500 mr-2" />
+                <span class="text-sm text-gray-600">Bruselas 902</span>
+              </div>
+              <div class="flex items-center mb-4">
+                <DollarSign className="w-4 h-4 text-gray-500 mr-2" />
+                <span class="text-sm text-gray-600">$200–300</span>
+              </div>
+              <a 
+                href="/menus/alchemycoffeelab" 
+                class="inline-block px-6 py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
+              >
+                Ver Menú Completo
+              </a>
+            </div>
+          </div>
+          
+          <!-- Cafetería destacada 2 -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
+            <div class="md:w-2/5 relative">
+              <Image 
+                src={fosforoCafe} 
+                alt="FOSFORO CAFÉ"
+                width={400}
+                height={500}
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
+              <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
+                <div class="bg-white/90 px-2 py-1 rounded-full inline-block">
+                  <Star className="w-4 h-4 text-yellow-500 inline mr-1" />
+                  <span class="text-sm font-medium">4.7 (450)</span>
+                </div>
+              </div>
+            </div>
+            <div class="md:w-3/5 p-6">
+              <h3 class="font-serif text-2xl font-bold text-[#3A2E27] mb-2">FOSFORO CAFÉ</h3>
+              <p class="text-[#5F4B3B] mb-4">Tu nueva cafetería favorita en barrio antiguo. Un espacio acogedor con una selección de cafés de especialidad y deliciosos postres artesanales.</p>
+              <div class="flex items-center mb-2">
+                <MapPin className="w-4 h-4 text-gray-500 mr-2" />
+                <span class="text-sm text-gray-600">Calle Diego de Montemayor #751-A</span>
+              </div>
+              <div class="flex items-center mb-4">
+                <DollarSign className="w-4 h-4 text-gray-500 mr-2" />
+                <span class="text-sm text-gray-600">$100–200</span>
+              </div>
+              <a 
+                href="/menus/fosforocafe" 
+                class="inline-block px-6 py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
+              >
+                Ver Menú Completo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de conexión futura con Supabase -->
+      <div class="bg-white rounded-xl p-8 shadow-md mt-16">
+        <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#3A2E27] mb-4 text-center">¿Tienes una cafetería?</h2>
+        <p class="text-center text-[#5F4B3B] max-w-2xl mx-auto mb-6">Próximamente podrás registrar tu cafetería en nuestra plataforma y mostrar tu menú digital a miles de amantes del café.</p>
+        <div class="text-center">
+          <a 
+            href="/registro" 
+            class="inline-block px-8 py-3 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
+          >
+            Registrar mi Cafetería
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</RestaurantLayout>
