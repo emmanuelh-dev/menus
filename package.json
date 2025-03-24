@@ -17,6 +17,7 @@
     "@astrojs/sitemap": "^3.2.1",
     "@astrojs/tailwind": "^5.1.4",
     "@astrojs/vercel": "^8.0.1",
+    "@supabase/supabase-js": "^2.49.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@vercel/analytics": "^1.4.1",

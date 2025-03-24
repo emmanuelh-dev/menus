@@ -9,208 +9,208 @@ import alchemyCoffee from "../menus/alchemycoffeelab/espuma.jpg";
 import fosforoCafe from "../menus/fosforocafe/media/menu.jpg";
 
 // Definir la estructura de datos para las cafeterías
-interface Cafeteria {
-  nombre: string;
-  calificacion: number;
-  numeroReviews: number;
-  rangoPrecio: string;
-  direccion: string;
-  horario: string;
-  servicios: string[];
-  imagen: ImageMetadata;
+interface CoffeeShop {
+  name: string;
+  rating: number;
+  reviewCount: number;
+  priceRange: string;
+  address: string;
+  hours: string;
+  services: string[];
+  image: ImageMetadata;
   link?: string;
-  distancia?: string;
-  cerrado?: boolean;
-  horaApertura?: string;
+  distance?: string;
+  closed?: boolean;
+  openingTime?: string;
 }
 
 // Datos de las cafeterías
-const cafeterias: Cafeteria[] = [
+const cafeterias: CoffeeShop[] = [
   {
-    nombre: "El Cafelito Monterrey",
-    calificacion: 4.8,
-    numeroReviews: 1300,
-    rangoPrecio: "$1–100",
-    direccion: "Miguel Hidalgo y Costilla 433",
-    horario: "8:00 AM - 8:00 PM",
-    servicios: ["Dine-in", "Takeaway"],
-    imagen: placeholder,
-    distancia: "9.0 km"
+    name: "El Cafelito Monterrey",
+    rating: 4.8,
+    reviewCount: 1300,
+    priceRange: "$1–100",
+    address: "Miguel Hidalgo y Costilla 433",
+    hours: "8:00 AM - 8:00 PM",
+    services: ["Dine-in", "Takeaway"],
+    image: placeholder,
+    distance: "9.0 km"
   },
   {
-    nombre: "Café 110 Monterrey",
-    calificacion: 4.6,
-    numeroReviews: 343,
-    rangoPrecio: "$100–200",
-    direccion: "Palestina 110",
-    horario: "7:30 AM - 9:00 PM",
-    servicios: ["Dine-in", "Takeaway", "No-contact delivery"],
-    imagen: placeholder,
-    distancia: "9.8 km"
+    name: "Café 110 Monterrey",
+    rating: 4.6,
+    reviewCount: 343,
+    priceRange: "$100–200",
+    address: "Palestina 110",
+    hours: "7:30 AM - 9:00 PM",
+    services: ["Dine-in", "Takeaway", "No-contact delivery"],
+    image: placeholder,
+    distance: "9.8 km"
   },
   {
-    nombre: "Amor Amor Café",
-    calificacion: 4.6,
-    numeroReviews: 665,
-    rangoPrecio: "$100–200",
-    direccion: "Padre Mier 918",
-    horario: "8:00 AM - 7:00 PM",
-    servicios: ["Dine-in", "Takeaway", "Delivery"],
-    imagen: placeholder,
-    distancia: "9.3 km"
+    name: "Amor Amor Café",
+    rating: 4.6,
+    reviewCount: 665,
+    priceRange: "$100–200",
+    address: "Padre Mier 918",
+    hours: "8:00 AM - 7:00 PM",
+    services: ["Dine-in", "Takeaway", "Delivery"],
+    image: placeholder,
+    distance: "9.3 km"
   },
   {
-    nombre: "Roland Coffee Bar",
-    calificacion: 4.5,
-    numeroReviews: 272,
-    rangoPrecio: "$200–300",
-    direccion: "Francisco Javier Mina 923",
-    horario: "8:00 AM - 6:00 PM",
-    servicios: ["Dine-in", "Takeaway", "No delivery"],
-    imagen: placeholder,
-    distancia: "8.8 km"
+    name: "Roland Coffee Bar",
+    rating: 4.5,
+    reviewCount: 272,
+    priceRange: "$200–300",
+    address: "Francisco Javier Mina 923",
+    hours: "8:00 AM - 6:00 PM",
+    services: ["Dine-in", "Takeaway", "No delivery"],
+    image: placeholder,
+    distance: "8.8 km"
   },
   {
-    nombre: "Tierra Libre",
-    calificacion: 4.7,
-    numeroReviews: 1500,
-    rangoPrecio: "$100–200",
-    direccion: "C. Mariano Matamoros 929",
-    horario: "1:00 PM - 9:00 PM",
-    servicios: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
-    imagen: placeholder,
-    distancia: "8.6 km",
-    cerrado: true,
-    horaApertura: "1 PM Tue"
+    name: "Tierra Libre",
+    rating: 4.7,
+    reviewCount: 1500,
+    priceRange: "$100–200",
+    address: "C. Mariano Matamoros 929",
+    hours: "1:00 PM - 9:00 PM",
+    services: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
+    image: placeholder,
+    distance: "8.6 km",
+    closed: true,
+    openingTime: "1 PM Tue"
   },
   {
-    nombre: "Café Limón",
-    calificacion: 4.7,
-    numeroReviews: 817,
-    rangoPrecio: "$100–200",
-    direccion: "Av. Junco de la Vega 308",
-    horario: "7:30 AM - 8:30 PM",
-    servicios: ["Dine-in", "Takeaway"],
-    imagen: placeholder,
-    distancia: "10.6 km"
+    name: "Café Limón",
+    rating: 4.7,
+    reviewCount: 817,
+    priceRange: "$100–200",
+    address: "Av. Junco de la Vega 308",
+    hours: "7:30 AM - 8:30 PM",
+    services: ["Dine-in", "Takeaway"],
+    image: placeholder,
+    distance: "10.6 km"
   },
   {
-    nombre: "Techo a Tierra Café",
-    calificacion: 4.8,
-    numeroReviews: 175,
-    rangoPrecio: "$100–200",
-    direccion: "Degollado Sur 750",
-    horario: "8:00 AM - 7:00 PM",
-    servicios: ["Dine-in", "Kerbside pickup", "Delivery"],
-    imagen: placeholder,
-    distancia: "9.7 km"
+    name: "Techo a Tierra Café",
+    rating: 4.8,
+    reviewCount: 175,
+    priceRange: "$100–200",
+    address: "Degollado Sur 750",
+    hours: "8:00 AM - 7:00 PM",
+    services: ["Dine-in", "Kerbside pickup", "Delivery"],
+    image: placeholder,
+    distance: "9.7 km"
   },
   {
-    nombre: "Alchemy Coffee Lab",
-    calificacion: 4.7,
-    numeroReviews: 1800,
-    rangoPrecio: "$200–300",
-    direccion: "Bruselas 902",
-    horario: "8:00 AM - 8:00 PM",
-    servicios: ["Dine-in", "Takeaway", "Delivery"],
-    imagen: alchemyCoffee,
+    name: "Alchemy Coffee Lab",
+    rating: 4.7,
+    reviewCount: 1800,
+    priceRange: "$200–300",
+    address: "Bruselas 902",
+    hours: "8:00 AM - 8:00 PM",
+    services: ["Dine-in", "Takeaway", "Delivery"],
+    image: alchemyCoffee,
     link: "/menus/alchemycoffeelab",
-    distancia: "9.6 km",
-    cerrado: true,
-    horaApertura: "8 AM Tue"
+    distance: "9.6 km",
+    closed: true,
+    openingTime: "8 AM Tue"
   },
   {
-    nombre: "Seltari Café",
-    calificacion: 4.9,
-    numeroReviews: 77,
-    rangoPrecio: "$100–200",
-    direccion: "Av Lázaro Cárdenas 3716",
-    horario: "7:00 AM - 9:00 PM",
-    servicios: ["Dine-in", "Drive-through", "No-contact delivery"],
-    imagen: placeholder,
-    distancia: "13.4 km"
+    name: "Seltari Café",
+    rating: 4.9,
+    reviewCount: 77,
+    priceRange: "$100–200",
+    address: "Av Lázaro Cárdenas 3716",
+    hours: "7:00 AM - 9:00 PM",
+    services: ["Dine-in", "Drive-through", "No-contact delivery"],
+    image: placeholder,
+    distance: "13.4 km"
   },
   {
-    nombre: "Mille Délices",
-    calificacion: 4.6,
-    numeroReviews: 929,
-    rangoPrecio: "$100–200",
-    direccion: "Av. Eugenio Garza Sada Sur 2762",
-    horario: "8:00 AM - 8:00 PM",
-    servicios: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
-    imagen: placeholder,
-    distancia: "10.6 km",
-    cerrado: true,
-    horaApertura: "8 AM Tue"
+    name: "Mille Délices",
+    rating: 4.6,
+    reviewCount: 929,
+    priceRange: "$100–200",
+    address: "Av. Eugenio Garza Sada Sur 2762",
+    hours: "8:00 AM - 8:00 PM",
+    services: ["Dine-in", "Kerbside pickup", "No-contact delivery"],
+    image: placeholder,
+    distance: "10.6 km",
+    closed: true,
+    openingTime: "8 AM Tue"
   },
   {
-    nombre: "FOSFORO CAFÉ",
-    calificacion: 4.7,
-    numeroReviews: 450,
-    rangoPrecio: "$100–200",
-    direccion: "Calle Diego de Montemayor #751-A",
-    horario: "8:00 AM - 8:00 PM",
-    servicios: ["Dine-in", "Takeaway", "Delivery"],
-    imagen: fosforoCafe,
+    name: "FOSFORO CAFÉ",
+    rating: 4.7,
+    reviewCount: 450,
+    priceRange: "$100–200",
+    address: "Calle Diego de Montemayor #751-A",
+    hours: "8:00 AM - 8:00 PM",
+    services: ["Dine-in", "Takeaway", "Delivery"],
+    image: fosforoCafe,
     link: "/menus/fosforocafe",
-    distancia: "9.2 km"
+    distance: "9.2 km"
   },
   {
-    nombre: "Gunther's Coffee House",
-    calificacion: 4.7,
-    numeroReviews: 76,
-    rangoPrecio: "$100–200",
-    direccion: "Av San Jerónimo 306",
-    horario: "7:30 AM - 7:30 PM",
-    servicios: ["Dine-in", "Kerbside pickup", "No delivery"],
-    imagen: placeholder,
-    distancia: "10.6 km"
+    name: "Gunther's Coffee House",
+    rating: 4.7,
+    reviewCount: 76,
+    priceRange: "$100–200",
+    address: "Av San Jerónimo 306",
+    hours: "7:30 AM - 7:30 PM",
+    services: ["Dine-in", "Kerbside pickup", "No delivery"],
+    image: placeholder,
+    distance: "10.6 km"
   },
   {
-    nombre: "Zu Coffee Center",
-    calificacion: 4.5,
-    numeroReviews: 396,
-    rangoPrecio: "$100–200",
-    direccion: "C. Washington 112A",
-    horario: "7:00 AM - 9:00 PM",
-    servicios: ["Dine-in", "Takeaway", "Delivery"],
-    imagen: placeholder,
-    distancia: "8.2 km"
+    name: "Zu Coffee Center",
+    rating: 4.5,
+    reviewCount: 396,
+    priceRange: "$100–200",
+    address: "C. Washington 112A",
+    hours: "7:00 AM - 9:00 PM",
+    services: ["Dine-in", "Takeaway", "Delivery"],
+    image: placeholder,
+    distance: "8.2 km"
   },
   {
-    nombre: "CAFÉ CACAO",
-    calificacion: 4.4,
-    numeroReviews: 932,
-    rangoPrecio: "$100–200",
-    direccion: "Av. Del Estado 203 A",
-    horario: "8:00 AM - 8:00 PM",
-    servicios: ["Dine-in", "Takeaway", "Delivery"],
-    imagen: placeholder,
-    distancia: "10.4 km"
+    name: "CAFÉ CACAO",
+    rating: 4.4,
+    reviewCount: 932,
+    priceRange: "$100–200",
+    address: "Av. Del Estado 203 A",
+    hours: "8:00 AM - 8:00 PM",
+    services: ["Dine-in", "Takeaway", "Delivery"],
+    image: placeholder,
+    distance: "10.4 km"
   },
   {
-    nombre: "COFFEE WITH ALIENS",
-    calificacion: 4.5,
-    numeroReviews: 638,
-    rangoPrecio: "$100–200",
-    direccion: "Blvrd Acapulco 1000",
-    horario: "8:00 AM - 8:00 PM",
-    servicios: ["Dine-in", "Takeaway", "Delivery"],
-    imagen: placeholder,
-    distancia: "13.5 km"
+    name: "COFFEE WITH ALIENS",
+    rating: 4.5,
+    reviewCount: 638,
+    priceRange: "$100–200",
+    address: "Blvrd Acapulco 1000",
+    hours: "8:00 AM - 8:00 PM",
+    services: ["Dine-in", "Takeaway", "Delivery"],
+    image: placeholder,
+    distance: "13.5 km"
   },
   {
-    nombre: "Café Esotérico",
-    calificacion: 4.5,
-    numeroReviews: 843,
-    rangoPrecio: "$100–200",
-    direccion: "Melchor Ocampo 222",
-    horario: "8:30 AM - 7:00 PM",
-    servicios: ["Dine-in", "Takeaway"],
-    imagen: placeholder,
-    distancia: "9.2 km",
-    cerrado: true,
-    horaApertura: "8:30 AM Tue"
+    name: "Café Esotérico",
+    rating: 4.5,
+    reviewCount: 843,
+    priceRange: "$100–200",
+    address: "Melchor Ocampo 222",
+    hours: "8:30 AM - 7:00 PM",
+    services: ["Dine-in", "Takeaway"],
+    image: placeholder,
+    distance: "9.2 km",
+    closed: true,
+    openingTime: "8:30 AM Tue"
   }
 ];
 
@@ -247,10 +247,11 @@ const schemaEnrichment = {
 
       <!-- Filtros interactivos -->
       <div class="mb-12 flex flex-wrap justify-center gap-4">
-        <button class="px-6 py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-full font-serif hover:bg-[#BFA78E] transition-colors">Todos</button>
-        <button class="px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors">Cerca de mí</button>
-        <button class="px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors">Mejor calificados</button>
-        <button class="px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors">Abiertos ahora</button>
+        <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-full font-serif hover:bg-[#BFA78E] transition-colors" data-filter="all">Todos</button>
+        <button id="filter-nearby" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="nearby">Cerca de mí</button>
+        <button id="filter-rated" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="rated">Mejor calificados</button>
+        <button id="filter-open" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="open">Abiertos ahora</button>
+        <button id="filter-menu" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="menu">Menú digital</button>
       </div>
 
       <!-- Mapa visual de cafeterías (representación estilizada) -->
@@ -269,21 +270,27 @@ const schemaEnrichment = {
             <div 
               class="absolute w-3 h-3 bg-[#A67C52] rounded-full transform hover:scale-150 transition-transform cursor-pointer"
               style={`top: ${30 + Math.random() * 60}%; left: ${20 + Math.random() * 60}%;`}
-              title={cafe.nombre}
+              title={cafe.name}
             ></div>
           ))}
         </div>
       </div>
 
       <!-- Grid de cafeterías con diseño creativo -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div id="cafeterias-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cafeterias.map((cafe) => (
-          <div class="group relative overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div 
+            class="cafe-card group relative overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            data-rating={cafe.rating}
+            data-distance={cafe.distance ? cafe.distance.replace(" km", "") : "0"}
+            data-closed={cafe.closed ? "true" : "false"}
+            data-has-menu={cafe.link ? "true" : "false"}
+          >
             <!-- Imagen con overlay -->
             <div class="relative h-48 overflow-hidden">
               <Image 
-                src={cafe.imagen} 
-                alt={cafe.nombre}
+                src={cafe.image} 
+                alt={cafe.name}
                 width={500}
                 height={300}
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -294,20 +301,20 @@ const schemaEnrichment = {
               <div class="absolute bottom-3 left-3 flex items-center space-x-2">
                 <div class="flex items-center bg-white/90 px-2 py-1 rounded-full">
                   <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                  <span class="text-sm font-medium">{cafe.calificacion}</span>
-                  <span class="text-xs text-gray-600 ml-1">({cafe.numeroReviews})</span>
+                  <span class="text-sm font-medium">{cafe.rating}</span>
+                  <span class="text-xs text-gray-600 ml-1">({cafe.reviewCount})</span>
                 </div>
                 <div class="bg-white/90 px-2 py-1 rounded-full">
-                  <span class="text-sm font-medium">{cafe.rangoPrecio}</span>
+                  <span class="text-sm font-medium">{cafe.priceRange}</span>
                 </div>
               </div>
 
               <!-- Distancia -->
-              {cafe.distancia && (
+              {cafe.distance && (
                 <div class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full">
                   <div class="flex items-center">
                     <MapPin className="w-3 h-3 text-[#A67C52] mr-1" />
-                    <span class="text-xs">{cafe.distancia}</span>
+                    <span class="text-xs">{cafe.distance}</span>
                   </div>
                 </div>
               )}
@@ -324,32 +331,32 @@ const schemaEnrichment = {
             <div class="p-5">
               <h3 class="font-serif text-xl font-bold text-[#3A2E27] mb-2 group-hover:text-[#A67C52] transition-colors">
                 {cafe.link ? (
-                  <a href={cafe.link} class="hover:underline">{cafe.nombre}</a>
+                  <a href={cafe.link} class="hover:underline">{cafe.name}</a>
                 ) : (
-                  cafe.nombre
+                  cafe.name
                 )}
               </h3>
 
               <!-- Estado (abierto/cerrado) -->
               <div class="flex items-center mb-3">
                 <Clock className="w-4 h-4 text-gray-500 mr-2" />
-                {cafe.cerrado ? (
-                  <span class="text-sm text-red-500">Cerrado · Abre {cafe.horaApertura}</span>
+                {cafe.closed ? (
+                  <span class="text-sm text-red-500">Cerrado · Abre {cafe.openingTime}</span>
                 ) : (
-                  <span class="text-sm text-green-600">Abierto · {cafe.horario}</span>
+                  <span class="text-sm text-green-600">Abierto · {cafe.hours}</span>
                 )}
               </div>
 
               <!-- Dirección -->
               <div class="flex items-start mb-3">
                 <MapPin className="w-4 h-4 text-gray-500 mr-2 mt-0.5" />
-                <span class="text-sm text-gray-600">{cafe.direccion}</span>
+                <span class="text-sm text-gray-600">{cafe.address}</span>
               </div>
 
               <!-- Servicios disponibles -->
               <div class="flex flex-wrap gap-2 mt-4">
-                {cafe.servicios.map((servicio) => (
-                  <span class="text-xs bg-[#F8F3E9] text-[#5F4B3B] px-2 py-1 rounded-full">{servicio}</span>
+                {cafe.services.map((service) => (
+                  <span class="text-xs bg-[#F8F3E9] text-[#5F4B3B] px-2 py-1 rounded-full">{service}</span>
                 ))}
               </div>
 
@@ -474,3 +481,97 @@ const schemaEnrichment = {
     </div>
   </div>
 </RestaurantLayout>
+
+<script>
+  // Definir interfaz para elementos HTML con dataset específico para cafeterías
+  interface CafeCardElement extends HTMLElement {
+    dataset: {
+      rating: string;
+      distance: string;
+      closed: string;
+      hasMenu: string;
+    };
+    style: CSSStyleDeclaration;
+  }
+
+  interface FilterButtonElement extends HTMLElement {
+    dataset: {
+      filter: string;
+    };
+    style: CSSStyleDeclaration;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Obtener referencias a los elementos
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const cafeCards = document.querySelectorAll('.cafe-card');
+    
+    // Función para actualizar la clase activa en los botones
+    function updateActiveButton(activeButton: Element) {
+      filterButtons.forEach(button => {
+        if (button === activeButton) {
+          button.classList.remove('bg-white/80');
+          button.classList.add('bg-[#D4BEA3]');
+        } else {
+          button.classList.remove('bg-[#D4BEA3]');
+          button.classList.add('bg-white/80');
+        }
+      });
+    }
+    
+    // Función para filtrar cafeterías
+    function filterCafes(filterType: string) {
+      cafeCards.forEach(card => {
+        const cafeCard = card as CafeCardElement;
+        const rating = parseFloat(cafeCard.dataset.rating);
+        const distance = parseFloat(cafeCard.dataset.distance);
+        const isClosed = cafeCard.dataset.closed === 'true';
+        const hasMenu = cafeCard.dataset.hasMenu === 'true';
+        
+        let shouldShow = true;
+        
+        switch(filterType) {
+          case 'all':
+            // Mostrar todas las cafeterías
+            shouldShow = true;
+            break;
+          case 'nearby':
+            // Mostrar cafeterías cercanas (menos de 10 km)
+            shouldShow = distance < 10;
+            break;
+          case 'rated':
+            // Mostrar cafeterías mejor calificadas (4.7 o más)
+            shouldShow = rating >= 4.7;
+            break;
+          case 'open':
+            // Mostrar cafeterías abiertas
+            shouldShow = !isClosed;
+            break;
+          case 'menu':
+            // Mostrar cafeterías con menú digital
+            shouldShow = hasMenu;
+            break;
+        }
+        
+        cafeCard.style.display = shouldShow ? 'block' : 'none';
+      });
+    }
+    
+    // Agregar event listeners a los botones
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filterButton = button as FilterButtonElement;
+        const filterType = filterButton.dataset.filter;
+        updateActiveButton(button);
+        filterCafes(filterType);
+      });
+    });
+    
+    // Inicializar con el filtro 'Mejor calificados' activo
+    const ratedButton = document.getElementById('filter-rated') as HTMLElement;
+    if (ratedButton) {
+      updateActiveButton(ratedButton);
+      filterCafes('rated');
+    }
+  });
+</script>
