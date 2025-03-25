@@ -1,16 +1,17 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-// import { isAuthenticated } from '../middleware/auth';
+import AdminHeader from "../components/AdminHeader";
+import BaseHead from "../components/BaseHead.astro";
+//import { isAuthenticated } from '../middleware/auth';
 
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = 'Panel de administrador' } = Astro.props;
+const { title, description = "Panel de administrador" } = Astro.props;
 
-// // Verificar autenticación
-// const { cookies, redirect, request } = Astro;
+// Verificar autenticación
+// const { cookies, redirect } = Astro;
 // const isAuth = await isAuthenticated(request, cookies);
 
 // if (!isAuth) {
@@ -22,41 +23,43 @@ const { title, description = 'Panel de administrador' } = Astro.props;
   <head>
     <BaseHead title={title} description={description} />
   </head>
-  <body class="bg-gray-100 min-h-screen flex flex-col">
-    <header class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-gray-900">Panel de Administrador</h1>
-        <nav class="flex space-x-4">
-          <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">Dashboard</a>
-          <a href="/admin/restaurants" class="text-gray-600 hover:text-gray-900">Restaurantes</a>
-          <a href="/admin/contacts" class="text-gray-600 hover:text-gray-900">Contactos</a>
-          <button id="logout-btn" class="text-red-600 hover:text-red-900">Cerrar sesión</button>
-        </nav>
-      </div>
-    </header>
+  <body class="bg-gray-100 min-h-screen">
+    <AdminHeader client:load />
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <slot />
-    </main>
+    <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <main class="flex-grow w-full px-8 py-6">
+        <slot />
+      </main>
 
-    <footer class="bg-white shadow-inner py-4">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
-        &copy; {new Date().getFullYear()} Panel de Administrador
-      </div>
-    </footer>
+      <footer class="bg-white shadow-inner py-4">
+        <div class="px-8 text-center text-gray-500 text-sm">
+          &copy; {new Date().getFullYear()} Panel de Administrador
+        </div>
+      </footer>
+    </div>
 
     <script>
       // Manejar cierre de sesión
-      document.getElementById('logout-btn')?.addEventListener('click', async () => {
-        try {
-          await fetch('/api/auth/logout', {
-            method: 'POST',
-          });
-          window.location.href = '/admin/login';
-        } catch (error) {
-          console.error('Error al cerrar sesión:', error);
-        }
-      });
+      document
+        .getElementById("logout-btn")
+        ?.addEventListener("click", async () => {
+          try {
+            const response = await fetch("/api/auth/logout", {
+              method: "POST",
+            });
+            
+            if (response.ok) {
+              window.location.href = "/admin/login";
+            } else {
+              const errorData = await response.json();
+              console.error("Error al cerrar sesión:", errorData);
+              alert("No se pudo cerrar sesión. Intente nuevamente.");
+            }
+          } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+            alert("Ocurrió un error al intentar cerrar sesión.");
+          }
+        });
     </script>
   </body>
 </html>
