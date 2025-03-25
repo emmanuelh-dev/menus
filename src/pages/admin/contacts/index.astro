@@ -1,0 +1,55 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { supabase } from '../../../lib/supabase';
+
+// Obtener todos los contactos
+const { data: contacts, error } = await supabase
+  .from('contact')
+  .select('*')
+
+if (error) {
+  console.error('Error al obtener contactos:', error);
+}
+---
+
+<AdminLayout title="Contactos | Panel de Administrador">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Mensajes de contacto</h1>
+  </div>
+  
+  {error && (
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+      <p>Error al cargar los mensajes de contacto. Por favor, intenta de nuevo más tarde.</p>
+    </div>
+  )}
+  
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    {contacts && contacts.length > 0 ? (
+      <ul class="divide-y divide-gray-200">
+        {contacts.map((contact) => (
+          <li>
+            <div class="px-4 py-4 sm:px-6">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-indigo-600 truncate">{contact.email}</p>
+                <div class="ml-2 flex-shrink-0 flex">
+                  <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {new Date(contact.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <div class="mt-2 sm:flex sm:justify-between">
+                <div class="sm:flex">
+                  <p class="text-sm text-gray-500">{contact.message}</p>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="px-4 py-5 sm:px-6 text-center">
+        <p class="text-gray-500">No hay nuevas solicitudes de mensajes.</p>
+      </div>
+    )}
+  </div>
+</AdminLayout>
