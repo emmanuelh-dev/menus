@@ -1,0 +1,11 @@
+---
+import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import ContactForm from "../../components/ContactForm.tsx";
+---
+
+<RestaurantLayout
+  title="Contactanos"
+  description="Deja tu mensaje y nos pondremos en contacto contigo lo antes posible."
+>
+  <ContactForm client:load />
+</RestaurantLayout>
