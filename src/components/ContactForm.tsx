@@ -32,18 +32,20 @@ export default function ContactForm() {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-4xl py-8 font-bold mb-4 text-center">Contáctanos</h1>
-
+      <div className="text-balance ">
+        <p>¿Tienes alguna pregunta o comentario? No dudes en enviarnos un mensaje.</p>
+        <p>Usa este formulario para solicitar un registro o nuevas características.</p>
+      </div>
       {status && (
         <div
-          className={`px-4 py-3 rounded mb-4 ${
-            status.success ? "bg-green-100 border-green-400 text-green-700" : "bg-red-100 border-red-400 text-red-700"
-          }`}
+          className={`px-4 py-3 rounded mb-4 ${status.success ? "bg-green-100 border-green-400 text-green-700" : "bg-red-100 border-red-400 text-red-700"
+            }`}
         >
           {status.message}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
         <div>
           <label htmlFor="email" className="block mb-1">Correo electrónico</label>
           <input
