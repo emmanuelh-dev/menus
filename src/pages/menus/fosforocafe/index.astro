@@ -11,6 +11,10 @@ import helado from "./media/helado.jpg";
 import logo from "./media/logo.png";
 import { Image } from "astro:assets";
 import icon from "./media/icon.png";
+import panini from "./media/PANINI.jpg";
+import special from "./media/special.jpg";
+import pizza from "./media/pizza.jpg";
+
 import { Flame, Snowflake } from "lucide-react";
 
 const galleryImages = [
@@ -25,6 +29,9 @@ const galleryImages = [
     title: "Instagram",
   },
   { src: cafetera, alt: "Cafetera", title: "Cafetera" },
+  { src: panini, alt: "Panini", title: "Panini" },
+  { src: special, alt: "Special", title: "Special" },
+  { src: pizza, alt: "Pizza", title: "Pizza Pan" },
   {
     src: vaso,
     alt: "Drink",
@@ -63,7 +70,7 @@ const schemaEnrichment = {
   email: "info@bysmax.com",
   priceRange: "$$",
   servesCuisine: ["Tapatía", "Asado", "Flautas", "Sopes", "Pozole", "Tostadas"],
-  openingHours: "Viernes-Domingo 12:00-23:00",
+  openingHours: "Viernes-Domingo 13:00-20:00",
   acceptsReservations: true,
   paymentAccepted: ["Cash", "Credit Card"],
   currenciesAccepted: ["MXN", "USD"],
