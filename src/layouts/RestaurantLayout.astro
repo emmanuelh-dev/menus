@@ -211,10 +211,12 @@ const path = Astro.url.pathname;
     <body>
         <Header textWhite={textWhite} backgroundColor={backgroundColor} />
         <slot />
-        <div class={`${textWhite ? 'text-white' : 'text-black'} ${backgroundColor}`}>
-            <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
-                <ReviewForm client:visible path={path} restaurantName={title} />
-            </div>   
-        </div>
+        {path.includes('/menus/') && (
+            <div class={`${textWhite ? 'text-white' : 'text-black'} ${backgroundColor}`}>
+                <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
+                    <ReviewForm client:only path={path} restaurantName={title} />
+                </div>   
+            </div>
+        )}
     </body>
 </html>
