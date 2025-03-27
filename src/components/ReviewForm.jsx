@@ -246,7 +246,7 @@ export default function ReviewForm({ restaurantName, path }) {
                     </span>
                   )}
                 </div>
-                <p className="text-gray-700">{review.comment}</p>
+                <p>{review.comment}</p>
               </div>
             ))}
           </div>
