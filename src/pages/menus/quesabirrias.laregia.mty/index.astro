@@ -7,6 +7,7 @@ import QuesabirriasGallery from "./QuesabirriasGallery.astro";
 import logo from "./logo.png";
 import menu from "./media/menu.jpg";
 import isotipo from "./isotipo.png";
+import ReviewForm from "../../../components/ReviewForm.jsx";
 
 const restaurantData = {
     name: "Quesabirrias “La Regia”",
@@ -195,6 +196,9 @@ const schemaEnrichment = {
         </div>
         <QuesabirriasGallery />
     </div>
+    <div class="max-w-4xl mx-auto px-10 lg:px-4 mt-12">
+        <ReviewForm client:visible restaurantName={restaurantData.name} />
+    </div>    
 </RestaurantLayout>
 
 <style>
