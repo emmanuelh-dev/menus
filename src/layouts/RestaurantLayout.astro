@@ -2,8 +2,10 @@
 import { ViewTransitions } from "astro:transitions";
 import Header from "../components/Header.astro";
 import ReviewForm from "../components/ReviewForm";
+import { supabase } from "../lib/supabase";
 
-// Interfaces for different schema types
+const path = Astro.url.pathname;
+
 interface Address {
     streetAddress?: string;
     addressLocality?: string;
@@ -41,7 +43,7 @@ export interface Props {
     textWhite?: boolean;
     backgroundColor?: string;
     favicon?: string;
-    // Schema enrichment props
+    
     schemaEnrichment?: {
         address?: Address;
         telephone?: string;
@@ -73,7 +75,41 @@ const {
     schemaEnrichment = {}
 } = Astro.props;
 
-// Base schema
+
+
+let reviewStats = {
+    ratingValue: 0,
+    reviewCount: 0
+};
+
+try {
+    const { data: restaurantData } = await supabase
+        .from("restaurants")
+        .select("id")
+        .eq("menu", path)
+        .single();
+    
+    if (restaurantData) {
+        const { data: reviewsData } = await supabase
+            .from("review")
+            .select("rate")
+            .eq("restaurant_id", restaurantData.id);
+        
+        if (reviewsData && reviewsData.length > 0) {
+            // Calculamos el promedio de calificaciones
+            const totalRating = reviewsData.reduce((sum, review) => sum + review.rate, 0);
+            const averageRating = totalRating / reviewsData.length;
+            
+            reviewStats = {
+                ratingValue: parseFloat(averageRating.toFixed(1)),
+                reviewCount: reviewsData.length
+            };
+        }
+    }
+} catch (error) {
+    console.error("Error al obtener estadísticas de reseñas:", error);
+}
+
 const schema: any = {
     "@context": "https://schema.org",
     "@type": type,
@@ -81,12 +117,10 @@ const schema: any = {
     description: description,
 };
 
-// Add image if provided
 if (image) {
     schema.image = new URL(image, Astro.url);
 }
 
-// Add address if provided
 if (schemaEnrichment.address) {
     schema.address = {
         "@type": "PostalAddress",
@@ -94,7 +128,6 @@ if (schemaEnrichment.address) {
     };
 }
 
-// Add other optional properties
 if (schemaEnrichment.telephone) schema.telephone = schemaEnrichment.telephone;
 if (schemaEnrichment.email) schema.email = schemaEnrichment.email;
 if (schemaEnrichment.priceRange) schema.priceRange = schemaEnrichment.priceRange;
@@ -104,20 +137,25 @@ if (schemaEnrichment.acceptsReservations) schema.acceptsReservations = schemaEnr
 if (schemaEnrichment.paymentAccepted) schema.paymentAccepted = schemaEnrichment.paymentAccepted;
 if (schemaEnrichment.currenciesAccepted) schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
 
-// Add aggregate rating if provided
-if (schemaEnrichment.aggregateRating) {
+if (reviewStats.reviewCount > 0) {
+    schema.aggregateRating = {
+        "@type": "AggregateRating",
+        ratingValue: reviewStats.ratingValue,
+        reviewCount: reviewStats.reviewCount,
+        bestRating: 5,
+        worstRating: 1
+    };
+} else if (schemaEnrichment.aggregateRating) {
     schema.aggregateRating = {
         "@type": "AggregateRating",
         ...schemaEnrichment.aggregateRating
     };
 }
 
-// Add menu sections if type is Menu and sections are provided
 if (type === "Menu" && schemaEnrichment.menu) {
     schema.hasMenuSection = schemaEnrichment.menu;
 }
 
-// Add awards if provided
 if (schemaEnrichment.awards) {
     schema.awards = schemaEnrichment.awards.map(award => ({
         "@type": "MonetaryAmount",
@@ -125,7 +163,6 @@ if (schemaEnrichment.awards) {
     }));
 }
 
-// Add dietary restrictions if provided
 if (schemaEnrichment.suitableForDiet) {
     schema.suitableForDiet = schemaEnrichment.suitableForDiet.map(diet => 
         `http://schema.org/${diet}`
@@ -141,7 +178,6 @@ const menuItems = [
     { name: "Contacto", url: "/contacto" },
 ];
 
-const path = Astro.url.pathname;
 
 ---
 

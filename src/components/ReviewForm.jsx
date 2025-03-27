@@ -11,7 +11,6 @@ export default function ReviewForm({ restaurantName, path }) {
   const [error, setError] = useState(null);
   const reviewsRef = useRef(null);
 
-  // Efecto para cargar el restaurante (solo se ejecuta cuando cambia el path o restaurantName)
   useEffect(() => {
     const getRestaurant = async () => {
       const { data, error } = await supabase
@@ -111,14 +110,39 @@ export default function ReviewForm({ restaurantName, path }) {
       console.error("Error al insertar la reseña:", error);
       setError("Error al enviar la reseña");
     } else {
-
+      // Añadir la nueva reseña al estado local
       const newReview = {
         rating: data[0].rate,
         comment: data[0].comment,
         created_at: data[0].created_at,
         restaurant_id: restaurant.id
       };
-      setReviews([newReview, ...reviews]);
+      
+      // Actualizar el estado de reseñas con la nueva reseña
+      const updatedReviews = [newReview, ...reviews];
+      setReviews(updatedReviews);
+      
+      // Calcular el nuevo promedio de calificaciones
+      const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
+      const newAverageRating = totalRating / updatedReviews.length;
+      
+      // Actualizar la columna rating en la tabla restaurants
+      try {
+        const { error: updateError } = await supabase
+          .from("restaurants")
+          .update({ rating: newAverageRating.toFixed(1) })
+          .eq("id", restaurant.id);
+          
+        if (updateError) {
+          console.error("Error al actualizar la calificación del restaurante:", updateError);
+        } else {
+          console.log("Calificación del restaurante actualizada:", newAverageRating.toFixed(1));
+        }
+      } catch (updateErr) {
+        console.error("Error inesperado al actualizar la calificación:", updateErr);
+      }
+      
+      // Limpiar el formulario
       setRating(0);
       setComment("");
     }
