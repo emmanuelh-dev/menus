@@ -1,6 +1,7 @@
 ---
 import { ViewTransitions } from "astro:transitions";
 import Header from "../components/Header.astro";
+import ReviewForm from "../components/ReviewForm";
 
 // Interfaces for different schema types
 interface Address {
@@ -139,6 +140,9 @@ const menuItems = [
     { name: "Reservas", url: "/reservas" },
     { name: "Contacto", url: "/contacto" },
 ];
+
+const path = Astro.url.pathname;
+
 ---
 
 <!doctype html>
@@ -207,5 +211,10 @@ const menuItems = [
     <body>
         <Header textWhite={textWhite} backgroundColor={backgroundColor} />
         <slot />
+        <div class={`${textWhite ? 'text-white' : 'text-black'} ${backgroundColor}`}>
+            <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
+                <ReviewForm client:visible path={path} restaurantName={title} />
+            </div>   
+        </div>
     </body>
 </html>

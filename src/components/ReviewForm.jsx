@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { FaStar, FaRegStar } from "react-icons/fa";
-import { supabase } from "../lib/supabase"; 
+import { supabase } from "../lib/supabase";
 
-export default function ReviewForm({ restaurantName }) {
+export default function ReviewForm({ restaurantName, path }) {
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -79,9 +79,9 @@ export default function ReviewForm({ restaurantName }) {
     reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length || 0;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+    <>
       <h2 className="text-xl font-semibold mb-4">
-        Deja tu reseña de {restaurantName}
+        Deja tu reseña para {restaurantName}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -119,7 +119,7 @@ export default function ReviewForm({ restaurantName }) {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Escribe tu reseña..."
             rows="4"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
             required
           />
         </div>
@@ -185,7 +185,6 @@ export default function ReviewForm({ restaurantName }) {
             </span>
           </div>
         </div>
-      </div>
-    </div>
+      </div></>
   );
 }
