@@ -1,0 +1,152 @@
+/* Estilos personalizados para el blog */
+
+/* Variables de colores */
+:root {
+  --blog-accent: var(--accent, #2337ff);
+  --blog-accent-light: #4d5dff;
+  --blog-accent-dark: var(--accent-dark, #000d8a);
+}
+
+/* Estilos para las tarjetas de blog */
+.blog-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para las imágenes dentro del contenido */
+.prose img {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin: 2rem 0;
+}
+
+/* Mejoras para la tipografía en el contenido del blog */
+.prose p {
+  line-height: 1.8;
+  color: rgba(var(--gray-dark), 0.9);
+}
+
+.prose h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: rgb(var(--black));
+  font-weight: 700;
+}
+
+.prose h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: rgb(var(--black));
+  font-weight: 600;
+}
+
+.prose blockquote {
+  background-color: rgba(var(--gray-light), 0.3);
+  border-left: 4px solid var(--blog-accent);
+  padding: 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+  margin: 2rem 0;
+}
+
+.prose blockquote p {
+  margin-bottom: 0;
+}
+
+/* Estilos para listas */
+.prose ul li, 
+.prose ol li {
+  margin-bottom: 0.5rem;
+}
+
+/* Estilos para enlaces dentro del contenido */
+.prose a {
+  color: var(--blog-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.prose a:hover {
+  border-bottom-color: var(--blog-accent);
+}
+
+/* Estilos para código */
+.prose code {
+  background-color: rgba(var(--gray-light), 0.5);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+.prose pre {
+  background-color: rgb(var(--gray-dark));
+  color: #f8f8f8;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+/* Estilos para tablas */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+
+.prose th {
+  background-color: rgba(var(--gray-light), 0.5);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.prose td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(var(--gray-light), 0.7);
+}
+
+/* Estilos para la fecha formateada */
+time {
+  font-size: 0.9rem;
+  color: rgba(var(--gray), 0.8);
+}
+
+/* Animaciones sutiles */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.blog-animation {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+  .prose {
+    font-size: 1rem;
+  }
+  
+  .prose h1 {
+    font-size: 2.25rem;
+  }
+  
+  .prose h2 {
+    font-size: 1.75rem;
+  }
+  
+  .prose h3 {
+    font-size: 1.5rem;
+  }
+}
