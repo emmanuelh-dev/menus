@@ -55,14 +55,14 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
 
         {/* Header */}
         <div className="relative z-10 text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white drop-shadow-lg">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-black drop-shadow-lg">
             GORDITAS Y TACOS
             <br />
             <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-yellow-300">LA MADRINA</span>
           </h1>
-          <div className="text-lg sm:text-xl md:text-2xl mt-2 sm:mt-4 text-white">CALZADA UNIÓN #231</div>
-          <div className="text-base sm:text-lg md:text-xl text-white">8131152910 - 8133906548</div>
-          <div className="text-sm sm:text-base md:text-lg italic text-white">
+          <div className="text-lg sm:text-xl md:text-2xl mt-2 sm:mt-4 text-black">CALZADA UNIÓN #231</div>
+          <div className="text-base sm:text-lg md:text-xl text-black">8131152910 - 8133906548</div>
+          <div className="text-sm sm:text-base md:text-lg italic text-black">
             Pagos con tarjeta y transferencia
           </div>
         </div>
@@ -74,8 +74,8 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
 
           {/* Menu Items */}
           <div className="w-full lg:w-1/2 bg-white/20 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-white drop-shadow-md">Menú</h2>
-            <ul className="text-purple-900 text-xl sm:text-2xl font-bold space-y-3">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-black drop-shadow-md">Menú</h2>
+            <ul className="text-black text-xl sm:text-2xl font-bold space-y-3">
               <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">CHICHARRÓN</li>
               <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">DESHEBRADA</li>
               <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">ASADO</li>
@@ -89,7 +89,7 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
 
           {/* Gallery */}
           <div className="w-full lg:w-1/2">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-white drop-shadow-md">Nuestras Delicias</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-black drop-shadow-md">Nuestras Delicias</h2>
             <div className="grid grid-cols-2 gap-3">
               {gallery.map((image, index) => (
                 <div
@@ -103,7 +103,7 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
                     className="w-full aspect-square object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-2">
-                    <p className="text-white text-sm font-medium">{image.alt}</p>
+                    <p className="text-black text-sm font-medium">{image.alt}</p>
                   </div>
                 </div>
               ))}
@@ -118,7 +118,7 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={closeModal}>
           <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
             <button
-              className="absolute top-2 right-2 text-white text-4xl font-bold z-50 hover:text-yellow-300 transition-colors"
+              className="absolute top-2 right-2 text-black text-4xl font-bold z-50 hover:text-yellow-300 transition-colors"
               onClick={closeModal}
             >
               &times;
@@ -150,7 +150,7 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
         href={`https://wa.me/528133906548`}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-[80px] right-6 bg-[#25D366] text-white p-2 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors duration-300 z-50 flex items-center justify-center animate-[pulse_2s_infinite]"
+        className="fixed bottom-[80px] right-6 bg-[#25D366] text-black p-2 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors duration-300 z-50 flex items-center justify-center animate-[pulse_2s_infinite]"
         style={{ animation: 'pulse 2s infinite' }}
       >
         <FaWhatsapp className="text-3xl" />
