@@ -1,104 +1,127 @@
 
-export default function Menu() {
+import { useState } from 'react';
+import type { ImageMetadata } from 'astro';
+
+interface ImageData {
+  src: {
+    src: string;
+    width: number;
+    height: number;
+    format: string;
+  };
+  alt: string;
+}
+
+export default function Menu({gallery}: {gallery: ImageData[]}) {
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
+
+  const openModal = (image: ImageData) => {
+    setSelectedImage(image);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#ff7223] p-2 sm:p-4">
-      <div className="w-full max-w-5xl rounded-lg p-4 sm:p-6 md:p-8 relative overflow-hidden">
+    <div className="flex justify-center items-center min-h-screen bg-[#ff7223] p-2">
+      <div>
         {/* Decorative elements */}
-        {[...Array(8)].map((_, i) => (
+        {[...Array(12)].map((_, i) => (
           <div
             key={i}
             className="absolute w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 bg-yellow-300 rounded-full opacity-70"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
-              transform: "rotate(45deg)",
+              transform: `rotate(${Math.random() * 360}deg)`,
+              animation: `float ${3 + Math.random() * 5}s infinite ease-in-out`,
             }}
           />
         ))}
 
         {/* Header */}
-        <div className="relative z-10 text-center mb-4 sm:mb-6">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-yellow-300 leading-tight">
+        <div className="relative z-10 text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white drop-shadow-lg">
             GORDITAS Y TACOS
             <br />
-            <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">LA MADRINA</span>
+            <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-yellow-300">LA MADRINA</span>
           </h1>
-          <div className="text-yellow-300 text-lg sm:text-xl md:text-2xl mt-2 sm:mt-4">CALZADA UNIÓN #231</div>
-          <div className="text-yellow-300 text-base sm:text-lg md:text-xl">8131152910 - 8133906548</div>
-          <div className="text-yellow-300 text-sm sm:text-base md:text-lg italic">
+          <div className="text-lg sm:text-xl md:text-2xl mt-2 sm:mt-4 text-white">CALZADA UNIÓN #231</div>
+          <div className="text-base sm:text-lg md:text-xl text-white">8131152910 - 8133906548</div>
+          <div className="text-sm sm:text-base md:text-lg italic text-white">
             Pagos con tarjeta y transferencia
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex flex-col md:flex-row justify-between items-center relative z-10 gap-6 md:gap-4">
-          {/* Food imgs */}
-          <div className="flex flex-row justify-center flex-wrap gap-4">
-            <div className="relative">
-              <div
-                className="absolute inset-0 bg-yellow-500 opacity-30 rounded-full"
-                style={{ transform: "scale(1.2)" }}
-              />
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full overflow-hidden border-4 border-purple-700 relative">
-                <img
-                  src="/placeholder.svg?height=150&width=150"
-                  alt="Gordita de chicharrón"
-                  width={150}
-                  height={150}
-                  className="object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="relative">
-              <div
-                className="absolute inset-0 bg-yellow-500 opacity-30 rounded-full"
-                style={{ transform: "scale(1.2)" }}
-              />
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:w-32 lg:w-36 lg:h-36 rounded-full overflow-hidden border-4 border-purple-700 relative">
-                <img
-                  src="/placeholder.svg?height=150&width=150"
-                  alt="Gorditas"
-                  width={150}
-                  height={150}
-                  className="object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="relative">
-              <div
-                className="absolute inset-0 bg-yellow-500 opacity-30 rounded-full"
-                style={{ transform: "scale(1.2)" }}
-              />
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full overflow-hidden border-4 border-purple-700 relative">
-                <img
-                  src="/placeholder.svg?height=150&width=150"
-                  alt="Tacos"
-                  width={150}
-                  height={150}
-                  className="object-cover"
-                />
-              </div>
+        <div className="flex flex-col lg:flex-row justify-between items-center relative z-10 gap-8 lg:gap-12">
+          {/* Gallery */}
+          <div className="w-full lg:w-1/2">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-white drop-shadow-md">Nuestras Delicias</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {gallery.map((image, index) => (
+                <div 
+                  key={index} 
+                  className="relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105 shadow-md"
+                  onClick={() => openModal(image)}
+                >
+                  <img 
+                    src={image.src.src} 
+                    alt={image.alt} 
+                    className="w-full aspect-square object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-2">
+                    <p className="text-white text-sm font-medium">{image.alt}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Menu Items */}
-          <div className="text-center md:text-right w-full md:w-auto">
-            <ul className="text-purple-800 text-xl sm:text-2xl md:text-3xl font-bold space-y-1 sm:space-y-2">
-              <li>CHICHARRÓN</li>
-              <li>DESHEBRADA</li>
-              <li>ASADO</li>
-              <li>PAPÁ A LA MEXICANA</li>
-              <li>HUEVO EN SALSA</li>
-              <li>RAJAS CON QUESO</li>
-              <li>FRIJOL CON QUESO</li>
-              <li>DISCADA</li>
+          <div className="w-full lg:w-1/2 bg-white/20 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-white drop-shadow-md">Menú</h2>
+            <ul className="text-purple-900 text-xl sm:text-2xl font-bold space-y-3">
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">CHICHARRÓN</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">DESHEBRADA</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">ASADO</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">PAPÁ A LA MEXICANA</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">HUEVO EN SALSA</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">RAJAS CON QUESO</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">FRIJOL CON QUESO</li>
+              <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">DISCADA</li>
             </ul>
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={closeModal}>
+          <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="absolute top-2 right-2 text-white text-4xl font-bold z-50 hover:text-yellow-300 transition-colors"
+              onClick={closeModal}
+            >
+              &times;
+            </button>
+            <img 
+              src={selectedImage.src.src } 
+              className="w-full h-full object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* CSS Animation */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(5deg); }
+        }
+      `}</style>
     </div>
-  )
+  );
 }
 
