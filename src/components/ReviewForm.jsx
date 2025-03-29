@@ -13,10 +13,44 @@ export default function ReviewForm({ restaurantName, path }) {
 
   useEffect(() => {
     const getRestaurant = async () => {
+      // Normalizar el path para manejar rutas con o sin barra diagonal al final
+      const normalizedPath = path.endsWith('/') ? path : path + '/';
+      const pathWithoutSlash = path.endsWith('/') ? path.slice(0, -1) : path;
+      
+      // Buscar el restaurante con ambas versiones del path (con y sin barra diagonal)
       const { data, error } = await supabase
         .from("restaurants")
         .select("*")
-        .eq("menu", path);
+        .or(`menu.eq.${normalizedPath},menu.eq.${pathWithoutSlash}`);
+        
+      // Si hay un error en la consulta OR, intentar con consultas individuales
+      if (error) {
+        console.error("Error en consulta OR:", error);
+        
+        // Intentar primero con el path normalizado
+        const { data: dataWithSlash, error: errorWithSlash } = await supabase
+          .from("restaurants")
+          .select("*")
+          .eq("menu", normalizedPath);
+          
+        if (!errorWithSlash && dataWithSlash && dataWithSlash.length > 0) {
+          return { data: dataWithSlash, error: null };
+        }
+        
+        // Si no hay resultados, intentar con el path sin barra diagonal
+        const { data: dataWithoutSlash, error: errorWithoutSlash } = await supabase
+          .from("restaurants")
+          .select("*")
+          .eq("menu", pathWithoutSlash);
+          
+        if (!errorWithoutSlash && dataWithoutSlash && dataWithoutSlash.length > 0) {
+          return { data: dataWithoutSlash, error: null };
+        }
+        
+        // Si ambas consultas fallan, devolver el error original
+        return { data: null, error };
+      }
+        
       if (error) {
         console.error("Error al cargar el restaurante:", error);
         setError("Error al cargar el restaurante");
