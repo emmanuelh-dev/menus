@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { FaWhatsapp } from 'react-icons/fa';
 import type { ImageMetadata } from 'astro';
 
 interface ImageData {
@@ -24,7 +25,7 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#ff7223] p-2">
+    <div className="flex justify-center items-center min-h-screen bg-[#ff7223] p-2 relative">
       <div>
         {/* Decorative elements */}
         {[...Array(12)].map((_, i) => (
@@ -120,7 +121,24 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
           0%, 100% { transform: translateY(0) rotate(0deg); }
           50% { transform: translateY(-10px) rotate(5deg); }
         }
+        
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
       `}</style>
+      
+      {/* WhatsApp Floating Button */}
+      <a 
+        href={`https://wa.me/528133906548`} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="fixed bottom-[80px] right-6 bg-[#25D366] text-white p-2 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors duration-300 z-50 flex items-center justify-center animate-[pulse_2s_infinite]"
+        style={{ animation: 'pulse 2s infinite' }}
+      >
+        <FaWhatsapp className="text-3xl" />
+      </a>
     </div>
   );
 }
