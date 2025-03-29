@@ -6,6 +6,7 @@ export const navItems = [
     { name: "Menús", href: "/menus" },
     { name: "Blog", href: "/blog" },
     { name: "Cafeterias", href: "/cafeterias" },
+    { name: "Espadas", href: "/espadas" },
     { name: "Contacto", href: "/contact" },
     { name: "Ingresa", href: "/admin/login" }, 
 ];
