@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
 import type { ImageMetadata } from 'astro';
+import CopyClabe from '../../../components/CopyClabe';
 
 interface ImageData {
   src: {
@@ -13,7 +14,7 @@ interface ImageData {
   alt: string;
 }
 
-export default function Menu({gallery}: {gallery: ImageData[]}) {
+export default function Menu({ gallery }: { gallery: ImageData[] }) {
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
 
   const openModal = (image: ImageData) => {
@@ -22,6 +23,17 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
 
   const closeModal = () => {
     setSelectedImage(null);
+  };
+
+  const contactInfo = {
+    clabe: "646015206825470152", // CLABE existente
+    clabe2: "728969000034765417", // Nueva CLABE
+    beneficiary2: "Yazmin Ayala", // Nuevo beneficiario
+    bank2: "STP", // Nuevo banco
+    delivery: "$25 - $35",
+    hours: "Martes a Domingo de 08:30 a 14:00",
+    address: "Calzada Union #231, Talaverna Croc",
+    whatsapp: "8133906548",
   };
 
   return (
@@ -54,31 +66,11 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
             Pagos con tarjeta y transferencia
           </div>
         </div>
+        <CopyClabe clabes={[contactInfo.clabe, contactInfo.clabe2]} />
 
         {/* Content */}
         <div className="flex flex-col lg:flex-row justify-between items-center relative z-10 gap-8 lg:gap-12">
-          {/* Gallery */}
-          <div className="w-full lg:w-1/2">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-white drop-shadow-md">Nuestras Delicias</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {gallery.map((image, index) => (
-                <div 
-                  key={index} 
-                  className="relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105 shadow-md"
-                  onClick={() => openModal(image)}
-                >
-                  <img 
-                    src={image.src.src} 
-                    alt={image.alt} 
-                    className="w-full aspect-square object-cover object-center"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-2">
-                    <p className="text-white text-sm font-medium">{image.alt}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+
 
           {/* Menu Items */}
           <div className="w-full lg:w-1/2 bg-white/20 backdrop-blur-sm rounded-lg p-6 shadow-lg">
@@ -94,6 +86,30 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
               <li className="p-2 bg-yellow-300/80 rounded-lg transition-transform hover:scale-105 shadow-md">DISCADA</li>
             </ul>
           </div>
+
+          {/* Gallery */}
+          <div className="w-full lg:w-1/2">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center text-white drop-shadow-md">Nuestras Delicias</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {gallery.map((image, index) => (
+                <div
+                  key={index}
+                  className="relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105 shadow-md"
+                  onClick={() => openModal(image)}
+                >
+                  <img
+                    src={image.src.src}
+                    alt={image.alt}
+                    className="w-full aspect-square object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-2">
+                    <p className="text-white text-sm font-medium">{image.alt}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -101,14 +117,14 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
       {selectedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={closeModal}>
           <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
-            <button 
+            <button
               className="absolute top-2 right-2 text-white text-4xl font-bold z-50 hover:text-yellow-300 transition-colors"
               onClick={closeModal}
             >
               &times;
             </button>
-            <img 
-              src={selectedImage.src.src } 
+            <img
+              src={selectedImage.src.src}
               className="w-full h-full object-contain rounded-lg"
             />
           </div>
@@ -128,11 +144,11 @@ export default function Menu({gallery}: {gallery: ImageData[]}) {
           100% { transform: scale(1); }
         }
       `}</style>
-      
+
       {/* WhatsApp Floating Button */}
-      <a 
-        href={`https://wa.me/528133906548`} 
-        target="_blank" 
+      <a
+        href={`https://wa.me/528133906548`}
+        target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-[80px] right-6 bg-[#25D366] text-white p-2 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors duration-300 z-50 flex items-center justify-center animate-[pulse_2s_infinite]"
         style={{ animation: 'pulse 2s infinite' }}
