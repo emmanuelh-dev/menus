@@ -1,26 +1,16 @@
 ---
 const today = new Date();
+
+const {textWhite, backgroundColor} = Astro.props;
+
+
 ---
 
-<footer>
-	&copy; {today.getFullYear()} <a href="https://www.bysmax.com" target="_blank">Bysmax</a>. Todos los derechos reservados.
-
+<footer class={`${textWhite ? 'text-white' : 'text-black'} ${backgroundColor}`}>
+	<div class="max-w-4xl mx-auto p-4 py-4">
+		<div class="flex items-center justify-between">
+			<p>&copy; {today.getFullYear()} <a href="https://www.bysmax.com" class="hover:underline" target="_blank">Bysmax</a>. Todos los derechos reservados.</p>
+			<a href="/contact" class="hover:underline">Contáctanos</a>
+		</div>
+	</div>
 </footer>
-<style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		text-align: center;
-	}
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
-	}
-	.social-links a {
-		text-decoration: none;
-	}
-	.social-links a:hover {
-	}
-</style>

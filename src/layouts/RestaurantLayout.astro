@@ -1,4 +1,5 @@
 ---
+import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import ReviewForm from "../components/ReviewForm";
 import { supabase } from "../lib/supabase";
@@ -6,221 +7,234 @@ import { supabase } from "../lib/supabase";
 const path = Astro.url.pathname;
 
 interface Address {
-    streetAddress?: string;
-    addressLocality?: string;
-    postalCode?: string;
-    addressCountry?: string;
+  streetAddress?: string;
+  addressLocality?: string;
+  postalCode?: string;
+  addressCountry?: string;
 }
 
 interface MenuItem {
-    "@type": "MenuItem";
-    name: string;
-    description?: string;
-    price?: string;
-    image?: string;
+  "@type": "MenuItem";
+  name: string;
+  description?: string;
+  price?: string;
+  image?: string;
 }
 
 interface MenuSection {
-    "@type": "MenuSection";
-    name: string;
-    description?: string;
-    items?: MenuItem[];
+  "@type": "MenuSection";
+  name: string;
+  description?: string;
+  items?: MenuItem[];
 }
 
 interface OpeningHoursSpecification {
-    "@type": "OpeningHoursSpecification";
-    dayOfWeek: string[];
-    opens: string;
-    closes: string;
+  "@type": "OpeningHoursSpecification";
+  dayOfWeek: string[];
+  opens: string;
+  closes: string;
 }
 
 export interface Props {
-    title: string;
-    description: string;
-    image?: string;
-    type?: "Restaurant" | "Menu" | "Event";
-    textWhite?: boolean;
-    backgroundColor?: string;
-    favicon?: string;
-    
-    schemaEnrichment?: {
-        address?: Address;
-        telephone?: string;
-        email?: string;
-        priceRange?: string;
-        servesCuisine?: string | string[];
-        menu?: MenuSection[];
-        openingHours?: string | OpeningHoursSpecification[];
-        acceptsReservations?: boolean;
-        paymentAccepted?: string[];
-        currenciesAccepted?: string[];
-        aggregateRating?: {
-            ratingValue: number;
-            reviewCount: number;
-        };
-        awards?: string[];
-        suitableForDiet?: string[];
+  title: string;
+  description: string;
+  image?: string;
+  type?: "Restaurant" | "Menu" | "Event";
+  textWhite?: boolean;
+  backgroundColor?: string;
+  favicon?: string;
+
+  schemaEnrichment?: {
+    address?: Address;
+    telephone?: string;
+    email?: string;
+    priceRange?: string;
+    servesCuisine?: string | string[];
+    menu?: MenuSection[];
+    openingHours?: string | OpeningHoursSpecification[];
+    acceptsReservations?: boolean;
+    paymentAccepted?: string[];
+    currenciesAccepted?: string[];
+    aggregateRating?: {
+      ratingValue: number;
+      reviewCount: number;
     };
+    awards?: string[];
+    suitableForDiet?: string[];
+  };
 }
 
-const { 
-    title, 
-    description, 
-    image, 
-    favicon,
-    type = "Restaurant",
-    textWhite = false,
-    backgroundColor ='bg-white',
-    schemaEnrichment = {}
+const {
+  title,
+  description,
+  image,
+  favicon,
+  type = "Restaurant",
+  textWhite = false,
+  backgroundColor = "bg-white",
+  schemaEnrichment = {},
 } = Astro.props;
 
-
-
 let reviewStats = {
-    ratingValue: 0,
-    reviewCount: 0
+  ratingValue: 0,
+  reviewCount: 0,
 };
 
 try {
-    const { data: restaurantData } = await supabase
-        .from("restaurants")
-        .select("id")
-        .eq("menu", path)
-        .single();
-    
-    if (restaurantData) {
-        const { data: reviewsData } = await supabase
-            .from("review")
-            .select("rate")
-            .eq("restaurant_id", restaurantData.id);
-        
-        if (reviewsData && reviewsData.length > 0) {
-            // Calculamos el promedio de calificaciones
-            const totalRating = reviewsData.reduce((sum, review) => sum + review.rate, 0);
-            const averageRating = totalRating / reviewsData.length;
-            
-            reviewStats = {
-                ratingValue: parseFloat(averageRating.toFixed(1)),
-                reviewCount: reviewsData.length
-            };
-        }
+  const { data: restaurantData } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("menu", path)
+    .single();
+
+  if (restaurantData) {
+    const { data: reviewsData } = await supabase
+      .from("review")
+      .select("rate")
+      .eq("restaurant_id", restaurantData.id);
+
+    if (reviewsData && reviewsData.length > 0) {
+      // Calculamos el promedio de calificaciones
+      const totalRating = reviewsData.reduce(
+        (sum, review) => sum + review.rate,
+        0
+      );
+      const averageRating = totalRating / reviewsData.length;
+
+      reviewStats = {
+        ratingValue: parseFloat(averageRating.toFixed(1)),
+        reviewCount: reviewsData.length,
+      };
     }
+  }
 } catch (error) {
-    console.error("Error al obtener estadísticas de reseñas:", error);
+  console.error("Error al obtener estadísticas de reseñas:", error);
 }
 
 const schema: any = {
-    "@context": "https://schema.org",
-    "@type": type,
-    name: title,
-    description: description,
+  "@context": "https://schema.org",
+  "@type": type,
+  name: title,
+  description: description,
 };
 
 if (image) {
-    schema.image = new URL(image, Astro.url);
+  schema.image = new URL(image, Astro.url);
 }
 
 if (schemaEnrichment.address) {
-    schema.address = {
-        "@type": "PostalAddress",
-        ...schemaEnrichment.address
-    };
+  schema.address = {
+    "@type": "PostalAddress",
+    ...schemaEnrichment.address,
+  };
 }
 
 if (schemaEnrichment.telephone) schema.telephone = schemaEnrichment.telephone;
 if (schemaEnrichment.email) schema.email = schemaEnrichment.email;
-if (schemaEnrichment.priceRange) schema.priceRange = schemaEnrichment.priceRange;
-if (schemaEnrichment.servesCuisine) schema.servesCuisine = schemaEnrichment.servesCuisine;
-if (schemaEnrichment.openingHours) schema.openingHours = schemaEnrichment.openingHours;
-if (schemaEnrichment.acceptsReservations) schema.acceptsReservations = schemaEnrichment.acceptsReservations;
-if (schemaEnrichment.paymentAccepted) schema.paymentAccepted = schemaEnrichment.paymentAccepted;
-if (schemaEnrichment.currenciesAccepted) schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
+if (schemaEnrichment.priceRange)
+  schema.priceRange = schemaEnrichment.priceRange;
+if (schemaEnrichment.servesCuisine)
+  schema.servesCuisine = schemaEnrichment.servesCuisine;
+if (schemaEnrichment.openingHours)
+  schema.openingHours = schemaEnrichment.openingHours;
+if (schemaEnrichment.acceptsReservations)
+  schema.acceptsReservations = schemaEnrichment.acceptsReservations;
+if (schemaEnrichment.paymentAccepted)
+  schema.paymentAccepted = schemaEnrichment.paymentAccepted;
+if (schemaEnrichment.currenciesAccepted)
+  schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
 
 if (reviewStats.reviewCount > 0) {
-    schema.aggregateRating = {
-        "@type": "AggregateRating",
-        ratingValue: reviewStats.ratingValue,
-        reviewCount: reviewStats.reviewCount,
-        bestRating: 5,
-        worstRating: 1
-    };
+  schema.aggregateRating = {
+    "@type": "AggregateRating",
+    ratingValue: reviewStats.ratingValue,
+    reviewCount: reviewStats.reviewCount,
+    bestRating: 5,
+    worstRating: 1,
+  };
 } else if (schemaEnrichment.aggregateRating) {
-    schema.aggregateRating = {
-        "@type": "AggregateRating",
-        ...schemaEnrichment.aggregateRating
-    };
+  schema.aggregateRating = {
+    "@type": "AggregateRating",
+    ...schemaEnrichment.aggregateRating,
+  };
 }
 
 if (type === "Menu" && schemaEnrichment.menu) {
-    schema.hasMenuSection = schemaEnrichment.menu;
+  schema.hasMenuSection = schemaEnrichment.menu;
 }
 
 if (schemaEnrichment.awards) {
-    schema.awards = schemaEnrichment.awards.map(award => ({
-        "@type": "MonetaryAmount",
-        name: award
-    }));
+  schema.awards = schemaEnrichment.awards.map((award) => ({
+    "@type": "MonetaryAmount",
+    name: award,
+  }));
 }
 
 if (schemaEnrichment.suitableForDiet) {
-    schema.suitableForDiet = schemaEnrichment.suitableForDiet.map(diet => 
-        `http://schema.org/${diet}`
-    );
+  schema.suitableForDiet = schemaEnrichment.suitableForDiet.map(
+    (diet) => `http://schema.org/${diet}`
+  );
 }
 
 const menuItems = [
-    { name: "Inicio", url: "/" },
-    { name: "Menú", url: "/menu" },
-    { name: "Carta de Vinos", url: "/carta-vinos" },
-    { name: "Eventos", url: "/eventos" },
-    { name: "Reservas", url: "/reservas" },
-    { name: "Contacto", url: "/contacto" },
+  { name: "Inicio", url: "/" },
+  { name: "Menú", url: "/menu" },
+  { name: "Carta de Vinos", url: "/carta-vinos" },
+  { name: "Eventos", url: "/eventos" },
+  { name: "Reservas", url: "/reservas" },
+  { name: "Contacto", url: "/contacto" },
 ];
-
-
 ---
 
 <!doctype html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href={favicon ? favicon : '/favicon.ico'} />
-        <meta name="generator" content={Astro.generator} />
-        <title>Menú - {title} | {schemaEnrichment?.address?.streetAddress}</title>  
-        <meta name="description" content={description} />
-        <link rel="canonical" href={Astro.url} />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={favicon ? favicon : "/favicon.ico"}
+    />
+    <meta name="generator" content={Astro.generator} />
+    <title>Menú - {title} | {schemaEnrichment?.address?.streetAddress}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url} />
 
-        <!-- Open Graph / Facebook -->
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={Astro.url} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
-        <!-- Twitter -->
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content={Astro.url} />
-        <meta property="twitter:title" content={title} />
-        <meta property="twitter:description" content={description} />
-        {image && <meta property="twitter:image" content={new URL(image, Astro.url)} />}
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    {
+      image && (
+        <meta property="twitter:image" content={new URL(image, Astro.url)} />
+      )
+    }
 
-        <!-- Schema.org for Google -->
-        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    <!-- Schema.org for Google -->
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
-            rel="stylesheet"
-        />
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
 
-        <!-- <script 
+    <!-- <script 
          async 
          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
          crossorigin="anonymous"
         /> -->
 
-        <!-- <ViewTransitions />
+    <!-- <ViewTransitions />
 
         <style is:global>
             :root {
@@ -239,19 +253,32 @@ const menuItems = [
             }
         </style> -->
 
-    <script src="https://analytics.ahrefs.com/analytics.js" data-key="tBLkU3Ea6HxUBHJiGObWig" async></script>
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
-    
-    </head>
-    <body>
-        <Header textWhite={textWhite} backgroundColor={backgroundColor} />
-        <slot />
-        {(path.includes('/menus/') || (path.includes('/cafeterias')) || (path.includes('/espadas'))) && (
-            <div class={`${textWhite ? 'text-white' : 'text-black'} ${backgroundColor}`}>
-                <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
-                    <ReviewForm client:only path={path} restaurantName={title} />
-                </div>   
-            </div>
-        )}
-    </body>
+    <script
+      src="https://analytics.ahrefs.com/analytics.js"
+      data-key="tBLkU3Ea6HxUBHJiGObWig"
+      async></script>
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
+  </head>
+  <body>
+    <Header textWhite={textWhite} backgroundColor={backgroundColor} />
+    <slot />
+    {
+      (path.includes("/menus/") ||
+        path.includes("/cafeterias") ||
+        path.includes("/espadas")) && (
+        <div
+          class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor}`}
+        >
+          <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
+            <ReviewForm client:only path={path} restaurantName={title} />
+          </div>
+        </div>
+      )
+    }
+
+    <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
+  </body>
 </html>
