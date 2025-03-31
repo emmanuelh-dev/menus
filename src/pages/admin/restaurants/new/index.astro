@@ -128,13 +128,13 @@ const supabase = createSupabaseClient(
       form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const formData = new FormData(form);
+        const formData = new FormData(form as any);
         
         // Convertir formData a objeto
         const restaurantData = {
           name: formData.get('name'),
           address: formData.get('address'),
-          rating: parseFloat(formData.get('rating') || '0'),
+          rating: parseFloat(formData.get('rating') as string),
           priceRange: formData.get('priceRange'),
           hours: formData.get('hours'),
           featured: formData.get('featured') === 'on'

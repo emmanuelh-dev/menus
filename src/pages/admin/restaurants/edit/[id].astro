@@ -155,14 +155,14 @@ if (error) {
       form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const formData = new FormData(form);
+        const formData = new FormData(form as any);
         const id = formData.get('id');
         
         // Convertir formData a objeto
         const restaurantData = {
           name: formData.get('name'),
           address: formData.get('address'),
-          rating: parseFloat(formData.get('rating')),
+          rating: parseFloat(formData.get('rating') as string),
           priceRange: formData.get('priceRange'),
           hours: formData.get('hours'),
           featured: formData.get('featured') === 'on'
