@@ -1,99 +1,141 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
-import { isAuthenticated } from '../../middleware/auth';
-import { supabase } from '../../lib/supabase';
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { isAuthenticated } from "../../middleware/auth";
+import { createSupabaseClient } from "../../lib/supabase";
 
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
 if (!isAuth) {
-  console.log(isAuth)
-  return Astro.redirect('/admin/login');
+  console.log(isAuth);
+  return Astro.redirect("/admin/login");
 }
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+if (!accessTokenCookie || !refreshTokenCookie) {
+}
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 
 // Obtener estadísticas
 const { count: restaurantsCount } = await supabase
-  .from('restaurants')
-  .select('*', { count: 'exact', head: true });
+  .from("restaurants")
+  .select("*", { count: "exact", head: true });
 
 const { count: contactsCount } = await supabase
-  .from('contact')
-  .select('*', { count: 'exact', head: true });
+  .from("contact")
+  .select("*", { count: "exact", head: true });
 
 // Obtener últimos contactos
 const { data: recentContacts } = await supabase
-  .from('contact')
-  .select('*')
-  .order('created_at', { ascending: false })
+  .from("contact")
+  .select("*")
+  .order("created_at", { ascending: false })
   .limit(100);
 
 // Obtener últimos restaurantes
 const { data: recentRestaurants } = await supabase
-  .from('restaurants')
-  .select('*')
-  .order('created_at', { ascending: false })
+  .from("restaurants")
+  .select("*")
+  .order("created_at", { ascending: false })
   .limit(5);
 ---
 
 <AdminLayout title="Dashboard | Panel de Administrador">
   <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
-  
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-lg font-medium text-gray-900 mb-2">Restaurantes</h2>
       <p class="text-3xl font-bold">{restaurantsCount}</p>
-      <a href="/admin/restaurants" class="text-indigo-600 hover:text-indigo-800 text-sm mt-2 inline-block">Ver todos →</a>
+      <a
+        href="/admin/restaurants"
+        class="text-indigo-600 hover:text-indigo-800 text-sm mt-2 inline-block"
+        >Ver todos →</a
+      >
     </div>
-    
+
     <div class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-2">Mensajes de contacto</h2>
+      <h2 class="text-lg font-medium text-gray-900 mb-2">
+        Mensajes de contacto
+      </h2>
       <p class="text-3xl font-bold">{contactsCount}</p>
-      <a href="/admin/contacts" class="text-indigo-600 hover:text-indigo-800 text-sm mt-2 inline-block">Ver todos →</a>
+      <a
+        href="/admin/contacts"
+        class="text-indigo-600 hover:text-indigo-800 text-sm mt-2 inline-block"
+        >Ver todos →</a
+      >
     </div>
   </div>
-  
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Últimos restaurantes</h2>
-      
-      {recentRestaurants && recentRestaurants.length > 0 ? (
-        <ul class="divide-y divide-gray-200">
-          {recentRestaurants.map((restaurant) => (
-            <li class="py-3">
-              <div class="flex items-center space-x-4">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 truncate">{restaurant.name}</p>
-                  <p class="text-sm text-gray-500 truncate">{restaurant.address}</p>
+      <h2 class="text-lg font-medium text-gray-900 mb-4">
+        Últimos restaurantes
+      </h2>
+
+      {
+        recentRestaurants && recentRestaurants.length > 0 ? (
+          <ul class="divide-y divide-gray-200">
+            {recentRestaurants.map((restaurant) => (
+              <li class="py-3">
+                <div class="flex items-center space-x-4">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {restaurant.name}
+                    </p>
+                    <p class="text-sm text-gray-500 truncate">
+                      {restaurant.address}
+                    </p>
+                  </div>
+                  <a
+                    href={`/admin/restaurants/edit/${restaurant.id}`}
+                    class="text-indigo-600 hover:text-indigo-900 text-sm"
+                  >
+                    Editar
+                  </a>
                 </div>
-                <a href={`/admin/restaurants/edit/${restaurant.id}`} class="text-indigo-600 hover:text-indigo-900 text-sm">Editar</a>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p class="text-gray-500 text-sm">No hay restaurantes registrados.</p>
-      )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="text-gray-500 text-sm">No hay restaurantes registrados.</p>
+        )
+      }
     </div>
-    
+
     <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-lg font-medium text-gray-900 mb-4">Mensajes Recientes</h2>
-      
-      {recentContacts && recentContacts.length > 0 ? (
-        <ul class="divide-y divide-gray-200">
-          {recentContacts.map((contact) => (
-            <li class="py-3">
-              <div class="flex items-center space-x-4">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 truncate">{contact.email}</p>
-                  <p class="text-sm text-gray-500 truncate">{contact.message.substring(0, 50)}...</p>
+
+      {
+        recentContacts && recentContacts.length > 0 ? (
+          <ul class="divide-y divide-gray-200">
+            {recentContacts.map((contact) => (
+              <li class="py-3">
+                <div class="flex items-center space-x-4">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {contact.email}
+                    </p>
+                    <p class="text-sm text-gray-500 truncate">
+                      {contact.message.substring(0, 50)}...
+                    </p>
+                  </div>
+                  <span class="text-xs text-gray-500">
+                    {new Date(contact.created_at).toLocaleDateString()}
+                  </span>
                 </div>
-                <span class="text-xs text-gray-500">{new Date(contact.created_at).toLocaleDateString()}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
-      )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
+        )
+      }
     </div>
   </div>
 </AdminLayout>

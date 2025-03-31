@@ -4,7 +4,35 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-// Crear el cliente de Supabase
+/**
+ * Crea un cliente de Supabase con opciones personalizadas
+ * @param {string} accessToken - Token de acceso opcional para autenticación
+ * @param {string} refreshToken - Token de actualización opcional para renovar la sesión
+ * @returns Cliente de Supabase configurado
+ */
+export function createSupabaseClient(accessToken?: string, refreshToken?: string) {
+  const options = {};
+  
+  // Si se proporcionan tokens, configurar opciones de autenticación
+  if (accessToken && refreshToken) {
+    Object.assign(options, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    });
+  }
+  
+  return createClient(supabaseUrl, supabaseKey, options);
+}
+
+// Crear el cliente de Supabase por defecto
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Interfaz para las cafeterías

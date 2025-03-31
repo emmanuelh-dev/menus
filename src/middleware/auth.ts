@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { createSupabaseClient } from '../lib/supabase';
 
 export async function isAuthenticated(request: Request, cookies: any) {
   const accessToken = cookies.get('sb-access-token')?.value;
@@ -6,12 +6,15 @@ export async function isAuthenticated(request: Request, cookies: any) {
 
   if (!accessToken || !refreshToken) {
     console.log('❌ No hay tokens en las cookies');
-    return;
+    return false;
   }
 
   console.log('🔍 Verificando autenticación con tokens existentes');
 
   try {
+    // Crear cliente de Supabase con los tokens de la sesión
+    const supabase = createSupabaseClient(accessToken, refreshToken);
+    
     // Verificar si el token es válido
     const { data, error } = await supabase.auth.getUser(accessToken);
 
@@ -19,7 +22,8 @@ export async function isAuthenticated(request: Request, cookies: any) {
       console.warn('⚠️ Token inválido, intentando refrescar sesión...');
       
       // Intentar refrescar la sesión
-      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession({
+      const supabaseRefresh = createSupabaseClient();
+      const { data: refreshData, error: refreshError } = await supabaseRefresh.auth.refreshSession({
         refresh_token: refreshToken,
       });
 
@@ -31,9 +35,10 @@ export async function isAuthenticated(request: Request, cookies: any) {
       console.log('✅ Sesión refrescada correctamente, actualizando cookies');
 
       // Actualizar cookies con los nuevos tokens
+      // No usamos httpOnly para que sean accesibles desde JavaScript
       cookies.set('sb-access-token', refreshData.session.access_token, {
         path: '/',
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
         sameSite: 'strict',
         maxAge: refreshData.session.expires_in,
@@ -41,7 +46,7 @@ export async function isAuthenticated(request: Request, cookies: any) {
 
       cookies.set('sb-refresh-token', refreshData.session.refresh_token, {
         path: '/',
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
         sameSite: 'strict',
         maxAge: 60 * 60 * 24 * 30,

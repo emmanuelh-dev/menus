@@ -1,7 +1,5 @@
 ---
-import { supabase } from "../../lib/supabase";
-import BaseHead from "../../components/BaseHead.astro";
-import Footer from "../../components/Footer.astro";
+import { supabase, createSupabaseClient } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 
 // Middleware-like authentication check
@@ -14,9 +12,12 @@ console.log("Refresh Token:", refreshTokenCookie);
 
 if (accessTokenCookie && refreshTokenCookie) {
   try {
-    const { data } = await supabase.auth.getUser(
-      accessTokenCookie.value  // Now TypeScript knows this .value exists
+    // Crear cliente con los tokens existentes
+  const supabaseWithAuth = createSupabaseClient(
+      accessTokenCookie.value,
+      refreshTokenCookie.value
     );
+    const { data } = await supabaseWithAuth.auth.getUser();
     if (data?.user) {
       return Astro.redirect("/admin/dashboard");
     }
@@ -90,7 +91,7 @@ if (accessTokenCookie && refreshTokenCookie) {
   </div>
 
   <script>
-    import { supabase } from "../../lib/supabase";
+    import { supabase, createSupabaseClient } from "../../lib/supabase";
 
     document.addEventListener("DOMContentLoaded", () => {
       const form = document.getElementById("login-form");
@@ -154,12 +155,12 @@ if (accessTokenCookie && refreshTokenCookie) {
           const refreshToken = data.session?.refresh_token;
 
           if (accessToken && refreshToken) {
-
-            document.cookie = `sb-access-token=${accessToken}; path=/;`;
-            document.cookie = `sb-refresh-token=${refreshToken}; path=/;`;
+            // Establecer cookies con las mismas opciones que en el middleware
+            // Nota: En el cliente no podemos usar httpOnly, pero establecemos las demás opciones
+            const maxAge = 30 * 24 * 60 * 60; // 30 días en segundos
+            document.cookie = `sb-access-token=${accessToken}; path=/; max-age=${maxAge}; secure; samesite=strict;`;
+            document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=${maxAge}; secure; samesite=strict;`;
             
-            console.log(document.cookie.split(";"));
-
             window.location.href = "/admin/dashboard";
           }
 
