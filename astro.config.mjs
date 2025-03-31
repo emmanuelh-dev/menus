@@ -12,7 +12,7 @@ import vercel from '@astrojs/vercel/serverless';
 export default defineConfig({
   site: 'https://menus.bysmax.com',
   integrations: [mdx(), sitemap(), tailwind(), react()],
-  // output: 'server',
+  output: 'server',
   adapter: vercel({
     webAnalytics: {
       enabled: true,

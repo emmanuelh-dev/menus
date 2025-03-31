@@ -9,6 +9,9 @@ import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
+console.log("Access Token:", accessTokenCookie);
+console.log("Refresh Token:", refreshTokenCookie);
+
 if (accessTokenCookie && refreshTokenCookie) {
   try {
     const { data } = await supabase.auth.getUser(
@@ -102,7 +105,6 @@ if (accessTokenCookie && refreshTokenCookie) {
         "login-button"
       ) as HTMLButtonElement | null;
 
-      // Ensure all elements exist before adding event listeners
       if (
         !form ||
         !errorMessage ||
@@ -113,7 +115,7 @@ if (accessTokenCookie && refreshTokenCookie) {
         console.error("One or more required elements are missing");
         return;
       }
-
+    
       // Enable login button only when both email and password are valid
       const validateInputs = () => {
         const isEmailValid = emailInput.checkValidity();
@@ -147,7 +149,20 @@ if (accessTokenCookie && refreshTokenCookie) {
             throw new Error(error.message || "Error al iniciar sesión");
           }
 
-          window.location.href = "/admin/dashboard";
+          // Store the access token in a cookie
+          const accessToken = data.session?.access_token;
+          const refreshToken = data.session?.refresh_token;
+
+          if (accessToken && refreshToken) {
+
+            document.cookie = `sb-access-token=${accessToken}; path=/;`;
+            document.cookie = `sb-refresh-token=${refreshToken}; path=/;`;
+            
+            console.log(document.cookie.split(";"));
+
+            window.location.href = "/admin/dashboard";
+          }
+
         } catch (error) {
           if (errorMessage) {
             errorMessage.textContent =

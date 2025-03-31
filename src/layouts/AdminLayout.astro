@@ -1,7 +1,7 @@
 ---
+
 import AdminHeader from "../components/AdminHeader";
 import BaseHead from "../components/BaseHead.astro";
-//import { isAuthenticated } from '../middleware/auth';
 
 interface Props {
   title: string;
@@ -9,15 +9,8 @@ interface Props {
 }
 
 const { title, description = "Panel de administrador" } = Astro.props;
-
-// Verificar autenticación
-// const { cookies, redirect } = Astro;
-// const isAuth = await isAuthenticated(request, cookies);
-
-// if (!isAuth) {
-//   return redirect('/admin/login');
-// }
 ---
+
 
 <html lang="es">
   <head>

@@ -1,18 +1,23 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../middleware/auth';
 import { supabase } from '../../lib/supabase';
 
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+  console.log(isAuth)
+  return Astro.redirect('/admin/login');
+}
+
 // Obtener estadísticas
-const { data: restaurantsData } = await supabase
+const { count: restaurantsCount } = await supabase
   .from('restaurants')
-  .select('id', { count: 'exact' });
+  .select('*', { count: 'exact', head: true });
 
-const { data: contactsData } = await supabase
+const { count: contactsCount } = await supabase
   .from('contact')
-  .select('id', { count: 'exact' });
-
-const restaurantsCount = restaurantsData?.length || 0;
-const contactsCount = contactsData?.length || 0;
+  .select('*', { count: 'exact', head: true });
 
 // Obtener últimos contactos
 const { data: recentContacts } = await supabase
@@ -21,7 +26,6 @@ const { data: recentContacts } = await supabase
   .order('created_at', { ascending: false })
   .limit(100);
 
- console.log(recentContacts) 
 // Obtener últimos restaurantes
 const { data: recentRestaurants } = await supabase
   .from('restaurants')
