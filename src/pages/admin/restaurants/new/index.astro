@@ -1,7 +1,166 @@
 ---
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import { isAuthenticated } from "../../../../middleware/auth";
+import { createSupabaseClient } from "../../../../lib/supabase";
 
+// Verificar autenticación
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+// Obtener tokens de las cookies
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+// Crear cliente de Supabase con autenticación
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 ---
-<AdminLayout title="Restaurantes | Panel de Administrador">
-    Hola
+
+<AdminLayout title="Nuevo Restaurante | Panel de Administrador">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Agregar Nuevo Restaurante</h1>
+    <a
+      href="/admin/restaurants"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      Volver
+    </a>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+    <form id="new-restaurant-form" class="space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          required
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div>
+        <label for="address" class="block text-sm font-medium text-gray-700">Dirección</label>
+        <input
+          type="text"
+          name="address"
+          id="address"
+          required
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div>
+        <label for="rating" class="block text-sm font-medium text-gray-700">Calificación</label>
+        <input
+          type="number"
+          name="rating"
+          id="rating"
+          min="1"
+          max="5"
+          step="0.1"
+          value="4.0"
+          required
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div>
+        <label for="priceRange" class="block text-sm font-medium text-gray-700">Rango de Precio</label>
+        <select
+          id="priceRange"
+          name="priceRange"
+          class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        >
+          <option value="$">$</option>
+          <option value="$$" selected>$$</option>
+          <option value="$$$">$$$</option>
+          <option value="$$$$">$$$$</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="hours" class="block text-sm font-medium text-gray-700">Horario</label>
+        <input
+          type="text"
+          name="hours"
+          id="hours"
+          placeholder="Lun-Vie: 9am-9pm, Sáb-Dom: 10am-8pm"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div>
+        <div class="flex items-center">
+          <input
+            id="featured"
+            name="featured"
+            type="checkbox"
+            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+          />
+          <label for="featured" class="ml-2 block text-sm text-gray-900">Destacado</label>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button
+          type="submit"
+          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Crear Restaurante
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('new-restaurant-form');
+      
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        // Convertir formData a objeto
+        const restaurantData = {
+          name: formData.get('name'),
+          address: formData.get('address'),
+          rating: parseFloat(formData.get('rating') || '0'),
+          priceRange: formData.get('priceRange'),
+          hours: formData.get('hours'),
+          featured: formData.get('featured') === 'on'
+        };
+        
+        try {
+          const response = await fetch('/api/restaurants', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(restaurantData)
+          });
+          
+          if (response.ok) {
+            alert('Restaurante creado correctamente');
+            window.location.href = '/admin/restaurants';
+          } else {
+            const data = await response.json();
+            alert(data.error || 'Error al crear el restaurante');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al crear el restaurante');
+        }
+      });
+    });
+  </script>
 </AdminLayout>

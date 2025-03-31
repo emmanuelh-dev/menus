@@ -1,9 +1,29 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { supabase } from '../../../lib/supabase';
+import { supabase, createSupabaseClient } from '../../../lib/supabase';
+import { isAuthenticated } from '../../../middleware/auth';
+
+// Verificar autenticación
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+// Obtener tokens de las cookies
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+// Crear cliente de Supabase con autenticación
+const supabaseAuth = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 
 // Obtener todos los restaurantes
-const { data: restaurants, error } = await supabase
+const { data: restaurants, error } = await supabaseAuth
   .from('restaurants')
   .select('*')
   .order('name');

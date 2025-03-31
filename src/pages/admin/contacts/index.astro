@@ -1,11 +1,32 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { supabase } from '../../../lib/supabase';
+import { supabase, createSupabaseClient } from '../../../lib/supabase';
+import { isAuthenticated } from '../../../middleware/auth';
+
+// Verificar autenticación
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+// Obtener tokens de las cookies
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+// Crear cliente de Supabase con autenticación
+const supabaseAuth = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 
 // Obtener todos los contactos
-const { data: contacts, error } = await supabase
+const { data: contacts, error } = await supabaseAuth
   .from('contact')
   .select('*')
+  .order('created_at', { ascending: false });
 
 if (error) {
   console.error('Error al obtener contactos:', error);
@@ -41,6 +62,14 @@ if (error) {
                 <div class="sm:flex">
                   <p class="text-sm text-gray-500">{contact.message}</p>
                 </div>
+                <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 space-x-2">
+                  <button 
+                    data-id={contact.id}
+                    class="delete-btn text-red-600 hover:text-red-900"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </div>
             </div>
           </li>
@@ -52,4 +81,37 @@ if (error) {
       </div>
     )}
   </div>
+
+  <script>
+    // Manejar eliminación de mensajes de contacto
+    document.addEventListener('DOMContentLoaded', () => {
+      const deleteButtons = document.querySelectorAll('.delete-btn');
+      
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+          const id = button.getAttribute('data-id');
+          if (!id) return;
+          
+          if (confirm('¿Estás seguro de que deseas eliminar este mensaje?')) {
+            try {
+              const response = await fetch(`/api/contacts/${id}`, {
+                method: 'DELETE',
+              });
+              
+              if (response.ok) {
+                // Recargar la página para reflejar los cambios
+                window.location.reload();
+              } else {
+                const data = await response.json();
+                alert(data.error || 'Error al eliminar el mensaje');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              alert('Error al eliminar el mensaje');
+            }
+          }
+        });
+      });
+    });
+  </script>
 </AdminLayout>
