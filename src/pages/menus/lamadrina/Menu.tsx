@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
 import type { ImageMetadata } from 'astro';
 import CopyClabe from '../../../components/CopyClabe';
+import WhatsappButton from '../../../components/WhatsappButton';
 
 interface ImageData {
   src: {
@@ -131,30 +132,9 @@ export default function Menu({ gallery }: { gallery: ImageData[] }) {
         </div>
       )}
 
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(5deg); }
-        }
-        
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-      `}</style>
-
+ 
       {/* WhatsApp Floating Button */}
-      <a
-        href={`https://wa.me/528133906548`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-[80px] right-6 bg-[#25D366] text-black p-2 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors duration-300 z-50 flex items-center justify-center animate-[pulse_2s_infinite]"
-        style={{ animation: 'pulse 2s infinite' }}
-      >
-        <FaWhatsapp className="text-3xl" />
-      </a>
+      <WhatsappButton phone={Number(contactInfo.whatsapp)} />
     </div>
   );
 }

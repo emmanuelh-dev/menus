@@ -2,6 +2,7 @@
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import ReviewForm from "../components/ReviewForm";
+import ScrollTopAndComment from "../components/ScrollTopAndComment";
 import { supabase } from "../lib/supabase";
 
 const path = Astro.url.pathname;
@@ -278,7 +279,7 @@ const menuItems = [
         </div>
       )
     }
-
+    <ScrollTopAndComment client:only/>
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
   </body>
 </html>

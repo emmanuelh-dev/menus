@@ -6,6 +6,7 @@ import { Facebook, Instagram } from "lucide-react";
 import menu from "./menu.jpg";
 import CopyClabe from "../../../components/CopyClabe";
 import { FaWhatsapp } from "react-icons/fa";
+import WhatsappButton from "../../../components/WhatsappButton";
 
 const menuItems = [
   { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
@@ -145,15 +146,7 @@ const schemaEnrichment = {
       </div>
 
       {/* WhatsApp Floating Button */}
-      <a
-        href={`https://wa.me/528133906548`}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="fixed bottom-[80px] right-6 bg-[#25D366] text-white p-2 rounded-full shadow-lg hover:bg-[#128C7E] z-50 flex items-center justify-center"
-        style={{ animation: 'pulse 2s infinite' }}
-      >
-        <FaWhatsapp className="text-3xl" />
-      </a>
+      <WhatsappButton client:load phone={Number(contactInfo.whatsapp)} />
     </div>
   </div>
 </RestaurantLayout>

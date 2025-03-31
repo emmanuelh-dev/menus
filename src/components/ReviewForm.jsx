@@ -202,7 +202,7 @@ export default function ReviewForm({ restaurantName, path }) {
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-4">
+      <h2 className="text-xl font-semibold mb-4" id="comment">
         Deja tu reseña para {restaurantName}
       </h2>
 
@@ -308,15 +308,6 @@ export default function ReviewForm({ restaurantName, path }) {
           </div>
         </div>
       </div>
-
-      {/* Botón flotante para ir a los comentarios */}
-      <button
-        onClick={scrollToReviews}
-        className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all hover:scale-110 z-50 flex items-center justify-center"
-        aria-label="Ver comentarios"
-      >
-        <FaComment size={20} />
-      </button>
     </>
   );
 }
