@@ -1,0 +1,62 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import AdminHeader from "../../components/AdminHeader";
+---
+
+<html lang="es" class="dark:bg-dark-primary">
+  <head>
+    <BaseHead title="Panel de Administrador" description="Bienvenido al panel de administrador" />
+    <script>
+      // Check for dark mode preference
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
+  </head>
+  <body class="bg-gray-100 dark:bg-dark-primary min-h-screen text-gray-900 dark:text-dark-text">
+    <AdminHeader client:load />
+
+    <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <main class="flex-grow w-full px-8 py-6">
+        <div class="bg-white dark:bg-dark-secondary rounded-lg shadow-md p-6">
+          <h1 class="text-2xl font-bold mb-4">¡Bienvenido al Panel de Administrador!</h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Has iniciado sesión correctamente. Desde aquí podrás gestionar tu restaurante.
+          </p>
+        </div>
+      </main>
+
+      <footer class="bg-white dark:bg-dark-secondary shadow-inner py-4">
+        <div class="px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+          &copy; {new Date().getFullYear()} Panel de Administrador
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Manejar cierre de sesión
+      document
+        .getElementById("logout-btn")
+        ?.addEventListener("click", async () => {
+          try {
+            const response = await fetch("/api/auth/logout", {
+              method: "POST",
+            });
+            
+            if (response.ok) {
+              window.location.href = "/admin/login";
+            } else {
+              const errorData = await response.json();
+              console.error("Error al cerrar sesión:", errorData);
+              alert("No se pudo cerrar sesión. Intente nuevamente.");
+            }
+          } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+            alert("Ocurrió un error al intentar cerrar sesión.");
+          }
+        });
+    </script>
+  </body>
+</html>
