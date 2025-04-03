@@ -7,6 +7,7 @@ import menu from "./menu.jpg";
 import CopyClabe from "../../../components/CopyClabe";
 import { FaWhatsapp } from "react-icons/fa";
 import WhatsappButton from "../../../components/WhatsappButton";
+import RecommendationButton from "../../../components/RecommendationButton";
 
 const menuItems = [
   { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
@@ -147,6 +148,9 @@ const schemaEnrichment = {
 
       {/* WhatsApp Floating Button */}
       <WhatsappButton client:load phone={Number(contactInfo.whatsapp)} />
+      
+      {/* AI Recommendation Button */}
+      <RecommendationButton client:load menuItems={menuItems} menuText={null} restaurantName={restaurantData.name} />
     </div>
   </div>
 </RestaurantLayout>

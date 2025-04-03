@@ -1,6 +1,7 @@
 ---
+import RecommendationButton from "../../../components/RecommendationButton";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
-
+import { menu } from "./menu"
 const restaurantData = {
   name: "Campomar Arboleda -  San Pedro Garza García",
   description: "La mejor comida de la zona",
@@ -74,6 +75,7 @@ const schemaEnrichment = {
     <link rel="stylesheet" href="/campomar/estilos_campomar_planti7.css" />
     <link rel="stylesheet" href="/campomar/wow.css" />
   </head>
+  <RecommendationButton client:load menuItems={null} menuText={menu} restaurantName={restaurantData.name}  />
   <!-- HEADER -->
   <div class="bg-[#ebebeb]">
     <div class="max-w-4xl mx-auto">
