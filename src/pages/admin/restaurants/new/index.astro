@@ -35,7 +35,7 @@ const supabase = createSupabaseClient(
   </div>
 
   <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
-    <form id="new-restaurant-form" class="space-y-6">
+    <form id="new-restaurant-form" class="space-y-6" enctype="multipart/form-data">
       <div>
         <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
         <input
@@ -45,6 +45,25 @@ const supabase = createSupabaseClient(
           required
           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
+      </div>
+      
+      <div>
+        <label for="image" class="block text-sm font-medium text-gray-700">Imagen del Restaurante</label>
+        <div class="mt-1 flex items-center">
+          <div id="image-preview" class="hidden w-32 h-32 bg-gray-100 rounded-md overflow-hidden mb-2">
+            <img id="preview-img" class="w-full h-full object-cover" src="" alt="Vista previa" />
+          </div>
+        </div>
+        <div class="mt-1">
+          <input
+            type="file"
+            name="image"
+            id="image"
+            accept="image/*"
+            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          />
+          <p class="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
+        </div>
       </div>
 
       <div>
@@ -124,23 +143,67 @@ const supabase = createSupabaseClient(
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('new-restaurant-form');
+      const imageInput = document.getElementById('image');
+      const imagePreview = document.getElementById('image-preview');
+      const previewImg = document.getElementById('preview-img');
+      
+      // Mostrar vista previa de la imagen
+      imageInput?.addEventListener('change', (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (previewImg && imagePreview) {
+              previewImg.setAttribute('src', e.target?.result as string);
+              imagePreview.classList.remove('hidden');
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
       
       form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const formData = new FormData(form as any);
-        
-        // Convertir formData a objeto
-        const restaurantData = {
-          name: formData.get('name'),
-          address: formData.get('address'),
-          rating: parseFloat(formData.get('rating') as string),
-          priceRange: formData.get('priceRange'),
-          hours: formData.get('hours'),
-          featured: formData.get('featured') === 'on'
-        };
+        const imageFile = formData.get('image') as File;
         
         try {
+          let imageUrl = null;
+          
+          // Subir imagen si existe
+          if (imageFile && imageFile.size > 0) {
+            // Crear un FormData específico para la imagen
+            const imageFormData = new FormData();
+            imageFormData.append('image', imageFile);
+            
+            // Subir la imagen primero
+            const uploadResponse = await fetch('/api/upload', {
+              method: 'POST',
+              body: imageFormData
+            });
+            
+            if (!uploadResponse.ok) {
+              const errorData = await uploadResponse.json();
+              throw new Error(errorData.error || 'Error al subir la imagen');
+            }
+            
+            const uploadResult = await uploadResponse.json();
+            imageUrl = uploadResult.url;
+          }
+          
+          // Crear objeto con datos del restaurante
+          const restaurantData = {
+            name: formData.get('name'),
+            address: formData.get('address'),
+            rating: parseFloat(formData.get('rating') as string),
+            priceRange: formData.get('priceRange'),
+            hours: formData.get('hours'),
+            featured: formData.get('featured') === 'on',
+            image: imageUrl
+          };
+          
+          // Enviar datos del restaurante
           const response = await fetch('/api/restaurants', {
             method: 'POST',
             headers: {
@@ -158,7 +221,7 @@ const supabase = createSupabaseClient(
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('Error al crear el restaurante');
+          alert(error instanceof Error ? error.message : 'Error al crear el restaurante');
         }
       });
     });

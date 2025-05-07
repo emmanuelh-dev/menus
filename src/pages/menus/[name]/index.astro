@@ -1,0 +1,11 @@
+---
+const {name} = Astro.params;
+import {getRestaurantByName} from "../../../lib/supabase";
+if (!name) {
+  throw new Error("No se ha especificado el nombre del restaurante");
+}
+const menu = await getRestaurantByName({name});
+console.log(menu);
+---
+
+<h1>Hello, {name}!</h1>

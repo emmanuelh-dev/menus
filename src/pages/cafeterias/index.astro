@@ -106,13 +106,13 @@ const schemaEnrichment = {
             data-has-menu={cafe.menu ? "true" : "false"}
           >
             <!-- Imagen con overlay -->
-            <div class="relative h-48 overflow-hidden">
+            <div class="relative aspect-square overflow-hidden">
               <img
                 src={cafe.image} 
                 alt={cafe.name}
                 width={500}
-                height={300}
-                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                height={500}
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 aspect-square"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
               
@@ -218,80 +218,45 @@ const schemaEnrichment = {
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Cafetería destacada 1 -->
+        { cafeterias.filter(cafe => cafe.featured).map(cafe=>(
           <div class="bg-white rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
-            <div class="md:w-2/5 relative">
-              <Image 
-                src={alchemyCoffee} 
-                alt="Alchemy Coffee Lab"
-                width={400}
-                height={500}
-                class="w-full h-full object-cover"
-              />
-              <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
-              <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
-                <div class="bg-white/90 px-2 py-1 rounded-full inline-block">
-                  <Star className="w-4 h-4 text-yellow-500 inline mr-1" />
-                  <span class="text-sm font-medium">4.7 (1.8K)</span>
-                </div>
-              </div>
-            </div>
-            <div class="md:w-3/5 p-6">
-              <h3 class="font-serif text-2xl font-bold text-[#3A2E27] mb-2">Alchemy Coffee Lab</h3>
-              <p class="text-[#5F4B3B] mb-4">Un laboratorio de café donde cada taza es una experiencia sensorial única. Especialistas en métodos de preparación alternativos y granos de especialidad.</p>
-              <div class="flex items-center mb-2">
-                <MapPin className="w-4 h-4 text-gray-500 mr-2" />
-                <span class="text-sm text-gray-600">Bruselas 902</span>
-              </div>
-              <div class="flex items-center mb-4">
-                <DollarSign className="w-4 h-4 text-gray-500 mr-2" />
-                <span class="text-sm text-gray-600">$200–300</span>
-              </div>
-              <a 
-                href="/menus/alchemycoffeelab" 
-                class="inline-block px-6 py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
-              >
-                Ver Menú Completo
-              </a>
-            </div>
-          </div>
-          
-          <!-- Cafetería destacada 2 -->
-          <div class="bg-white rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
-            <div class="md:w-2/5 relative">
-              <Image 
-                src={fosforoCafe} 
-                alt="FOSFORO CAFÉ"
-                width={400}
-                height={500}
-                class="w-full h-full object-cover"
-              />
-              <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
-              <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
-                <div class="bg-white/90 px-2 py-1 rounded-full inline-block">
-                  <Star className="w-4 h-4 text-yellow-500 inline mr-1" />
-                  <span class="text-sm font-medium">4.7 (450)</span>
-                </div>
-              </div>
-            </div>
-            <div class="md:w-3/5 p-6">
-              <h3 class="font-serif text-2xl font-bold text-[#3A2E27] mb-2">FOSFORO CAFÉ</h3>
-              <p class="text-[#5F4B3B] mb-4">Tu nueva cafetería favorita en barrio antiguo. Un espacio acogedor con una selección de cafés de especialidad y deliciosos postres artesanales.</p>
-              <div class="flex items-center mb-2">
-                <MapPin className="w-4 h-4 text-gray-500 mr-2" />
-                <span class="text-sm text-gray-600">Calle Diego de Montemayor #751-A</span>
-              </div>
-              <div class="flex items-center mb-4">
-                <DollarSign className="w-4 h-4 text-gray-500 mr-2" />
-                <span class="text-sm text-gray-600">$100–200</span>
-              </div>
-              <a 
-                href="/menus/fosforocafe" 
-                class="inline-block px-6 py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
-              >
-                Ver Menú Completo
-              </a>
-            </div>
-          </div>
+             <div class="md:w-2/5 relative">
+               <Image 
+                 src={cafe.image} 
+                 alt="Alchemy Coffee Lab"
+                 width={400}
+                 height={500}
+                 class="w-full h-full object-cover"
+               />
+               <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
+               <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
+                 <div class="bg-white/90 px-2 py-1 rounded-full inline-block">
+                   <Star className="w-4 h-4 text-yellow-500 inline mr-1" />
+                   <span class="text-sm font-medium">4.7 (1.8K)</span>
+                 </div>
+               </div>
+             </div>
+             <div class="md:w-3/5 p-6">
+               <h3 class="font-serif text-2xl font-bold text-[#3A2E27] mb-2">Alchemy Coffee Lab</h3>
+               <p class="text-[#5F4B3B] mb-4">Un laboratorio de café donde cada taza es una experiencia sensorial única. Especialistas en métodos de preparación alternativos y granos de especialidad.</p>
+               <div class="flex items-center mb-2">
+                 <MapPin className="w-4 h-4 text-gray-500 mr-2" />
+                 <span class="text-sm text-gray-600">Bruselas 902</span>
+               </div>
+               <div class="flex items-center mb-4">
+                 <DollarSign className="w-4 h-4 text-gray-500 mr-2" />
+                 <span class="text-sm text-gray-600">$200–300</span>
+               </div>
+               <a 
+                 href={'/'+cafe.menu} 
+                 class="inline-block px-6 py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
+               >
+                 Ver Menú Completo
+               </a>
+             </div>
+           </div>   
+          ))
+        }
         </div>
       </div>
 

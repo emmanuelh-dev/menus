@@ -58,6 +58,7 @@ export async function getCafeterias() {
   const { data, error } = await supabase
     .from('restaurants')
     .select('*')
+    .eq('type', 'cafeteria')
   if (error) {
     console.error('Error fetching cafeterias:', error);
     return [];
@@ -93,4 +94,16 @@ export async function getOpinionesCafeteria(cafeteriaId: number) {
   }
   
   return data;
+}
+
+export async function getRestaurantByName({ name }: { name: string }) {
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('menu', name)
+  if (error) {
+    console.error('Error fetching cafeterias:', error);
+    return [];
+  }
+  return data as Cafeteria[];
 }

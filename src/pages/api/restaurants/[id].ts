@@ -98,7 +98,6 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
     // Agregar fecha de actualización
     const dataToUpdate = {
       ...restaurantData,
-      updated_at: new Date().toISOString()
     };
     
     // Actualizar en la base de datos
