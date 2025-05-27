@@ -44,15 +44,6 @@ const case_studies: Restaurant[] = [
         type: "Fast Food",
     },
     {
-        name: "Quesabirrias “La Regia”",
-        description: "Tacos, empalmes, quesadillas, birrias y mas...",
-        restaurantLink: "/menus/quesabirrias.laregia.mty",
-        image: tacos,
-        link: "/menus/quesabirrias.laregia.mty",
-        industry: "Restaurante",
-        type: "Casual",
-    },
-    {
         name: "Antojitos Tauro",
         description: "Tacos, empalmes, quesadillas, birrias y mas...",
         restaurantLink: "/menus/antojitostauro",
@@ -96,9 +87,6 @@ const restaurants = await getRestaurants({type: null})
 const restaurantWithImages = restaurants.filter((restaurant) => {
     return restaurant.image !== null
 });
-
-console.log("Restaurants fetched from Supabase:", restaurantWithImages);
-
 ---
 
 <RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">

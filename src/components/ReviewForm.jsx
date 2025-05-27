@@ -1,6 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { FaStar, FaRegStar, FaComment } from "react-icons/fa";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { FaStar, FaRegStar } from "react-icons/fa";
 import { supabase } from "../lib/supabase";
+
+const STAR_COUNT = 5;
+const DEFAULT_MENU = "campomar";
 
 export default function ReviewForm({ restaurantName, path }) {
   const [reviews, setReviews] = useState([]);
@@ -9,192 +12,193 @@ export default function ReviewForm({ restaurantName, path }) {
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const reviewsRef = useRef(null);
 
-  useEffect(() => {
-    const getRestaurant = async () => {
-      // Normalizar el path para manejar rutas con o sin barra diagonal al final
-      const normalizedPath = path.endsWith('/') ? path : path + '/';
-      const pathWithoutSlash = path.endsWith('/') ? path.slice(0, -1) : path;
-      
-      // Buscar el restaurante con ambas versiones del path (con y sin barra diagonal)
+  const menu = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.split('/').pop() || DEFAULT_MENU;
+    }
+    return path?.split('/').pop() || DEFAULT_MENU;
+  }, [path]);
+
+  const findOrCreateRestaurant = useCallback(async () => {
+    try {
       const { data, error } = await supabase
         .from("restaurants")
         .select("*")
-        .or(`menu.eq.${normalizedPath},menu.eq.${pathWithoutSlash}`);
-        
-      // Si hay un error en la consulta OR, intentar con consultas individuales
-      if (error) {
-        console.error("Error en consulta OR:", error);
-        
-        // Intentar primero con el path normalizado
-        const { data: dataWithSlash, error: errorWithSlash } = await supabase
-          .from("restaurants")
-          .select("*")
-          .eq("menu", normalizedPath);
-          
-        if (!errorWithSlash && dataWithSlash && dataWithSlash.length > 0) {
-          return { data: dataWithSlash, error: null };
-        }
-        
-        // Si no hay resultados, intentar con el path sin barra diagonal
-        const { data: dataWithoutSlash, error: errorWithoutSlash } = await supabase
-          .from("restaurants")
-          .select("*")
-          .eq("menu", pathWithoutSlash);
-          
-        if (!errorWithoutSlash && dataWithoutSlash && dataWithoutSlash.length > 0) {
-          return { data: dataWithoutSlash, error: null };
-        }
-        
-        // Si ambas consultas fallan, devolver el error original
-        return { data: null, error };
+        .eq("menu", menu)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
       }
-        
-      if (error) {
-        console.error("Error al cargar el restaurante:", error);
-        setError("Error al cargar el restaurante");
+
+      if (data) {
+        setRestaurant(data);
         return;
       }
-      
-      // Si encontramos el restaurante, lo establecemos en el estado
-      if (data && data.length > 0) {
-        setRestaurant(data[0]);
-        return;
-      }
-      
-      // Si no existe el restaurante, lo creamos automáticamente
-      try {
-        const { data: newRestaurant, error: createError } = await supabase
-          .from("restaurants")
-          .insert([{
-            name: restaurantName,
-            menu: path,
-          }])
-          .select();
-          
-        if (createError) {
-          console.error("Error al crear el restaurante:", createError);
-          setError("Error al crear el restaurante");
-          return;
-        }
-        
-        console.log("Restaurante creado automáticamente:", newRestaurant[0]);
-        setRestaurant(newRestaurant[0]);
-      } catch (err) {
-        console.error("Error inesperado al crear el restaurante:", err);
-        setError("Error inesperado al crear el restaurante");
-      }
-    };
 
-    getRestaurant();
-  }, [restaurantName, path]);
+      const { data: newRestaurant, error: createError } = await supabase
+        .from("restaurants")
+        .insert([{
+          name: restaurantName || menu,
+          menu: menu,
+        }])
+        .select()
+        .single();
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      if (!restaurant || !restaurant.id) return;
-      
+      if (createError) throw createError;
+
+      setRestaurant(newRestaurant);
+    } catch (err) {
+      console.error("Restaurant operation failed:", err);
+      setError("Failed to load restaurant data");
+    }
+  }, [menu, restaurantName]);
+
+  const loadReviews = useCallback(async () => {
+    if (!restaurant?.id) return;
+
+    try {
       const { data, error } = await supabase
         .from("review")
         .select("rate, comment, created_at")
         .eq("restaurant_id", restaurant.id)
         .order("created_at", { ascending: false });
-      if (error) {
-        console.error("Error al cargar reseñas:", error);
-        setError("Error al cargar reseñas");
-      } else {
 
-        setReviews(
-          data.map((review) => ({
-            rating: review.rate,
-            comment: review.comment,
-            created_at: review.created_at,
-            restaurant_id: restaurant.id,
-          }))
-        );
-      }
-    };
+      if (error) throw error;
 
-    loadReviews();
-  }, [restaurant]);
+      const mappedReviews = data.map(review => ({
+        rating: review.rate,
+        comment: review.comment,
+        created_at: review.created_at,
+        restaurant_id: restaurant.id,
+      }));
 
+      setReviews(mappedReviews);
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+      setError("Failed to load reviews");
+    }
+  }, [restaurant?.id]);
 
-  const handleSubmit = async (e) => {
+  const updateRestaurantRating = useCallback(async (newReviews) => {
+    if (!restaurant?.id || newReviews.length === 0) return;
+
+    const totalRating = newReviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = (totalRating / newReviews.length).toFixed(1);
+
+    try {
+      const { error } = await supabase
+        .from("restaurants")
+        .update({ rating: averageRating })
+        .eq("id", restaurant.id);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error("Failed to update restaurant rating:", err);
+    }
+  }, [restaurant?.id]);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    setError(null);
-
+    
     if (rating === 0 || !comment.trim()) {
-      setError("Por favor completa todos los campos");
+      setError("Please complete all fields");
       return;
     }
 
-    const { data, error } = await supabase
-      .from("review")
-      .insert([
-        {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .from("review")
+        .insert([{
           rate: rating,
           comment: comment.trim(),
-          restaurant: restaurantName,
+          restaurant: restaurant.name,
           restaurant_id: restaurant.id,
-        },
-      ])
-      .select();
+        }])
+        .select()
+        .single();
 
-    if (error) {
-      console.error("Error al insertar la reseña:", error);
-      setError("Error al enviar la reseña");
-    } else {
-      // Añadir la nueva reseña al estado local
+      if (error) throw error;
+
       const newReview = {
-        rating: data[0].rate,
-        comment: data[0].comment,
-        created_at: data[0].created_at,
+        rating: data.rate,
+        comment: data.comment,
+        created_at: data.created_at,
         restaurant_id: restaurant.id
       };
-      
-      // Actualizar el estado de reseñas con la nueva reseña
+
       const updatedReviews = [newReview, ...reviews];
       setReviews(updatedReviews);
       
-      // Calcular el nuevo promedio de calificaciones
-      const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
-      const newAverageRating = totalRating / updatedReviews.length;
-      
-      // Actualizar la columna rating en la tabla restaurants
-      try {
-        const { error: updateError } = await supabase
-          .from("restaurants")
-          .update({ rating: newAverageRating.toFixed(1) })
-          .eq("id", restaurant.id);
-          
-        if (updateError) {
-          console.error("Error al actualizar la calificación del restaurante:", updateError);
-        } else {
-          console.log("Calificación del restaurante actualizada:", newAverageRating.toFixed(1));
-        }
-      } catch (updateErr) {
-        console.error("Error inesperado al actualizar la calificación:", updateErr);
-      }
-      
-      // Limpiar el formulario
+      await updateRestaurantRating(updatedReviews);
+
       setRating(0);
       setComment("");
+    } catch (err) {
+      console.error("Failed to submit review:", err);
+      setError("Failed to submit review");
+    } finally {
+      setIsSubmitting(false);
     }
-  };
+  }, [rating, comment, restaurant, reviews, updateRestaurantRating]);
 
-  const averageRating =
-    reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length || 0;
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+  }, [reviews]);
 
-  const scrollToReviews = () => {
-    reviewsRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const isFormValid = rating > 0 && comment.trim().length > 0;
+
+  useEffect(() => {
+    findOrCreateRestaurant();
+  }, [findOrCreateRestaurant]);
+
+  useEffect(() => {
+    loadReviews();
+  }, [loadReviews]);
+
+  const renderStars = useCallback((count, interactive = false) => {
+    return Array.from({ length: STAR_COUNT }, (_, index) => {
+      const starNumber = index + 1;
+      const isActive = starNumber <= count;
+      
+      return (
+        <button
+          key={starNumber}
+          type="button"
+          {...(interactive && {
+            onClick: () => setRating(starNumber),
+            onMouseEnter: () => setHoverRating(starNumber),
+            onMouseLeave: () => setHoverRating(0),
+          })}
+          className={`text-2xl transition-colors ${
+            interactive ? 'focus:outline-none hover:scale-110' : ''
+          }`}
+          aria-label={`${starNumber} star${starNumber !== 1 ? 's' : ''}`}
+          disabled={!interactive}
+        >
+          {isActive ? (
+            <FaStar className="text-yellow-500" />
+          ) : (
+            <FaRegStar className={interactive ? "text-gray-300 hover:text-yellow-400" : "text-gray-300"} />
+          )}
+        </button>
+      );
+    });
+  }, []);
 
   if (!restaurant) {
     return (
       <div className="p-4 text-center">
         <div className="animate-pulse">
-          <p className="text-gray-600 mb-2">Preparando el sistema de reseñas...</p>
-          <p className="text-sm text-gray-500">Estamos configurando este restaurante para recibir reseñas.</p>
+          <p className="text-gray-600 mb-2">Setting up review system...</p>
+          <p className="text-sm text-gray-500">Configuring restaurant for reviews.</p>
         </div>
       </div>
     );
@@ -203,107 +207,82 @@ export default function ReviewForm({ restaurantName, path }) {
   return (
     <>
       <h2 className="text-xl font-semibold mb-4" id="comment">
-        Deja tu reseña para {restaurantName}
+        Leave your review for {restaurant.name}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-2">
-            Calificación (1 a 5 estrellas)
+            Rating (1 to 5 stars)
           </label>
           <div className="flex space-x-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                onMouseEnter={() => setHoverRating(star)}
-                onMouseLeave={() => setHoverRating(0)}
-                className="text-2xl focus:outline-none transition-colors"
-                aria-label={`${star} estrella${star !== 1 ? "s" : ""}`}
-              >
-                {star <= (hoverRating || rating) ? (
-                  <FaStar className="text-yellow-500" />
-                ) : (
-                  <FaRegStar className="text-gray-300 hover:text-yellow-400" />
-                )}
-              </button>
-            ))}
+            {renderStars(hoverRating || rating, true)}
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">
-            Comentario
+            Comment
           </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Escribe tu reseña..."
+            placeholder="Write your review..."
             rows="4"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-black resize-y"
             required
+            disabled={isSubmitting}
           />
         </div>
 
-        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {error && (
+          <div className="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-200">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"
-          disabled={rating === 0 || !comment.trim()}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!isFormValid || isSubmitting}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Enviar reseña
+          {isSubmitting ? 'Submitting...' : 'Submit Review'}
         </button>
       </form>
 
       <div className="mt-8" ref={reviewsRef}>
-        <h3 className="text-lg font-semibold mb-4">Reseñas anteriores</h3>
+        <h3 className="text-lg font-semibold mb-4">Previous Reviews</h3>
 
         {reviews.length > 0 ? (
           <div className="space-y-4">
             {reviews.map((review, index) => (
-              <div key={index} className="border-b pb-4">
+              <article key={`${review.restaurant_id}-${index}`} className="border-b pb-4 last:border-b-0">
                 <div className="flex items-center mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i}>
-                      {i < review.rating ? (
-                        <FaStar className="text-yellow-500" />
-                      ) : (
-                        <FaRegStar className="text-gray-300" />
-                      )}
-                    </span>
-                  ))}
+                  <div className="flex">
+                    {renderStars(review.rating)}
+                  </div>
                   {review.created_at && (
-                    <span className="ml-2 text-xs text-gray-500">
+                    <time className="ml-2 text-xs text-gray-500">
                       {new Date(review.created_at).toLocaleDateString()}
-                    </span>
+                    </time>
                   )}
                 </div>
-                <p>{review.comment}</p>
-              </div>
+                <p className="text-gray-700">{review.comment}</p>
+              </article>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No hay reseñas aún</p>
+          <p className="text-gray-500">No reviews yet</p>
         )}
 
-        <div className="mt-6">
-          <h4 className="font-medium">Calificación promedio:</h4>
-          <div className="flex items-center mt-1">
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <h4 className="font-medium mb-2">Average Rating:</h4>
+          <div className="flex items-center">
             <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <span key={i}>
-                  {i < Math.round(averageRating) ? (
-                    <FaStar className="text-yellow-500" />
-                  ) : (
-                    <FaRegStar className="text-gray-300" />
-                  )}
-                </span>
-              ))}
+              {renderStars(Math.round(averageRating))}
             </div>
             <span className="ml-2 text-gray-600">
-              ({averageRating.toFixed(1)} de 5)
+              ({averageRating.toFixed(1)} out of 5 • {reviews.length} review{reviews.length !== 1 ? 's' : ''})
             </span>
           </div>
         </div>
