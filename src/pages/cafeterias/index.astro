@@ -194,7 +194,7 @@ const schemaEnrichment = {
               <div class="mt-5">
                 {cafe.menu ? (
                   <a 
-                    href={cafe.menu} 
+                    href={'menus/' + cafe.menu} 
                     class="inline-block w-full text-center py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
                   >
                     Ver Menú
@@ -203,7 +203,7 @@ const schemaEnrichment = {
                   <button 
                     class="w-full py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-lg font-serif hover:bg-[#BFA78E] transition-colors"
                   >
-                    Más Información
+                    No hay menú disponible
                   </button>
                 )}
               </div>
@@ -247,12 +247,20 @@ const schemaEnrichment = {
                  <DollarSign className="w-4 h-4 text-gray-500 mr-2" />
                  <span class="text-sm text-gray-600">$200–300</span>
                </div>
-               <a 
-                 href={'/'+cafe.menu} 
-                 class="inline-block px-6 py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
-               >
-                 Ver Menú Completo
-               </a>
+                {cafe.menu ? (
+                  <a 
+                    href={'menus/' + cafe.menu} 
+                    class="inline-block w-full text-center py-2 bg-[#A67C52] text-white rounded-lg font-serif hover:bg-[#8C5E3B] transition-colors"
+                  >
+                    Ver Menú
+                  </a>
+                ) : (
+                  <button 
+                    class="w-full py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-lg font-serif hover:bg-[#BFA78E] transition-colors"
+                  >
+                    No hay menú disponible
+                  </button>
+                )}
              </div>
            </div>   
           ))
