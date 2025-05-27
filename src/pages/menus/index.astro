@@ -11,6 +11,7 @@ import antojitostauro from './antojitostauro/logo.jpg';
 import papachinislogo from './papachinis/logo.jpg';
 import fosforo from './fosforocafe/media/menu.jpg';
 import la_santa from './la-santa/la-santa.jpeg';
+import { getRestaurants } from "../../lib/supabase";
 
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
@@ -61,15 +62,6 @@ const case_studies: Restaurant[] = [
         type: "Casual",
     },
     {
-        name: "FastFood",
-        description: "Fast food",
-        restaurantLink: "/menus/fast-food",
-        image: pizza,
-        link: "/menus/fast-food",
-        industry: "Restaurante",
-        type: "Casual",
-    },
-    {
         name: "Antojitos Doña Guille",
         description: "El Auténtico Sabor Tapatío",
         restaurantLink: "/menus/antojitosdonaguille",
@@ -96,16 +88,17 @@ const case_studies: Restaurant[] = [
         industry: "Restaurante",
         type: "Fast Food",
     },
-    {
-        name: "FOSFORO",
-        description: "La mejor comida de la zona",
-        restaurantLink: "/menus/fosforocafe",
-        image: fosforo,
-        link: "/menus/fosforocafe",
-        industry: "Restaurante",
-        type: "Fast Food",
-    }
 ];
+
+
+const restaurants = await getRestaurants({type: null})
+
+const restaurantWithImages = restaurants.filter((restaurant) => {
+    return restaurant.image !== null
+});
+
+console.log("Restaurants fetched from Supabase:", restaurantWithImages);
+
 ---
 
 <RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">
@@ -137,28 +130,59 @@ const case_studies: Restaurant[] = [
             </div>
 
             <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-                {case_studies.map((study) => (
+                {restaurantWithImages.map((restaurant) => (
                     <div 
                         class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
-                        data-industry={study.industry}
-                        data-type={study.type}
+                        data-industry={restaurant.type}
+                        data-type={restaurant.type}
                     >
                         <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
-                            <Image
-                                src={study.image}
-                                alt={study.name}
+                            <img
+                                src={restaurant.image}
+                                alt={restaurant.name}
                                 class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            <a href={study.restaurantLink}>{study.name}</a>
+                            <a href={'/menus/'+ restaurant.menu}>{restaurant.name}</a>
                         </h2>
-                        <p class="text-gray-600">{study.description}</p>
+                        <p class="text-gray-600">{}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.industry}</span>
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{study.type}</span>
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
                         </div>
-                        <a href={study.link} class="group mt-4 block">
+                        {restaurant.menu && <a href={'/menus/' + restaurant.menu} class="group mt-4 block">
+                            <span class="flex items-center justify-between">
+                                Leer la historia completa
+                                <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
+                                    <ArrowRight />
+                                </div>
+                            </span>
+                        </a>}
+                    </div>
+                ))}
+                {case_studies.map((restaurant) => (
+                    <div 
+                        class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
+                        data-industry={restaurant.industry}
+                        data-type={restaurant.type}
+                    >
+                        <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
+                            <Image
+                                src={restaurant.image}
+                                alt={restaurant.name}
+                                class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">
+                            <a href={restaurant.restaurantLink}>{restaurant.name}</a>
+                        </h2>
+                        <p class="text-gray-600">{restaurant.description}</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.industry}</span>
+                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
+                        </div>
+                        <a href={restaurant.link} class="group mt-4 block">
                             <span class="flex items-center justify-between">
                                 Leer la historia completa
                                 <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">

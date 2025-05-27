@@ -7,7 +7,7 @@ import { Coffee, MapPin, Clock, Star, DollarSign, Phone, ArrowRight } from "luci
 import placeholder from "../menus/placeholder.svg";
 import alchemyCoffee from "../menus/alchemycoffeelab/espuma.jpg";
 import fosforoCafe from "../menus/fosforocafe/media/menu.jpg";
-import { getCafeterias } from "../../lib/supabase";
+import { getRestaurants } from "../../lib/supabase";
 
 // Definir la estructura de datos para las cafeterías
 interface CoffeeShop {
@@ -27,7 +27,9 @@ interface CoffeeShop {
 
 
 // Obtener cafeterías
-const cafeterias_raw = await getCafeterias();
+const cafeterias_raw = await getRestaurants({
+  type: "cafeteria",
+});
 
 const cafeterias = cafeterias_raw.map((cafeteria) => ({
   ...cafeteria,

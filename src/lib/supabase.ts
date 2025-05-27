@@ -36,7 +36,7 @@ export function createSupabaseClient(accessToken?: string, refreshToken?: string
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Interfaz para las cafeterías
-export interface Cafeteria {
+export interface Restaurant {
   id: number;
   name: string;
   rating: number;
@@ -51,19 +51,26 @@ export interface Cafeteria {
   closed?: boolean;
   openingTime?: string;
   featured?: boolean;
+  type?: string;
 }
 
 // Función para obtener todas las cafeterías
-export async function getCafeterias() {
-  const { data, error } = await supabase
+export async function getRestaurants({type}: {type: string | null}) {
+
+  let query = supabase
     .from('restaurants')
     .select('*')
-    .eq('type', 'cafeteria')
+
+  if (type){
+    query = query.eq('type', type);
+  }
+
+  const { data, error } = await query
   if (error) {
     console.error('Error fetching cafeterias:', error);
     return [];
   }
-  return data as Cafeteria[];
+  return data as Restaurant[];
 }
 
 // Función para obtener cafeterías destacadas
@@ -78,7 +85,7 @@ export async function getCafeteriasDestacadas() {
     return [];
   }
   
-  return data as Cafeteria[];
+  return data as Restaurant[];
 }
 
 // Función para obtener opiniones de una cafetería
@@ -105,5 +112,5 @@ export async function getRestaurantByName({ name }: { name: string }) {
     console.error('Error fetching cafeterias:', error);
     return [];
   }
-  return data as Cafeteria[];
+  return data as Restaurant[];
 }
