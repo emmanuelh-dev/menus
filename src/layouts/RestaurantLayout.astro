@@ -165,10 +165,7 @@ if (type === "Menu" && schemaEnrichment.menu) {
 }
 
 if (schemaEnrichment.awards) {
-  schema.awards = schemaEnrichment.awards.map((award) => ({
-    "@type": "MonetaryAmount",
-    name: award,
-  }));
+  schema.awards = schemaEnrichment.awards;
 }
 
 if (schemaEnrichment.suitableForDiet) {
@@ -176,16 +173,6 @@ if (schemaEnrichment.suitableForDiet) {
     (diet) => `http://schema.org/${diet}`
   );
 }
-
-const menuItems = [
-  { name: "Inicio", url: "/" },
-  { name: "Menú", url: "/menu" },
-  { name: "Carta de Vinos", url: "/carta-vinos" },
-  { name: "Eventos", url: "/eventos" },
-  { name: "Reservas", url: "/reservas" },
-  { name: "Contacto", url: "/contacto" },
-];
-
 ---
 
 <!doctype html>
@@ -199,7 +186,9 @@ const menuItems = [
       href={favicon ? favicon : "/favicon.ico"}
     />
     <meta name="generator" content={Astro.generator} />
-    <title>Menú - {title} | {schemaEnrichment?.address?.streetAddress}</title>
+    <title>
+      Menú - {title} | {schemaEnrichment?.address?.streetAddress} - Menu PDF
+    </title>
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
 
@@ -280,7 +269,7 @@ const menuItems = [
         </div>
       )
     }
-    <ScrollTopAndComment client:only/>
+    <ScrollTopAndComment client:only />
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
   </body>
 </html>
