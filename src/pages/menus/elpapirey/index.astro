@@ -8,6 +8,14 @@ import CopyClabe from "../../../components/CopyClabe";
 import { FaWhatsapp } from "react-icons/fa";
 import WhatsappButton from "../../../components/WhatsappButton";
 import RecommendationButton from "../../../components/RecommendationButton";
+import { supabase } from "../../../lib/supabase";
+
+  const { data } = await supabase
+    .from("restaurants")
+    .select("*")
+    .eq("menu", 'elpapirey')
+    .single();
+
 
 const menuItems = [
   { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
@@ -88,13 +96,14 @@ const schemaEnrichment = {
     facebook: "https://www.facebook.com/profile.php?id=100090381744195",
   },
 };
+
 ---
 
 <RestaurantLayout
   title={restaurantData.name}
   description={restaurantData.name}
   schemaEnrichment={schemaEnrichment}
-  image={menu.src}
+  image={data.image}
   favicon={logo.src}
   textWhite={true}
   backgroundColor="bg-black"
@@ -106,7 +115,7 @@ const schemaEnrichment = {
       <!-- Header with Logo and Social Media -->
       <div class="flex flex-col items-center mb-8">
         <div class="flex items-center gap-4 mb-4">
-          <Image src={logo} alt="El Papi Rey Logo" width="250" height="250" />
+          <Image src={data.image} alt="El Papi Rey Logo" width="250" height="250" />
         </div>
         <div class="flex gap-4 text-white mb-4">
           <a href={socialMedia.instagram.url} class="flex items-center gap-2">

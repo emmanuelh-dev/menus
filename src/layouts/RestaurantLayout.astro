@@ -259,9 +259,8 @@ if (schemaEnrichment.suitableForDiet) {
     {
       (path.includes("/menus/") ||
         path.includes("/cafeterias") ||
-        path.includes("/espadas")) && (
-        <div
-          class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor}`}
+        path.includes("/espadas")) && (        <div
+          class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
         >
           <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
             <ReviewForm client:only path={path} restaurantName={title} />
