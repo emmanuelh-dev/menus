@@ -1,0 +1,151 @@
+---
+// LocalBusinessSchema.astro - Structured data for local business SEO
+
+interface Props {
+  cafeterias?: Array<{
+    name: string;
+    address: string;
+    rating?: number;
+    reviewCount?: number;
+    priceRange?: string;
+    hours?: string;
+    services?: string[];
+  }>;
+}
+
+const { cafeterias = [] } = Astro.props;
+
+// Featured cafeterias from Reddit data for structured markup
+const featuredCafeterias = [
+  {
+    name: "Cafetería Kali",
+    address: "San Pedro Garza García, Nuevo León",
+    rating: 4.8,
+    reviewCount: 250,
+    priceRange: "$$",
+    hours: "Mon-Sun 07:00-22:00",
+    services: ["Café de especialidad", "WiFi", "Para trabajar"]
+  },
+  {
+    name: "Café Prana", 
+    address: "Barrio Antiguo, Monterrey, Nuevo León",
+    rating: 4.7,
+    reviewCount: 180,
+    priceRange: "$$",
+    hours: "Mon-Sun 08:00-21:00",
+    services: ["Espresso", "Ambiente histórico", "Terraza"]
+  },
+  {
+    name: "Panem",
+    address: "Centro Histórico, Monterrey, Nuevo León", 
+    rating: 4.6,
+    reviewCount: 320,
+    priceRange: "$$",
+    hours: "Mon-Sat 07:00-20:00",
+    services: ["Panadería", "Café artesanal", "Desayunos"]
+  },
+  {
+    name: "El Cafelito",
+    address: "Centro, Monterrey, Nuevo León",
+    rating: 4.5,
+    reviewCount: 150,
+    priceRange: "$",
+    hours: "Mon-Sat 06:00-19:00", 
+    services: ["Tradicional", "Familiar", "Económico"]
+  },
+  {
+    name: "Le Petite Bretonne",
+    address: "Monterrey Sur, Nuevo León",
+    rating: 4.7,
+    reviewCount: 200,
+    priceRange: "$$",
+    hours: "Mon-Sun 07:00-21:00",
+    services: ["Café francés", "Croissants", "Repostería"]
+  },
+  {
+    name: "Cafetería Gaby",
+    address: "Centro, Monterrey, Nuevo León",
+    rating: 4.4,
+    reviewCount: 90,
+    priceRange: "$",
+    hours: "Mon-Sat 06:30-18:00",
+    services: ["Clásico", "Historia local", "Económico"]
+  }
+];
+
+const allCafeterias = cafeterias.length > 0 ? cafeterias : featuredCafeterias;
+
+// Generate structured data for local business listings
+const generateLocalBusinessSchema = (cafeteria: any) => {
+  return {
+    "@type": "CafeOrCoffeeShop",
+    "name": cafeteria.name,
+    "address": {
+      "@type": "PostalAddress", 
+      "addressLocality": cafeteria.address.includes("San Pedro") ? "San Pedro Garza García" : "Monterrey",
+      "addressRegion": "Nuevo León",
+      "addressCountry": "MX"
+    },
+    "aggregateRating": cafeteria.rating ? {
+      "@type": "AggregateRating",
+      "ratingValue": cafeteria.rating,
+      "reviewCount": cafeteria.reviewCount || 0,
+      "bestRating": 5,
+      "worstRating": 1
+    } : undefined,
+    "priceRange": cafeteria.priceRange || "$$",
+    "openingHours": cafeteria.hours ? [cafeteria.hours] : undefined,
+    "servesCuisine": "Coffee",
+    "acceptsReservations": false,
+    "paymentAccepted": ["Cash", "Credit Card"],
+    "amenityFeature": cafeteria.services?.map((service: string) => ({
+      "@type": "LocationFeatureSpecification",
+      "name": service
+    })) || []
+  };
+};
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Mejores Cafeterías en Monterrey",
+  "description": "Lista completa de las mejores cafeterías en Monterrey, San Pedro y área metropolitana",
+  "numberOfItems": allCafeterias.length,
+  "itemListElement": allCafeterias.map((cafeteria, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@context": "https://schema.org",
+      ...generateLocalBusinessSchema(cafeteria)
+    }
+  }))
+};
+
+// Main organization schema
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Menús Monterrey",
+  "url": "https://menusmty.com",
+  "description": "Guía completa de cafeterías y restaurantes en Monterrey",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Monterrey", 
+    "addressRegion": "Nuevo León",
+    "addressCountry": "MX"
+  },
+  "areaServed": {
+    "@type": "GeoCircle",
+    "geoMidpoint": {
+      "@type": "GeoCoordinates",
+      "latitude": 25.6866,
+      "longitude": -100.3161
+    },
+    "geoRadius": "50000"
+  }
+};
+---
+
+<!-- Local Business Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />

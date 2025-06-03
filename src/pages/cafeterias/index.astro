@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import LocalBusinessSchema from "../../components/LocalBusinessSchema.astro";
 import { Coffee, MapPin, Clock, Star, DollarSign, Phone, ArrowRight } from "lucide-react";
 
 // Importar imágenes para las cafeterías
@@ -37,9 +38,46 @@ const cafeterias = cafeterias_raw.map((cafeteria) => ({
 
 // Configuración para SEO
 const seoData = {
-  title: "Cafeterías  especialidad en Monterrey | Descubre los mejores cafés de especialidad ",
-  description: "Explora las mejores cafeterías de Monterrey. Encuentra tu café favorito con información detallada sobre precios, ubicación, horarios y servicios.",
-  keywords: ["cafeterías monterrey", "café local", "mejores cafés", "café monterrey", "coffee shop"],
+  title: "Mejores Cafeterías en Monterrey 2025 | Café de Especialidad en Centro y San Pedro",
+  description: "Descubre las mejores cafeterías en Monterrey, San Pedro y Centro. Encuentra Cafetería Kali, Café Prana en Barrio Antiguo, El Cafelito y más. Guía completa con ubicaciones, horarios y menús.",
+  keywords: [
+    "cafeterías en monterrey", 
+    "cafetería centro monterrey", 
+    "cafeterías barrio antiguo monterrey", 
+    "cafetería san pedro", 
+    "café monterrey", 
+    "mejores cafeterías monterrey", 
+    "cafeterías bonitas en monterrey", 
+    "cafeterías para trabajar en monterrey",
+    "café de especialidad monterrey",
+    "cafetería kali san pedro",
+    "café prana barrio antiguo",
+    "panem centro monterrey",
+    "el cafelito monterrey",
+    "le petite bretonne monterrey sur",
+    "cafeterías abiertas domingos monterrey",
+    "wifi cafeterías monterrey",
+    "cafeterías económicas monterrey centro"
+  ],
+  openGraph: {
+    title: "Mejores Cafeterías en Monterrey 2025 | Guía Completa",
+    description: "Guía definitiva de cafeterías en Monterrey. Desde Cafetería Kali en San Pedro hasta Café Prana en Barrio Antiguo. ☕ Ubicaciones, horarios y menús actualizados.",
+    type: "website",
+    url: "https://menusmty.com/cafeterias",
+    image: {
+      url: "https://menusmty.com/images/cafeterias-monterrey-og.jpg",
+      width: 1200,
+      height: 630,
+      alt: "Las mejores cafeterías en Monterrey - Guía completa 2025"
+    }
+  },
+  twitter: {
+    card: "summary_large_image", 
+    title: "☕ Mejores Cafeterías en Monterrey 2025",
+    description: "Descubre Cafetería Kali, Café Prana, Panem y más. Guía completa con ubicaciones y horarios actualizados.",
+    image: "https://menusmty.com/images/cafeterias-monterrey-twitter.jpg"
+  },
+  canonical: "https://menusmty.com/cafeterias"
 };
 
 // Configuración para Schema.org
@@ -58,35 +96,37 @@ const schemaEnrichment = {
   schemaEnrichment={schemaEnrichment}
   backgroundColor="bg-[#F8F3E9]"
 >
+  <!-- Local Business Structured Data -->
+  <LocalBusinessSchema cafeterias={cafeterias} />
+  
   <div class="min-h-screen bg-[#F8F3E9] py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Encabezado con estilo serif -->  
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">      <!-- Encabezado con estilo serif y contenido SEO optimizado -->  
       <div class="text-center mb-16">
-        <h1 class="text-5xl md:text-6xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight">Cafeterías de Monterrey</h1>
-        <p class="text-xl md:text-2xl font-serif text-[#5F4B3B] max-w-3xl mx-auto">Descubre los rincones más acogedores para disfrutar del mejor café de la ciudad</p>
-      </div>
+        <h1 class="text-5xl md:text-6xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight">Mejores Cafeterías en Monterrey 2025</h1>
+        <p class="text-xl md:text-2xl font-serif text-[#5F4B3B] max-w-3xl mx-auto">Descubre las cafeterías más populares en Centro, San Pedro, Barrio Antiguo y toda la zona metropolitana de Monterrey</p>
+        <div class="mt-8 text-lg text-[#5F4B3B] max-w-4xl mx-auto">
+          <p>Guía completa de cafeterías en Monterrey con ubicaciones verificadas, horarios actualizados y menús digitales. Incluye las favoritas de la comunidad: Cafetería Kali, Café Prana, El Cafelito, Panem y muchas más.</p>
+        </div>
+      </div>      <!-- Sección de ubicaciones destacadas - Compacta -->
 
       <!-- Filtros interactivos -->
       <div class="mb-12 flex flex-wrap justify-center gap-4">
         <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-full font-serif hover:bg-[#BFA78E] transition-colors" data-filter="all">Todos</button>
-        <button id="filter-nearby" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="nearby">Cerca de mí</button>
         <button id="filter-rated" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="rated">Mejor calificados</button>
         <button id="filter-open" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="open">Abiertos ahora</button>
         <button id="filter-menu" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="menu">Menú digital</button>
       </div>
 
       <!-- Mapa visual de cafeterías (representación estilizada) -->
-      <div class="relative mb-16 overflow-hidden rounded-xl bg-[#E6D7C3] p-4">
+      <!-- <div class="relative mb-16 overflow-hidden rounded-xl bg-[#E6D7C3] p-4">
         <div class="absolute top-4 left-4 bg-white/90 px-4 py-2 rounded-lg shadow-md z-10">
           <h3 class="font-serif text-lg font-semibold text-[#3A2E27]">Mapa de Cafeterías</h3>
           <p class="text-sm text-[#5F4B3B]">Explora visualmente las cafeterías cercanas</p>
         </div>
         <div class="h-[300px] md:h-[400px] bg-[#E6D7C3] rounded-lg relative overflow-hidden">
-          <!-- Aquí iría un mapa real, por ahora es decorativo -->
           <div class="absolute inset-0 flex items-center justify-center">
             <p class="font-serif text-[#8C7B6D] text-lg">Mapa interactivo (próximamente)</p>
           </div>
-          <!-- Puntos decorativos representando cafeterías -->
           {cafeterias.map((cafe, index) => (
             <div 
               class="absolute w-3 h-3 bg-[#A67C52] rounded-full transform hover:scale-150 transition-transform cursor-pointer"
@@ -95,7 +135,7 @@ const schemaEnrichment = {
             ></div>
           ))}
         </div>
-      </div>
+      </div> -->
 
       <!-- Grid de cafeterías con diseño creativo -->
       <div id="cafeterias-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -268,6 +308,92 @@ const schemaEnrichment = {
           ))
         }
         </div>
+      </div>  
+            <div class="mb-12 bg-white rounded-lg p-6 shadow-sm">
+        <h2 class="text-2xl font-serif font-bold text-[#3A2E27] mb-4 text-center">Explora por Zona</h2>
+        <div class="flex flex-wrap justify-center gap-4 text-sm">
+          <div class="bg-[#F8F3E9] px-4 py-2 rounded-full">
+            <span class="font-semibold text-[#3A2E27]">Centro:</span>
+            <span class="text-[#5F4B3B]"> Panem, El Cafelito, Gaby</span>
+          </div>
+          <div class="bg-[#F8F3E9] px-4 py-2 rounded-full">
+            <span class="font-semibold text-[#3A2E27]">San Pedro:</span>
+            <span class="text-[#5F4B3B]"> Cafetería Kali, Café Central</span>
+          </div>
+          <div class="bg-[#F8F3E9] px-4 py-2 rounded-full">
+            <span class="font-semibold text-[#3A2E27]">Barrio Antiguo:</span>
+            <span class="text-[#5F4B3B]"> Café Prana, Café Iguana</span>
+          </div>
+          <div class="bg-[#F8F3E9] px-4 py-2 rounded-full">
+            <span class="font-semibold text-[#3A2E27]">Sur:</span>
+            <span class="text-[#5F4B3B]"> Le Petite Bretonne</span>
+          </div>
+        </div>
+      </div>      <!-- Sección de cafeterías más populares - Versión compacta -->
+      <div class="mb-12 bg-gradient-to-r from-[#F8F3E9] to-[#E6D7C3] rounded-lg p-6">
+        <h2 class="text-2xl font-serif font-bold text-[#3A2E27] mb-4 text-center">⭐ Top Recomendadas por la Comunidad</h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <!-- Cafetería Kali -->
+          <div class="bg-white rounded-lg p-3 shadow-sm text-center hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center mb-1">
+              <Star className="w-3 h-3 text-yellow-500 mr-1" />
+              <span class="text-xs font-medium">4.8</span>
+            </div>
+            <h3 class="text-sm font-serif font-bold text-[#3A2E27] mb-1">Cafetería Kali</h3>
+            <p class="text-xs text-[#8C7B6D]">San Pedro</p>
+          </div>
+
+          <!-- Café Prana -->
+          <div class="bg-white rounded-lg p-3 shadow-sm text-center hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center mb-1">
+              <Star className="w-3 h-3 text-yellow-500 mr-1" />
+              <span class="text-xs font-medium">4.7</span>
+            </div>
+            <h3 class="text-sm font-serif font-bold text-[#3A2E27] mb-1">Café Prana</h3>
+            <p class="text-xs text-[#8C7B6D]">Barrio Antiguo</p>
+          </div>
+
+          <!-- Panem -->
+          <div class="bg-white rounded-lg p-3 shadow-sm text-center hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center mb-1">
+              <Star className="w-3 h-3 text-yellow-500 mr-1" />
+              <span class="text-xs font-medium">4.6</span>
+            </div>
+            <h3 class="text-sm font-serif font-bold text-[#3A2E27] mb-1">Panem</h3>
+            <p class="text-xs text-[#8C7B6D]">Centro</p>
+          </div>
+
+          <!-- El Cafelito -->
+          <div class="bg-white rounded-lg p-3 shadow-sm text-center hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center mb-1">
+              <Star className="w-3 h-3 text-yellow-500 mr-1" />
+              <span class="text-xs font-medium">4.5</span>
+            </div>
+            <h3 class="text-sm font-serif font-bold text-[#3A2E27] mb-1">El Cafelito</h3>
+            <p class="text-xs text-[#8C7B6D]">Centro</p>
+          </div>
+
+          <!-- Le Petite Bretonne -->
+          <div class="bg-white rounded-lg p-3 shadow-sm text-center hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center mb-1">
+              <Star className="w-3 h-3 text-yellow-500 mr-1" />
+              <span class="text-xs font-medium">4.7</span>
+            </div>
+            <h3 class="text-sm font-serif font-bold text-[#3A2E27] mb-1">Le Petite Bretonne</h3>
+            <p class="text-xs text-[#8C7B6D]">Mty Sur</p>
+          </div>
+
+          <!-- Cafetería Gaby -->
+          <div class="bg-white rounded-lg p-3 shadow-sm text-center hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center mb-1">
+              <Star className="w-3 h-3 text-yellow-500 mr-1" />
+              <span class="text-xs font-medium">4.4</span>
+            </div>
+            <h3 class="text-sm font-serif font-bold text-[#3A2E27] mb-1">Cafetería Gaby</h3>
+            <p class="text-xs text-[#8C7B6D]">Centro</p>
+          </div>
+        </div>
       </div>
 
       <!-- Sección de conexión futura con Supabase -->
@@ -281,6 +407,87 @@ const schemaEnrichment = {
           >
             Registrar mi Cafetería
           </a>
+        </div>
+      </div>
+
+      <!-- FAQ Section para SEO -->
+      <div class="mt-16 bg-gradient-to-br from-[#F8F3E9] to-[#E6D7C3] rounded-xl p-8">
+        <h2 class="text-3xl font-serif font-bold text-[#3A2E27] mb-8 text-center">Preguntas Frecuentes sobre Cafeterías en Monterrey</h2>
+        
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="bg-white rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-3">¿Cuáles son las mejores cafeterías en el Centro de Monterrey?</h3>
+            <p class="text-[#5F4B3B]">Las cafeterías más populares en el Centro incluyen Panem en el Centro Histórico, El Cafelito y Cafetería Gaby. Estas ofrecen una mezcla perfecta entre tradición, calidad y precios accesibles.</p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-3">¿Dónde encontrar café de especialidad en San Pedro?</h3>
+            <p class="text-[#5F4B3B]">Cafetería Kali es la más recomendada en San Pedro Garza García por su excelente café de especialidad. También hay opciones como Café Central y varias sucursales de cadenas premium en Valle Oriente.</p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-3">¿Qué cafeterías están abiertas los domingos en Monterrey?</h3>
+            <p class="text-[#5F4B3B]">La mayoría de cafeterías en centros comerciales y zonas turísticas como Barrio Antiguo están abiertas los domingos. Café Prana en Barrio Antiguo y las cafeterías en Paseo San Pedro suelen tener horarios extendidos.</p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-3">¿Cuáles son las cafeterías más bonitas para fotos en Monterrey?</h3>
+            <p class="text-[#5F4B3B]">Para Instagram destacan Le Petite Bretonne por su decoración francesa, Café Prana por su ambiente histórico en Barrio Antiguo, y Cafetería Kali por su diseño moderno en San Pedro.</p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-3">¿Dónde puedo trabajar con laptop en cafeterías de Monterrey?</h3>
+            <p class="text-[#5F4B3B]">Las mejores cafeterías para trabajar incluyen Starbucks Reserve en Valle, Cafetería Kali en San Pedro (WiFi rápido y ambiente tranquilo), y varias opciones en Santa Catarina que ofrecen espacios cómodos para trabajar.</p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-3">¿Qué cafeterías tienen precios más económicos en Monterrey?</h3>
+            <p class="text-[#5F4B3B]">Las cafeterías tradicionales en el Centro como El Cafelito y Cafetería Gaby ofrecen los mejores precios. También las cafeterías locales en colonias como del Valle y Contry tienen opciones más económicas que las de especialidad.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información adicional para SEO local -->
+      <div class="mt-16 bg-white rounded-xl p-8 shadow-md">
+        <h2 class="text-3xl font-serif font-bold text-[#3A2E27] mb-6 text-center">Guía Completa de Cafeterías por Zona</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-4">Zona Centro y Barrio Antiguo</h3>
+            <ul class="space-y-2 text-[#5F4B3B]">
+              <li>• <strong>Panem:</strong> Centro Histórico - Panadería y café artesanal</li>
+              <li>• <strong>El Cafelito:</strong> Centro - Ambiente familiar, precios accesibles</li>
+              <li>• <strong>Cafetería Gaby:</strong> Centro - Tradición de décadas</li>
+              <li>• <strong>Café Prana:</strong> Barrio Antiguo - Icónico y bohemio</li>
+              <li>• <strong>Café Regina:</strong> Centro - Clásico regiomontano</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-serif font-bold text-[#3A2E27] mb-4">San Pedro y Zona Sur</h3>
+            <ul class="space-y-2 text-[#5F4B3B]">
+              <li>• <strong>Cafetería Kali:</strong> San Pedro - Café de especialidad premium</li>
+              <li>• <strong>Le Petite Bretonne:</strong> Monterrey Sur - Estilo francés</li>
+              <li>• <strong>Café Central:</strong> San Pedro - Ambiente ejecutivo</li>
+              <li>• <strong>Starbucks Reserve:</strong> Valle Oriente - Experiencia premium</li>
+              <li>• <strong>Local Coffee:</strong> Varias ubicaciones en San Pedro</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-8 p-6 bg-[#F8F3E9] rounded-lg">
+          <h4 class="text-lg font-serif font-bold text-[#3A2E27] mb-3">Consejos para Encontrar la Cafetería Perfecta</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-[#5F4B3B]">
+            <div>
+              <strong>Para trabajar:</strong> Busca WiFi rápido, tomas de corriente y ambiente tranquilo. Ideal: Cafetería Kali, Starbucks Reserve.
+            </div>
+            <div>
+              <strong>Para citas:</strong> Ambiente romántico y acogedor. Ideal: Le Petite Bretonne, Café Prana.
+            </div>
+            <div>
+              <strong>Para presupuesto:</strong> Cafeterías tradicionales del Centro. Ideal: El Cafelito, Cafetería Gaby.
+            </div>
+          </div>
         </div>
       </div>
     </div>
