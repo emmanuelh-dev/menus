@@ -1,6 +1,8 @@
 ---
 import { Image } from "astro:assets";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
+import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
 
 // Importar imágenes para los moteles
@@ -15,7 +17,7 @@ interface Motel {
   address: string;
   hours: string;
   amenities: string[];
-  image: any;
+  image?: any;
   menu?: string;
   distance?: string;
   closed?: boolean;
@@ -35,7 +37,6 @@ const motelesList: Motel[] = [
     address: "Cerca de Universidad, Monterrey",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento gratuito", "Aire acondicionado", "Restaurante 24/7"],
-    image: placeholder,
     specialties: ["Habitaciones temáticas", "Servicio 24/7", "Ambiente romántico"],
     highlight: true
   },  {
@@ -46,7 +47,6 @@ const motelesList: Motel[] = [
     address: "Av. Abraham Lincoln y Av. San Bernabé 12001, 64108 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera privada", "TV por cable"],
-    image: placeholder,
     specialties: ["Ubicación premium", "Servicios completos", "Privacidad total"],
     phone: "+52 81 8306 3434"
   },  {
@@ -57,7 +57,6 @@ const motelesList: Motel[] = [
     address: "México 40D 39, 67116 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Jacuzzi", "TV premium"],
-    image: placeholder,
     specialties: ["Lujo y confort", "Instalaciones premium", "Ambiente exclusivo"],
     phone: "+52 81 8140 0100"
   },
@@ -69,7 +68,6 @@ const motelesList: Motel[] = [
     address: "Monterrey, Nuevo León",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento privado", "Cocheras cerradas"],
-    image: placeholder,
     specialties: ["Privacidad total", "Cocheras privadas", "Ambiente japonés"],
     distance: "8-12 horas entre semana, fines de semana pueden tener fila"
   },  {
@@ -80,7 +78,6 @@ const motelesList: Motel[] = [
     address: "Av. Abraham Lincoln 12003, San Bernabé, 64100 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera cerrada"],
-    image: placeholder,
     specialties: ["Zona Cumbres", "Discreción garantizada", "Fácil acceso"],
     phone: "+52 81 8306 0329"
   },  {
@@ -91,7 +88,6 @@ const motelesList: Motel[] = [
     address: "Camelia 445, Moderna, 64530 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "TV por cable", "Restaurante"],
-    image: placeholder,
     specialties: ["Habitaciones desde $300", "12 horas de estancia", "Excelente precio"],
     phone: "+52 81 8372 2025"
   },  {
@@ -102,7 +98,6 @@ const motelesList: Motel[] = [
     address: "Av. Francisco I. Madero 4223 A, Fierro, 64590 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Cochera", "Servicio a cuarto"],
-    image: placeholder,
     specialties: ["Muy recomendado en Reddit", "Comodidad y discreción", "Buen servicio"],
     phone: "+52 81 8191 9101"
   },  {
@@ -113,7 +108,6 @@ const motelesList: Motel[] = [
     address: "C. Aramberri #419 Ote, Centro, 64000 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Ubicación céntrica"],
-    image: placeholder,
     specialties: ["Centro de Monterrey", "Fácil acceso", "Tradición local"],
     phone: "+52 81 8344 6862"
   },  {
@@ -124,7 +118,6 @@ const motelesList: Motel[] = [
     address: "Av. Raúl Rangel Frías 5617, Del Maestro, 64180 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera privada", "TV premium"],
-    image: placeholder,
     specialties: ["Más de 2K reseñas", "Muy popular", "Rangel Frías"],
     phone: "+52 81 8140 0100"
   },  {
@@ -135,7 +128,6 @@ const motelesList: Motel[] = [
     address: "Av. Benito Juárez 5840, Las Huertas, 67190 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera"],
-    image: placeholder,
     specialties: ["Tradición familiar", "Zona Las Huertas", "Ambiente acogedor"],
     phone: "+52 81 1895 6468"
   },  {
@@ -146,7 +138,6 @@ const motelesList: Motel[] = [
     address: "Av. Raúl Rangel Frías 5615, Marvel, 64180 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Buena ubicación"],
-    image: placeholder,
     specialties: ["Buena relación calidad-precio", "Rangel Frías", "Ubicación conveniente"],
     phone: "+52 81 1133 9695"
   },  {
@@ -157,7 +148,6 @@ const motelesList: Motel[] = [
     address: "Vicente Guerrero Norte 1511, Treviño, 64570 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera cerrada"],
-    image: placeholder,
     specialties: ["Zona Treviño", "Instalaciones amplias", "Buen servicio"],
     phone: "+52 81 2525 1199"
   },  {
@@ -168,7 +158,6 @@ const motelesList: Motel[] = [
     address: "Antiguo Camino a Pedreras 4400, Villa del Obispo, 64650 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Vista panorámica"],
-    image: placeholder,
     specialties: ["Vista al valle", "Zona Villa del Obispo", "Ambiente tranquilo"],
     phone: "+52 81 1158 8684"
   },
@@ -180,7 +169,6 @@ const motelesList: Motel[] = [
     address: "Monterrey, Nuevo León", 
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento gratuito", "Alberca techada", "Jacuzzi", "Bar", "Servicio a cuarto"],
-    image: placeholder,
     specialties: ["Alberca techada", "Jacuzzi", "Servicios completos"]
   },  {
     name: "Motel Pedregal",
@@ -190,7 +178,6 @@ const motelesList: Motel[] = [
     address: "Av. Manuel Jesús Clouthier, Cumbres del Valle, 64650 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Zona Cumbres"],
-    image: placeholder,
     specialties: ["Cumbres del Valle", "Zona residencial", "Privacidad"],
     phone: "+52 81 8315 6047"
   },  {
@@ -201,7 +188,6 @@ const motelesList: Motel[] = [
     address: "Monterrey, Nuevo León",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado"],
-    image: placeholder,
     specialties: ["Limpieza excepcional", "Buen servicio", "Recomendado en Reddit"]
   },
   {
@@ -212,17 +198,128 @@ const motelesList: Motel[] = [
     address: "Monterrey, Nuevo León",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Suites premium"],
-    image: placeholder,
     specialties: ["Suites de lujo", "Privacidad", "Diseño moderno"]
   }
 ];
 
-// Configuración para SEO
-const seoData = {
-  title: "Mejores Moteles en Monterrey 2025 | Guía Completa",
-  description: "Descubre los mejores moteles en Monterrey. Encuentra el lugar perfecto para una escapada romántica con información detallada sobre precios, ubicación, horarios y servicios.",
-  keywords: ["moteles monterrey", "moteles baratos monterrey", "love hotel monterrey", "moteles con jacuzzi", "moteles privados monterrey"],
+// Obtener parámetros de URL para SEO dinámico
+const url = new URL(Astro.request.url);
+const zona = url.searchParams.get('zona') || undefined;
+const tipo = url.searchParams.get('tipo') || undefined;
+
+const getDynamicSEO = () => {
+  const baseTitle = "Mejores Moteles en Monterrey 2025";
+  const baseDescription = "Guía completa de moteles en Monterrey";
+  const baseKeywords = ["moteles monterrey", "motel monterrey"];
+  const baseUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : Astro.url.toString();
+
+  // SEO por zona específica
+  if (zona) {
+    switch (zona.toLowerCase()) {
+      case 'centro':
+        return {
+          title: `Moteles en Centro de Monterrey 2025 | Hotel Los Angeles y Más`,
+          description: `Mejores moteles en el centro de Monterrey. Hotel Los Angeles, opciones económicas y ubicación céntrica. Guía completa con precios.`,
+          keywords: [...baseKeywords, "moteles en el centro de monterrey", "motel en monterrey centro", "moteles centro monterrey", "hotel los angeles monterrey"],
+          heading: "Moteles en Centro de Monterrey",
+          subheading: "Los mejores moteles en el corazón de la ciudad",
+          canonical: `${baseUrl}?zona=centro`,
+          ogUrl: `${baseUrl}?zona=centro`
+        };
+      
+      case 'universidad':
+        return {
+          title: `Moteles cerca de Universidad Monterrey 2025 | Motel Love Recomendado`,
+          description: `Moteles cerca de Universidad en Monterrey. Motel Love (favorito del autor), opciones premium y ubicación conveniente. Precios y horarios.`,
+          keywords: [...baseKeywords, "motel cerca universidad monterrey", "motel love monterrey", "moteles universidad"],
+          heading: "Moteles cerca de Universidad",
+          subheading: "Opciones premium cerca de la zona universitaria",
+          canonical: `${baseUrl}?zona=universidad`,
+          ogUrl: `${baseUrl}?zona=universidad`
+        };
+        
+      case 'cumbres':
+        return {
+          title: `Moteles en Cumbres Monterrey 2025 | Hacienda Cumbres y Más`,
+          description: `Moteles en zona Cumbres, Monterrey. Motel Hacienda Cumbres, opciones de lujo y privacidad. Guía con precios actualizados.`,
+          keywords: [...baseKeywords, "moteles cumbres monterrey", "motel hacienda cumbres", "moteles zona cumbres"],
+          heading: "Moteles en Cumbres",
+          subheading: "Opciones premium en la zona más exclusiva",
+          canonical: `${baseUrl}?zona=cumbres`,
+          ogUrl: `${baseUrl}?zona=cumbres`
+        };
+    }
+  }
+
+  // SEO por tipo de motel
+  if (tipo) {
+    switch (tipo.toLowerCase()) {
+      case 'baratos':
+        return {
+          title: `Moteles Baratos en Monterrey 2025 | Desde $300 por 4 Horas`,
+          description: `Moteles baratos en Monterrey con los mejores precios. Hotel White, Grand Motel y más opciones económicas. Guía de precios 2025.`,
+          keywords: [...baseKeywords, "moteles baratos en monterrey", "motel barato monterrey", "moteles economicos monterrey", "moteles precio bajo"],
+          heading: "Moteles Baratos en Monterrey",
+          subheading: "Las mejores opciones económicas sin sacrificar calidad",
+          canonical: `${baseUrl}?tipo=baratos`,
+          ogUrl: `${baseUrl}?tipo=baratos`
+        };
+      
+      case 'jacuzzi':
+        return {
+          title: `Moteles con Jacuzzi en Monterrey 2025 | Marbella, Canarias y Más`,
+          description: `Moteles con jacuzzi en Monterrey. Motel Marbella, Canarias y opciones de lujo con jacuzzi privado. Precios y ubicaciones.`,
+          keywords: [...baseKeywords, "motel con jacuzzi monterrey", "moteles con jacuzzi en monterrey", "motel jacuzzi privado", "moteles lujo jacuzzi"],
+          heading: "Moteles con Jacuzzi en Monterrey",
+          subheading: "Experiencia de lujo con jacuzzi privado",
+          canonical: `${baseUrl}?tipo=jacuzzi`,
+          ogUrl: `${baseUrl}?tipo=jacuzzi`
+        };
+        
+      case '12-horas':
+        return {
+          title: `Moteles de 12 Horas en Monterrey 2025 | Hotel White y Más`,
+          description: `Moteles con estancia de 12 horas en Monterrey. Hotel White y opciones para escapadas largas. Precios especiales para 12 horas.`,
+          keywords: [...baseKeywords, "motel 12 horas monterrey", "motel de 12 horas en monterrey", "estancia larga motel"],
+          heading: "Moteles de 12 Horas",
+          subheading: "Escapadas largas con los mejores precios",
+          canonical: `${baseUrl}?tipo=12-horas`,
+          ogUrl: `${baseUrl}?tipo=12-horas`
+        };
+    }
+  }
+
+  // SEO por defecto optimizado
+  return {
+    title: baseTitle + " | Motel Love, Kyoto y Más",
+    description: baseDescription + ". Encuentra moteles baratos, con jacuzzi y los mejores de la ciudad. Motel Love (recomendado), Kyoto Suites, Marbella y más. Precios, ubicaciones y recomendaciones actualizadas.",
+    keywords: [
+      ...baseKeywords,
+      "moteles baratos en monterrey",
+      "motel con jacuzzi monterrey", 
+      "mejores moteles en monterrey",
+      "moteles con jacuzzi en monterrey",
+      "motel en monterrey centro",
+      "moteles en el centro de monterrey",
+      "moteles mty",
+      "moteles en mty",
+      "mejores moteles monterrey",
+      "motel barato monterrey",
+      "motel de 12 horas en monterrey",
+      "kyoto motel mty",
+      "kyoto suites monterrey",
+      "grand motel monterrey",
+      "marbella motel monterrey",
+      "motel love monterrey"
+    ],
+    heading: "Mejores Moteles en Monterrey 2025",
+    subheading: "Encuentra el lugar perfecto para tu escapada romántica en la ciudad",
+    canonical: baseUrl,
+    ogUrl: baseUrl
+  };
 };
+
+const seoData = getDynamicSEO();
 
 // Configuración para Schema.org
 const schemaEnrichment = {
@@ -239,31 +336,48 @@ const schemaEnrichment = {
   description={seoData.description}
   schemaEnrichment={schemaEnrichment}
   backgroundColor="bg-black"
-  textWhite={true}
->
+  textWhite={true}  canonical={seoData.canonical}
+  ogUrl={seoData.ogUrl}
+>  <!-- Motel Business Structured Data -->
+  <MotelBusinessSchema moteles={motelesList} />
+  
+  <!-- Breadcrumb Structured Data -->
+  <MotelBreadcrumbSchema zona={zona} tipo={tipo} />
+
 <main>
     <section class="relative overflow-hidden">
         <!-- Background Image with Overlay -->
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); filter: brightness(0.3);"></div>
-        
-        <!-- Content -->
+          <!-- Content -->
         <div class="relative z-10 max-w-6xl mx-auto px-4 py-24 md:py-32 text-center">
             <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">💕 Romance & Privacidad</span>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">{seoData.title}</h1>
-            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">{seoData.description}</p>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">{seoData.heading}</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">{seoData.subheading}</p>
+            <p class="text-lg text-white/80 max-w-2xl mx-auto">Guía completa de moteles en Monterrey con ubicaciones verificadas, horarios actualizados y recomendaciones personales. Incluye opciones desde $300 hasta moteles de lujo.</p>
         </div>
 
     </section>
 
     <section class="min-h-screen bg-black text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
-          <!-- Filtros interactivos -->
-          <div class="mb-12 flex flex-wrap justify-center gap-4">
-            <button id="filter-all" class="filter-btn px-6 py-2 bg-pink-500 text-white rounded-full font-serif hover:bg-pink-400 transition-colors" data-filter="all">Todos</button>
-            <button id="filter-premium" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="premium">Premium</button>
-            <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="rated">Mejor calificados</button>
-            <button id="filter-amenities" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="amenities">Con amenidades</button>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">          <!-- Filtros interactivos -->
+          <div class="mb-12 space-y-4">
+            <!-- Filtros principales -->
+            <div class="flex flex-wrap justify-center gap-4">
+              <button id="filter-all" class="filter-btn px-6 py-2 bg-pink-500 text-white rounded-full font-serif hover:bg-pink-400 transition-colors" data-filter="all">Todos</button>
+              <button id="filter-premium" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="premium">Premium</button>
+              <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="rated">Mejor calificados</button>
+              <button id="filter-amenities" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="amenities">Con amenidades</button>
+            </div>
+            
+            <!-- Filtros por tipo/características -->
+            <div class="flex flex-wrap justify-center gap-3 text-sm">
+              <a href="?tipo=baratos" class="px-4 py-2 bg-green-900/30 text-green-400 rounded-full border border-green-500/30 hover:bg-green-500 hover:text-white transition-colors">💰 Moteles Baratos</a>
+              <a href="?tipo=jacuzzi" class="px-4 py-2 bg-blue-900/30 text-blue-400 rounded-full border border-blue-500/30 hover:bg-blue-500 hover:text-white transition-colors">🛁 Con Jacuzzi</a>
+              <a href="?tipo=12-horas" class="px-4 py-2 bg-purple-900/30 text-purple-400 rounded-full border border-purple-500/30 hover:bg-purple-500 hover:text-white transition-colors">⏰ 12 Horas</a>
+              <a href="?zona=centro" class="px-4 py-2 bg-orange-900/30 text-orange-400 rounded-full border border-orange-500/30 hover:bg-orange-500 hover:text-white transition-colors">🏛️ Centro</a>
+              <a href="?zona=universidad" class="px-4 py-2 bg-yellow-900/30 text-yellow-400 rounded-full border border-yellow-500/30 hover:bg-yellow-500 hover:text-white transition-colors">🎓 Universidad</a>
+              <a href="?zona=cumbres" class="px-4 py-2 bg-indigo-900/30 text-indigo-400 rounded-full border border-indigo-500/30 hover:bg-indigo-500 hover:text-white transition-colors">🏔️ Cumbres</a>
+            </div>
           </div>
 
           <!-- Recomendación personal del autor -->
@@ -301,7 +415,7 @@ const schemaEnrichment = {
                 <!-- Imagen con overlay -->
                 <div class="relative h-48 overflow-hidden">
                   <img
-                    src={motel.image.src || placeholder.src} 
+                    src={motel.image?.src || '/motel.png'} 
                     alt={motel.name}
                     width={500}
                     height={300}
@@ -417,7 +531,7 @@ const schemaEnrichment = {
               <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
                 <div class="md:w-2/5 relative">
                   <img
-                    src={placeholder.src} 
+                    src={'/motel.png'} 
                     alt="Motel Love"
                     width={400}
                     height={500}
@@ -452,7 +566,7 @@ const schemaEnrichment = {
               <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
                 <div class="md:w-2/5 relative">
                   <img
-                    src={placeholder.src} 
+                    src={'/motel.png'} 
                     alt="Kyoto Suites"
                     width={400}
                     height={500}
@@ -509,6 +623,42 @@ const schemaEnrichment = {
                   <li>• Los precios pueden variar según la temporada</li>
                   <li>• Lleva efectivo, no todos aceptan tarjeta</li>
                 </ul>
+              </div>
+            </div>          </div>
+
+          <!-- FAQ Section para SEO -->
+          <div class="mt-16 bg-[#1E1E1E] rounded-xl p-8 shadow-md border border-pink-500/20">
+            <h2 class="text-3xl font-serif font-bold text-pink-400 mb-8 text-center">Preguntas Frecuentes sobre Moteles en Monterrey</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
+                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Cuáles son los mejores moteles en Monterrey?</h3>
+                <p class="text-gray-300">Los mejores moteles incluyen Motel Love (cerca de Universidad), Kyoto Suites Monterrey con cocheras privadas, y Motel Marbella por sus amenidades de lujo. También destacan ATM Motel y Motel Señorial.</p>
+              </div>
+
+              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
+                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Dónde encontrar moteles baratos en Monterrey?</h3>
+                <p class="text-gray-300">Para moteles económicos recomendamos Hotel White (desde $300 por 12 horas), Grand Motel en zona Treviño, y Super Motel en Rangel Frías. Todos ofrecen excelente relación calidad-precio.</p>
+              </div>
+
+              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
+                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Qué moteles tienen jacuzzi en Monterrey?</h3>
+                <p class="text-gray-300">Motel Marbella, Motel Canarias y varios moteles premium ofrecen jacuzzi privado. Los precios van desde $600-800 por sesión, perfectos para una experiencia romántica especial.</p>
+              </div>
+
+              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
+                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Cuáles son los moteles en el centro de Monterrey?</h3>
+                <p class="text-gray-300">En el centro destacan Hotel Los Angeles (Centro Histórico) y opciones cerca de la zona céntrica. También hay buenas opciones en Barrio Antiguo y zonas aledañas al centro.</p>
+              </div>
+
+              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
+                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Cómo son los precios de moteles en Monterrey?</h3>
+                <p class="text-gray-300">Los precios van desde $300-450 por 4 horas (económicos), $450-600 (estándar), $600-800 (premium) hasta $800+ para opciones de lujo. Los fines de semana pueden tener ligeros incrementos.</p>
+              </div>
+
+              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
+                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Qué motel recomienda el autor?</h3>
+                <p class="text-gray-300">El favorito personal es Motel Love cerca de Universidad. Aunque a veces hay fila por su popularidad, ofrece excelentes instalaciones, privacidad garantizada y un servicio de primera calidad.</p>
               </div>
             </div>
           </div>

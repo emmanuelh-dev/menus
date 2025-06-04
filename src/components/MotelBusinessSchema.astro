@@ -1,0 +1,178 @@
+---
+// MotelBusinessSchema.astro - Structured data for motel business SEO
+
+interface Props {
+  moteles?: Array<{
+    name: string;
+    address: string;
+    rating?: number;
+    reviewCount?: number;
+    priceRange?: string;
+    hours?: string;
+    amenities?: string[];
+    phone?: string;
+  }>;
+}
+
+const { moteles = [] } = Astro.props;
+
+// Featured moteles for structured markup
+const featuredMoteles = [
+  {
+    name: "Motel Love",
+    address: "Cerca de Universidad, Monterrey, Nuevo León",
+    rating: 4.6,
+    reviewCount: 1100,
+    priceRange: "$$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento gratuito", "Aire acondicionado", "Restaurante 24/7"]
+  },
+  {
+    name: "Kyoto Suites Motel",
+    address: "Monterrey, Nuevo León",
+    rating: 4.5,
+    reviewCount: 951,
+    priceRange: "$$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento privado", "Cocheras cerradas"]
+  },
+  {
+    name: "Motel Marbella",
+    address: "México 40D 39, 67116 Monterrey, N.L.",
+    rating: 4.5,
+    reviewCount: 728,
+    priceRange: "$$$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Jacuzzi", "TV premium"]
+  },
+  {
+    name: "Motel Canarias",
+    address: "Av. Abraham Lincoln y Av. San Bernabé 12001, 64108 Monterrey, N.L.",
+    rating: 4.5,
+    reviewCount: 730,
+    priceRange: "$$$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera privada", "TV por cable"]
+  },
+  {
+    name: "ATM Motel",
+    address: "Av. Raúl Rangel Frías 5617, Del Maestro, 64180 Monterrey, N.L.",
+    rating: 4.3,
+    reviewCount: 2339,
+    priceRange: "$$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera privada", "TV premium"]
+  },
+  {
+    name: "Motel Señorial",
+    address: "Av. Francisco I. Madero 4223 A, Fierro, 64590 Monterrey, N.L.",
+    rating: 4.4,
+    reviewCount: 694,
+    priceRange: "$$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Cochera", "Servicio a cuarto"]
+  },
+  {
+    name: "Hotel White",
+    address: "Camelia 445, Moderna, 64530 Monterrey, N.L.",
+    rating: 4.4,
+    reviewCount: 378,
+    priceRange: "$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "TV por cable", "Restaurante"]
+  },
+  {
+    name: "Grand Motel",
+    address: "Vicente Guerrero Norte 1511, Treviño, 64570 Monterrey, N.L.",
+    rating: 4.2,
+    reviewCount: 464,
+    priceRange: "$$",
+    hours: "24 hours",
+    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera cerrada"]
+  }
+];
+
+const allMoteles = moteles.length > 0 ? moteles : featuredMoteles;
+
+// Generate structured data for motel business listings
+const generateMotelBusinessSchema = (motel: any) => {
+  return {
+    "@type": "LodgingBusiness",
+    "name": motel.name,
+    "address": {
+      "@type": "PostalAddress", 
+      "streetAddress": motel.address,
+      "addressLocality": "Monterrey",
+      "addressRegion": "Nuevo León",
+      "addressCountry": "MX"
+    },
+    "aggregateRating": motel.rating ? {
+      "@type": "AggregateRating",
+      "ratingValue": motel.rating,
+      "reviewCount": motel.reviewCount || 10,
+      "bestRating": 5,
+      "worstRating": 1
+    } : undefined,
+    "priceRange": motel.priceRange || "$$",
+    "openingHours": ["Mo-Su 00:00-23:59"],
+    "telephone": motel.phone,
+    "acceptsReservations": false,
+    "paymentAccepted": ["Cash", "Credit Card"],
+    "checkinTime": "00:00",
+    "checkoutTime": "23:59",
+    "amenityFeature": motel.amenities?.map((amenity: string) => ({
+      "@type": "LocationFeatureSpecification",
+      "name": amenity
+    })) || [],
+    "starRating": {
+      "@type": "Rating",
+      "ratingValue": motel.rating || 4.0
+    },
+    "petsAllowed": false
+  };
+};
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Mejores Moteles en Monterrey",
+  "description": "Lista completa de los mejores moteles en Monterrey con información de precios, ubicaciones y amenidades",
+  "numberOfItems": allMoteles.length,
+  "itemListElement": allMoteles.map((motel, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@context": "https://schema.org",
+      ...generateMotelBusinessSchema(motel)
+    }
+  }))
+};
+
+// Main organization schema for motel directory
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "TravelAgency",
+  "name": "Menús Monterrey - Guía de Moteles",
+  "url": "https://menusmty.com/moteles",
+  "description": "Guía completa de moteles en Monterrey con recomendaciones, precios y ubicaciones verificadas",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Monterrey", 
+    "addressRegion": "Nuevo León",
+    "addressCountry": "MX"
+  },
+  "areaServed": {
+    "@type": "GeoCircle",
+    "geoMidpoint": {
+      "@type": "GeoCoordinates",
+      "latitude": 25.6866,
+      "longitude": -100.3161
+    },
+    "geoRadius": "50000"
+  }
+};
+---
+
+<!-- Motel Business Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />

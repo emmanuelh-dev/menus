@@ -1,0 +1,71 @@
+---
+// MotelBreadcrumbSchema.astro - Breadcrumb structured data for motel pages
+
+interface Props {
+  zona?: string;
+  tipo?: string;
+}
+
+const { zona, tipo } = Astro.props;
+
+const baseUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://menusmty.com';
+
+// Base breadcrumb structure
+const breadcrumbList = [
+  {
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Inicio",
+    "item": baseUrl
+  },
+  {
+    "@type": "ListItem", 
+    "position": 2,
+    "name": "Moteles en Monterrey",
+    "item": `${baseUrl}/moteles`
+  }
+];
+
+// Add zone-specific breadcrumb
+if (zona) {
+  const zoneNames: Record<string, string> = {
+    'centro': 'Centro',
+    'universidad': 'Universidad',
+    'cumbres': 'Cumbres',
+    'san-pedro': 'San Pedro'
+  };
+  
+  breadcrumbList.push({
+    "@type": "ListItem",
+    "position": 3,
+    "name": `Moteles en ${zoneNames[zona] || zona}`,
+    "item": `${baseUrl}/moteles?zona=${zona}`
+  });
+}
+
+// Add type-specific breadcrumb
+if (tipo) {
+  const typeNames: Record<string, string> = {
+    'baratos': 'Moteles Baratos',
+    'jacuzzi': 'Moteles con Jacuzzi',
+    '12-horas': 'Moteles de 12 Horas',
+    'lujo': 'Moteles de Lujo'
+  };
+  
+  const position = zona ? 4 : 3;
+  breadcrumbList.push({
+    "@type": "ListItem",
+    "position": position,
+    "name": typeNames[tipo] || tipo,
+    "item": `${baseUrl}/moteles?tipo=${tipo}`
+  });
+}
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbList
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
