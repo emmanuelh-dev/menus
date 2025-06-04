@@ -7,6 +7,7 @@ export const navItems = [
     { name: "Blog", href: "/blog" },
     { name: "Cafeterias", href: "/cafeterias" },
     { name: "Espadas", href: "/espadas" },
+    { name: "Moteles", href: "/moteles" },
     { name: "Contacto", href: "/contact" },
     { name: "Ingresa", href: "/admin/login" }, 
 ];
