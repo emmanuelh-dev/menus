@@ -1,0 +1,266 @@
+---
+// filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\menu-items\[id]\delete.astro
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { isAuthenticated } from "../../../../middleware/auth";
+import { createSupabaseClient } from "../../../../lib/supabase";
+
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
+
+const { id } = Astro.params;
+
+let item: any = null;
+let error: string | null = null;
+let optionsCount: number = 0;
+
+try {
+    // Obtener datos del item
+    const { data: itemData, error: itemError } = await supabase
+        .from('menu_items')
+        .select(`
+            *,
+            menu_categories(name),
+            restaurants(name)
+        `)
+        .eq('id', id)
+        .single();
+    
+    if (itemError) {
+        throw new Error(itemError.message);
+    }
+    
+    if (!itemData) {
+        throw new Error('Producto no encontrado');
+    }
+    
+    // Reorganizar los datos para compatibilidad con el template
+    item = {
+        ...itemData,
+        category_name: itemData.menu_categories?.name,
+        restaurant_name: itemData.restaurants?.name
+    };
+
+    // Contar opciones de personalización
+    const { count } = await supabase
+        .from('menu_item_options')
+        .select('*', { count: 'exact', head: true })
+        .eq('menu_item_id', id);
+    
+    optionsCount = count || 0;
+
+} catch (err) {
+    console.error('Error:', err);
+    error = err instanceof Error ? err.message : 'Error desconocido';
+}
+
+// Manejar la eliminación
+if (Astro.request.method === 'POST') {
+    try {
+        const formData = await Astro.request.formData();
+        const confirmDelete = formData.get('confirm_delete') === 'true';
+        
+        if (!confirmDelete) {
+            error = 'Debe confirmar la eliminación';
+        } else {
+            // Eliminar el producto (las opciones se eliminan por CASCADE)
+            const { error: deleteError } = await supabase
+                .from('menu_items')
+                .delete()
+                .eq('id', id);
+
+            if (deleteError) {
+                throw new Error(deleteError.message);
+            }
+
+            return Astro.redirect(`/admin/menus/${item.restaurant_id}/categories/${item.category_id}/items?success=item_deleted`);        }
+    } catch (err) {
+        console.error('Error deleting item:', err);
+        error = 'Error al eliminar el producto: ' + (err instanceof Error ? err.message : 'Error desconocido');
+    }
+}
+---
+
+<AdminLayout title="Eliminar Producto">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Eliminar Producto</h1>
+                    <p class="text-gray-600 mt-2">Esta acción no se puede deshacer</p>
+                </div>
+                <a href={`/admin/menus/${item?.restaurant_id}/categories/${item?.category_id}/items`} class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    Cancelar
+                </a>
+            </div>
+
+            {error && (
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    {error}
+                </div>
+            )}
+
+            {item && (
+                <div class="bg-white shadow-lg rounded-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">¿Confirmar eliminación?</h3>
+                            <p class="text-gray-600">Esta acción eliminará permanentemente el producto y todas sus opciones.</p>
+                        </div>
+                    </div>
+
+                    <!-- Información del producto -->
+                    <div class="border border-gray-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-start space-x-4">
+                            {/* Imagen del producto */}
+                            {item.image && (
+                                <div class="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                    <img src={item.image} alt={item.name} class="w-full h-full object-cover" />
+                                </div>
+                            )}
+                            
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500">Nombre:</span>
+                                    <p class="text-gray-900 font-semibold">{item.name}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500">Precio:</span>
+                                    <p class="text-gray-900">${item.base_price}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500">Categoría:</span>
+                                    <p class="text-gray-900">{item.category_name}</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-500">Restaurante:</span>
+                                    <p class="text-gray-900">{item.restaurant_name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {item.description && (
+                            <div class="mt-4">
+                                <span class="text-sm font-medium text-gray-500">Descripción:</span>
+                                <p class="text-gray-900">{item.description}</p>
+                            </div>
+                        )}
+
+                        {/* Características especiales */}
+                        <div class="mt-4">
+                            <span class="text-sm font-medium text-gray-500">Características:</span>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                {item.is_featured && (
+                                    <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Destacado</span>
+                                )}
+                                {item.is_vegetarian && (
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Vegetariano</span>
+                                )}
+                                {item.is_vegan && (
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Vegano</span>
+                                )}
+                                {item.is_gluten_free && (
+                                    <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Sin Gluten</span>
+                                )}
+                                {item.is_spicy && (
+                                    <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Picante</span>
+                                )}
+                                <span class={`px-2 py-1 text-xs font-medium rounded-full ${
+                                    item.is_active 
+                                        ? 'bg-green-100 text-green-800' 
+                                        : 'bg-red-100 text-red-800'
+                                }`}>
+                                    {item.is_active ? 'Activo' : 'Inactivo'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Ingredientes y alérgenos */}
+                        {(item.ingredients?.length > 0 || item.allergens?.length > 0) && (
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {item.ingredients?.length > 0 && (
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-500">Ingredientes:</span>
+                                        <p class="text-gray-900 text-sm">{item.ingredients.join(', ')}</p>
+                                    </div>
+                                )}
+                                {item.allergens?.length > 0 && (
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-500">Alérgenos:</span>
+                                        <p class="text-gray-900 text-sm">{item.allergens.join(', ')}</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}                    </div>
+
+                    <!-- Advertencias sobre datos relacionados -->
+                    {optionsCount > 0 && (
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <h4 class="text-sm font-medium text-yellow-800">Datos que se eliminarán</h4>
+                            </div>
+                            <ul class="text-sm text-yellow-700 space-y-1">
+                                <li>• {optionsCount} opción{optionsCount !== 1 ? 'es' : ''} de personalización</li>
+                                <li>• Grupos de opciones configurados</li>
+                                <li>• Historial de configuraciones del producto</li>
+                            </ul>
+                        </div>
+                    )}
+
+                    <!-- Formulario de confirmación -->
+                    <form method="POST">
+                        <div class="mb-6">
+                            <label class="flex items-center space-x-3">
+                                <input
+                                    type="checkbox"
+                                    name="confirm_delete"
+                                    value="true"
+                                    required
+                                    class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                                />
+                                <span class="text-sm text-gray-700">
+                                    Entiendo que esta acción no se puede deshacer y eliminará permanentemente 
+                                    el producto "{item.name}" y todos sus datos asociados.
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end space-x-4">
+                            <a href={`/admin/menus/${item.restaurant_id}/categories/${item.category_id}/items`} class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                Cancelar
+                            </a>
+                            <button
+                                type="submit"
+                                class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                            >
+                                Eliminar Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+        </div>
+    </div>
+</AdminLayout>

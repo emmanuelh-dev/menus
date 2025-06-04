@@ -3,40 +3,78 @@ import { Image } from "astro:assets";
 import logo from "./logo.jpg";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import { Facebook, Instagram } from "lucide-react";
-import menu from "./menu.jpg";
+import menuImage from "./menu.jpg";
 import CopyClabe from "../../../components/CopyClabe";
 import { FaWhatsapp } from "react-icons/fa";
 import WhatsappButton from "../../../components/WhatsappButton";
 import RecommendationButton from "../../../components/RecommendationButton";
 import { supabase } from "../../../lib/supabase";
 
-  const { data } = await supabase
-    .from("restaurants")
-    .select("*")
-    .eq("menu", 'elpapirey')
-    .single();
+const { data: restaurant } = await supabase
+  .from("restaurants")
+  .select("*")
+  .eq("menu", 'elpapirey')
+  .single();
 
+const { data: menu } = await supabase
+  .from("menus")
+  .select("*")
+  .eq("restaurant_id", restaurant?.id)
+  .eq("is_active", true)
+  .single();
 
-const menuItems = [
-  { name: "HAMBURGESAS", category: true, color: "text-orange-500" },
-  { name: "Especial", price: 60, color: "text-white" },
-  { name: "Doble", price: 80, color: "text-white" },
-  { name: "Hawaiana", price: 70, color: "text-white" },
-  { name: "Salchiburger", price: 70, color: "text-white" },
-  { name: "HOT DOG", category: true, color: "text-cyan-400" },
-  { name: "Chico", price: 30, color: "text-white" },
-  { name: "Grande", price: 40, color: "text-white" },
-  {
-    name: "PAPAS A LA FRANCESA",
-    category: true,
-    price: 45,
-    color: "text-red-500",
-  },
-  { name: "TORTA", category: true, price: 80, color: "text-purple-500" },
-  { name: "TACOS DORADOS", category: true, price: 80, color: "text-green-400" },
-  { name: "CHILES", category: true, price: 25, color: "text-pink-400" },
-  { name: "SALCHIPAPAS", category: true, price: 55, color: "text-blue-500" },
+const { data: categoriesData } = await supabase
+  .from("menu_categories")
+  .select(`
+    *,
+    menu_items (
+      *
+    )
+  `)
+  .eq("restaurant_id", restaurant.id)
+  .eq("is_active", true)
+  .order("display_order");
+
+const categoryColors = [
+  "text-orange-500",
+  "text-cyan-400", 
+  "text-red-500",
+  "text-purple-500",
+  "text-green-400",
+  "text-pink-400",
+  "text-blue-500",
+  "text-yellow-500",
+  "text-indigo-500",
+  "text-teal-500"
 ];
+
+const menuItems = categoriesData?.flatMap((category, categoryIndex) => {
+  const categoryItem = {
+    name: category.name.toUpperCase(),
+    category: true,
+    color: categoryColors[categoryIndex % categoryColors.length],
+    description: category.description
+  };
+
+  const items = category.menu_items
+    ?.filter(item => item.is_active)
+    ?.sort((a, b) => a.display_order - b.display_order)
+    ?.map(item => ({
+      name: item.name,
+      price: item.base_price,
+      color: "text-white",
+      description: item.description,
+      category: false,
+      is_vegetarian: item.is_vegetarian,
+      is_vegan: item.is_vegan,
+      is_gluten_free: item.is_gluten_free,
+      is_spicy: item.is_spicy,
+      allergens: item.allergens,
+      ingredients: item.ingredients
+    })) || [];
+
+  return [categoryItem, ...items];
+}) || [];
 
 const socialMedia = {
   instagram: {
@@ -99,30 +137,29 @@ const schemaEnrichment = {
 
 ---
 
-<RestaurantLayout
-  title={restaurantData.name}
+<RestaurantLayout  title={restaurantData.name}
   description={restaurantData.name}
   schemaEnrichment={schemaEnrichment}
-  image={data.image}
+  image={restaurant?.image}
   favicon={logo.src}
   textWhite={true}
   backgroundColor="bg-black"
 >
   <div
-    class="min-h-screen bg-black flex items-center justify-center p-8 permanent-marker-regular"
+    class="min-h-screen bg-black flex items-center justify-center p-8 permanent-marker-regular text-xl"
   >
     <div class="w-full max-w-2xl bg-black  rounded-lg">
       <!-- Header with Logo and Social Media -->
       <div class="flex flex-col items-center mb-8">
         <div class="flex items-center gap-4 mb-4">
-          <Image src={data.image} alt="El Papi Rey Logo" width="250" height="250" />
+          <Image src={restaurant.image} alt="El Papi Rey Logo" width="500" height="500" class="w-full max-w-[500px]"/>
         </div>
         <div class="flex gap-4 text-white mb-4">
-          <a href={socialMedia.instagram.url} class="flex items-center gap-2">
+          <a href={socialMedia.instagram.url} class="flex items-center gap-2 font-bold">
             <Instagram className="text-pink-500" />
             {socialMedia.instagram.name}
           </a>
-          <a href={socialMedia.facebook.url} class="flex items-center gap-2">
+          <a href={socialMedia.facebook.url} class="flex items-center gap-2 font-bold">
             <Facebook className="text-blue-500" />
             {socialMedia.facebook.name}
           </a>
@@ -134,22 +171,57 @@ const schemaEnrichment = {
         </h1>
         <p class="sr-ony hidden text-orange-500 text-xl">DEJATE CAYETANO</p>
       </div>
-      <CopyClabe client:load clabes={[contactInfo.clabe, contactInfo.clabe2]}/>
-      <!-- Menu Items -->
+      <CopyClabe client:load clabes={[contactInfo.clabe, contactInfo.clabe2]}/>      <!-- Menu Items -->
       <div class="space-y-6 mb-8">
         {
           menuItems.map((item) => (
-            <div
-              class={`flex justify-between items-center ${item.category ? "mt-6" : "pl-4"}`}
-            >
-              <span
-                class={`${item.color} ${item.category ? "text-xl font-bold" : "text-lg"} font-medium tracking-wide`}
-              >
-                {item.name}
-              </span>
-              <span class="text-yellow-400 text-xl font-bold">
-                {item.price ? `$${item.price}` : null}
-              </span>
+            <div class={`${item.category ? "mt-6" : "px-4"}`}>
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class={`${item.color} ${item.category ? "text-xl font-bold" : "text-lg"} font-medium tracking-wide`}
+                    >
+                      {item.name}
+                    </span>
+                    {!item.category && (
+                      <div class="flex gap-1">
+                        {item.is_vegetarian && (
+                          <span class="text-green-400 text-xs" title="Vegetariano">🌱</span>
+                        )}
+                        {item.is_vegan && (
+                          <span class="text-green-500 text-xs" title="Vegano">🌿</span>
+                        )}
+                        {item.is_gluten_free && (
+                          <span class="text-blue-400 text-xs" title="Sin Gluten">🚫🌾</span>
+                        )}
+                        {item.is_spicy && (
+                          <span class="text-red-400 text-xs" title="Picante">🌶️</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {!item.category && item.description && (
+                    <p class="text-gray-400 text-sm mt-1">{item.description}</p>
+                  )}
+                  {item.category && item.description && (
+                    <p class="text-gray-400 text-sm mt-1">{item.description}</p>
+                  )}
+                  {!item.category && item.ingredients && (
+                    <p class="text-gray-500 text-xs mt-1">
+                      Ingredientes: {item.ingredients.join(", ")}
+                    </p>
+                  )}
+                  {!item.category && item.allergens && item.allergens.length > 0 && (
+                    <p class="text-orange-400 text-xs mt-1">
+                      ⚠️ Contiene: {item.allergens.join(", ")}
+                    </p>
+                  )}
+                </div>
+                <span class="text-yellow-400 text-xl font-bold ml-4">
+                  {item.price ? `$${item.price}` : null}
+                </span>
+              </div>
             </div>
           ))
         }

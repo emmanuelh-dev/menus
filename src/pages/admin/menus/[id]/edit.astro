@@ -1,0 +1,322 @@
+---
+// filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\menus\[id]\edit.astro
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+
+const { id } = Astro.params;
+
+// Obtener datos del menú existente
+let menu = null;
+let restaurants = [];
+let error = null;
+
+try {
+    const { Pool } = await import('pg');
+    const pool = new Pool({
+        connectionString: import.meta.env.DATABASE_URL
+    });
+
+    // Obtener datos del menú
+    const menuQuery = await pool.query(
+        'SELECT * FROM menus WHERE id = $1',
+        [id]
+    );
+    
+    if (menuQuery.rows.length === 0) {
+        throw new Error('Menú no encontrado');
+    }
+    
+    menu = menuQuery.rows[0];
+
+    // Obtener lista de restaurantes para el select
+    const restaurantsQuery = await pool.query(
+        'SELECT id, name FROM restaurants ORDER BY name'
+    );
+    restaurants = restaurantsQuery.rows;
+
+    await pool.end();
+} catch (err) {
+    console.error('Error:', err);
+    error = err.message;
+}
+
+// Manejar el envío del formulario
+if (Astro.request.method === 'POST') {
+    try {
+        const formData = await Astro.request.formData();
+        const { Pool } = await import('pg');
+        const pool = new Pool({
+            connectionString: import.meta.env.DATABASE_URL
+        });
+
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        const restaurant_id = parseInt(formData.get('restaurant_id') as string);
+        const menu_type = formData.get('menu_type') as string;
+        const is_active = formData.get('is_active') === 'on';
+        const start_date = formData.get('start_date') as string || null;
+        const end_date = formData.get('end_date') as string || null;
+        const availability_start = formData.get('availability_start') as string || null;
+        const availability_end = formData.get('availability_end') as string || null;
+        const display_order = parseInt(formData.get('display_order') as string) || 0;
+
+        // Manejar días de disponibilidad
+        const availability_days = [];
+        for (let i = 0; i <= 6; i++) {
+            if (formData.get(`day_${i}`)) {
+                availability_days.push(i);
+            }
+        }
+
+        await pool.query(
+            `UPDATE menus SET 
+                name = $1, description = $2, restaurant_id = $3, menu_type = $4, 
+                is_active = $5, start_date = $6, end_date = $7, 
+                availability_days = $8, availability_start = $9, availability_end = $10, 
+                display_order = $11, updated_at = NOW()
+            WHERE id = $12`,
+            [
+                name, description, restaurant_id, menu_type, is_active,
+                start_date, end_date, availability_days, availability_start,
+                availability_end, display_order, id
+            ]
+        );
+
+        await pool.end();
+        return Astro.redirect('/admin/menus?success=updated');
+    } catch (err) {
+        console.error('Error updating menu:', err);
+        error = 'Error al actualizar el menú: ' + err.message;
+    }
+}
+
+const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+---
+
+<AdminLayout title="Editar Menú">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Editar Menú</h1>
+                    <p class="text-gray-600 mt-2">Modifica la información del menú</p>
+                </div>
+                <a href="/admin/menus" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    Volver a Menús
+                </a>
+            </div>
+
+            {error && (
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    {error}
+                </div>
+            )}
+
+            {menu && (
+                <form method="POST" class="bg-white shadow-lg rounded-lg p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Información básica -->
+                        <div class="md:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
+                        </div>
+
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre del Menú *
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={menu.name}
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Ej: Menú Principal"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="restaurant_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                Restaurante *
+                            </label>
+                            <select
+                                id="restaurant_id"
+                                name="restaurant_id"
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="">Seleccionar restaurante</option>
+                                {restaurants.map(restaurant => (
+                                    <option 
+                                        value={restaurant.id} 
+                                        selected={restaurant.id === menu.restaurant_id}
+                                    >
+                                        {restaurant.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                                Descripción
+                            </label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="3"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Descripción del menú..."
+                            >{menu.description}</textarea>
+                        </div>
+
+                        <!-- Configuración -->
+                        <div class="md:col-span-2 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Configuración</h3>
+                        </div>
+
+                        <div>
+                            <label for="menu_type" class="block text-sm font-medium text-gray-700 mb-2">
+                                Tipo de Menú
+                            </label>
+                            <select
+                                id="menu_type"
+                                name="menu_type"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="main" selected={menu.menu_type === 'main'}>Principal</option>
+                                <option value="kids" selected={menu.menu_type === 'kids'}>Infantil</option>
+                                <option value="daily" selected={menu.menu_type === 'daily'}>Del Día</option>
+                                <option value="drinks" selected={menu.menu_type === 'drinks'}>Bebidas</option>
+                                <option value="desserts" selected={menu.menu_type === 'desserts'}>Postres</option>
+                                <option value="breakfast" selected={menu.menu_type === 'breakfast'}>Desayuno</option>
+                                <option value="lunch" selected={menu.menu_type === 'lunch'}>Almuerzo</option>
+                                <option value="dinner" selected={menu.menu_type === 'dinner'}>Cena</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">
+                                Orden de Visualización
+                            </label>
+                            <input
+                                type="number"
+                                id="display_order"
+                                name="display_order"
+                                value={menu.display_order}
+                                min="0"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <!-- Vigencia -->
+                        <div class="md:col-span-2 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Vigencia</h3>
+                        </div>
+
+                        <div>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
+                                Fecha de Inicio
+                            </label>
+                            <input
+                                type="date"
+                                id="start_date"
+                                name="start_date"
+                                value={menu.start_date}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
+                                Fecha de Fin
+                            </label>
+                            <input
+                                type="date"
+                                id="end_date"
+                                name="end_date"
+                                value={menu.end_date}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <!-- Horarios -->
+                        <div class="md:col-span-2 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Horarios de Disponibilidad</h3>
+                        </div>
+
+                        <div>
+                            <label for="availability_start" class="block text-sm font-medium text-gray-700 mb-2">
+                                Hora de Inicio
+                            </label>
+                            <input
+                                type="time"
+                                id="availability_start"
+                                name="availability_start"
+                                value={menu.availability_start}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="availability_end" class="block text-sm font-medium text-gray-700 mb-2">
+                                Hora de Fin
+                            </label>
+                            <input
+                                type="time"
+                                id="availability_end"
+                                name="availability_end"
+                                value={menu.availability_end}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <!-- Días de la semana -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Días de Disponibilidad
+                            </label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+                                {dayNames.map((day, index) => (
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name={`day_${index}`}
+                                            checked={menu.availability_days?.includes(index)}
+                                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                        <span class="text-sm text-gray-700">{day}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="md:col-span-2 mt-6">
+                            <label class="flex items-center space-x-3">
+                                <input
+                                    type="checkbox"
+                                    name="is_active"
+                                    checked={menu.is_active}
+                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <span class="text-sm font-medium text-gray-700">Menú activo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                        <a href="/admin/menus" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancelar
+                        </a>
+                        <button
+                            type="submit"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Actualizar Menú
+                        </button>
+                    </div>
+                </form>
+            )}
+        </div>
+    </div>
+</AdminLayout>

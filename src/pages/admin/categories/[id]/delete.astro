@@ -1,0 +1,206 @@
+---
+// filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\categories\[id]\delete.astro
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+
+const { id } = Astro.params;
+
+let category = null;
+let error = null;
+let itemCount = 0;
+let subcategoryCount = 0;
+
+try {
+    const { Pool } = await import('pg');
+    const pool = new Pool({
+        connectionString: import.meta.env.DATABASE_URL
+    });
+
+    // Obtener datos de la categoría
+    const categoryQuery = await pool.query(
+        `SELECT c.*, r.name as restaurant_name 
+         FROM menu_categories c 
+         JOIN restaurants r ON c.restaurant_id = r.id 
+         WHERE c.id = $1`,
+        [id]
+    );
+    
+    if (categoryQuery.rows.length === 0) {
+        throw new Error('Categoría no encontrada');
+    }
+    
+    category = categoryQuery.rows[0];
+
+    // Contar subcategorías
+    const subcategoryCountQuery = await pool.query(
+        'SELECT COUNT(*) as count FROM menu_categories WHERE parent_id = $1',
+        [id]
+    );
+    subcategoryCount = parseInt(subcategoryCountQuery.rows[0].count);
+
+    // Contar items de la categoría
+    const itemCountQuery = await pool.query(
+        'SELECT COUNT(*) as count FROM menu_items WHERE category_id = $1',
+        [id]
+    );
+    itemCount = parseInt(itemCountQuery.rows[0].count);
+
+    await pool.end();
+} catch (err) {
+    console.error('Error:', err);
+    error = err.message;
+}
+
+// Manejar la eliminación
+if (Astro.request.method === 'POST') {
+    try {
+        const formData = await Astro.request.formData();
+        const confirmDelete = formData.get('confirm_delete') === 'true';
+        
+        if (!confirmDelete) {
+            error = 'Debe confirmar la eliminación';
+        } else {
+            const { Pool } = await import('pg');
+            const pool = new Pool({
+                connectionString: import.meta.env.DATABASE_URL
+            });
+
+            // Eliminar la categoría (los items y subcategorías se eliminan por CASCADE)
+            await pool.query('DELETE FROM menu_categories WHERE id = $1', [id]);
+
+            await pool.end();
+            return Astro.redirect(`/admin/menus/${category.restaurant_id}/categories?success=category_deleted`);
+        }
+    } catch (err) {
+        console.error('Error deleting category:', err);
+        error = 'Error al eliminar la categoría: ' + err.message;
+    }
+}
+---
+
+<AdminLayout title="Eliminar Categoría">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Eliminar Categoría</h1>
+                    <p class="text-gray-600 mt-2">Esta acción no se puede deshacer</p>
+                </div>
+                <a href={`/admin/menus/${category?.restaurant_id}/categories`} class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    Cancelar
+                </a>
+            </div>
+
+            {error && (
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    {error}
+                </div>
+            )}
+
+            {category && (
+                <div class="bg-white shadow-lg rounded-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">¿Confirmar eliminación?</h3>
+                            <p class="text-gray-600">Esta acción eliminará permanentemente la categoría y todo su contenido.</p>
+                        </div>
+                    </div>
+
+                    <!-- Información de la categoría -->
+                    <div class="border border-gray-200 rounded-lg p-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Nombre:</span>
+                                <p class="text-gray-900">{category.name}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Restaurante:</span>
+                                <p class="text-gray-900">{category.restaurant_name}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Tipo:</span>
+                                <p class="text-gray-900">
+                                    {category.parent_id ? 'Subcategoría' : 'Categoría Principal'}
+                                </p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Estado:</span>
+                                <span class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                                    category.is_active 
+                                        ? 'bg-green-100 text-green-800' 
+                                        : 'bg-red-100 text-red-800'
+                                }`}>
+                                    {category.is_active ? 'Activa' : 'Inactiva'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {category.description && (
+                            <div class="mt-4">
+                                <span class="text-sm font-medium text-gray-500">Descripción:</span>
+                                <p class="text-gray-900">{category.description}</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <!-- Advertencias sobre datos relacionados -->
+                    {(subcategoryCount > 0 || itemCount > 0) && (
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <h4 class="text-sm font-medium text-yellow-800">Datos que se eliminarán</h4>
+                            </div>
+                            <ul class="text-sm text-yellow-700 space-y-1">
+                                {subcategoryCount > 0 && (
+                                    <li>• {subcategoryCount} subcategoría{subcategoryCount !== 1 ? 's' : ''}</li>
+                                )}
+                                {itemCount > 0 && (
+                                    <li>• {itemCount} producto{itemCount !== 1 ? 's' : ''} de la categoría</li>
+                                )}
+                                <li>• Todas las opciones de personalización de los productos</li>
+                                <li>• Historial y configuraciones de la categoría</li>
+                            </ul>
+                        </div>
+                    )}
+
+                    <!-- Formulario de confirmación -->
+                    <form method="POST">
+                        <div class="mb-6">
+                            <label class="flex items-center space-x-3">
+                                <input
+                                    type="checkbox"
+                                    name="confirm_delete"
+                                    value="true"
+                                    required
+                                    class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                                />
+                                <span class="text-sm text-gray-700">
+                                    Entiendo que esta acción no se puede deshacer y eliminará permanentemente 
+                                    la categoría "{category.name}" y todos sus datos asociados.
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end space-x-4">
+                            <a href={`/admin/menus/${category.restaurant_id}/categories`} class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                Cancelar
+                            </a>
+                            <button
+                                type="submit"
+                                class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                            >
+                                Eliminar Categoría
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+        </div>
+    </div>
+</AdminLayout>

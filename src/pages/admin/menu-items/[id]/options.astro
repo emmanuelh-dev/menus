@@ -1,0 +1,576 @@
+---
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import { isAuthenticated } from "../../../../middleware/auth";
+import { createSupabaseClient } from "../../../../lib/supabase";
+
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
+
+const itemId = Astro.params.id;
+let error = null;
+let success = false;
+
+// Obtener información del platillo
+const { data: menuItem } = await supabase
+  .from("menu_items")
+  .select(`
+    *,
+    menu_categories (
+      id,
+      name,
+      restaurant_id,
+      restaurants (
+        id,
+        name
+      )
+    )
+  `)
+  .eq("id", itemId)
+  .single();
+
+if (!menuItem) {
+  return Astro.redirect("/admin/menus");
+}
+
+// Obtener opciones existentes
+const { data: options } = await supabase
+  .from("menu_item_options")
+  .select("*")
+  .eq("menu_item_id", itemId)
+  .order("option_type, display_order");
+
+// Obtener grupos de opciones
+const { data: optionGroups } = await supabase
+  .from("menu_option_groups")
+  .select(`
+    *,
+    menu_option_group_items (
+      option_id,
+      display_order,
+      menu_item_options (
+        id,
+        name,
+        description,
+        price_modifier
+      )
+    )
+  `)
+  .eq("menu_item_id", itemId)
+  .order("display_order");
+
+// Procesar formulario para crear nueva opción
+if (Astro.request.method === "POST") {
+  try {
+    const formData = await Astro.request.formData();
+    const action = formData.get("action") as string;
+
+    if (action === "create_option") {
+      const optionData = {
+        menu_item_id: parseInt(itemId),
+        option_type: formData.get("option_type") as string,
+        name: formData.get("name") as string,
+        description: formData.get("description") as string || null,
+        price_modifier: parseFloat(formData.get("price_modifier") as string) || 0,
+        is_required: formData.get("is_required") === "on",
+        max_selections: parseInt(formData.get("max_selections") as string) || 1,
+        display_order: parseInt(formData.get("display_order") as string) || 0,
+        is_active: formData.get("is_active") === "on",
+      };
+
+      const { error: insertError } = await supabase
+        .from("menu_item_options")
+        .insert([optionData]);
+
+      if (insertError) {
+        error = insertError.message;
+      } else {
+        success = true;
+      }
+    } else if (action === "create_group") {
+      const groupData = {
+        menu_item_id: parseInt(itemId),
+        name: formData.get("group_name") as string,
+        description: formData.get("group_description") as string || null,
+        is_required: formData.get("group_is_required") === "on",
+        max_selections: parseInt(formData.get("group_max_selections") as string) || 1,
+        min_selections: parseInt(formData.get("group_min_selections") as string) || 0,
+        display_order: parseInt(formData.get("group_display_order") as string) || 0,
+      };
+
+      const { error: insertError } = await supabase
+        .from("menu_option_groups")
+        .insert([groupData]);
+
+      if (insertError) {
+        error = insertError.message;
+      } else {
+        success = true;
+      }
+    }
+
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+  } catch (e) {
+    error = "Error al procesar el formulario";
+  }
+}
+---
+
+<AdminLayout title={`Opciones - ${menuItem.name}`}>
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center mb-6">
+      <a href={`/admin/menus/${menuItem.menu_categories.restaurant_id}/categories/${menuItem.category_id}/items`} class="text-indigo-600 hover:text-indigo-800 mr-4">
+        ← Volver a Platillos
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold">Opciones de Personalización</h1>
+        <p class="text-gray-600">{menuItem.name} - {menuItem.menu_categories.name}</p>
+      </div>
+    </div>
+
+    {success && (
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+        ¡Configuración guardada exitosamente!
+      </div>
+    )}
+
+    {error && (
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        Error: {error}
+      </div>
+    )}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Formularios para crear opciones -->
+      <div>
+        <div class="space-y-6">
+          <!-- Formulario para opción individual -->
+          <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Nueva Opción</h2>
+            
+            <form method="POST" class="space-y-4">
+              <input type="hidden" name="action" value="create_option" />
+              
+              <div>
+                <label for="option_type" class="block text-sm font-medium text-gray-700 mb-2">
+                  Tipo de Opción *
+                </label>
+                <select
+                  id="option_type"
+                  name="option_type"
+                  required
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                >
+                  <option value="">Seleccionar tipo</option>
+                  <option value="size">Tamaño</option>
+                  <option value="extra">Extra/Adicional</option>
+                  <option value="customization">Personalización</option>
+                  <option value="sauce">Salsa</option>
+                  <option value="cooking">Tipo de cocción</option>
+                  <option value="topping">Topping</option>
+                  <option value="side">Acompañamiento</option>
+                  <option value="drink">Bebida</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Ej: Grande, Extra queso, Sin cebolla"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                  Descripción
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows="2"
+                  placeholder="Descripción opcional..."
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                ></textarea>
+              </div>
+
+              <div>
+                <label for="price_modifier" class="block text-sm font-medium text-gray-700 mb-2">
+                  Modificador de Precio
+                </label>
+                <input
+                  type="number"
+                  id="price_modifier"
+                  name="price_modifier"
+                  step="0.01"
+                  value="0"
+                  placeholder="0.00"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                />
+                <p class="text-xs text-gray-500 mt-1">Precio adicional (+) o descuento (-)</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="max_selections" class="block text-sm font-medium text-gray-700 mb-2">
+                    Max. Selecciones
+                  </label>
+                  <input
+                    type="number"
+                    id="max_selections"
+                    name="max_selections"
+                    min="1"
+                    value="1"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">
+                    Orden
+                  </label>
+                  <input
+                    type="number"
+                    id="display_order"
+                    name="display_order"
+                    min="0"
+                    value="0"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-center">
+                  <input type="checkbox" name="is_required" class="rounded border-gray-300 focus:ring-indigo-500 mr-2" />
+                  <span class="text-sm">Opción obligatoria</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" name="is_active" checked class="rounded border-gray-300 focus:ring-indigo-500 mr-2" />
+                  <span class="text-sm">Activa</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+              >
+                Crear Opción
+              </button>
+            </form>
+          </div>
+
+          <!-- Formulario para grupo de opciones -->
+          <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Nuevo Grupo de Opciones</h2>
+            
+            <form method="POST" class="space-y-4">
+              <input type="hidden" name="action" value="create_group" />
+              
+              <div>
+                <label for="group_name" class="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre del Grupo *
+                </label>
+                <input
+                  type="text"
+                  id="group_name"
+                  name="group_name"
+                  required
+                  placeholder="Ej: Tamaños, Extras, Salsas"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="group_description" class="block text-sm font-medium text-gray-700 mb-2">
+                  Descripción
+                </label>
+                <textarea
+                  id="group_description"
+                  name="group_description"
+                  rows="2"
+                  placeholder="Descripción del grupo..."
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                ></textarea>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label for="group_min_selections" class="block text-sm font-medium text-gray-700 mb-2">
+                    Mín.
+                  </label>
+                  <input
+                    type="number"
+                    id="group_min_selections"
+                    name="group_min_selections"
+                    min="0"
+                    value="0"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label for="group_max_selections" class="block text-sm font-medium text-gray-700 mb-2">
+                    Máx.
+                  </label>
+                  <input
+                    type="number"
+                    id="group_max_selections"
+                    name="group_max_selections"
+                    min="1"
+                    value="1"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label for="group_display_order" class="block text-sm font-medium text-gray-700 mb-2">
+                    Orden
+                  </label>
+                  <input
+                    type="number"
+                    id="group_display_order"
+                    name="group_display_order"
+                    min="0"
+                    value="0"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="flex items-center">
+                  <input type="checkbox" name="group_is_required" class="rounded border-gray-300 focus:ring-indigo-500 mr-2" />
+                  <span class="text-sm">Grupo obligatorio</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
+              >
+                Crear Grupo
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de opciones y grupos existentes -->
+      <div class="lg:col-span-2">
+        <div class="space-y-6">
+          <!-- Opciones individuales -->
+          <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-medium text-gray-900">Opciones Individuales</h2>
+            </div>
+
+            {options && options.length > 0 ? (
+              <div class="divide-y divide-gray-200">
+                {options.map((option) => (
+                  <div class="p-6">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <div class="flex items-center space-x-3">
+                          <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                            {option.option_type}
+                          </span>
+                          <h3 class="text-lg font-medium text-gray-900">
+                            {option.name}
+                          </h3>
+                          {option.price_modifier !== 0 && (
+                            <span class={`text-sm font-medium ${
+                              option.price_modifier > 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {option.price_modifier > 0 ? '+' : ''}${option.price_modifier}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {option.description && (
+                          <p class="text-sm text-gray-600 mt-1">
+                            {option.description}
+                          </p>
+                        )}
+                        
+                        <div class="flex items-center space-x-4 mt-2">
+                          <span class={`px-2 py-1 text-xs font-medium rounded-full ${
+                            option.is_active 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {option.is_active ? 'Activa' : 'Inactiva'}
+                          </span>
+                          
+                          {option.is_required && (
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                              Obligatoria
+                            </span>
+                          )}
+                          
+                          <span class="text-xs text-gray-500">
+                            Max: {option.max_selections} | Orden: {option.display_order}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div class="flex space-x-2 ml-4">
+                        <button
+                          class="text-indigo-600 hover:text-indigo-900 text-sm"
+                          onclick={`editOption(${option.id})`}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          class="text-red-600 hover:text-red-900 text-sm"
+                          onclick={`deleteOption(${option.id})`}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="text-center py-12">
+                <p class="text-gray-500 text-lg mb-4">No hay opciones individuales</p>
+              </div>
+            )}
+          </div>
+
+          <!-- Grupos de opciones -->
+          <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-medium text-gray-900">Grupos de Opciones</h2>
+            </div>
+
+            {optionGroups && optionGroups.length > 0 ? (
+              <div class="divide-y divide-gray-200">
+                {optionGroups.map((group) => (
+                  <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 class="text-lg font-medium text-gray-900">
+                          {group.name}
+                        </h3>
+                        {group.description && (
+                          <p class="text-sm text-gray-600 mt-1">
+                            {group.description}
+                          </p>
+                        )}
+                        <div class="flex items-center space-x-4 mt-2">
+                          {group.is_required && (
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                              Obligatorio
+                            </span>
+                          )}
+                          <span class="text-xs text-gray-500">
+                            Selecciones: {group.min_selections}-{group.max_selections}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div class="flex space-x-2">
+                        <button
+                          class="text-indigo-600 hover:text-indigo-900 text-sm"
+                          onclick={`editGroup(${group.id})`}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          class="text-red-600 hover:text-red-900 text-sm"
+                          onclick={`deleteGroup(${group.id})`}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <!-- Opciones del grupo -->
+                    {group.menu_option_group_items && group.menu_option_group_items.length > 0 && (
+                      <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Opciones incluidas:</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {group.menu_option_group_items.map((groupItem) => (
+                            <div class="flex justify-between items-center bg-white p-3 rounded border">
+                              <div>
+                                <span class="text-sm font-medium">{groupItem.menu_item_options.name}</span>
+                                {groupItem.menu_item_options.description && (
+                                  <p class="text-xs text-gray-500">{groupItem.menu_item_options.description}</p>
+                                )}
+                              </div>
+                              {groupItem.menu_item_options.price_modifier !== 0 && (
+                                <span class={`text-xs font-medium ${
+                                  groupItem.menu_item_options.price_modifier > 0 ? 'text-green-600' : 'text-red-600'
+                                }`}>
+                                  {groupItem.menu_item_options.price_modifier > 0 ? '+' : ''}${groupItem.menu_item_options.price_modifier}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="text-center py-12">
+                <p class="text-gray-500 text-lg mb-4">No hay grupos de opciones</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  function editOption(optionId) {
+    // Implementar lógica de edición
+    window.location.href = `/admin/menu-item-options/edit/${optionId}`;
+  }
+
+  function deleteOption(optionId) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta opción?')) {
+      window.location.href = `/admin/menu-item-options/delete/${optionId}`;
+    }
+  }
+
+  function editGroup(groupId) {
+    // Implementar lógica de edición de grupo
+    window.location.href = `/admin/menu-option-groups/edit/${groupId}`;
+  }
+
+  function deleteGroup(groupId) {
+    if (confirm('¿Estás seguro de que quieres eliminar este grupo? Todas las opciones del grupo también se eliminarán.')) {
+      window.location.href = `/admin/menu-option-groups/delete/${groupId}`;
+    }
+  }
+</script>

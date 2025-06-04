@@ -1,0 +1,445 @@
+---
+// filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\menu-items\[id]\edit.astro
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { isAuthenticated } from "../../../../middleware/auth";
+import { createSupabaseClient } from "../../../../lib/supabase";
+
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
+
+const { id } = Astro.params;
+
+// Obtener datos del item existente
+let item: any = null;
+let categories: any[] = [];
+let error: string | null = null;
+
+try {
+    // Obtener datos del item
+    const { data: itemData, error: itemError } = await supabase
+        .from('menu_items')
+        .select(`
+            *,
+            menu_categories(name),
+            restaurants(name)
+        `)
+        .eq('id', id)
+        .single();
+    
+    if (itemError) {
+        throw new Error(itemError.message);
+    }
+    
+    if (!itemData) {
+        throw new Error('Producto no encontrado');
+    }
+    
+    // Reorganizar los datos para compatibilidad con el template
+    item = {
+        ...itemData,
+        category_name: itemData.menu_categories?.name,
+        restaurant_name: itemData.restaurants?.name
+    };
+
+    // Obtener categorías del mismo restaurante
+    const { data: categoriesData, error: categoriesError } = await supabase
+        .from('menu_categories')
+        .select('id, name')
+        .eq('restaurant_id', item.restaurant_id)
+        .eq('is_active', true)
+        .order('name');
+    
+    if (categoriesError) {
+        throw new Error(categoriesError.message);
+    }
+    
+    categories = categoriesData || [];
+
+} catch (err: any) {
+    console.error('Error:', err);
+    error = err.message;
+}
+
+// Manejar el envío del formulario
+if (Astro.request.method === 'POST') {
+    try {
+        const formData = await Astro.request.formData();
+
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        const base_price = parseFloat(formData.get('base_price') as string);
+        const image = formData.get('image') as string || null;
+        const category_id = parseInt(formData.get('category_id') as string);
+        const ingredients = (formData.get('ingredients') as string).split(',').map(i => i.trim()).filter(i => i);
+        const allergens = (formData.get('allergens') as string).split(',').map(a => a.trim()).filter(a => a);
+        const calories = parseInt(formData.get('calories') as string) || null;
+        const preparation_time = parseInt(formData.get('preparation_time') as string) || null;
+        const display_order = parseInt(formData.get('display_order') as string) || 0;
+        const stock_quantity = parseInt(formData.get('stock_quantity') as string) || null;
+        
+        // Flags booleanos
+        const is_active = formData.get('is_active') === 'on';
+        const is_featured = formData.get('is_featured') === 'on';
+        const is_vegetarian = formData.get('is_vegetarian') === 'on';
+        const is_vegan = formData.get('is_vegan') === 'on';
+        const is_gluten_free = formData.get('is_gluten_free') === 'on';
+        const is_spicy = formData.get('is_spicy') === 'on';
+        const spicy_level = parseInt(formData.get('spicy_level') as string) || 0;
+
+        // Horarios de disponibilidad
+        const availability_start = formData.get('availability_start') as string || null;
+        const availability_end = formData.get('availability_end') as string || null;
+
+        const updateData = {
+            name,
+            description,
+            base_price,
+            image,
+            category_id,
+            ingredients,
+            allergens,
+            calories,
+            preparation_time,
+            display_order,
+            is_active,
+            is_featured,
+            is_vegetarian,
+            is_vegan,
+            is_gluten_free,
+            is_spicy,
+            spicy_level,
+            availability_start,
+            availability_end,
+            stock_quantity,
+            updated_at: new Date().toISOString()
+        };
+
+        const { error: updateError } = await supabase
+            .from('menu_items')
+            .update(updateData)
+            .eq('id', id);
+
+        if (updateError) {
+            throw new Error(updateError.message);
+        }
+
+        return Astro.redirect(`/admin/menus/${item.restaurant_id}/categories/${item.category_id}/items?success=item_updated`);
+    } catch (err: any) {
+        console.error('Error updating item:', err);
+        error = 'Error al actualizar el producto: ' + err.message;
+    }
+}
+---
+
+<AdminLayout title="Editar Producto">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Editar Producto</h1>
+                    <p class="text-gray-600 mt-2">Modifica la información del producto del menú</p>
+                </div>
+                <a href={`/admin/menus/${item?.restaurant_id}/categories/${item?.category_id}/items`} class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    Volver a Productos
+                </a>
+            </div>
+
+            {error && (
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    {error}
+                </div>
+            )}
+
+            {item && (
+                <form method="POST" class="bg-white shadow-lg rounded-lg p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Información básica -->
+                        <div class="md:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
+                        </div>
+
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre del Producto *
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={item.name}
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Ej: Hamburguesa Clásica"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                Categoría *
+                            </label>
+                            <select
+                                id="category_id"
+                                name="category_id"
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                {categories.map(category => (
+                                    <option 
+                                        value={category.id}
+                                        selected={category.id === item.category_id}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                                Descripción
+                            </label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="3"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Descripción del producto..."
+                            >{item.description}</textarea>
+                        </div>
+
+                        <div>
+                            <label for="base_price" class="block text-sm font-medium text-gray-700 mb-2">
+                                Precio Base *
+                            </label>
+                            <input
+                                type="number"
+                                id="base_price"
+                                name="base_price"
+                                value={item.base_price}
+                                step="0.01"
+                                min="0"
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="0.00"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                                URL de la Imagen
+                            </label>
+                            <input
+                                type="url"
+                                id="image"
+                                name="image"
+                                value={item.image}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="https://ejemplo.com/imagen.jpg"
+                            />
+                        </div>
+
+                        <!-- Detalles del producto -->
+                        <div class="md:col-span-2 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Detalles del Producto</h3>
+                        </div>
+
+                        <div>
+                            <label for="ingredients" class="block text-sm font-medium text-gray-700 mb-2">
+                                Ingredientes
+                            </label>
+                            <input
+                                type="text"
+                                id="ingredients"
+                                name="ingredients"
+                                value={item.ingredients?.join(', ')}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Separar con comas: carne, queso, lechuga, tomate"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="allergens" class="block text-sm font-medium text-gray-700 mb-2">
+                                Alérgenos
+                            </label>
+                            <input
+                                type="text"
+                                id="allergens"
+                                name="allergens"
+                                value={item.allergens?.join(', ')}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Separar con comas: gluten, lácteos, frutos secos"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="calories" class="block text-sm font-medium text-gray-700 mb-2">
+                                Calorías
+                            </label>
+                            <input
+                                type="number"
+                                id="calories"
+                                name="calories"
+                                value={item.calories}
+                                min="0"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-2">
+                                Tiempo de Preparación (minutos)
+                            </label>
+                            <input
+                                type="number"
+                                id="preparation_time"
+                                name="preparation_time"
+                                value={item.preparation_time}
+                                min="0"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="stock_quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                                Stock Disponible
+                            </label>
+                            <input
+                                type="number"
+                                id="stock_quantity"
+                                name="stock_quantity"
+                                value={item.stock_quantity}
+                                min="0"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Dejar vacío para stock ilimitado"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">
+                                Orden de Visualización
+                            </label>
+                            <input
+                                type="number"
+                                id="display_order"
+                                name="display_order"
+                                value={item.display_order}
+                                min="0"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <!-- Disponibilidad -->
+                        <div class="md:col-span-2 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Horarios de Disponibilidad</h3>
+                        </div>
+
+                        <div>
+                            <label for="availability_start" class="block text-sm font-medium text-gray-700 mb-2">
+                                Disponible desde
+                            </label>
+                            <input
+                                type="time"
+                                id="availability_start"
+                                name="availability_start"
+                                value={item.availability_start}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="availability_end" class="block text-sm font-medium text-gray-700 mb-2">
+                                Disponible hasta
+                            </label>
+                            <input
+                                type="time"
+                                id="availability_end"
+                                name="availability_end"
+                                value={item.availability_end}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+
+                        <!-- Características especiales -->
+                        <div class="md:col-span-2 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Características Especiales</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="is_featured" checked={item.is_featured} class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                                    <span class="text-sm text-gray-700">Destacado</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="is_vegetarian" checked={item.is_vegetarian} class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500" />
+                                    <span class="text-sm text-gray-700">Vegetariano</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="is_vegan" checked={item.is_vegan} class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500" />
+                                    <span class="text-sm text-gray-700">Vegano</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="is_gluten_free" checked={item.is_gluten_free} class="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500" />
+                                    <span class="text-sm text-gray-700">Sin Gluten</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="is_spicy" checked={item.is_spicy} class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
+                                    <span class="text-sm text-gray-700">Picante</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="is_active" checked={item.is_active} class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                                    <span class="text-sm text-gray-700">Activo</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Nivel de picante */}
+                        <div class="md:col-span-2 mt-4">
+                            <label for="spicy_level" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nivel de Picante (0-5)
+                            </label>
+                            <input
+                                type="range"
+                                id="spicy_level"
+                                name="spicy_level"
+                                value={item.spicy_level}
+                                min="0"
+                                max="5"
+                                step="1"
+                                class="w-full"
+                            />
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>Sin picante</span>
+                                <span>Muy picante</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                        <a href={`/admin/menus/${item.restaurant_id}/categories/${item.category_id}/items`} class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancelar
+                        </a>
+                        <button
+                            type="submit"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Actualizar Producto
+                        </button>
+                    </div>
+                </form>
+            )}
+        </div>
+    </div>
+</AdminLayout>
