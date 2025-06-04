@@ -35,7 +35,18 @@ const { data: recentContacts } = await supabase
   .from("contact")
   .select("*")
   .order("created_at", { ascending: false })
-  .limit(100);
+  .limit(10);
+
+const { data: recentComments } = await supabase
+  .from("review")
+  .select(`
+    *,
+    restaurants (
+      name
+    )
+  `)
+  .order("created_at", { ascending: false })
+  .limit(10);
 
 // Obtener últimos restaurantes
 const { data: recentRestaurants } = await supabase
@@ -74,6 +85,66 @@ const { data: recentRestaurants } = await supabase
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Comentarios Recientes</h2>
+
+      {
+        recentComments && recentComments.length > 0 ? (
+          <ul class="divide-y divide-gray-200">
+            {recentComments.map((comment) => (
+              <li class="py-3">                <div class="flex items-center space-x-4">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {comment.restaurants?.name || comment.restaurant || 'Restaurante no especificado'}
+                    </p>
+                    <p class="text-sm text-gray-500 truncate">
+                      {comment.comment.substring(0, 500)}...
+                    </p>
+                  </div>
+                  <span class="text-xs text-gray-500">
+                    {new Date(comment.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
+        )
+      }
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">
+        Mensajes Recientes
+      </h2>
+
+      {
+        recentContacts && recentContacts.length > 0 ? (
+          <ul class="divide-y divide-gray-200">
+            {recentContacts.map((contact) => (
+              <li class="py-3">
+                <div class="flex items-center space-x-4">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {contact.email}
+                    </p>
+                    <p class="text-sm text-gray-500 truncate">
+                      {contact.message.substring(0, 500)}...
+                    </p>
+                  </div>
+                  <span class="text-xs text-gray-500">
+                    {new Date(contact.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
+        )
+      }
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-lg font-medium text-gray-900 mb-4">
         Últimos restaurantes
       </h2>
@@ -104,36 +175,6 @@ const { data: recentRestaurants } = await supabase
           </ul>
         ) : (
           <p class="text-gray-500 text-sm">No hay restaurantes registrados.</p>
-        )
-      }
-    </div>
-
-    <div class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Mensajes Recientes</h2>
-
-      {
-        recentContacts && recentContacts.length > 0 ? (
-          <ul class="divide-y divide-gray-200">
-            {recentContacts.map((contact) => (
-              <li class="py-3">
-                <div class="flex items-center space-x-4">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate">
-                      {contact.email}
-                    </p>
-                    <p class="text-sm text-gray-500 truncate">
-                      {contact.message.substring(0, 50)}...
-                    </p>
-                  </div>
-                  <span class="text-xs text-gray-500">
-                    {new Date(contact.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
         )
       }
     </div>
