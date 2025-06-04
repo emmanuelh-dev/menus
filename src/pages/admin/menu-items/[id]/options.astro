@@ -22,7 +22,7 @@ const supabase = createSupabaseClient(
 );
 
 const itemId = Astro.params.id;
-let error = null;
+let error: string | null = null;
 let success = false;
 
 // Obtener información del platillo
@@ -77,11 +77,9 @@ const { data: optionGroups } = await supabase
 if (Astro.request.method === "POST") {
   try {
     const formData = await Astro.request.formData();
-    const action = formData.get("action") as string;
-
-    if (action === "create_option") {
+    const action = formData.get("action") as string;    if (action === "create_option") {
       const optionData = {
-        menu_item_id: parseInt(itemId),
+        menu_item_id: parseInt(itemId as string),
         option_type: formData.get("option_type") as string,
         name: formData.get("name") as string,
         description: formData.get("description") as string || null,
@@ -100,10 +98,9 @@ if (Astro.request.method === "POST") {
         error = insertError.message;
       } else {
         success = true;
-      }
-    } else if (action === "create_group") {
+      }    } else if (action === "create_group") {
       const groupData = {
-        menu_item_id: parseInt(itemId),
+        menu_item_id: parseInt(itemId as string),
         name: formData.get("group_name") as string,
         description: formData.get("group_description") as string || null,
         is_required: formData.get("group_is_required") === "on",
@@ -552,23 +549,24 @@ if (Astro.request.method === "POST") {
 </AdminLayout>
 
 <script>
-  function editOption(optionId) {
+  // Functions used in onclick handlers in the HTML above
+  function editOption(optionId: number): void {
     // Implementar lógica de edición
     window.location.href = `/admin/menu-item-options/edit/${optionId}`;
   }
 
-  function deleteOption(optionId) {
+  function deleteOption(optionId: number): void {
     if (confirm('¿Estás seguro de que quieres eliminar esta opción?')) {
       window.location.href = `/admin/menu-item-options/delete/${optionId}`;
     }
   }
 
-  function editGroup(groupId) {
+  function editGroup(groupId: number): void {
     // Implementar lógica de edición de grupo
     window.location.href = `/admin/menu-option-groups/edit/${groupId}`;
   }
 
-  function deleteGroup(groupId) {
+  function deleteGroup(groupId: number): void {
     if (confirm('¿Estás seguro de que quieres eliminar este grupo? Todas las opciones del grupo también se eliminarán.')) {
       window.location.href = `/admin/menu-option-groups/delete/${groupId}`;
     }

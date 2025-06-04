@@ -22,7 +22,7 @@ const supabase = createSupabaseClient(
 );
 
 const menuId = Astro.params.id;
-let error = null;
+let error: string | null = null;
 let success = false;
 
 // Obtener información del menú
@@ -72,9 +72,7 @@ if (Astro.request.method === "POST") {
 
     const { error: insertError } = await supabase
       .from("menu_categories")
-      .insert([categoryData]);
-
-    if (insertError) {
+      .insert([categoryData]);    if (insertError) {
       error = insertError.message;
     } else {
       success = true;
@@ -83,7 +81,7 @@ if (Astro.request.method === "POST") {
         window.location.reload();
       }, 1000);
     }
-  } catch (e) {
+  } catch (e: any) {
     error = "Error al procesar el formulario";
   }
 }
@@ -303,7 +301,7 @@ if (Astro.request.method === "POST") {
 </AdminLayout>
 
 <script>
-  function deleteCategory(categoryId) {
+  function deleteCategory(categoryId: number) {
     if (confirm('¿Estás seguro de que quieres eliminar esta categoría? Todos los platillos de esta categoría también se eliminarán.')) {
       // Aquí implementarías la lógica de eliminación
       window.location.href = `/admin/menus/categories/delete/${categoryId}`;

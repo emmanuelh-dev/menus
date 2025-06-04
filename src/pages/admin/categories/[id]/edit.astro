@@ -1,46 +1,90 @@
 ---
 // filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\categories\[id]\edit.astro
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../../../middleware/auth';
+import { createSupabaseClient } from '../../../../lib/supabase';
+
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 
 const { id } = Astro.params;
 
+// Definir tipos
+interface Category {
+  id: number;
+  name: string;
+  description?: string;
+  restaurant_id: number;
+  parent_id?: number;
+  is_active: boolean;
+  restaurant_name?: string;
+  image?: string;
+  display_order?: number;
+}
+
+interface ParentCategory {
+  id: number;
+  name: string;
+}
+
 // Obtener datos de la categoría existente
-let category = null;
-let parentCategories = [];
-let error = null;
+let category: Category | null = null;
+let parentCategories: ParentCategory[] = [];
+let error: string | null = null;
 
 try {
-    const { Pool } = await import('pg');
-    const pool = new Pool({
-        connectionString: import.meta.env.DATABASE_URL
-    });
-
-    // Obtener datos de la categoría
-    const categoryQuery = await pool.query(
-        `SELECT c.*, r.name as restaurant_name 
-         FROM menu_categories c 
-         JOIN restaurants r ON c.restaurant_id = r.id 
-         WHERE c.id = $1`,
-        [id]
-    );
+    // Obtener datos de la categoría con información del restaurante
+    const { data: categoryData, error: categoryError } = await supabase
+        .from('menu_categories')
+        .select(`
+            *,
+            restaurants (
+                id,
+                name
+            )
+        `)
+        .eq('id', id)
+        .single();
     
-    if (categoryQuery.rows.length === 0) {
+    if (categoryError || !categoryData) {
         throw new Error('Categoría no encontrada');
     }
     
-    category = categoryQuery.rows[0];
+    // Formatear los datos
+    category = {
+        ...categoryData,
+        restaurant_name: categoryData.restaurants?.name
+    } as Category;
 
     // Obtener categorías padre posibles (del mismo restaurante, excluyendo la actual y sus hijos)
-    const parentQuery = await pool.query(
-        `SELECT id, name FROM menu_categories 
-         WHERE restaurant_id = $1 AND id != $2 AND parent_id IS NULL
-         ORDER BY name`,
-        [category.restaurant_id, id]
-    );
-    parentCategories = parentQuery.rows;
+    const { data: parentData, error: parentError } = await supabase
+        .from('menu_categories')
+        .select('id, name')
+        .eq('restaurant_id', category.restaurant_id)
+        .neq('id', id)
+        .is('parent_id', null)
+        .order('name');
+    
+    if (!parentError && parentData) {
+        parentCategories = parentData;
+    }
 
-    await pool.end();
-} catch (err) {
+} catch (err: any) {
     console.error('Error:', err);
     error = err.message;
 }
@@ -49,10 +93,6 @@ try {
 if (Astro.request.method === 'POST') {
     try {
         const formData = await Astro.request.formData();
-        const { Pool } = await import('pg');
-        const pool = new Pool({
-            connectionString: import.meta.env.DATABASE_URL
-        });
 
         const name = formData.get('name') as string;
         const description = formData.get('description') as string;
@@ -61,17 +101,25 @@ if (Astro.request.method === 'POST') {
         const display_order = parseInt(formData.get('display_order') as string) || 0;
         const is_active = formData.get('is_active') === 'on';
 
-        await pool.query(
-            `UPDATE menu_categories SET 
-                name = $1, description = $2, image = $3, parent_id = $4, 
-                display_order = $5, is_active = $6, updated_at = NOW()
-            WHERE id = $7`,
-            [name, description, image, parent_id, display_order, is_active, id]
-        );
+        const { error: updateError } = await supabase
+            .from('menu_categories')
+            .update({
+                name,
+                description,
+                image,
+                parent_id: parent_id ? parseInt(parent_id) : null,
+                display_order,
+                is_active,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id);
 
-        await pool.end();
-        return Astro.redirect(`/admin/menus/${category.restaurant_id}/categories?success=category_updated`);
-    } catch (err) {
+        if (updateError) {
+            throw new Error(updateError.message);
+        }
+
+        return Astro.redirect(`/admin/menus/${category?.restaurant_id}/categories?success=category_updated`);
+    } catch (err: any) {
         console.error('Error updating category:', err);
         error = 'Error al actualizar la categoría: ' + err.message;
     }

@@ -1,58 +1,89 @@
 ---
 // filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\menus\[id]\delete.astro
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../../../middleware/auth';
+import { createSupabaseClient } from '../../../../lib/supabase';
+
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 
 const { id } = Astro.params;
 
-let menu = null;
-let error = null;
+// Definir tipos
+interface Menu {
+  id: number;
+  name: string;
+  description?: string;
+  restaurant_id: number;
+  menu_type: string;
+  is_active: boolean;
+  restaurants?: {
+    id: number;
+    name: string;
+  };
+}
+
+let menu: Menu | null = null;
+let error: string | null = null;
 let categoryCount = 0;
 let itemCount = 0;
 
 try {
-    const { Pool } = await import('pg');
-    const pool = new Pool({
-        connectionString: import.meta.env.DATABASE_URL
-    });
-
     // Obtener datos del menú
-    const menuQuery = await pool.query(
-        `SELECT m.*, r.name as restaurant_name 
-         FROM menus m 
-         JOIN restaurants r ON m.restaurant_id = r.id 
-         WHERE m.id = $1`,
-        [id]
-    );
+    const { data: menuData, error: menuError } = await supabase
+        .from('menus')
+        .select(`
+            *,
+            restaurants (
+                id,
+                name
+            )
+        `)
+        .eq('id', id)
+        .single();
     
-    if (menuQuery.rows.length === 0) {
+    if (menuError || !menuData) {
         throw new Error('Menú no encontrado');
     }
     
-    menu = menuQuery.rows[0];
+    menu = menuData;
 
     // Contar categorías asociadas
-    const categoryCountQuery = await pool.query(
-        `SELECT COUNT(*) as count 
-         FROM menu_category_assignments mca
-         JOIN menu_categories mc ON mca.category_id = mc.id
-         WHERE mca.menu_id = $1`,
-        [id]
-    );
-    categoryCount = parseInt(categoryCountQuery.rows[0].count);
+    const { data: categoryData, error: categoryError } = await supabase
+        .from('menu_categories')
+        .select('id', { count: 'exact' })
+        .eq('menu_id', id);
+    
+    if (!categoryError && categoryData) {
+        categoryCount = categoryData.length;
+    }
 
     // Contar items del menú
-    const itemCountQuery = await pool.query(
-        `SELECT COUNT(*) as count 
-         FROM menu_items mi
-         JOIN menu_categories mc ON mi.category_id = mc.id
-         JOIN menu_category_assignments mca ON mc.id = mca.category_id
-         WHERE mca.menu_id = $1`,
-        [id]
-    );
-    itemCount = parseInt(itemCountQuery.rows[0].count);
+    const { data: itemData, error: itemError } = await supabase
+        .from('menu_items')
+        .select('id', { count: 'exact' })
+        .eq('menu_id', id);
+    
+    if (!itemError && itemData) {
+        itemCount = itemData.length;
+    }
 
-    await pool.end();
-} catch (err) {
+} catch (err: any) {
     console.error('Error:', err);
     error = err.message;
 }
@@ -66,18 +97,19 @@ if (Astro.request.method === 'POST') {
         if (!confirmDelete) {
             error = 'Debe confirmar la eliminación';
         } else {
-            const { Pool } = await import('pg');
-            const pool = new Pool({
-                connectionString: import.meta.env.DATABASE_URL
-            });
-
             // Eliminar el menú (las relaciones se eliminan por CASCADE)
-            await pool.query('DELETE FROM menus WHERE id = $1', [id]);
+            const { error: deleteError } = await supabase
+                .from('menus')
+                .delete()
+                .eq('id', id);
 
-            await pool.end();
+            if (deleteError) {
+                throw new Error(deleteError.message);
+            }
+
             return Astro.redirect('/admin/menus?success=deleted');
         }
-    } catch (err) {
+    } catch (err: any) {
         console.error('Error deleting menu:', err);
         error = 'Error al eliminar el menú: ' + err.message;
     }
@@ -119,14 +151,13 @@ if (Astro.request.method === 'POST') {
 
                     <!-- Información del menú -->
                     <div class="border border-gray-200 rounded-lg p-4 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">                            <div>
                                 <span class="text-sm font-medium text-gray-500">Nombre:</span>
                                 <p class="text-gray-900">{menu.name}</p>
                             </div>
                             <div>
                                 <span class="text-sm font-medium text-gray-500">Restaurante:</span>
-                                <p class="text-gray-900">{menu.restaurant_name}</p>
+                                <p class="text-gray-900">{menu.restaurants?.name}</p>
                             </div>
                             <div>
                                 <span class="text-sm font-medium text-gray-500">Tipo:</span>
