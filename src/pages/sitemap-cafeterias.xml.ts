@@ -12,12 +12,11 @@ export async function GET() {
     '/cafeterias?zona=barrio-antiguo&tipo=especialidad',
     '/cafeterias?zona=san-pedro&tipo=especialidad',
   ];
-
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${cafeteriaUrls.map(url => `
   <url>
-    <loc>${baseUrl}${url}</loc>
+    <loc>${baseUrl}${url.replace(/&/g, '&amp;')}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${url === '/cafeterias' ? '1.0' : '0.8'}</priority>
