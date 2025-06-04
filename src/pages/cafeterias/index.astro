@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import LocalBusinessSchema from "../../components/LocalBusinessSchema.astro";
+import BreadcrumbSchema from "../../components/BreadcrumbSchema.astro";
 import { Coffee, MapPin, Clock, Star, DollarSign, Phone, ArrowRight } from "lucide-react";
 
 // Importar imágenes para las cafeterías
@@ -10,7 +11,6 @@ import alchemyCoffee from "../menus/alchemycoffeelab/espuma.jpg";
 import fosforoCafe from "../menus/fosforocafe/media/menu.jpg";
 import { getRestaurants } from "../../lib/supabase";
 
-// Definir la estructura de datos para las cafeterías
 interface CoffeeShop {
   name: string;
   rating: number;
@@ -27,7 +27,6 @@ interface CoffeeShop {
 }
 
 
-// Obtener cafeterías
 const cafeterias_raw = await getRestaurants({
   type: "cafeteria",
 });
@@ -36,49 +35,89 @@ const cafeterias = cafeterias_raw.map((cafeteria) => ({
   ...cafeteria,
 }));
 
-// Configuración para SEO
-const seoData = {
-  title: "Mejores Cafeterías en Monterrey 2025 | Café de Especialidad en Centro y San Pedro",
-  description: "Descubre las mejores cafeterías en Monterrey, San Pedro y Centro. Encuentra Cafetería Kali, Café Prana en Barrio Antiguo, El Cafelito y más. Guía completa con ubicaciones, horarios y menús.",
-  keywords: [
-    "cafeterías en monterrey", 
-    "cafetería centro monterrey", 
-    "cafeterías barrio antiguo monterrey", 
-    "cafetería san pedro", 
-    "café monterrey", 
-    "mejores cafeterías monterrey", 
-    "cafeterías bonitas en monterrey", 
-    "cafeterías para trabajar en monterrey",
-    "café de especialidad monterrey",
-    "cafetería kali san pedro",
-    "café prana barrio antiguo",
-    "panem centro monterrey",
-    "el cafelito monterrey",
-    "le petite bretonne monterrey sur",
-    "cafeterías abiertas domingos monterrey",
-    "wifi cafeterías monterrey",
-    "cafeterías económicas monterrey centro"
-  ],
-  openGraph: {
-    title: "Mejores Cafeterías en Monterrey 2025 | Guía Completa",
-    description: "Guía definitiva de cafeterías en Monterrey. Desde Cafetería Kali en San Pedro hasta Café Prana en Barrio Antiguo. ☕ Ubicaciones, horarios y menús actualizados.",
-    type: "website",
-    url: "https://menusmty.com/cafeterias",
-    image: {
-      url: "https://menusmty.com/images/cafeterias-monterrey-og.jpg",
-      width: 1200,
-      height: 630,
-      alt: "Las mejores cafeterías en Monterrey - Guía completa 2025"
+const url = new URL(Astro.request.url);
+const zona = url.searchParams.get('zona') || undefined;
+const tipo = url.searchParams.get('tipo') || undefined;
+
+const getDynamicSEO = () => {
+  const baseTitle = "Mejores Cafeterías en Monterrey 2025";
+  const baseDescription = "Descubre las mejores cafeterías en Monterrey";
+  const baseKeywords = ["cafeterías en monterrey", "café monterrey"];
+  const baseUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : Astro.url.toString();
+
+  // Si hay filtro por zona
+  if (zona) {
+    switch (zona.toLowerCase()) {
+      case 'barrio-antiguo':
+        return {
+          title: `Cafeterías en Barrio Antiguo Monterrey 2025 | Café Prana y Más`,
+          description: `Mejores cafeterías en Barrio Antiguo, Monterrey. Café Prana, Café Iguana y más opciones bohemias. Guía completa con ubicaciones y horarios.`,
+          keywords: [...baseKeywords, "cafeterías barrio antiguo", "café barrio antiguo monterrey", "café prana barrio antiguo", "cafés bohemios monterrey"],
+          heading: "Cafeterías en Barrio Antiguo",
+          subheading: "Descubre los cafés más bohemios e históricos del corazón cultural de Monterrey",
+          canonical: `${baseUrl}?zona=barrio-antiguo`,
+          ogUrl: `${baseUrl}?zona=barrio-antiguo`
+        };
+      
+      case 'san-pedro':
+        return {
+          title: `Cafeterías en San Pedro Garza García 2025 | Cafetería Kali y Más`,
+          description: `Mejores cafeterías en San Pedro Garza García. Cafetería Kali, Café Central y opciones premium. Guía completa de café de especialidad.`,
+          keywords: [...baseKeywords, "cafeterías san pedro", "cafetería san pedro garza garcía", "cafetería kali san pedro", "café especialidad san pedro"],
+          heading: "Cafeterías en San Pedro Garza García", 
+          subheading: "Las mejores opciones de café de especialidad en la zona más exclusiva",
+          canonical: `${baseUrl}?zona=san-pedro`,
+          ogUrl: `${baseUrl}?zona=san-pedro`
+        };
+      
+      case 'centro':
+        return {
+          title: `Cafeterías en Centro Monterrey 2025 | Panem, El Cafelito y Más`,
+          description: `Mejores cafeterías en Centro de Monterrey. Panem, El Cafelito, Cafetería Gaby y más opciones tradicionales. Guía completa.`,
+          keywords: [...baseKeywords, "cafetería centro monterrey", "panem centro monterrey", "el cafelito monterrey", "cafeterías centro histórico"],
+          heading: "Cafeterías en Centro Monterrey",
+          subheading: "Tradición y sabor en el corazón histórico de la ciudad",
+          canonical: `${baseUrl}?zona=centro`,
+          ogUrl: `${baseUrl}?zona=centro`
+        };
+      
+      case 'sur':
+        return {
+          title: `Cafeterías en Monterrey Sur 2025 | Le Petite Bretonne y Más`,
+          description: `Mejores cafeterías en zona Sur de Monterrey. Le Petite Bretonne y más opciones. Guía completa con ubicaciones y especialidades.`,
+          keywords: [...baseKeywords, "cafeterías monterrey sur", "le petite bretonne monterrey", "cafés zona sur monterrey"],
+          heading: "Cafeterías en Monterrey Sur",
+          subheading: "Explora los mejores cafés en la zona sur de la ciudad",
+          canonical: `${baseUrl}?zona=sur`,
+          ogUrl: `${baseUrl}?zona=sur`        };
     }
-  },
-  twitter: {
-    card: "summary_large_image", 
-    title: "☕ Mejores Cafeterías en Monterrey 2025",
-    description: "Descubre Cafetería Kali, Café Prana, Panem y más. Guía completa con ubicaciones y horarios actualizados.",
-    image: "https://menusmty.com/images/cafeterias-monterrey-twitter.jpg"
-  },
-  canonical: "https://menusmty.com/cafeterias"
+  }
+
+  // Si hay filtro por tipo de café
+  if (tipo === 'especialidad') {
+    return {
+      title: `Café de Especialidad en Monterrey 2025 | Cafetería Kali, Prana y Más`,
+      description: `Mejor café de especialidad en Monterrey. Cafetería Kali, Café Prana, métodos alternativos y granos selectos. Guía completa 2025.`,
+      keywords: [...baseKeywords, "café de especialidad monterrey", "café especialidad cerca de mi", "mejor café especialidad monterrey", "café gourmet monterrey"],
+      heading: "Café de Especialidad en Monterrey",
+      subheading: "Los mejores granos y métodos de preparación en la ciudad",
+      canonical: `${baseUrl}?tipo=especialidad`,
+      ogUrl: `${baseUrl}?tipo=especialidad`
+    };
+  }
+  // SEO por defecto
+  return {
+    title: baseTitle + " | Café de Especialidad en Centro y San Pedro",
+    description: baseDescription + ", San Pedro y Centro. Encuentra Cafetería Kali, Café Prana en Barrio Antiguo, El Cafelito y más. Guía completa con ubicaciones, horarios y menús.",
+    keywords: [...baseKeywords, "cafetería centro monterrey", "cafeterías barrio antiguo monterrey", "cafetería san pedro", "mejores cafeterías monterrey", "cafeterías bonitas en monterrey", "cafeterías para trabajar en monterrey", "café de especialidad monterrey"],
+    heading: "Mejores Cafeterías en Monterrey 2025",
+    subheading: "Descubre las cafeterías más populares en Centro, San Pedro, Barrio Antiguo y toda la zona metropolitana de Monterrey",
+    canonical: baseUrl,
+    ogUrl: baseUrl
+  };
 };
+
+const seoData = getDynamicSEO();
 
 // Configuración para Schema.org
 const schemaEnrichment = {
@@ -95,26 +134,53 @@ const schemaEnrichment = {
   description={seoData.description}
   schemaEnrichment={schemaEnrichment}
   backgroundColor="bg-[#F8F3E9]"
->
-  <!-- Local Business Structured Data -->
+  canonical={seoData.canonical}
+  ogUrl={seoData.ogUrl}
+>  <!-- Local Business Structured Data -->
   <LocalBusinessSchema cafeterias={cafeterias} />
   
+  <!-- Breadcrumb Structured Data -->
+  <BreadcrumbSchema zona={zona} tipo={tipo} />
+  
   <div class="min-h-screen bg-[#F8F3E9] py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">      <!-- Encabezado con estilo serif y contenido SEO optimizado -->  
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">      <!-- Encabezado dinámico según filtros SEO -->  
       <div class="text-center mb-16">
-        <h1 class="text-5xl md:text-6xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight">Mejores Cafeterías en Monterrey 2025</h1>
-        <p class="text-xl md:text-2xl font-serif text-[#5F4B3B] max-w-3xl mx-auto">Descubre las cafeterías más populares en Centro, San Pedro, Barrio Antiguo y toda la zona metropolitana de Monterrey</p>
+        <h1 class="text-5xl md:text-6xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight">{seoData.heading}</h1>
+        <p class="text-xl md:text-2xl font-serif text-[#5F4B3B] max-w-3xl mx-auto">{seoData.subheading}</p>
         <div class="mt-8 text-lg text-[#5F4B3B] max-w-4xl mx-auto">
           <p>Guía completa de cafeterías en Monterrey con ubicaciones verificadas, horarios actualizados y menús digitales. Incluye las favoritas de la comunidad: Cafetería Kali, Café Prana, El Cafelito, Panem y muchas más.</p>
         </div>
-      </div>      <!-- Sección de ubicaciones destacadas - Compacta -->
+      </div><!-- Sección de ubicaciones destacadas - Compacta -->      <!-- Filtros interactivos -->
+      <div class="mb-12 space-y-4">
+        <!-- Filtros de calidad/estado -->
+        <div class="flex flex-wrap justify-center gap-4">
+          <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-full font-serif hover:bg-[#BFA78E] transition-colors" data-filter="all">Todos</button>
+          <button id="filter-rated" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="rated">Mejor calificados</button>
+          <button id="filter-open" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="open">Abiertos ahora</button>
+          <button id="filter-menu" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="menu">Menú digital</button>
+          <button id="filter-especialidad" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="especialidad">De Especialidad</button>
+        </div>
+        
+        <!-- Filtros de ubicación -->
+        <div class="flex flex-wrap justify-center gap-4">
+          <span class="text-sm text-[#5F4B3B] flex items-center">📍 Por zona:</span>
+          <button id="filter-centro" class="location-filter-btn px-4 py-2 bg-white/80 text-[#3A2E27] rounded-full text-sm font-serif hover:bg-[#D4BEA3] transition-colors" data-location="centro">Centro</button>
+          <button id="filter-san-pedro" class="location-filter-btn px-4 py-2 bg-white/80 text-[#3A2E27] rounded-full text-sm font-serif hover:bg-[#D4BEA3] transition-colors" data-location="san-pedro">San Pedro</button>
+          <button id="filter-barrio-antiguo" class="location-filter-btn px-4 py-2 bg-white/80 text-[#3A2E27] rounded-full text-sm font-serif hover:bg-[#D4BEA3] transition-colors" data-location="barrio-antiguo">Barrio Antiguo</button>
+          <button id="filter-sur" class="location-filter-btn px-4 py-2 bg-white/80 text-[#3A2E27] rounded-full text-sm font-serif hover:bg-[#D4BEA3] transition-colors" data-location="sur">Sur</button>
+        </div>
+      </div>
 
-      <!-- Filtros interactivos -->
-      <div class="mb-12 flex flex-wrap justify-center gap-4">
-        <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-full font-serif hover:bg-[#BFA78E] transition-colors" data-filter="all">Todos</button>
-        <button id="filter-rated" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="rated">Mejor calificados</button>
-        <button id="filter-open" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="open">Abiertos ahora</button>
-        <button id="filter-menu" class="filter-btn px-6 py-2 bg-white/80 text-[#3A2E27] rounded-full font-serif hover:bg-[#D4BEA3] transition-colors" data-filter="menu">Menú digital</button>
+      <!-- Indicador de filtros activos por URL -->
+      <div id="url-filter-indicator" class="mb-8 hidden">
+        <div class="bg-gradient-to-r from-[#A67C52] to-[#8C5E3B] text-white rounded-lg p-4 text-center">
+          <p class="font-serif text-lg">
+            <span id="filter-message"></span>
+          </p>
+          <button id="clear-filters" class="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-colors">
+            Ver todas las cafeterías
+          </button>
+        </div>
       </div>
 
       <!-- Mapa visual de cafeterías (representación estilizada) -->
@@ -135,17 +201,35 @@ const schemaEnrichment = {
             ></div>
           ))}
         </div>
-      </div> -->
-
-      <!-- Grid de cafeterías con diseño creativo -->
+      </div> -->      <!-- Grid de cafeterías con diseño creativo -->
       <div id="cafeterias-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {cafeterias.map((cafe) => (
+        {cafeterias.map((cafe) => {
+          // Determinar zona basada en la dirección
+          let zona = "centro";
+          if (cafe.address?.includes("San Pedro") || cafe.address?.includes("Garza García")) {
+            zona = "san-pedro";
+          } else if (cafe.address?.includes("Barrio Antiguo") || cafe.name?.includes("Prana") || cafe.name?.includes("FOSFORO")) {
+            zona = "barrio-antiguo";
+          } else if (cafe.address?.includes("Sur") || cafe.name?.includes("Petite Bretonne")) {
+            zona = "sur";
+          }
+          
+          // Determinar si es café de especialidad
+          const esEspecialidad = cafe.name?.includes("Kali") || 
+                                 cafe.name?.includes("Prana") || 
+                                 cafe.name?.includes("Alchemy") || 
+                                 cafe.name?.includes("FOSFORO") ||
+                                 cafe.services?.some(service => service.toLowerCase().includes("especialidad"));
+          
+          return (
           <div 
             class="cafe-card group relative overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
             data-rating={cafe.rating}
             data-distance={cafe.distance ? cafe.distance.replace(" km", "") : "0"}
             data-closed={cafe.closed ? "true" : "false"}
             data-has-menu={cafe.menu ? "true" : "false"}
+            data-zona={zona}
+            data-especialidad={esEspecialidad ? "true" : "false"}
           >
             <!-- Imagen con overlay -->
             <div class="relative aspect-square overflow-hidden">
@@ -246,12 +330,12 @@ const schemaEnrichment = {
                     class="w-full py-2 bg-[#D4BEA3] text-[#3A2E27] rounded-lg font-serif hover:bg-[#BFA78E] transition-colors"
                   >
                     No hay menú disponible
-                  </button>
-                )}
+                  </button>                )}
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <!-- Sección de destacados -->
@@ -495,31 +579,47 @@ const schemaEnrichment = {
 </RestaurantLayout>
 
 <script>
-  // Definir interfaz para elementos HTML con dataset específico para cafeterías
+  // Definir interfaces para elementos HTML con dataset específico para cafeterías
   interface CafeCardElement extends HTMLElement {
     dataset: {
       rating: string;
       distance: string;
       closed: string;
       hasMenu: string;
+      zona: string;
+      especialidad: string;
     };
     style: CSSStyleDeclaration;
   }
 
   interface FilterButtonElement extends HTMLElement {
     dataset: {
-      filter: string;
+      filter?: string;
+      location?: string;
     };
     style: CSSStyleDeclaration;
   }
 
+  // Variables globales para filtros activos
+  let activeQualityFilter = 'all';
+  let activeLocationFilter = '';
+
   document.addEventListener('DOMContentLoaded', () => {
     // Obtener referencias a los elementos
     const filterButtons = document.querySelectorAll('.filter-btn');
+    const locationFilterButtons = document.querySelectorAll('.location-filter-btn');
     const cafeCards = document.querySelectorAll('.cafe-card');
+    const urlFilterIndicator = document.getElementById('url-filter-indicator');
+    const filterMessage = document.getElementById('filter-message');
+    const clearFiltersButton = document.getElementById('clear-filters');
     
-    // Función para actualizar la clase activa en los botones
-    function updateActiveButton(activeButton: Element) {
+    // Detectar parámetros URL y aplicar filtros automáticamente
+    const urlParams = new URLSearchParams(window.location.search);
+    const zonaParam = urlParams.get('zona');
+    const tipoParam = urlParams.get('tipo');
+    
+    // Función para actualizar la clase activa en los botones de calidad
+    function updateActiveQualityButton(activeButton: Element) {
       filterButtons.forEach(button => {
         if (button === activeButton) {
           button.classList.remove('bg-white/80');
@@ -531,59 +631,178 @@ const schemaEnrichment = {
       });
     }
     
-    // Función para filtrar cafeterías
-    function filterCafes(filterType: string) {
+    // Función para actualizar la clase activa en los botones de ubicación
+    function updateActiveLocationButton(activeButton: Element | null) {
+      locationFilterButtons.forEach(button => {
+        if (button === activeButton) {
+          button.classList.remove('bg-white/80');
+          button.classList.add('bg-[#D4BEA3]');
+        } else {
+          button.classList.remove('bg-[#D4BEA3]');
+          button.classList.add('bg-white/80');
+        }
+      });
+    }
+    
+    // Función principal para filtrar cafeterías
+    function filterCafes() {
       cafeCards.forEach(card => {
         const cafeCard = card as CafeCardElement;
         const rating = parseFloat(cafeCard.dataset.rating);
         const distance = parseFloat(cafeCard.dataset.distance);
         const isClosed = cafeCard.dataset.closed === 'true';
         const hasMenu = cafeCard.dataset.hasMenu === 'true';
+        const zona = cafeCard.dataset.zona;
+        const esEspecialidad = cafeCard.dataset.especialidad === 'true';
         
         let shouldShow = true;
         
-        switch(filterType) {
+        // Filtros de calidad/estado
+        switch(activeQualityFilter) {
           case 'all':
-            // Mostrar todas las cafeterías
             shouldShow = true;
             break;
-          case 'nearby':
-            // Mostrar cafeterías cercanas (menos de 10 km)
-            shouldShow = distance < 10;
-            break;
           case 'rated':
-            // Mostrar cafeterías mejor calificadas (4.7 o más)
             shouldShow = rating >= 4.7;
             break;
           case 'open':
-            // Mostrar cafeterías abiertas
             shouldShow = !isClosed;
             break;
           case 'menu':
-            // Mostrar cafeterías con menú digital
             shouldShow = hasMenu;
             break;
+          case 'especialidad':
+            shouldShow = esEspecialidad;
+            break;
+        }
+        
+        // Filtros de ubicación (aplicar además del filtro de calidad)
+        if (shouldShow && activeLocationFilter) {
+          shouldShow = zona === activeLocationFilter;
         }
         
         cafeCard.style.display = shouldShow ? 'block' : 'none';
       });
     }
+      // Llamar a priorización después de cada filtrado
+    const originalFilterCafes = filterCafes;
+    const enhancedFilterCafes = function() {
+      originalFilterCafes();
+      prioritizeRelevantCafes();
+    };
     
-    // Agregar event listeners a los botones
+    // Reemplazar las llamadas a filterCafes con enhancedFilterCafes
     filterButtons.forEach(button => {
       button.addEventListener('click', () => {
         const filterButton = button as FilterButtonElement;
-        const filterType = filterButton.dataset.filter;
-        updateActiveButton(button);
-        filterCafes(filterType);
+        activeQualityFilter = filterButton.dataset.filter || 'all';
+        updateActiveQualityButton(button);
+        enhancedFilterCafes();
       });
     });
     
-    // Inicializar con el filtro 'Mejor calificados' activo
-    const ratedButton = document.getElementById('filter-rated') as HTMLElement;
-    if (ratedButton) {
-      updateActiveButton(ratedButton);
-      filterCafes('all');
+    locationFilterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const locationButton = button as FilterButtonElement;
+        const location = locationButton.dataset.location || '';
+        
+        if (activeLocationFilter === location) {
+          activeLocationFilter = '';
+          updateActiveLocationButton(null);
+        } else {
+          activeLocationFilter = location;
+          updateActiveLocationButton(button);
+        }
+        
+        enhancedFilterCafes();
+      });
+    });
+    
+    // Aplicar filtros iniciales
+    enhancedFilterCafes();
+      // Función para mostrar/ocultar el indicador de filtros por URL
+    function updateUrlFilterIndicator() {
+      if (zonaParam || tipoParam) {
+        if (urlFilterIndicator) {
+          urlFilterIndicator.classList.remove('hidden');
+        }
+        
+        let message = 'Filtros activos: ';
+        
+        if (zonaParam) {
+          message += `Zona ${zonaParam.replace('-', ' ')} `;
+        }
+        
+        if (tipoParam === 'especialidad') {
+          message += `| Café de Especialidad`;
+        }
+        
+        if (filterMessage) {
+          filterMessage.innerHTML = message;
+        }
+      } else {
+        if (urlFilterIndicator) {
+          urlFilterIndicator.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Aplicar filtros automáticos basados en URL
+    if (zonaParam) {
+      activeLocationFilter = zonaParam;
+      const locationButton = document.querySelector(`[data-location="${zonaParam}"]`) as HTMLElement;
+      if (locationButton) {
+        updateActiveLocationButton(locationButton);
+      }
+    }
+    
+    if (tipoParam === 'especialidad') {
+      activeQualityFilter = 'especialidad';
+      const especialidadButton = document.getElementById('filter-especialidad') as HTMLElement;
+      if (especialidadButton) {
+        updateActiveQualityButton(especialidadButton);
+      }
+    } else {
+      // Si no hay filtros especiales, inicializar con "Mejor calificados"
+      const ratedButton = document.getElementById('filter-rated') as HTMLElement;
+      if (ratedButton) {
+        activeQualityFilter = 'rated';
+        updateActiveQualityButton(ratedButton);
+      }
+    }
+      // Aplicar filtros iniciales
+    enhancedFilterCafes();
+    updateUrlFilterIndicator();
+    
+    // Función para mostrar cafeterías relevantes primero cuando hay intención de búsqueda
+    function prioritizeRelevantCafes() {
+      const grid = document.getElementById('cafeterias-grid');
+      if (!grid) return;
+      
+      const cards = Array.from(grid.children) as HTMLElement[];
+      
+      // Si hay filtros activos de zona o especialidad, reordenar
+      if (activeLocationFilter || activeQualityFilter === 'especialidad') {
+        cards.sort((a, b) => {
+          const aCard = a as CafeCardElement;
+          const bCard = b as CafeCardElement;
+          
+          const aZonaMatch = activeLocationFilter ? aCard.dataset.zona === activeLocationFilter : false;
+          const bZonaMatch = activeLocationFilter ? bCard.dataset.zona === activeLocationFilter : false;
+          
+          const aEspecialidadMatch = activeQualityFilter === 'especialidad' ? aCard.dataset.especialidad === 'true' : false;
+          const bEspecialidadMatch = activeQualityFilter === 'especialidad' ? bCard.dataset.especialidad === 'true' : false;
+          
+          // Priorizar coincidencias exactas
+          const aScore = (aZonaMatch ? 2 : 0) + (aEspecialidadMatch ? 1 : 0);
+          const bScore = (bZonaMatch ? 2 : 0) + (bEspecialidadMatch ? 1 : 0);
+          
+          return bScore - aScore;
+        });
+        
+        // Reordenar elementos en el DOM
+        cards.forEach(card => grid.appendChild(card));
+      }
     }
   });
 </script>

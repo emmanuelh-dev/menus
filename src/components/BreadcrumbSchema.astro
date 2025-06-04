@@ -1,0 +1,60 @@
+---
+export interface Props {
+  zona?: string;
+  tipo?: string;
+}
+
+const { zona, tipo } = Astro.props;
+
+const baseUrl = Astro.site?.toString() || 'https://tu-dominio.com';
+
+const breadcrumbList = [
+  {
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Inicio",
+    "item": baseUrl
+  },
+  {
+    "@type": "ListItem", 
+    "position": 2,
+    "name": "Cafeterías",
+    "item": `${baseUrl}/cafeterias`
+  }
+];
+
+// Agregar breadcrumb específico según filtros
+if (zona) {
+  const zonaNames = {
+    'barrio-antiguo': 'Barrio Antiguo',
+    'san-pedro': 'San Pedro',
+    'centro': 'Centro',
+    'sur': 'Sur'
+  };
+  
+  breadcrumbList.push({
+    "@type": "ListItem",
+    "position": 3,
+    "name": `Cafeterías en ${zonaNames[zona] || zona}`,
+    "item": `${baseUrl}/cafeterias?zona=${zona}`
+  });
+}
+
+if (tipo === 'especialidad') {
+  const position = zona ? 4 : 3;
+  breadcrumbList.push({
+    "@type": "ListItem",
+    "position": position,
+    "name": "Café de Especialidad",
+    "item": `${baseUrl}/cafeterias?tipo=especialidad`
+  });
+}
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbList
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />

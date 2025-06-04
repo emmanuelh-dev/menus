@@ -44,6 +44,8 @@ export interface Props {
   textWhite?: boolean;
   backgroundColor?: string;
   favicon?: string;
+  canonical?: string;
+  ogUrl?: string;
 
   schemaEnrichment?: {
     address?: Address;
@@ -74,6 +76,8 @@ const {
   textWhite = false,
   backgroundColor = "bg-white",
   schemaEnrichment = {},
+  canonical,
+  ogUrl,
 } = Astro.props;
 
 let reviewStats = {
@@ -185,23 +189,22 @@ if (schemaEnrichment.suitableForDiet) {
       type="image/svg+xml"
       href={favicon ? favicon : "/favicon.ico"}
     />
-    <meta name="generator" content={Astro.generator} />
-    <title>
+    <meta name="generator" content={Astro.generator} />    <title>
       Menú - {title} | {schemaEnrichment?.address?.streetAddress} - Menu PDF
     </title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={Astro.url} />
+    <link rel="canonical" href={canonical || Astro.url} />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url} />
+    <meta property="og:url" content={ogUrl || Astro.url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:url" content={ogUrl || Astro.url} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     {
