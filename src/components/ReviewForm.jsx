@@ -262,17 +262,17 @@ export default function ReviewForm({ restaurantName, path }) {
                     {renderStars(review.rating)}
                   </div>
                   {review.created_at && (
-                    <time className="ml-2 text-xs text-gray-500">
+                    <time className="ml-2 text-xs">
                       {new Date(review.created_at).toLocaleDateString()}
                     </time>
                   )}
                 </div>
-                <p className="text-gray-700">{review.comment}</p>
+                <p className="">{review.comment}</p>
               </article>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No reviews yet</p>
+          <p className="">No reviews yet</p>
         )}
 
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
