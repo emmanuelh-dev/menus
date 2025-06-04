@@ -80,7 +80,7 @@ if (Astro.request.method === "POST") {
     const allergens = allergensText ? allergensText.split(',').map(a => a.trim()).filter(a => a) : [];
 
     const itemData = {
-      category_id: parseInt(categoryId),
+      category_id: parseInt(categoryId as any),
       restaurant_id: menu.restaurant_id,
       name: formData.get("name") as string,
       description: formData.get("description") as string,

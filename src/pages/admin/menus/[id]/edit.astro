@@ -1,40 +1,82 @@
 ---
 // filepath: c:\Users\Emmanuel\Documents\GitHub\menus\src\pages\admin\menus\[id]\edit.astro
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../../../middleware/auth';
+import { createSupabaseClient } from '../../../../lib/supabase';
+
+// Verificar autenticación
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+if (!isAuth) {
+  return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+  return Astro.redirect("/admin/login");
+}
+
+const supabase = createSupabaseClient(
+  accessTokenCookie.value,
+  refreshTokenCookie.value
+);
 
 const { id } = Astro.params;
 
+// Definir tipos para los objetos
+interface Menu {
+  id: number;
+  name: string;
+  description: string;
+  restaurant_id: number;
+  menu_type: string;
+  is_active: boolean;
+  start_date?: string;
+  end_date?: string;
+  availability_days?: number[];
+  availability_start?: string;
+  availability_end?: string;
+  display_order: number;
+}
+
+interface Restaurant {
+  id: number;
+  name: string;
+}
+
 // Obtener datos del menú existente
-let menu = null;
-let restaurants = [];
-let error = null;
+let menu: Menu | null = null;
+let restaurants: Restaurant[] = [];
+let error: string | null = null;
 
 try {
-    const { Pool } = await import('pg');
-    const pool = new Pool({
-        connectionString: import.meta.env.DATABASE_URL
-    });
-
     // Obtener datos del menú
-    const menuQuery = await pool.query(
-        'SELECT * FROM menus WHERE id = $1',
-        [id]
-    );
+    const { data: menuData, error: menuError } = await supabase
+        .from('menus')
+        .select('*')
+        .eq('id', id)
+        .single();
     
-    if (menuQuery.rows.length === 0) {
+    if (menuError) {
         throw new Error('Menú no encontrado');
     }
     
-    menu = menuQuery.rows[0];
+    menu = menuData as Menu;
 
     // Obtener lista de restaurantes para el select
-    const restaurantsQuery = await pool.query(
-        'SELECT id, name FROM restaurants ORDER BY name'
-    );
-    restaurants = restaurantsQuery.rows;
+    const { data: restaurantsData, error: restaurantsError } = await supabase
+        .from('restaurants')
+        .select('id, name')
+        .order('name');
+    
+    if (restaurantsError) {
+        throw restaurantsError;
+    }
+    
+    restaurants = restaurantsData as Restaurant[];
 
-    await pool.end();
-} catch (err) {
+} catch (err: any) {
     console.error('Error:', err);
     error = err.message;
 }
@@ -43,10 +85,6 @@ try {
 if (Astro.request.method === 'POST') {
     try {
         const formData = await Astro.request.formData();
-        const { Pool } = await import('pg');
-        const pool = new Pool({
-            connectionString: import.meta.env.DATABASE_URL
-        });
 
         const name = formData.get('name') as string;
         const description = formData.get('description') as string;
@@ -60,30 +98,37 @@ if (Astro.request.method === 'POST') {
         const display_order = parseInt(formData.get('display_order') as string) || 0;
 
         // Manejar días de disponibilidad
-        const availability_days = [];
+        const availability_days: number[] = [];
         for (let i = 0; i <= 6; i++) {
             if (formData.get(`day_${i}`)) {
                 availability_days.push(i);
             }
         }
 
-        await pool.query(
-            `UPDATE menus SET 
-                name = $1, description = $2, restaurant_id = $3, menu_type = $4, 
-                is_active = $5, start_date = $6, end_date = $7, 
-                availability_days = $8, availability_start = $9, availability_end = $10, 
-                display_order = $11, updated_at = NOW()
-            WHERE id = $12`,
-            [
-                name, description, restaurant_id, menu_type, is_active,
-                start_date, end_date, availability_days, availability_start,
-                availability_end, display_order, id
-            ]
-        );
+        const { error: updateError } = await supabase
+            .from('menus')
+            .update({
+                name, 
+                description, 
+                restaurant_id, 
+                menu_type, 
+                is_active,
+                start_date, 
+                end_date, 
+                availability_days, 
+                availability_start,
+                availability_end, 
+                display_order,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id);
 
-        await pool.end();
+        if (updateError) {
+            throw updateError;
+        }
+
         return Astro.redirect('/admin/menus?success=updated');
-    } catch (err) {
+    } catch (err: any) {
         console.error('Error updating menu:', err);
         error = 'Error al actualizar el menú: ' + err.message;
     }
