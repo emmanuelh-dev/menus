@@ -2,6 +2,7 @@
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../../../middleware/auth";
 import { createSupabaseClient } from "../../../../lib/supabase";
+import CategoryManager from "../../../../components/admin/CategoryManager.tsx";
 
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
@@ -22,8 +23,6 @@ const supabase = createSupabaseClient(
 );
 
 const menuId = Astro.params.id;
-let error: string | null = null;
-let success = false;
 
 // Obtener información del menú
 const { data: menu } = await supabase
@@ -54,37 +53,6 @@ const { data: categories } = await supabase
   `)
   .eq("restaurant_id", menu.restaurant_id)
   .order("display_order");
-
-// Procesar formulario para crear nueva categoría
-if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
-    
-    const categoryData = {
-      restaurant_id: menu.restaurant_id,
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      image: formData.get("image") as string || null,
-      parent_id: formData.get("parent_id") ? parseInt(formData.get("parent_id") as string) : null,
-      display_order: parseInt(formData.get("display_order") as string) || 0,
-      is_active: formData.get("is_active") === "on",
-    };
-
-    const { error: insertError } = await supabase
-      .from("menu_categories")
-      .insert([categoryData]);    if (insertError) {
-      error = insertError.message;
-    } else {
-      success = true;
-      // Recargar la página para mostrar la nueva categoría
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    }
-  } catch (e: any) {
-    error = "Error al procesar el formulario";
-  }
-}
 ---
 
 <AdminLayout title={`Categorías - ${menu.name}`}>
@@ -99,212 +67,11 @@ if (Astro.request.method === "POST") {
       </div>
     </div>
 
-    {success && (
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-        ¡Categoría creada exitosamente!
-      </div>
-    )}
-
-    {error && (
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-        Error: {error}
-      </div>
-    )}
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Formulario para crear nueva categoría -->
-      <div class="lg:col-span-1">
-        <div class="bg-white shadow rounded-lg p-6 sticky top-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Nueva Categoría</h2>
-          
-          <form method="POST" class="space-y-4">
-            <div>
-              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                Nombre *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                placeholder="Ej: Entradas, Platos Principales..."
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                Descripción
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                rows="3"
-                placeholder="Descripción de la categoría..."
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              ></textarea>
-            </div>
-
-            <div>
-              <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                URL de Imagen
-              </label>
-              <input
-                type="url"
-                id="image"
-                name="image"
-                placeholder="https://ejemplo.com/imagen.jpg"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label for="parent_id" class="block text-sm font-medium text-gray-700 mb-2">
-                Categoría Padre (Subcategoría)
-              </label>
-              <select
-                id="parent_id"
-                name="parent_id"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              >
-                <option value="">Sin categoría padre</option>
-                {categories?.filter(cat => !cat.parent_id).map((category) => (
-                  <option value={category.id}>{category.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">
-                  Orden
-                </label>
-                <input
-                  type="number"
-                  id="display_order"
-                  name="display_order"
-                  min="0"
-                  value="0"
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                />
-              </div>
-
-              <div class="flex items-center pt-8">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  name="is_active"
-                  checked
-                  class="rounded border-gray-300 focus:ring-indigo-500"
-                />
-                <label for="is_active" class="ml-2 text-sm text-gray-700">
-                  Activa
-                </label>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-            >
-              Crear Categoría
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Lista de categorías existentes -->
-      <div class="lg:col-span-2">
-        <div class="bg-white shadow rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-medium text-gray-900">Categorías Existentes</h2>
-          </div>
-
-          {categories && categories.length > 0 ? (
-            <div class="divide-y divide-gray-200">
-              {categories.map((category) => (
-                <div class="p-6">
-                  <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                      <div class="flex items-center space-x-3">
-                        {category.image && (
-                          <img
-                            src={category.image}
-                            alt={category.name}
-                            class="w-12 h-12 rounded-lg object-cover"
-                          />
-                        )}
-                        <div>
-                          <h3 class="text-lg font-medium text-gray-900">
-                            {category.name}
-                            {category.parent && (
-                              <span class="text-sm text-gray-500 ml-2">
-                                (subcategoría de {category.parent.name})
-                              </span>
-                            )}
-                          </h3>
-                          {category.description && (
-                            <p class="text-sm text-gray-600 mt-1">
-                              {category.description}
-                            </p>
-                          )}
-                          <div class="flex items-center space-x-4 mt-2">
-                            <span class={`px-2 py-1 text-xs font-medium rounded-full ${
-                              category.is_active 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {category.is_active ? 'Activa' : 'Inactiva'}
-                            </span>
-                            <span class="text-xs text-gray-500">
-                              Orden: {category.display_order}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="flex space-x-2 ml-4">
-                      <a
-                        href={`/admin/menus/${menuId}/categories/${category.id}/items`}
-                        class="text-green-600 hover:text-green-900 text-sm"
-                      >
-                        Ver Platillos
-                      </a>
-                      <a
-                        href={`/admin/menus/categories/edit/${category.id}`}
-                        class="text-indigo-600 hover:text-indigo-900 text-sm"
-                      >
-                        Editar
-                      </a>
-                      <button
-                        class="text-red-600 hover:text-red-900 text-sm"
-                        onclick={`deleteCategory(${category.id})`}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="text-center py-12">
-              <p class="text-gray-500 text-lg mb-4">No hay categorías creadas</p>
-              <p class="text-gray-400 text-sm">Usa el formulario de la izquierda para crear la primera categoría</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <CategoryManager 
+      client:load
+      restaurantId={menu.restaurant_id}
+      menuId={menuId as string}
+      initialCategories={categories || []}
+    />
   </div>
 </AdminLayout>
-
-<script>
-  function deleteCategory(categoryId: number) {
-    if (confirm('¿Estás seguro de que quieres eliminar esta categoría? Todos los platillos de esta categoría también se eliminarán.')) {
-      // Aquí implementarías la lógica de eliminación
-      window.location.href = `/admin/menus/categories/delete/${categoryId}`;
-    }
-  }
-</script>
