@@ -5,9 +5,6 @@ import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
 
-// Importar imágenes para los moteles
-import placeholder from "../menus/placeholder.svg";
-
 // Definir la estructura de datos para los moteles
 interface Motel {
   name: string;
@@ -25,6 +22,7 @@ interface Motel {
   specialties?: string[];
   highlight?: boolean;
   phone?: string;
+  destacado?: boolean;
 }
 
 // Datos de moteles basados en La Guía M, Google Maps y recomendaciones de Reddit
@@ -34,11 +32,12 @@ const motelesList: Motel[] = [
     rating: 4.6,
     reviewCount: 1100,
     priceRange: "$$$",
-    address: "Cerca de Universidad, Monterrey",
+    address: "José Mariano Salas 232, Regina, 64290 Monterrey, N.L.",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento gratuito", "Aire acondicionado", "Restaurante 24/7"],
     specialties: ["Habitaciones temáticas", "Servicio 24/7", "Ambiente romántico"],
-    highlight: true
+    highlight: true,
+
   },  {
     name: "Motel Canarias",
     rating: 4.5,
@@ -58,6 +57,7 @@ const motelesList: Motel[] = [
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Jacuzzi", "TV premium"],
     specialties: ["Lujo y confort", "Instalaciones premium", "Ambiente exclusivo"],
+    highlight: true,
     phone: "+52 81 8140 0100"
   },
   {
@@ -181,14 +181,15 @@ const motelesList: Motel[] = [
     specialties: ["Cumbres del Valle", "Zona residencial", "Privacidad"],
     phone: "+52 81 8315 6047"
   },  {
-    name: "Motel NU (Niu)",
-    rating: 4.1,
+    name: "Motel Niu",
+    rating: 4.6,
     reviewCount: 195,
     priceRange: "$$",
     address: "Monterrey, Nuevo León",
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado"],
-    specialties: ["Limpieza excepcional", "Buen servicio", "Recomendado en Reddit"]
+    specialties: ["Limpieza excepcional", "Buen servicio"],
+    highlight: true,
   },
   {
     name: "M Suites Monterrey", 
@@ -359,7 +360,8 @@ const schemaEnrichment = {
     </section>
 
     <section class="min-h-screen bg-black text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">          <!-- Filtros interactivos -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Filtros interactivos -->
           <div class="mb-12 space-y-4">
             <!-- Filtros principales -->
             <div class="flex flex-wrap justify-center gap-4">
@@ -405,7 +407,7 @@ const schemaEnrichment = {
     
           <!-- Grid de moteles con diseño creativo -->
           <div id="moteles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {motelesList.map((motel) => (
+            {motelesList.sort((a, b) => b.rating - a.rating).map((motel) => (
               <div 
                 class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border ${motel.highlight ? 'border-pink-500/50 bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
                 data-rating={motel.rating}
@@ -527,75 +529,75 @@ const schemaEnrichment = {
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles Destacados</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <!-- Motel destacado 1 -->
-              <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
-                <div class="md:w-2/5 relative">
-                  <img
-                    src={'/motel.png'} 
-                    alt="Motel Love"
-                    width={400}
-                    height={500}
-                    class="w-full h-full object-cover"
-                  />
-                  <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
-                  <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
-                    <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
-                      <Star className="w-4 h-4 text-pink-400 inline mr-1" />
-                      <span class="text-sm font-medium text-white">4.6 (1.1K)</span>
+              {motelesList.filter(motel => motel.highlight === true).map(motel => (
+                <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
+                  <div class="md:w-2/5 relative">
+                    <img
+                      src={motel.image?.src || '/motel.png'} 
+                      alt={motel.name}
+                      width={400}
+                      height={500}
+                      class="w-full h-full object-cover"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
+                    <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
+                      <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
+                        <Star className="w-4 h-4 text-pink-400 inline mr-1" />
+                        <span class="text-sm font-medium text-white">{motel.rating} ({motel.reviewCount})</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="md:w-3/5 p-6">
-                  <h3 class="font-serif text-2xl font-bold text-pink-400 mb-2">Motel Love</h3>
-                  <p class="text-gray-300 mb-4">El favorito personal del autor. Ubicado cerca de Universidad, este motel ofrece una experiencia premium con instalaciones de primera clase y un ambiente romántico inigualable.</p>
-                  <div class="flex items-center mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">Cerca de Universidad, Monterrey</span>
-                  </div>
-                  <div class="flex items-center mb-4">
-                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">$600–800 por sesión</span>
-                  </div>
-                  <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-3 mb-4">
-                    <p class="text-pink-300 text-sm">💡 <strong>Tip:</strong> Llega con tiempo, especialmente los fines de semana, ya que suele haber fila por su alta demanda.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Motel destacado 2 -->
-              <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
-                <div class="md:w-2/5 relative">
-                  <img
-                    src={'/motel.png'} 
-                    alt="Kyoto Suites"
-                    width={400}
-                    height={500}
-                    class="w-full h-full object-cover"
-                  />
-                  <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
-                  <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
-                    <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
-                      <Star className="w-4 h-4 text-pink-400 inline mr-1" />
-                      <span class="text-sm font-medium text-white">4.5 (951)</span>
+                  <div class="md:w-3/5 p-6">
+                    <h3 class="font-serif text-2xl font-bold text-pink-400 mb-2">{motel.name}</h3>
+                    <p class="text-gray-300 mb-4">{motel.address}</p>
+                    <div class="flex items-center mb-2">
+                      <MapPin className="w-4 h-4 text-gray-400 mr-2" />
+                      <span class="text-sm text-gray-300">{motel.address}</span>
                     </div>
+                    <div class="flex items-center mb-4">
+                      <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
+                      <span class="text-sm text-gray-300">{motel.priceRange}</span>
+                    </div>
+                    
+                    {/* Mostrar especialidades si existen */}
+                    {motel.specialties && motel.specialties.length > 0 && (
+                      <div class="flex flex-wrap gap-2 mb-4">
+                        {motel.specialties.map(specialty => (
+                          <span class="text-xs bg-pink-900/30 text-pink-300 px-2 py-1 rounded-full border border-pink-500/30">
+                            {specialty}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Tip personalizado según el motel */}
+                    <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-3 mb-4">
+                      {motel.name === "Motel Love" && (
+                        <p class="text-pink-300 text-sm">💡 <strong>Tip:</strong> Llega con tiempo, especialmente los fines de semana, ya que suele haber fila por su alta demanda.</p>
+                      )}
+                      {motel.name === "Motel Marbella" && (
+                        <p class="text-pink-300 text-sm">🛁 <strong>Tip:</strong> Perfecto para ocasiones especiales con jacuzzi privado y amenidades de lujo.</p>
+                      )}
+                      {motel.name === "Motel Niu" && (
+                        <p class="text-pink-300 text-sm">✨ <strong>Tip:</strong> Destacado por su limpieza excepcional y excelente servicio al cliente.</p>
+                      )}
+                      {!["Motel Love", "Motel Marbella", "Motel Niu"].includes(motel.name) && (
+                        <p class="text-pink-300 text-sm">⭐ <strong>Destacado:</strong> Excelente opción recomendada por nuestros usuarios.</p>
+                      )}
+                    </div>
+                    
+                    {/* Mostrar teléfono si existe */}
+                    {motel.phone && (
+                      <div class="flex items-center mt-3">
+                        <Phone className="w-4 h-4 text-gray-400 mr-2" />
+                        <a href={`tel:${motel.phone}`} class="text-sm text-pink-400 hover:text-pink-300 transition-colors">
+                          {motel.phone}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div class="md:w-3/5 p-6">
-                  <h3 class="font-serif text-2xl font-bold text-pink-400 mb-2">Kyoto Suites Motel</h3>
-                  <p class="text-gray-300 mb-4">Conocido por su privacidad total con cocheras cerradas. Perfecto para quienes buscan discreción absoluta con un ambiente inspirado en el diseño japonés.</p>
-                  <div class="flex items-center mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">Monterrey, Nuevo León</span>
-                  </div>
-                  <div class="flex items-center mb-4">
-                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">$600–800 por 8h fin de semana</span>
-                  </div>
-                  <div class="bg-yellow-900/30 border border-yellow-500/30 rounded-lg p-3 mb-4">
-                    <p class="text-yellow-300 text-sm">⏰ <strong>Horarios:</strong> 8-12h entre semana, puede haber fila de 30-40 min los fines de semana.</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
