@@ -1,14 +1,14 @@
 ---
-const {name, sucursal} = Astro.params;
+const { name, sucursal } = Astro.params;
 console.log("Restaurant Name:", Astro.params);
 
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
-import {getRestaurantByName, supabase} from "../../../../lib/supabase";
+import { getRestaurantByName, supabase } from "../../../../lib/supabase";
 
 if (!name) {
   throw new Error("No se ha especificado el nombre del restaurante");
 }
-const menuData = await getRestaurantByName({name});
+const menuData = await getRestaurantByName({ name });
 
 const restaurant = menuData[0];
 
@@ -20,19 +20,20 @@ const { data: menu } = await supabase
   .eq("menu", sucursal)
   .single();
 
-
-  console.log("Menu Data:", menu);
+console.log("Menu Data:", menu);
 // Verificar que existe el restaurante
 if (!menuData || menuData.length === 0) {
   throw new Error(`No se encontró el restaurante: ${name}`);
 }
 
 const schemaEnrichment = {
-  address: restaurant.address ? {
-    streetAddress: restaurant.address,
-    addressLocality: "Ciudad",
-    addressCountry: "MX"
-  } : undefined,
+  address: menu.address
+    ? {
+        streetAddress: menu.address,
+        addressLocality: "Ciudad",
+        addressCountry: "MX",
+      }
+    : undefined,
   telephone: undefined,
   priceRange: restaurant.priceRange || "$$",
   servesCuisine: restaurant.type ? [restaurant.type] : ["Restaurant"],
@@ -40,11 +41,27 @@ const schemaEnrichment = {
   acceptsReservations: true,
   paymentAccepted: ["Cash", "Credit Card"],
   currenciesAccepted: ["MXN"],
-  aggregateRating: restaurant.rating ? {
-    ratingValue: restaurant.rating,
-    reviewCount: restaurant.reviewCount || 1
-  } : undefined,
+  aggregateRating: restaurant.rating
+    ? {
+        ratingValue: restaurant.rating,
+        reviewCount: restaurant.reviewCount || 1,
+      }
+    : undefined,
 };
+
+const { data: categoriesData } = await supabase
+  .from("menu_categories")
+  .select(`
+    *,
+    menu_items (
+      *
+    )
+  `)
+  .eq("restaurant_id", restaurant.id)
+  .eq("is_active", true)
+  .order("display_order");
+
+console.log(categoriesData)
 
 ---
 
@@ -54,198 +71,279 @@ const schemaEnrichment = {
   image={restaurant.image}
   textWhite={false}
   backgroundColor="bg-white"
-  schemaEnrichment={schemaEnrichment}  type="Restaurant"
+  schemaEnrichment={schemaEnrichment}
+  type="Restaurant"
 >
   <!-- Custom Styles for Enhanced Review Focus -->
-  <style>    .hover-lift {
+  <style>
+    .hover-lift {
       transition: all 0.3s ease;
     }
-    
+
     .hover-lift:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     }
-      .star-rating {
-      filter: drop-shadow(0 2px 4px rgba(255,215,0,0.3));
+    .star-rating {
+      filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
     }
-    
+
     .review-form-section {
       scroll-margin-top: 100px;
-    }  </style>
+    }
+  </style>
 
   <div class="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
     <!-- Hero Section - Focused on Review Invitation -->
     <div class="bg-white shadow-lg">
-      <div class=" mx-auto px-4 py-12">
+      <div class="mx-auto px-4 py-12">
         <div class="text-center">
-          {restaurant.image && (
-            <div class="mb-8">
-              <img 
-                src={restaurant.image} 
-                alt={restaurant.name}
-                class="w-32 h-32 mx-auto rounded-full shadow-xl border-4 border-orange-200 object-cover"
-              />
-            </div>
-          )}          
+          {
+            restaurant.image && (
+              <div class="mb-8">
+                <img
+                  src={restaurant.image}
+                  alt={restaurant.name}
+                  class="w-48 h-48  mx-auto rounded-full shadow-xl border-4 border-orange-200 object-cover"
+                />
+              </div>
+            )
+          }
           <h1 class="text-5xl font-bold text-gray-900 mb-4">
             {restaurant.name}
+            {menu ? ` - ${menu.name}` : ""}
           </h1>
 
           <!-- Rating Display -->
-          {restaurant.rating && (
-            <div class="flex items-center justify-center mb-8">
-              <div class="flex items-center space-x-1">
-                {Array.from({length: 5}, (_, i) => (
-                  <svg 
-                    class={`w-8 h-8 ${i < Math.floor(restaurant.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
-                    fill="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                  </svg>
-                ))}
+          {
+            restaurant.rating && (
+              <div class="flex items-center justify-center mb-8">
+                <div class="flex items-center space-x-1">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <svg
+                      class={`w-8 h-8 ${i < Math.floor(restaurant.rating) ? "text-yellow-400" : "text-gray-300"}`}
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ))}
+                </div>
+                <span class="ml-3 text-2xl font-semibold text-gray-700">
+                  {restaurant.rating}/5
+                </span>
               </div>
-              <span class="ml-3 text-2xl font-semibold text-gray-700">
-                {restaurant.rating}/5
-              </span>
-            </div>
-          )}
+            )
+          }
 
           <!-- Main CTA for Reviews -->
-          <div class="max-w-4xl mx-auto bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl">
+          <div
+            class="max-w-4xl mx-auto bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl"
+          >
             <h2 class="text-3xl font-bold text-white mb-4">
               🍴 ¡Comparte tu Experiencia!
             </h2>
             <p class="text-orange-100 text-lg mb-6 max-w-xl mx-auto">
-              ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros comensales. 
-              ¡Cuéntanos qué tal estuvo tu experiencia!
+              ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros
+              comensales. ¡Cuéntanos qué tal estuvo tu experiencia!
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button 
+            <div
+              class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
+              <button
                 onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
                 class="bg-white text-orange-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 ⭐ Escribir Reseña
               </button>
-              <span class="text-orange-200 text-sm">
-                Solo toma 2 minutos
-              </span>
+              <span class="text-orange-200 text-sm"> Solo toma 2 minutos </span>
             </div>
-          </div>        </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Menu Section -->
-    {!menu ? (
-      <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center mb-8">
-        <div class="text-6xl mb-4">🚀</div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">
-          ¡Menú Digital en Construcción!
-        </h3>
-        <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
-          Estamos trabajando para traerte el menú completo de {restaurant.name} muy pronto. 
-          Mientras tanto, ¡tu reseña nos ayuda a mejorar!
-        </p>
-        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
-          <p class="text-orange-800 font-semibold">
-            🎯 ¡Sé de los primeros en calificar!
+    {
+      !menu && (
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center mb-8">
+          <div class="text-6xl mb-4">🚀</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">
+            ¡Menú Digital en Construcción!
+          </h3>
+          <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+            Estamos trabajando para traerte el menú completo de{" "}
+            {restaurant.name} muy pronto. Mientras tanto, ¡tu reseña nos ayuda a
+            mejorar!
           </p>
-        </div>
-      </div>
-    ) : (
-      <div class="bg-white">
-        {menu.image && (
-          <div class="max-w-6xl mx-auto px-4 py-8">
-            <img 
-              src={menu.image} 
-              alt="Menu Image" 
-              class="w-full h-auto rounded-lg shadow-lg mb-8"
-            />
+          <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
+            <p class="text-orange-800 font-semibold">
+              🎯 ¡Sé de los primeros en calificar!
+            </p>
           </div>
-        )}
-      </div>
-    )}
+        </div>
+      )
+    }
+
+    <div class="bg-white space-y-4">
+      {categoriesData && 
+        categoriesData.map(category => (
+          category.image && (
+            <div class="max-w-6xl mx-auto ">
+              <h3 class="text-4xl font-bold">{category.name}</h3>
+              <img
+                src={category.image}
+                alt="Menu Image"
+                class="w-full h-auto rounded-lg shadow-lg"
+              />
+            </div>
+          )
+        ))}
+    </div>
     <div class="max-w-4xl mx-auto px-4 py-8">
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
         <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">
           📍 Información del Restaurante
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {restaurant.address && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg class="w-5 h-5 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">Dirección</div>
-                <div class="text-sm text-gray-900">{restaurant.address}</div>
+          {
+            restaurant.address && (
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <svg
+                  class="w-5 h-5 mr-3 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-semibold">
+                    Dirección
+                  </div>
+                  <div class="text-sm text-gray-900">{restaurant.address}</div>
+                </div>
               </div>
-            </div>
-          )}
-          
-          {restaurant.hours && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg class="w-5 h-5 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">Horarios</div>
-                <div class="text-sm text-gray-900">{restaurant.hours}</div>
+            )
+          }
+
+          {
+            restaurant.hours && (
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <svg
+                  class="w-5 h-5 mr-3 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-semibold">
+                    Horarios
+                  </div>
+                  <div class="text-sm text-gray-900">{restaurant.hours}</div>
+                </div>
               </div>
-            </div>
-          )}
-          
-          {restaurant.priceRange && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg class="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">Precios</div>
-                <div class="text-sm text-gray-900">{restaurant.priceRange}</div>
+            )
+          }
+
+          {
+            restaurant.priceRange && (
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <svg
+                  class="w-5 h-5 mr-3 text-blue-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                  />
+                </svg>
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-semibold">
+                    Precios
+                  </div>
+                  <div class="text-sm text-gray-900">
+                    {restaurant.priceRange}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-          
-          {restaurant.type && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg class="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">Tipo</div>
-                <div class="text-sm text-gray-900">{restaurant.type}</div>
+            )
+          }
+
+          {
+            restaurant.type && (
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <svg
+                  class="w-5 h-5 mr-3 text-purple-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                  />
+                </svg>
+                <div>
+                  <div class="text-xs text-gray-500 uppercase font-semibold">
+                    Tipo
+                  </div>
+                  <div class="text-sm text-gray-900">{restaurant.type}</div>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          }
         </div>
       </div>
 
       <!-- Secondary CTA Section -->
-      <div class="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8">
-        <h3 class="text-2xl font-bold mb-4">
-          💬 ¿Ya visitaste este lugar?
-        </h3>
+      <div
+        class="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8"
+      >
+        <h3 class="text-2xl font-bold mb-4">💬 ¿Ya visitaste este lugar?</h3>
         <p class="text-blue-100 mb-6">
-          Ayuda a otros visitantes compartiendo tu experiencia. Tu opinión cuenta mucho para la comunidad.
+          Ayuda a otros visitantes compartiendo tu experiencia. Tu opinión
+          cuenta mucho para la comunidad.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button 
+          <button
             onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
             class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
           >
             📝 Calificar ahora
           </button>
-          <a 
-            href="/contact" 
+          <a
+            href="/contact"
             class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
           >
             📞 Contactar restaurante
           </a>
         </div>
       </div>
-
     </div>
   </div>
 </RestaurantLayout>

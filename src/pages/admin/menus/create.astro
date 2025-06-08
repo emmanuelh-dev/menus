@@ -69,13 +69,12 @@ if (Astro.request.method === "POST") {  try {
       if (formData.get(`day_${i}`)) {
         availabilityDays.push(i);
       }
-    }
-
-    const menuData = {
+    }    const menuData = {
       restaurant_id: parseInt(formData.get("restaurant_id") as string),
       name: formData.get("name") as string,
       menu: formData.get("menu") as string || null,
       description: formData.get("description") as string,
+      address: formData.get("address") as string || null,
       menu_type: formData.get("menu_type") as string,
       image: imageUrl,
       is_active: formData.get("is_active") === "on",
@@ -183,14 +182,26 @@ if (Astro.request.method === "POST") {  try {
         </div>        <div>
           <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
             Descripción
-          </label>
-          <textarea
+          </label>          <textarea
             id="description"
             name="description"
             rows="3"
             placeholder="Descripción del menú..."
             class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           ></textarea>
+        </div>
+
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+            Dirección
+          </label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            placeholder="Ej: Calle Principal 123, Colonia Centro"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
         </div>        <div>
           <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
             Imagen del Menú
