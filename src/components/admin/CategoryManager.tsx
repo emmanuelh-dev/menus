@@ -26,6 +26,8 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -34,7 +36,6 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
     display_order: 0,
     is_active: true,
   });
-
   const showMessage = (message: string, isError: boolean = false) => {
     if (isError) {
       setError(message);
@@ -47,6 +48,36 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
       setError(null);
       setSuccess(false);
     }, 3000);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al subir la imagen');
+    }
+
+    const result = await response.json();
+    return result.url;
   };
 
   const loadCategories = async () => {
@@ -63,17 +94,23 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
       showMessage('Error de red al cargar categorías', true);
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let imageUrl = formData.image;
+
+      // Subir nueva imagen si se seleccionó una
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
       const categoryData = {
         restaurant_id: restaurantId,
         name: formData.name,
         description: formData.description || null,
-        image: formData.image || null,
+        image: imageUrl || null,
         parent_id: formData.parent_id ? parseInt(formData.parent_id) : null,
         display_order: formData.display_order,
         is_active: formData.is_active,
@@ -99,6 +136,8 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
           display_order: 0,
           is_active: true,
         });
+        setImageFile(null);
+        setImagePreview('');
         // Recargar categorías
         await loadCategories();
       } else {
@@ -193,21 +232,30 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
                 placeholder="Descripción de la categoría..."
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               />
-            </div>
-
-            <div>
+            </div>            <div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-                URL de Imagen
+                Imagen de la Categoría
               </label>
+              
+              {imagePreview && (
+                <div className="mb-3">
+                  <img
+                    src={imagePreview}
+                    alt="Vista previa"
+                    className="w-24 h-24 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
+              
               <input
-                type="url"
+                type="file"
                 id="image"
                 name="image"
-                value={formData.image}
-                onChange={handleInputChange}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
               />
+              <p className="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
             </div>
 
             <div>

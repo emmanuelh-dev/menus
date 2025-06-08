@@ -21,7 +21,8 @@ const { data: menu } = await supabase
   .select("*")
   .eq("restaurant_id", restaurant?.id)
   .eq("is_active", true)
-  .single();
+
+  console.log(menu)
 
 const { data: categoriesData } = await supabase
   .from("menu_categories")

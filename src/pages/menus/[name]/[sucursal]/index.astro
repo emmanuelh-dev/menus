@@ -1,16 +1,14 @@
 ---
-const {name} = Astro.params;
-import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
-import {getRestaurantByName, supabase} from "../../../lib/supabase";
+const {name, sucursal} = Astro.params;
+console.log("Restaurant Name:", Astro.params);
+
+import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
+import {getRestaurantByName, supabase} from "../../../../lib/supabase";
 
 if (!name) {
   throw new Error("No se ha especificado el nombre del restaurante");
 }
 const menuData = await getRestaurantByName({name});
-
-if (!menuData || menuData.length === 0) {
-  throw new Error(`No se encontró el restaurante: ${name}`);
-}
 
 const restaurant = menuData[0];
 
@@ -19,8 +17,15 @@ const { data: menu } = await supabase
   .select("*")
   .eq("restaurant_id", restaurant?.id)
   .eq("is_active", true)
+  .eq("menu", sucursal)
+  .single();
 
-  console.log(menu)
+
+  console.log("Menu Data:", menu);
+// Verificar que existe el restaurante
+if (!menuData || menuData.length === 0) {
+  throw new Error(`No se encontró el restaurante: ${name}`);
+}
 
 const schemaEnrichment = {
   address: restaurant.address ? {
@@ -51,6 +56,7 @@ const schemaEnrichment = {
   backgroundColor="bg-white"
   schemaEnrichment={schemaEnrichment}  type="Restaurant"
 >
+  <!-- Custom Styles for Enhanced Review Focus -->
   <style>    .hover-lift {
       transition: all 0.3s ease;
     }
@@ -70,7 +76,7 @@ const schemaEnrichment = {
   <div class="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
     <!-- Hero Section - Focused on Review Invitation -->
     <div class="bg-white shadow-lg">
-      <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class=" mx-auto px-4 py-12">
         <div class="text-center">
           {restaurant.image && (
             <div class="mb-8">
@@ -106,7 +112,7 @@ const schemaEnrichment = {
           )}
 
           <!-- Main CTA for Reviews -->
-          <div class="bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl">
+          <div class="max-w-4xl mx-auto bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl">
             <h2 class="text-3xl font-bold text-white mb-4">
               🍴 ¡Comparte tu Experiencia!
             </h2>
@@ -125,12 +131,40 @@ const schemaEnrichment = {
                 Solo toma 2 minutos
               </span>
             </div>
-          </div>
-        </div>
+          </div>        </div>
       </div>
     </div>
 
-    <!-- Restaurant Info - Compact Section -->
+    <!-- Menu Section -->
+    {!menu ? (
+      <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center mb-8">
+        <div class="text-6xl mb-4">🚀</div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">
+          ¡Menú Digital en Construcción!
+        </h3>
+        <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+          Estamos trabajando para traerte el menú completo de {restaurant.name} muy pronto. 
+          Mientras tanto, ¡tu reseña nos ayuda a mejorar!
+        </p>
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
+          <p class="text-orange-800 font-semibold">
+            🎯 ¡Sé de los primeros en calificar!
+          </p>
+        </div>
+      </div>
+    ) : (
+      <div class="bg-white">
+        {menu.image && (
+          <div class="max-w-6xl mx-auto px-4 py-8">
+            <img 
+              src={menu.image} 
+              alt="Menu Image" 
+              class="w-full h-auto rounded-lg shadow-lg mb-8"
+            />
+          </div>
+        )}
+      </div>
+    )}
     <div class="max-w-4xl mx-auto px-4 py-8">
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
         <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">
@@ -189,7 +223,7 @@ const schemaEnrichment = {
       </div>
 
       <!-- Secondary CTA Section -->
-      <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8">
+      <div class="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8">
         <h3 class="text-2xl font-bold mb-4">
           💬 ¿Ya visitaste este lugar?
         </h3>
@@ -210,88 +244,8 @@ const schemaEnrichment = {
             📞 Contactar restaurante
           </a>
         </div>
-      </div>      <!-- Available Menus/Branches Section -->
-      {menu && menu.length > 0 ? (
-        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
-            🏪 Sucursales Disponibles
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menu.map((menuItem) => (
-              <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-200 hover-lift">
-                <div class="flex items-center mb-4">
-                  <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-2 4h2M7 7h.01M7 11h.01M7 15h.01"></path>
-                    </svg>
-                  </div>
-                  <h4 class="text-lg font-semibold text-gray-900">{menuItem.name}</h4>
-                </div>
-                
-                {menuItem.description && (
-                  <p class="text-gray-600 mb-4 text-sm">{menuItem.description}</p>
-                )}
-                
-                <div class="space-y-2 text-sm">
-                  <div class="flex items-center text-gray-500">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                    <span class="capitalize">{menuItem.menu_type}</span>
-                  </div>
-                  
-                  {menuItem.availability_days && (
-                    <div class="flex items-center text-gray-500">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                      <span>{menuItem.availability_days}</span>
-                    </div>
-                  )}
-                  
-                  {menuItem.availability_start && menuItem.availability_end && (
-                    <div class="flex items-center text-gray-500">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <span>{menuItem.availability_start} - {menuItem.availability_end}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div class="mt-6">
-                  <a 
-                    href={`/menus/${name}/${menuItem.menu}`}
-                    class="w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center"
-                  >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    Ver Menú
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <!-- Menu Coming Soon -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div class="text-6xl mb-4">🚀</div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-4">
-            ¡Menú Digital en Construcción!
-          </h3>
-          <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Estamos trabajando para traerte el menú completo de {restaurant.name} muy pronto. 
-            Mientras tanto, ¡tu reseña nos ayuda a mejorar!
-          </p>
-          <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
-            <p class="text-orange-800 font-semibold">
-              🎯 ¡Sé de los primeros en calificar!
-            </p>
-          </div>
-        </div>
-      )}
+      </div>
+
     </div>
   </div>
 </RestaurantLayout>

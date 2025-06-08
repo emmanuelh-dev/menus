@@ -32,7 +32,38 @@ const { data: restaurants } = await supabase
 // Procesar formulario
 if (Astro.request.method === "POST") {  try {
     const formData = await Astro.request.formData();
-      // Procesar días de disponibilidad
+    
+    // Manejar subida de imagen
+    let imageUrl: string | null = null;
+    const imageFile = formData.get('image') as File;
+      if (imageFile && imageFile.size > 0) {
+      // Crear FormData para la imagen
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', imageFile);
+      
+      // Construir URL absoluta para la API
+      const uploadUrl = new URL('/api/upload', Astro.url.origin);
+      
+      // Subir imagen usando la API existente
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'POST',
+        body: uploadFormData,
+        headers: {
+          'Cookie': Astro.request.headers.get('cookie') || ''
+        }
+      });
+      
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.url;
+      } else {
+        const errorData = await uploadResponse.json();
+        error = errorData.error || 'Error al subir la imagen';
+        throw new Error(error);
+      }
+    }
+    
+    // Procesar días de disponibilidad
     const availabilityDays: number[] = [];
     for (let i = 0; i <= 6; i++) {
       if (formData.get(`day_${i}`)) {
@@ -43,8 +74,10 @@ if (Astro.request.method === "POST") {  try {
     const menuData = {
       restaurant_id: parseInt(formData.get("restaurant_id") as string),
       name: formData.get("name") as string,
+      menu: formData.get("menu") as string || null,
       description: formData.get("description") as string,
       menu_type: formData.get("menu_type") as string,
+      image: imageUrl,
       is_active: formData.get("is_active") === "on",
       start_date: formData.get("start_date") as string || null,
       end_date: formData.get("end_date") as string || null,
@@ -79,10 +112,8 @@ if (Astro.request.method === "POST") {  try {
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
         Error: {error}
       </div>
-    )}
-
-    <div class="bg-white shadow rounded-lg p-6">
-      <form method="POST" class="space-y-6">
+    )}    <div class="bg-white shadow rounded-lg p-6">
+      <form method="POST" enctype="multipart/form-data" class="space-y-6">
         <!-- Información básica -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -137,8 +168,19 @@ if (Astro.request.method === "POST") {  try {
             class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
-
         <div>
+          <label for="menu" class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre corto *
+          </label>
+          <input
+            type="text"
+            id="menu"
+            name="menu"
+            required
+            placeholder="Ej: Menú Principal, Menú Infantil, etc."
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>        <div>
           <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
             Descripción
           </label>
@@ -149,6 +191,28 @@ if (Astro.request.method === "POST") {  try {
             placeholder="Descripción del menú..."
             class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           ></textarea>
+        </div>        <div>
+          <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+            Imagen del Menú
+          </label>
+          
+          <div id="imagePreview" class="hidden mb-4">
+            <img 
+              id="previewImg" 
+              alt="Vista previa" 
+              class="w-32 h-32 object-cover rounded-lg shadow-sm"
+            />
+            <p class="text-sm text-gray-500 mt-1">Vista previa</p>
+          </div>
+          
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          />
+          <p class="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
         </div>
 
         <!-- Configuración de disponibilidad -->
@@ -282,8 +346,32 @@ if (Astro.request.method === "POST") {  try {
           >
             Crear Menú
           </button>
-        </div>
-      </form>
+        </div>      </form>
     </div>
   </div>
+  <script>
+    // Image preview functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const imageInput = document.getElementById('image') as HTMLInputElement;
+      const imagePreview = document.getElementById('imagePreview') as HTMLElement;
+      const previewImg = document.getElementById('previewImg') as HTMLImageElement;
+
+      imageInput?.addEventListener('change', function(e) {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            if (e.target?.result && previewImg) {
+              previewImg.src = e.target.result as string;
+              imagePreview?.classList.remove('hidden');
+            }
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview?.classList.add('hidden');
+        }
+      });
+    });
+  </script>
 </AdminLayout>

@@ -83,8 +83,10 @@ CREATE TABLE menus (
     id SERIAL PRIMARY KEY,
     restaurant_id INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL, -- ej: "Menú Principal", "Menú Infantil", "Menú del Día"
+    menu VARCHAR(255), -- nombre corto del menú
     description TEXT,
     menu_type VARCHAR(50) DEFAULT 'main', -- 'main', 'kids', 'daily', 'drinks', etc.
+    image TEXT, -- URL de la imagen del menú
     is_active BOOLEAN DEFAULT true,
     start_date DATE,
     end_date DATE,
