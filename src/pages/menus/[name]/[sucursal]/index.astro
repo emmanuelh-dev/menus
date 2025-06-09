@@ -258,13 +258,13 @@ const schemaEnrichment = {
                         class="w-full h-64 object-cover rounded-lg shadow-lg"
                       />
                     </div>
-                  )}                  {/* Menu Items Grid */}
+                  )} 
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {category.menu_items.map((item) => (
                       <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
                         {/* Item Image */}
                         {item.image && (
-                          <div class="h-48 overflow-hidden relative">
+                          <div class="h-64 overflow-hidden relative">
                             <img
                               src={item.image}
                               alt={item.name}
@@ -280,8 +280,8 @@ const schemaEnrichment = {
                         )}
                         
                         {/* Item Content */}
-                        <div class="p-6">
-                          <div class="flex justify-between items-start mb-3">
+                        <div class="p-2">
+                          <div class="flex justify-between items-start mb-2">
                             <h4 class="text-xl font-bold text-gray-900 flex-1 pr-2">
                               {item.name}
                             </h4>
@@ -294,7 +294,7 @@ const schemaEnrichment = {
 
                           {/* Description */}
                           {item.description && (
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                            <p class="text-gray-600 text-sm line-clamp-3">
                               {item.description}
                             </p>
                           )}
