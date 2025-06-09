@@ -1,6 +1,5 @@
 ---
 const { name, sucursal } = Astro.params;
-console.log("Restaurant Name:", Astro.params);
 
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import { getRestaurantByName, supabase } from "../../../../lib/supabase";
@@ -12,16 +11,29 @@ const menuData = await getRestaurantByName({ name });
 
 const restaurant = menuData[0];
 
-console.log("Restaurant Data:", restaurant);
-
 const { data: menu } = await supabase
   .from("menus")
   .select("*")
   .eq("restaurant_id", restaurant?.id)
-  .eq("is_active", true)
   .eq("menu", sucursal)
+  .eq("is_active", true)
   .single();
-console.log("Menu Data:", menu);
+
+console.log("Menu data:", menu);
+
+const { data: categoriesData } = await supabase
+  .from("menu_categories")
+  .select(
+    `
+    *,
+    menu_items (
+      *
+    )
+  `
+  )
+  .eq("restaurant_id", restaurant.id)
+  .eq("is_active", true)
+  .order("display_order");
 
 if (!menuData || menuData.length === 0) {
   throw new Error(`No se encontró el restaurante: ${name}`);
@@ -30,7 +42,7 @@ if (!menuData || menuData.length === 0) {
 const schemaEnrichment = {
   address: menu?.address
     ? {
-        streetAddress: (menu.address || restaurant.address),
+        streetAddress: menu.address || restaurant.address,
         addressLocality: "Ciudad",
         addressCountry: "MX",
       }
@@ -49,20 +61,6 @@ const schemaEnrichment = {
       }
     : undefined,
 };
-
-const { data: categoriesData } = await supabase
-  .from("menu_categories")
-  .select(`
-    *,
-    menu_items (
-      *
-    )
-  `)
-  .eq("restaurant_id", restaurant.id)
-  .eq("is_active", true)
-  .order("display_order");
-
-
 ---
 
 <RestaurantLayout
@@ -74,7 +72,6 @@ const { data: categoriesData } = await supabase
   schemaEnrichment={schemaEnrichment}
   type="Restaurant"
 >
-  <!-- Custom Styles for Enhanced Review Focus -->
   <style>
     .hover-lift {
       transition: all 0.3s ease;
@@ -164,14 +161,15 @@ const { data: categoriesData } = await supabase
     </div>
 
     <!-- Menu Section -->
-    { !menu && (
+    {
+      !menu && (
         <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center mb-8">
           <div class="text-6xl mb-4">🚀</div>
           <h3 class="text-2xl font-bold text-gray-900 mb-4">
             ¡Menú Digital en Construcción!
           </h3>
           <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Estamos trabajando para traerte el menú completo de 
+            Estamos trabajando para traerte el menú completo de
             {restaurant.name} muy pronto. Mientras tanto, ¡tu reseña nos ayuda a
             mejorar!
           </p>
@@ -185,19 +183,22 @@ const { data: categoriesData } = await supabase
     }
 
     <div class="bg-white space-y-4">
-      {categoriesData && 
-        categoriesData.map(category => (
-          category.image && (
-            <div class="max-w-6xl mx-auto">
-              <h3 class="text-4xl font-bold mb-4">{category.name}</h3>
-              <img
-                src={category.image}
-                alt="Menu Image"
-                class="w-full h-auto lg:rounded-lg shadow-lg"
-              />
-            </div>
+      {
+        categoriesData &&
+          categoriesData.map(
+            (category) =>
+              category.image && (
+                <div class="max-w-6xl mx-auto">
+                  <h3 class="text-4xl font-bold mb-4">{category.name}</h3>
+                  <img
+                    src={category.image}
+                    alt="Menu Image"
+                    class="w-full h-auto lg:rounded-lg shadow-lg"
+                  />
+                </div>
+              )
           )
-        ))}
+      }
     </div>
     <div class="max-w-4xl mx-auto px-4 py-8">
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
