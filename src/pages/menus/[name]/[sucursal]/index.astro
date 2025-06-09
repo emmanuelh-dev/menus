@@ -124,15 +124,13 @@ const schemaEnrichment = {
 
     .menu-item-card:hover {
       transform: translateY(-4px) scale(1.02);
-    }
-
-    /* Price styling */
+    }    /* Price styling */
     .price-highlight {
-      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-    }    /* Modal styles */
+    }/* Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -265,8 +263,7 @@ const schemaEnrichment = {
       });
     });
   </script>
-
-  <div class="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+  <div class="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-50">
     <!-- Hero Section - Focused on Review Invitation -->
     <div class="bg-white shadow-lg">
       <div class="mx-auto px-4 py-12">
@@ -277,7 +274,7 @@ const schemaEnrichment = {
                 <img
                   src={restaurant.image}
                   alt={restaurant.name}
-                  class="w-48 h-48  mx-auto rounded-full shadow-xl border-4 border-orange-200 object-cover"
+                  class="w-48 h-48  mx-auto rounded-full shadow-xl border-4 border-amber-200 object-cover"
                 />
               </div>
             )
@@ -307,29 +304,27 @@ const schemaEnrichment = {
                 </span> */}
               </div>
             )
-          }
-
-          <!-- Main CTA for Reviews -->
+          }          <!-- Main CTA for Reviews -->
           <div
-            class="max-w-4xl mx-auto bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl"
+            class="max-w-4xl mx-auto bg-gradient-to-r from-amber-700 to-yellow-700 p-8 rounded-2xl shadow-2xl"
           >
             <h2 class="text-3xl font-bold text-white mb-4">
-              🍴 ¡Comparte tu Experiencia!
+              ☕ ¡Comparte tu Experiencia Cafetera!
             </h2>
-            <p class="text-orange-100 text-lg mb-6 max-w-xl mx-auto">
+            <p class="text-amber-100 text-lg mb-6 max-w-xl mx-auto">
               ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros
-              comensales. ¡Cuéntanos qué tal estuvo tu experiencia!
+              amantes del café. ¡Cuéntanos qué tal estuvo tu experiencia!
             </p>
             <div
               class="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
               <button
                 onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-                class="bg-white text-orange-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                class="bg-white text-amber-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-amber-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 ⭐ Escribir Reseña
               </button>
-              <span class="text-orange-200 text-sm"> Solo toma 2 minutos </span>
+              <span class="text-amber-200 text-sm"> Solo toma 2 minutos </span>
             </div>
           </div>
         </div>
@@ -348,9 +343,8 @@ const schemaEnrichment = {
             Estamos trabajando para traerte el menú completo de
             {restaurant.name} muy pronto. Mientras tanto, ¡tu reseña nos ayuda a
             mejorar!
-          </p>
-          <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
-            <p class="text-orange-800 font-semibold">
+          </p>          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-md mx-auto">
+            <p class="text-amber-800 font-semibold">
               🎯 ¡Sé de los primeros en calificar!
             </p>
           </div>
@@ -517,10 +511,9 @@ const schemaEnrichment = {
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {
-            restaurant.address && (
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            restaurant.address && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
                 <svg
-                  class="w-5 h-5 mr-3 text-orange-500"
+                  class="w-5 h-5 mr-3 text-amber-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -549,10 +542,9 @@ const schemaEnrichment = {
           }
 
           {
-            restaurant.hours && (
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            restaurant.hours && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
                 <svg
-                  class="w-5 h-5 mr-3 text-green-500"
+                  class="w-5 h-5 mr-3 text-yellow-700"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -575,10 +567,9 @@ const schemaEnrichment = {
           }
 
           {
-            restaurant.priceRange && (
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            restaurant.priceRange && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
                 <svg
-                  class="w-5 h-5 mr-3 text-blue-500"
+                  class="w-5 h-5 mr-3 text-amber-700"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -603,10 +594,9 @@ const schemaEnrichment = {
           }
 
           {
-            restaurant.type && (
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            restaurant.type && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
                 <svg
-                  class="w-5 h-5 mr-3 text-purple-500"
+                  class="w-5 h-5 mr-3 text-yellow-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

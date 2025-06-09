@@ -179,9 +179,8 @@ if (schemaEnrichment.suitableForDiet) {
 }
 ---
 
-<!doctype html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link
@@ -216,11 +215,10 @@ if (schemaEnrichment.suitableForDiet) {
     <!-- Schema.org for Google -->
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-    <!-- Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Google Fonts for Restaurant Feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- <script 
          async 
@@ -256,7 +254,7 @@ if (schemaEnrichment.suitableForDiet) {
       src="https://cloud.umami.is/script.js"
       data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
   </head>
-  <body>
+  <body class="restaurant-typography">
     <Header textWhite={textWhite} backgroundColor={backgroundColor} />
     <slot />
     {
@@ -273,5 +271,29 @@ if (schemaEnrichment.suitableForDiet) {
     }
     <ScrollTopAndComment client:only />
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
+
+    <style>
+      .restaurant-typography {
+        font-family: 'Lora', serif;
+      }
+      
+      .restaurant-typography h1,
+      .restaurant-typography h2,
+      .restaurant-typography h3,
+      .restaurant-typography h4 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+      }
+      
+      .restaurant-brand {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+      }
+      
+      .menu-item-name {
+        font-family: 'Playfair Display', serif;
+        font-weight: 500;
+      }
+    </style>
   </body>
 </html>
