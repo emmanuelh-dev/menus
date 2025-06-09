@@ -2,7 +2,6 @@
 import RecommendationButton from "../../../../components/RecommendationButton";
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import CategoryNavigation from "../../../../components/CategoryNavigation";
-import FloatingCategoryMenu from "../../../../components/FloatingCategoryMenu";
 import { supabase } from "../../../../lib/supabase";
 import { menu } from "./menu";
 
@@ -152,8 +151,6 @@ const schemaEnrichment = {
         backgroundColor="bg-gray-900" 
         textColor="text-white" 
     />
-    
-    <RecommendationButton client:load menuItems={menuItems} menuText={menu} restaurantName={restaurantData.name} />
     <!-- HEADER -->
     <div class="bg-[#ebebeb]">
         <div class="max-w-4xl mx-auto">
