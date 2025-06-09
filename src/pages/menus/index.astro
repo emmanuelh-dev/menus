@@ -116,11 +116,21 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
                         data-type={restaurant.type}
                     >
                         <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
-                            <img
-                                src={restaurant.image}
-                                alt={restaurant.name}
-                                class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
-                            />
+                            {restaurant.menu ? (
+                                <a href={'/menus/' + restaurant.menu}>
+                                    <img
+                                        src={restaurant.image}
+                                        alt={restaurant.name}
+                                        class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                                    />
+                                </a>
+                            ) : (
+                                <img
+                                    src={restaurant.image}
+                                    alt={restaurant.name}
+                                    class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                                />
+                            )}
                         </div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">
                             <a href={'/menus/'+ restaurant.menu}>{restaurant.name}</a>

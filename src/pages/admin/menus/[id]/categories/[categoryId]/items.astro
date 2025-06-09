@@ -72,6 +72,36 @@ if (Astro.request.method === "POST") {
   try {
     const formData = await Astro.request.formData();
     
+    // Manejar subida de imagen
+    let imageUrl: string | null = null;
+    const imageFile = formData.get('image') as File;
+    if (imageFile && imageFile.size > 0) {
+      // Crear FormData para la imagen
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', imageFile);
+      
+      // Construir URL absoluta para la API
+      const uploadUrl = new URL('/api/upload', Astro.url.origin);
+      
+      // Subir imagen usando la API existente
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'POST',
+        body: uploadFormData,
+        headers: {
+          'Cookie': Astro.request.headers.get('cookie') || ''
+        }
+      });
+        if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.url;
+      } else {
+        const errorData = await uploadResponse.json();
+        const uploadError = errorData.error || 'Error al subir la imagen';
+        error = uploadError;
+        throw new Error(uploadError);
+      }
+    }
+    
     // Procesar ingredientes y alérgenos como arrays
     const ingredientsText = formData.get("ingredients") as string;
     const allergensText = formData.get("allergens") as string;
@@ -85,7 +115,7 @@ if (Astro.request.method === "POST") {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       base_price: parseFloat(formData.get("base_price") as string),
-      image: formData.get("image") as string || null,
+      image: imageUrl,
       ingredients: ingredients.length > 0 ? ingredients : null,
       allergens: allergens.length > 0 ? allergens : null,
       calories: formData.get("calories") ? parseInt(formData.get("calories") as string) : null,
@@ -99,7 +129,7 @@ if (Astro.request.method === "POST") {
       is_spicy: formData.get("is_spicy") === "on",
       spicy_level: formData.get("spicy_level") ? parseInt(formData.get("spicy_level") as string) : 0,
       stock_quantity: formData.get("stock_quantity") ? parseInt(formData.get("stock_quantity") as string) : null,
-    };    const { error: insertError } = await supabase
+    };const { error: insertError } = await supabase
       .from("menu_items")
       .insert([itemData]);
 
@@ -144,7 +174,7 @@ if (Astro.request.method === "POST") {
       <div class="xl:col-span-1">
         <div class="bg-white shadow rounded-lg p-6 sticky top-6">
 
-          <form method="POST" class="space-y-4">
+          <form method="POST" enctype="multipart/form-data" class="space-y-4">
                       <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-medium text-gray-900 mb-4">Nuevo Platillo</h2>
             <div>
@@ -197,19 +227,25 @@ if (Astro.request.method === "POST") {
                 placeholder="0.00"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               />
-            </div>
-
-            <div>
+            </div>            <div>
               <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                URL de Imagen
+                Imagen del Platillo
               </label>
+              
+              <!-- Vista previa de la imagen -->
+              <div id="imagePreview" class="hidden mb-3">
+                <img id="previewImg" src="" alt="Vista previa" class="w-32 h-32 object-cover rounded-lg" />
+                <p class="text-sm text-gray-500 mt-1">Vista previa de la imagen</p>
+              </div>
+              
               <input
-                type="url"
+                type="file"
                 id="image"
                 name="image"
-                placeholder="https://ejemplo.com/platillo.jpg"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                accept="image/*"
+                class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
               />
+              <p class="text-xs text-gray-500 mt-1">PNG, JPG o WEBP (máx. 2MB)</p>
             </div>
 
             <div>
@@ -475,6 +511,29 @@ if (Astro.request.method === "POST") {
 </AdminLayout>
 
 <script>
+  // Funcionalidad de previsualización de imagen
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+
+    imageInput?.addEventListener('change', function(e) {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          if (e.target?.result && previewImg) {
+            (previewImg as HTMLImageElement).src = e.target.result as string;
+            imagePreview?.classList.remove('hidden');
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview?.classList.add('hidden');
+      }
+    });
+  });
+
   function deleteItem(itemId) {
     if (confirm('¿Estás seguro de que quieres eliminar este platillo?')) {
       window.location.href = `/admin/menu-items/delete/${itemId}`;
