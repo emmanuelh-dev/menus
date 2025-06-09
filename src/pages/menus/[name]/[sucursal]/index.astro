@@ -20,7 +20,6 @@ const { data: menu } = await supabase
   .eq("is_active", true)
   .single();
 
-
 const { data: categoriesData } = await supabase
   .from("menu_categories")
   .select(
@@ -36,11 +35,12 @@ const { data: categoriesData } = await supabase
   .order("display_order");
 
 // Crear lista de categorías para navegación
-const navigationCategories = categoriesData?.map((category) => ({
-  id: `category-${category.id}`,
-  name: category.name,
-  description: category.description
-})) || [];
+const navigationCategories =
+  categoriesData?.map((category) => ({
+    id: `category-${category.id}`,
+    name: category.name,
+    description: category.description,
+  })) || [];
 
 if (!menuData || menuData.length === 0) {
   throw new Error(`No se encontró el restaurante: ${name}`);
@@ -80,11 +80,11 @@ const schemaEnrichment = {
   type="Restaurant"
 >
   <!-- Componentes de navegación -->
-  <CategoryNavigation 
-    client:load 
-    categories={navigationCategories} 
-    backgroundColor="bg-white" 
-    textColor="text-gray-700" 
+  <CategoryNavigation
+    client:load
+    categories={navigationCategories}
+    backgroundColor="bg-white"
+    textColor="text-gray-700"
   /><style>
     .hover-lift {
       transition: all 0.3s ease;
@@ -108,7 +108,7 @@ const schemaEnrichment = {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-    }    /* Mobile-first menu images */
+    } /* Mobile-first menu images */
 
     @media (min-width: 769px) {
       .menu-image-mobile {
@@ -124,13 +124,13 @@ const schemaEnrichment = {
 
     .menu-item-card:hover {
       transform: translateY(-4px) scale(1.02);
-    }    /* Price styling */
+    } /* Price styling */
     .price-highlight {
       background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-    }/* Modal styles */
+    } /* Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -186,13 +186,23 @@ const schemaEnrichment = {
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes zoomIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     .clickable-image {
@@ -214,10 +224,12 @@ const schemaEnrichment = {
   </div>
   <script>
     // Modal functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('imageModal') as HTMLElement;
-      const modalImage = document.getElementById('modalImage') as HTMLImageElement;
-      const closeBtn = document.querySelector('.modal-close') as HTMLElement;
+    document.addEventListener("DOMContentLoaded", function () {
+      const modal = document.getElementById("imageModal") as HTMLElement;
+      const modalImage = document.getElementById(
+        "modalImage"
+      ) as HTMLImageElement;
+      const closeBtn = document.querySelector(".modal-close") as HTMLElement;
 
       if (!modal || !modalImage || !closeBtn) return;
 
@@ -225,21 +237,21 @@ const schemaEnrichment = {
       function openModal(imageSrc: string, imageAlt: string) {
         modalImage.src = imageSrc;
         modalImage.alt = imageAlt;
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        modal.classList.add("show");
+        document.body.style.overflow = "hidden";
       }
 
       // Function to close modal
       function closeModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
+        modal.classList.remove("show");
+        document.body.style.overflow = "auto";
       }
 
       // Add click listeners to all clickable images
-      const clickableImages = document.querySelectorAll('.clickable-image');
-      clickableImages.forEach(function(img) {
+      const clickableImages = document.querySelectorAll(".clickable-image");
+      clickableImages.forEach(function (img) {
         const imageElement = img as HTMLImageElement;
-        imageElement.addEventListener('click', function() {
+        imageElement.addEventListener("click", function () {
           if (this.src && this.alt !== undefined) {
             openModal(this.src, this.alt);
           }
@@ -247,17 +259,17 @@ const schemaEnrichment = {
       });
 
       // Close modal events
-      closeBtn.addEventListener('click', closeModal);
-      
-      modal.addEventListener('click', function(e) {
+      closeBtn.addEventListener("click", closeModal);
+
+      modal.addEventListener("click", function (e) {
         if (e.target === modal) {
           closeModal();
         }
       });
 
       // Close with Escape key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.classList.contains('show')) {
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && modal.classList.contains("show")) {
           closeModal();
         }
       });
@@ -304,14 +316,19 @@ const schemaEnrichment = {
                 </span> */}
               </div>
             )
-          }          <!-- Main CTA for Reviews -->
+          }
+          <!-- Main CTA for Reviews -->
           <div
-            class="max-w-4xl mx-auto bg-gradient-to-r from-amber-700 to-yellow-700 p-8 rounded-2xl shadow-2xl"
+            class={`max-w-4xl mx-auto bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl ${restaurant.type === "cafeteria" ? "from-amber-100 to-yellow-100 border-2 border-amber-200" : ""}`}
           >
-            <h2 class="text-3xl font-bold text-white mb-4">
+            <h2
+              class={`text-3xl font-bold mb-4 ${restaurant.type === "cafeteria" ? "text-amber-900" : "text-white"}`}
+            >
               ☕ ¡Comparte tu Experiencia Cafetera!
             </h2>
-            <p class="text-amber-100 text-lg mb-6 max-w-xl mx-auto">
+            <p
+              class={`text-lg mb-6 max-w-xl mx-auto ${restaurant.type === "cafeteria" ? "text-amber-800" : "text-amber-100"}`}
+            >
               ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros
               amantes del café. ¡Cuéntanos qué tal estuvo tu experiencia!
             </p>
@@ -320,11 +337,15 @@ const schemaEnrichment = {
             >
               <button
                 onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-                class="bg-white text-amber-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-amber-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                class={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ${restaurant.type === "cafeteria" ? "bg-amber-800 text-white hover:bg-amber-700" : "bg-white text-amber-700 hover:bg-amber-50"}`}
               >
                 ⭐ Escribir Reseña
               </button>
-              <span class="text-amber-200 text-sm"> Solo toma 2 minutos </span>
+              <span
+                class={`text-sm ${restaurant.type === "cafeteria" ? "text-amber-700" : "text-amber-200"}`}
+              >
+                Solo toma 2 minutos
+              </span>
             </div>
           </div>
         </div>
@@ -343,40 +364,46 @@ const schemaEnrichment = {
             Estamos trabajando para traerte el menú completo de
             {restaurant.name} muy pronto. Mientras tanto, ¡tu reseña nos ayuda a
             mejorar!
-          </p>          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-md mx-auto">
+          </p>{" "}
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-md mx-auto">
             <p class="text-amber-800 font-semibold">
               🎯 ¡Sé de los primeros en calificar!
             </p>
           </div>
         </div>
       )
-    }    <!-- Menu Categories Section -->
+    }
+    <!-- Menu Categories Section -->
     {
       categoriesData && categoriesData.length > 0 && (
         <div class="bg-white space-y-8 py-8">
           {categoriesData.map((category) => (
-            <div id={`category-${category.id}`} class="max-w-6xl mx-auto lg:px-4">
+            <div
+              id={`category-${category.id}`}
+              class="max-w-6xl mx-auto lg:px-4"
+            >
               {/* Category with Image Only - Simple Layout */}
-              {category.image && (!category.menu_items || category.menu_items.length === 0) && (
-                <div class="mb-8">
-                  <h3 class="text-3xl font-bold mb-4 text-center text-gray-900">
-                    {category.name}
-                  </h3>
-                  <div class="w-full">
-                    <img
-                      src={category.image}
-                      alt={`Menú ${category.name}`}
-                      class="w-full h-auto md:rounded-lg shadow-lg clickable-image"
-                    />
+              {category.image &&
+                (!category.menu_items || category.menu_items.length === 0) && (
+                  <div class="mb-8">
+                    <h3 class="text-3xl font-bold mb-4 text-center text-gray-900">
+                      {category.name}
+                    </h3>
+                    <div class="w-full">
+                      <img
+                        src={category.image}
+                        alt={`Menú ${category.name}`}
+                        class="w-full h-auto md:rounded-lg shadow-lg clickable-image"
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Category with Items - Rich Layout */}
               {category.menu_items && category.menu_items.length > 0 && (
-                <div class="mb-12 px-4">
+                <div class="mb-12 px-4 max-w-4xl mx-auto">
                   <div class="text-center mb-8">
-                    <h3 class="text-4xl font-bold text-gray-900 mb-2">
+                    <h3 class={`text-4xl font-extrabold mb-2  ${restaurant.type === "cafeteria" ? "text-amber-800" : "text-gray-900"}`}>
                       {category.name}
                     </h3>
                     {category.description && (
@@ -384,7 +411,8 @@ const schemaEnrichment = {
                         {category.description}
                       </p>
                     )}
-                  </div>{/* Category Image if exists */}
+                  </div>
+                  {/* Category Image if exists */}
                   {category.image && (
                     <div class="mb-8">
                       <img
@@ -393,109 +421,136 @@ const schemaEnrichment = {
                         class="w-full h-64 object-cover rounded-lg shadow-lg clickable-image"
                       />
                     </div>
-                  )}                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {category.menu_items
-                      .filter(item => item.is_active)
-                      .sort((a, b) => a.display_order - b.display_order)
-                      .map((item) => (
-                      <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
-                        {/* Item Image */}
-                        {item.image && (
-                          <div class="h-64 overflow-hidden relative">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              class="w-full h-full object-cover transition-transform duration-300 hover:scale-105 clickable-image"
-                            />
-                            {/* Featured badge overlay */}
-                            {item.is_featured && (
-                              <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
-                                ⭐ Destacado
+                  )}
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {restaurant.type !== "cafeteria" &&
+                      category.menu_items
+                        .filter((item) => item.is_active)
+                        .sort((a, b) => a.display_order - b.display_order)
+                        .map((item) => (
+                          <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
+                            {/* Item Image */}
+                            {item.image && (
+                              <div class="h-64 overflow-hidden relative">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  class="w-full h-full object-cover transition-transform duration-300 hover:scale-105 clickable-image"
+                                />
+                                {/* Featured badge overlay */}
+                                {item.is_featured && (
+                                  <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                                    ⭐ Destacado
+                                  </div>
+                                )}
                               </div>
                             )}
-                          </div>
-                        )}
-                        
-                        {/* Item Content */}
-                        <div class="p-2">
-                          <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-xl font-bold text-gray-900 flex-1 pr-2">
-                              {item.name}
-                            </h4>
-                            <div class="text-right">
-                              <span class="text-2xl font-bold price-highlight">
-                                ${item.base_price}
-                              </span>
-                            </div>
-                          </div>
 
-                          {/* Description */}
-                          {item.description && (
-                            <p class="text-gray-600 text-sm line-clamp-3">
-                              {item.description}
-                            </p>
-                          )}
+                            {/* Item Content */}
+                            <div class="p-2">
+                              <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-xl font-bold text-gray-900 flex-1 pr-2">
+                                  {item.name}
+                                </h4>
+                                <div class="text-right">
+                                  <span class="text-2xl font-bold price-highlight">
+                                    ${item.base_price}
+                                  </span>
+                                </div>
+                              </div>
 
-                          {/* Tags and Features */}
-                          <div class="flex flex-wrap gap-2 mb-4">
-                            {item.is_spicy && (
-                              <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                🌶️ Picante
-                              </span>
-                            )}
-                            {item.is_vegan && (
-                              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                🌱 Vegano
-                              </span>
-                            )}
-                            {item.is_vegetarian && !item.is_vegan && (
-                              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                🥬 Vegetariano
-                              </span>
-                            )}
-                            {item.is_gluten_free && (
-                              <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                🌾 Sin Gluten
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Additional Info */}
-                          {(item.calories || item.preparation_time) && (
-                            <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
-                              {item.calories && (
-                                <span class="flex items-center">
-                                  🔥 {item.calories} cal
-                                </span>
+                              {/* Description */}
+                              {item.description && (
+                                <p class="text-gray-600 text-sm line-clamp-3">
+                                  {item.description}
+                                </p>
                               )}
-                              {item.preparation_time && (
-                                <span class="flex items-center">
-                                  ⏱️ {item.preparation_time} min
-                                </span>
+
+                              {/* Tags and Features */}
+                              <div class="flex flex-wrap gap-2 mb-4">
+                                {item.is_spicy && (
+                                  <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
+                                    🌶️ Picante
+                                  </span>
+                                )}
+                                {item.is_vegan && (
+                                  <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
+                                    🌱 Vegano
+                                  </span>
+                                )}
+                                {item.is_vegetarian && !item.is_vegan && (
+                                  <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
+                                    🥬 Vegetariano
+                                  </span>
+                                )}
+                                {item.is_gluten_free && (
+                                  <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
+                                    🌾 Sin Gluten
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Additional Info */}
+                              {(item.calories || item.preparation_time) && (
+                                <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
+                                  {item.calories && (
+                                    <span class="flex items-center">
+                                      🔥 {item.calories} cal
+                                    </span>
+                                  )}
+                                  {item.preparation_time && (
+                                    <span class="flex items-center">
+                                      ⏱️ {item.preparation_time} min
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Ingredients */}
+                              {item.ingredients && (
+                                <div class="mt-3 pt-3 border-t border-gray-100">
+                                  <p class="text-xs text-gray-500">
+                                    <strong>Ingredientes:</strong>{" "}
+                                    {item.ingredients}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Allergens Warning */}
+                              {item.allergens && (
+                                <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                                  <p class="text-yellow-800">
+                                    <strong>⚠️ Alérgenos:</strong>{" "}
+                                    {item.allergens}
+                                  </p>
+                                </div>
                               )}
                             </div>
-                          )}
-
-                          {/* Ingredients */}
-                          {item.ingredients && (
-                            <div class="mt-3 pt-3 border-t border-gray-100">
-                              <p class="text-xs text-gray-500">
-                                <strong>Ingredientes:</strong> {item.ingredients}
-                              </p>
+                          </div>
+                        ))}
+                  </div>
+                  <div class="grid gap-6">
+                    {restaurant.type === 'cafeteria' && category.menu_items &&
+                      category.menu_items
+                        .filter((item) => item.is_active)
+                        .sort((a, b) => a.display_order - b.display_order)
+                        .map((item, itemIdx) => (
+                          <div class="mb-2 flex justify-between">
+                            <div>
+                              <h3 class="text-xl font-semibold text-black mb-1">
+                                {item.name}
+                              </h3>
+                              {item.description && (
+                                <p class="text-sm text-[#3b2314]/70 mb-1">
+                                  {item.description}
+                                </p>
+                              )}
                             </div>
-                          )}
-
-                          {/* Allergens Warning */}
-                          {item.allergens && (
-                            <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                              <p class="text-yellow-800">
-                                <strong>⚠️ Alérgenos:</strong> {item.allergens}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                            {item.base_price && (
+                              <p class="font-medium">${item.base_price}</p>
+                            )}
+                          </div>
+                        ))}
                   </div>
                 </div>
               )}
@@ -504,145 +559,147 @@ const schemaEnrichment = {
         </div>
       )
     }
-    <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">
-          📍 Información del Restaurante
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {
-            restaurant.address && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <svg
-                  class="w-5 h-5 mr-3 text-amber-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-semibold">
-                    Dirección
-                  </div>
-                  <div class="text-sm text-gray-900">{restaurant.address}</div>
+  </div>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">
+        📍 Información del Restaurante
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {
+          restaurant.address && (
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+              <svg
+                class="w-5 h-5 mr-3 text-amber-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500 uppercase font-semibold">
+                  Dirección
                 </div>
+                <div class="text-sm text-gray-900">{restaurant.address}</div>
               </div>
-            )
-          }
+            </div>
+          )
+        }
 
-          {
-            restaurant.hours && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <svg
-                  class="w-5 h-5 mr-3 text-yellow-700"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-semibold">
-                    Horarios
-                  </div>
-                  <div class="text-sm text-gray-900">{restaurant.hours}</div>
+        {
+          restaurant.hours && (
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+              <svg
+                class="w-5 h-5 mr-3 text-yellow-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500 uppercase font-semibold">
+                  Horarios
                 </div>
+                <div class="text-sm text-gray-900">{restaurant.hours}</div>
               </div>
-            )
-          }
+            </div>
+          )
+        }
 
-          {
-            restaurant.priceRange && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <svg
-                  class="w-5 h-5 mr-3 text-amber-700"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                  />
-                </svg>
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-semibold">
-                    Precios
-                  </div>
-                  <div class="text-sm text-gray-900">
-                    {restaurant.priceRange}
-                  </div>
+        {
+          restaurant.priceRange && (
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+              <svg
+                class="w-5 h-5 mr-3 text-amber-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500 uppercase font-semibold">
+                  Precios
                 </div>
+                <div class="text-sm text-gray-900">{restaurant.priceRange}</div>
               </div>
-            )
-          }
+            </div>
+          )
+        }
 
-          {
-            restaurant.type && (              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <svg
-                  class="w-5 h-5 mr-3 text-yellow-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
-                <div>
-                  <div class="text-xs text-gray-500 uppercase font-semibold">
-                    Tipo
-                  </div>
-                  <div class="text-sm text-gray-900">{restaurant.type}</div>
+        {
+          restaurant.type && (
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+              <svg
+                class="w-5 h-5 mr-3 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                />
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500 uppercase font-semibold">
+                  Tipo
                 </div>
+                <div class="text-sm text-gray-900">{restaurant.type}</div>
               </div>
-            )
-          }
-        </div>
+            </div>
+          )
+        }
       </div>
+    </div>
 
-      <!-- Secondary CTA Section -->
-      <div
-        class="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8"
-      >
-        <h3 class="text-2xl font-bold mb-4">💬 ¿Ya visitaste este lugar?</h3>
-        <p class="text-blue-100 mb-6">
-          Ayuda a otros visitantes compartiendo tu experiencia. Tu opinión
-          cuenta mucho para la comunidad.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-            class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-          >
-            📝 Calificar ahora
-          </button>
-          <a
-            href="/contact"
-            class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-          >
-            📞 Contactar restaurante
-          </a>
-        </div>
+    <!-- Secondary CTA Section -->
+    <div
+      class="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8"
+    >
+      <h3 class="text-2xl font-bold mb-4">💬 ¿Ya visitaste este lugar?</h3>
+      <p class="text-blue-100 mb-6">
+        Ayuda a otros visitantes compartiendo tu experiencia. Tu opinión cuenta
+        mucho para la comunidad.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button
+          onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
+          class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+        >
+          📝 Calificar ahora
+        </button>
+        <a
+          href="/contact"
+          class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+        >
+          📞 Contactar restaurante
+        </a>
       </div>
     </div>
   </div>
