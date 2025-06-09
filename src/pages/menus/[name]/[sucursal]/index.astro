@@ -95,14 +95,12 @@ const schemaEnrichment = {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-    }
+    }    /* Mobile-first menu images */
 
-    /* Mobile-first menu images */
-    @media (max-width: 768px) {
+    @media (min-width: 769px) {
       .menu-image-mobile {
-        margin: 0 -1rem;
-        border-radius: 0;
-        width: calc(100% + 2rem);
+        object-fit: cover;
+        max-height: 600px;
       }
     }
 
@@ -121,8 +119,138 @@ const schemaEnrichment = {
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+    }    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+      animation: zoomIn 0.3s ease-in-out;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.5);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .clickable-image {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.02);
     }
   </style>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <img id="modalImage" src="" alt="" class="modal-image" />
+    </div>
+  </div>  <script>
+    // Modal functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('imageModal') as HTMLElement;
+      const modalImage = document.getElementById('modalImage') as HTMLImageElement;
+      const closeBtn = document.querySelector('.modal-close') as HTMLElement;
+
+      if (!modal || !modalImage || !closeBtn) return;
+
+      // Function to open modal
+      function openModal(imageSrc: string, imageAlt: string) {
+        modalImage.src = imageSrc;
+        modalImage.alt = imageAlt;
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+
+      // Function to close modal
+      function closeModal() {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+      }
+
+      // Add click listeners to all clickable images
+      const clickableImages = document.querySelectorAll('.clickable-image');
+      clickableImages.forEach(function(img) {
+        const imageElement = img as HTMLImageElement;
+        imageElement.addEventListener('click', function() {
+          if (this.src && this.alt !== undefined) {
+            openModal(this.src, this.alt);
+          }
+        });
+      });
+
+      // Close modal events
+      closeBtn.addEventListener('click', closeModal);
+      
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Close with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+          closeModal();
+        }
+      });
+    });
+  </script>
 
   <div class="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
     <!-- Hero Section - Focused on Review Invitation -->
@@ -219,7 +347,8 @@ const schemaEnrichment = {
       categoriesData && categoriesData.length > 0 && (
         <div class="bg-white space-y-8 py-8">
           {categoriesData.map((category) => (
-            <div class="max-w-6xl mx-auto px-4">              {/* Category with Image Only - Simple Layout */}
+            <div class="max-w-6xl mx-auto lg:px-4">
+              {/* Category with Image Only - Simple Layout */}
               {category.image && (!category.menu_items || category.menu_items.length === 0) && (
                 <div class="mb-8">
                   <h3 class="text-3xl font-bold mb-4 text-center text-gray-900">
@@ -229,15 +358,14 @@ const schemaEnrichment = {
                     <img
                       src={category.image}
                       alt={`Menú ${category.name}`}
-                      class="w-full h-auto menu-image-mobile md:rounded-lg shadow-lg object-cover"
+                      class="w-full h-auto menu-image-mobile md:rounded-lg shadow-lg clickable-image"
                     />
-                  </div>
-                </div>
+                  </div>                </div>
               )}
 
               {/* Category with Items - Rich Layout */}
               {category.menu_items && category.menu_items.length > 0 && (
-                <div class="mb-12">
+                <div class="mb-12 px-4">
                   <div class="text-center mb-8">
                     <h3 class="text-4xl font-bold text-gray-900 mb-2">
                       {category.name}
@@ -247,18 +375,16 @@ const schemaEnrichment = {
                         {category.description}
                       </p>
                     )}
-                  </div>
-
-                  {/* Category Image if exists */}
+                  </div>                  {/* Category Image if exists */}
                   {category.image && (
                     <div class="mb-8">
                       <img
                         src={category.image}
                         alt={`Categoría ${category.name}`}
-                        class="w-full h-64 object-cover rounded-lg shadow-lg"
+                        class="w-full h-64 object-cover rounded-lg shadow-lg clickable-image"
                       />
                     </div>
-                  )} 
+                  )}
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {category.menu_items.map((item) => (
                       <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
@@ -268,7 +394,7 @@ const schemaEnrichment = {
                             <img
                               src={item.image}
                               alt={item.name}
-                              class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                              class="w-full h-full object-cover transition-transform duration-300 hover:scale-105 clickable-image"
                             />
                             {/* Featured badge overlay */}
                             {item.is_featured && (
