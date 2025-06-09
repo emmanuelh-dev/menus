@@ -1,0 +1,315 @@
+---
+const {name} = Astro.params;
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import {getRestaurantByName, supabase} from "../../../lib/supabase";
+
+if (!name) {
+  throw new Error("No se ha especificado el nombre del restaurante");
+}
+const menuData = await getRestaurantByName({name});
+
+if (!menuData || menuData.length === 0) {
+  throw new Error(`No se encontró el restaurante: ${name}`);
+}
+
+const restaurant = menuData[0];
+
+const { data: menu } = await supabase
+  .from("menus")
+  .select("*")
+  .eq("restaurant_id", restaurant?.id)
+  .eq("is_active", true)
+
+const schemaEnrichment = {
+  address: restaurant.address ? {
+    streetAddress: restaurant.address,
+    addressLocality: "Ciudad",
+    addressCountry: "MX"
+  } : undefined,
+  telephone: undefined,
+  priceRange: restaurant.priceRange || "$$",
+  servesCuisine: restaurant.type ? [restaurant.type] : ["Restaurant"],
+  openingHours: restaurant.hours || undefined,
+  acceptsReservations: true,
+  paymentAccepted: ["Cash", "Credit Card"],
+  currenciesAccepted: ["MXN"],
+  aggregateRating: restaurant.rating ? {
+    ratingValue: restaurant.rating,
+    reviewCount: restaurant.reviewCount || 1
+  } : undefined,
+};
+
+---
+
+<RestaurantLayout
+  title={restaurant.name || name}
+  description={`Menú de ${restaurant.name || name}`}
+  image={restaurant.image}
+  textWhite={false}
+  backgroundColor="bg-white"
+  schemaEnrichment={schemaEnrichment}  type="Restaurant"
+>  <style>
+    .hover-lift {
+      transition: all 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .star-rating {
+      filter: drop-shadow(0 2px 4px rgba(255,215,0,0.3));
+    }
+    
+    .review-form-section {
+      scroll-margin-top: 100px;
+    }
+    
+    .font-serif {
+      font-family: "Playfair Display", serif;
+    }
+    
+    .motel-gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .motel-card {
+      transition: all 0.3s ease;
+    }
+    
+    .motel-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+
+  <div class="min-h-screen bg-black text-white">    <!-- Hero Section - Motel Style -->
+    <section class="relative overflow-hidden">
+      <!-- Background with motel theme -->
+      <div class="absolute inset-0 motel-gradient" style="filter: brightness(0.3);"></div>
+      
+      <!-- Content -->
+      <div class="relative z-10 max-w-4xl mx-auto px-4 py-24 text-center">
+        <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">💕 Romance & Privacidad</span>
+        
+        {restaurant.image && (
+          <div class="mb-8">
+            <img 
+              src={restaurant.image} 
+              alt={restaurant.name}
+              class="w-48 h-48 mx-auto rounded-full shadow-xl border-4 border-pink-400 object-cover"
+            />
+          </div>
+        )}          
+        
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">
+          {restaurant.name}
+        </h1>
+
+        <!-- Rating Display -->
+        {restaurant.rating && (
+          <div class="flex items-center justify-center mb-8">
+            <div class="flex items-center space-x-1">
+              {Array.from({length: 5}, (_, i) => (
+                <svg 
+                  class={`w-8 h-8 ${i < Math.floor(restaurant.rating) ? 'text-pink-400' : 'text-gray-500'}`} 
+                  fill="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+              ))}
+            </div>
+            <span class="ml-3 text-2xl font-semibold text-white">
+              {restaurant.rating}/5
+            </span>
+          </div>
+        )}
+
+        <!-- Main CTA for Reviews -->
+        <div class="bg-gradient-to-r from-pink-900/60 to-purple-900/60 p-8 rounded-2xl shadow-2xl border border-pink-500/30">
+          <h2 class="text-3xl font-bold text-pink-300 mb-4 font-serif">
+            🌟 ¡Comparte tu Experiencia!
+          </h2>
+          <p class="text-pink-100 text-lg mb-6 max-w-xl mx-auto">
+            ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros visitantes. 
+            ¡Cuéntanos qué tal estuvo tu experiencia romántica!
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button 
+              onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
+              class="bg-pink-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-pink-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-serif"
+            >
+              ⭐ Escribir Reseña
+            </button>
+            <span class="text-pink-200 text-sm">
+              Solo toma 2 minutos
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>    <!-- Restaurant Info - Motel Style -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+      <div class="bg-[#1E1E1E] rounded-2xl shadow-lg p-6 mb-8 border border-pink-500/20">
+        <h3 class="text-2xl font-semibold text-pink-300 mb-6 text-center font-serif">
+          📍 Información del Establecimiento
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {restaurant.address && (
+            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
+              <svg class="w-5 h-5 mr-3 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <div>
+                <div class="text-xs text-pink-200 uppercase font-semibold">Dirección</div>
+                <div class="text-sm text-white">{restaurant.address}</div>
+              </div>
+            </div>
+          )}
+          
+          {restaurant.hours && (
+            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
+              <svg class="w-5 h-5 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <div class="text-xs text-pink-200 uppercase font-semibold">Horarios</div>
+                <div class="text-sm text-white">{restaurant.hours}</div>
+              </div>
+            </div>
+          )}
+          
+          {restaurant.priceRange && (
+            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
+              <svg class="w-5 h-5 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+              <div>
+                <div class="text-xs text-pink-200 uppercase font-semibold">Precios</div>
+                <div class="text-sm text-white">{restaurant.priceRange}</div>
+              </div>
+            </div>
+          )}
+          
+          {restaurant.type && (
+            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
+              <svg class="w-5 h-5 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+              <div>
+                <div class="text-xs text-pink-200 uppercase font-semibold">Tipo</div>
+                <div class="text-sm text-white">{restaurant.type}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Secondary CTA Section -->
+      <div class="bg-gradient-to-r from-pink-900/60 to-purple-900/60 rounded-2xl p-8 text-center text-white mb-8 border border-pink-500/30">
+        <h3 class="text-2xl font-bold mb-4 font-serif text-pink-300">
+          💬 ¿Ya visitaste este lugar?
+        </h3>
+        <p class="text-pink-100 mb-6">
+          Ayuda a otros visitantes compartiendo tu experiencia romántica. Tu opinión cuenta mucho para la comunidad.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button 
+            onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
+            class="bg-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-400 transition-colors font-serif"
+          >
+            📝 Calificar ahora
+          </button>
+          <a 
+            href="/contact" 
+            class="border-2 border-pink-400 text-pink-300 px-6 py-3 rounded-lg font-semibold hover:bg-pink-500 hover:text-white transition-colors font-serif"
+          >
+            📞 Contactar establecimiento
+          </a>
+        </div>
+      </div>      <!-- Available Menus/Branches Section -->
+      {menu && menu.length > 0 ? (
+        <div class="bg-[#1E1E1E] rounded-2xl shadow-lg p-8 mb-8 border border-pink-500/20">
+          <h3 class="text-2xl font-bold text-pink-300 mb-6 text-center font-serif">
+            🏨 Sucursales Disponibles
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {menu.map((menuItem) => (
+              <div class="bg-gradient-to-br from-pink-900/30 to-purple-900/30 rounded-xl p-6 border border-pink-500/30 hover-lift motel-card">
+                <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-2 4h2M7 7h.01M7 11h.01M7 15h.01"></path>
+                    </svg>
+                  </div>
+                  <h4 class="text-lg font-semibold text-pink-300 font-serif">{menuItem.name}</h4>
+                </div>
+                
+                {menuItem.description && (
+                  <p class="text-gray-300 mb-4 text-sm">{menuItem.description}</p>
+                )}
+                
+                <div class="space-y-2 text-sm">
+                  <div class="flex items-center text-gray-400">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                    </svg>
+                    <span class="capitalize text-pink-200">{menuItem.menu_type}</span>
+                  </div>
+                  
+                  {menuItem.availability_days && (
+                    <div class="flex items-center text-gray-400">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      <span class="text-pink-200">{menuItem.availability_days}</span>
+                    </div>
+                  )}
+                  
+                  {menuItem.availability_start && menuItem.availability_end && (
+                    <div class="flex items-center text-gray-400">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span class="text-pink-200">{menuItem.availability_start} - {menuItem.availability_end}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div class="mt-6">
+                  <a 
+                    href={`/menus/${name}/${menuItem.menu}`}
+                    class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-pink-400 transition-colors flex items-center justify-center font-serif"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    Ver Menú
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <!-- Menu Coming Soon -->
+        <div class="bg-[#1E1E1E] rounded-2xl shadow-lg p-8 text-center border border-pink-500/20">
+          <div class="text-6xl mb-4">🚀</div>
+          <h3 class="text-2xl font-bold text-pink-300 mb-4 font-serif">
+            ¡Menú Digital en Construcción!
+          </h3>
+          <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+            Estamos trabajando para traerte el menú completo de {restaurant.name} muy pronto. 
+            Mientras tanto, ¡tu reseña nos ayuda a mejorar la experiencia!
+          </p>
+          <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-4 max-w-md mx-auto">
+            <p class="text-pink-300 font-semibold">
+              🎯 ¡Sé de los primeros en calificar!
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</RestaurantLayout>

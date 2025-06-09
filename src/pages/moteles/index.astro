@@ -69,7 +69,8 @@ const motelesList: Motel[] = [
     hours: "24 horas",
     amenities: ["WiFi gratis", "Estacionamiento privado", "Cocheras cerradas"],
     specialties: ["Privacidad total", "Cocheras privadas", "Ambiente japonés"],
-    distance: "8-12 horas entre semana, fines de semana pueden tener fila"
+    distance: "8-12 horas entre semana, fines de semana pueden tener fila",
+    highlight: true,
   },  {
     name: "Motel Hacienda Cumbres",
     rating: 4.4,
@@ -336,7 +337,7 @@ const schemaEnrichment = {
   title={seoData.title}
   description={seoData.description}
   schemaEnrichment={schemaEnrichment}
-  backgroundColor="bg-black"
+  backgroundColor="bg-gradient-to-r from-[#4a5568] to-[#553c7b]"
   textWhite={true}  canonical={seoData.canonical}
   ogUrl={seoData.ogUrl}
 >  <!-- Motel Business Structured Data -->
@@ -348,7 +349,7 @@ const schemaEnrichment = {
 <main>
     <section class="relative overflow-hidden">
         <!-- Background Image with Overlay -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); filter: brightness(0.3);"></div>
+        <div class="absolute inset-0 bg-cover bg-center bg-gradient-to-r from-[#4a5568] to-[#553c7b]"></div>
           <!-- Content -->
         <div class="relative z-10 max-w-6xl mx-auto px-4 py-24 md:py-32 text-center">
             <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">💕 Romance & Privacidad</span>
