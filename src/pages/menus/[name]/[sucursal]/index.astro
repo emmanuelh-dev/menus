@@ -12,6 +12,8 @@ const menuData = await getRestaurantByName({ name });
 
 const restaurant = menuData[0];
 
+console.log("Restaurant Data:", restaurant);
+
 const { data: menu } = await supabase
   .from("menus")
   .select("*")
@@ -19,17 +21,16 @@ const { data: menu } = await supabase
   .eq("is_active", true)
   .eq("menu", sucursal)
   .single();
-
 console.log("Menu Data:", menu);
-// Verificar que existe el restaurante
+
 if (!menuData || menuData.length === 0) {
   throw new Error(`No se encontró el restaurante: ${name}`);
 }
 
 const schemaEnrichment = {
-  address: menu.address
+  address: menu?.address
     ? {
-        streetAddress: menu.address,
+        streetAddress: (menu.address || restaurant.address),
         addressLocality: "Ciudad",
         addressCountry: "MX",
       }
@@ -61,12 +62,11 @@ const { data: categoriesData } = await supabase
   .eq("is_active", true)
   .order("display_order");
 
-console.log(categoriesData)
 
 ---
 
 <RestaurantLayout
-  title={restaurant.name || name}
+  title={restaurant.name + (" - " + menu?.name || "") || name}
   description={`Menú de ${restaurant.name || name}`}
   image={restaurant.image}
   textWhite={false}
@@ -111,7 +111,7 @@ console.log(categoriesData)
           }
           <h1 class="text-5xl font-bold text-gray-900 mb-4">
             {restaurant.name}
-            {menu ? ` - ${menu.name}` : ""}
+            {menu ? ` - ${menu.name}` : sucursal?.toUpperCase()}
           </h1>
 
           <!-- Rating Display -->
