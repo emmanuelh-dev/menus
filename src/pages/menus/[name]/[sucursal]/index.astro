@@ -35,8 +35,6 @@ const { data: categoriesData } = await supabase
   .eq("is_active", true)
   .order("display_order");
 
-console.log(categoriesData)
-
 // Crear lista de categorías para navegación
 const navigationCategories = categoriesData?.map((category) => ({
   id: `category-${category.id}`,
@@ -374,7 +372,7 @@ const schemaEnrichment = {
                     <img
                       src={category.image}
                       alt={`Menú ${category.name}`}
-                      class="w-full h-auto menu-image-mobile md:rounded-lg shadow-lg clickable-image"
+                      class="w-full h-auto md:rounded-lg shadow-lg clickable-image"
                     />
                   </div>
                 </div>
