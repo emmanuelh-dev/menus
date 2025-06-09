@@ -2,6 +2,7 @@
 const { name, sucursal } = Astro.params;
 
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
+import CategoryNavigation from "../../../../components/CategoryNavigation";
 import { getRestaurantByName, supabase } from "../../../../lib/supabase";
 
 if (!name) {
@@ -34,7 +35,14 @@ const { data: categoriesData } = await supabase
   .eq("is_active", true)
   .order("display_order");
 
-  console.log(categoriesData)
+console.log(categoriesData)
+
+// Crear lista de categorías para navegación
+const navigationCategories = categoriesData?.map((category) => ({
+  id: `category-${category.id}`,
+  name: category.name,
+  description: category.description
+})) || [];
 
 if (!menuData || menuData.length === 0) {
   throw new Error(`No se encontró el restaurante: ${name}`);
@@ -72,7 +80,14 @@ const schemaEnrichment = {
   backgroundColor="bg-white"
   schemaEnrichment={schemaEnrichment}
   type="Restaurant"
->  <style>
+>
+  <!-- Componentes de navegación -->
+  <CategoryNavigation 
+    client:load 
+    categories={navigationCategories} 
+    backgroundColor="bg-white" 
+    textColor="text-gray-700" 
+  /><style>
     .hover-lift {
       transition: all 0.3s ease;
     }
@@ -100,6 +115,7 @@ const schemaEnrichment = {
     @media (min-width: 769px) {
       .menu-image-mobile {
         object-fit: cover;
+        max-height: 600px;
       }
     }
 
@@ -199,7 +215,8 @@ const schemaEnrichment = {
       <span class="modal-close">&times;</span>
       <img id="modalImage" src="" alt="" class="modal-image" />
     </div>
-  </div>  <script>
+  </div>
+  <script>
     // Modal functionality
     document.addEventListener('DOMContentLoaded', function() {
       const modal = document.getElementById('imageModal') as HTMLElement;
@@ -287,9 +304,9 @@ const schemaEnrichment = {
                     </svg>
                   ))}
                 </div>
-                <span class="ml-3 text-2xl font-semibold text-gray-700">
+                {/* <span class="ml-3 text-2xl font-semibold text-gray-700">
                   {restaurant.rating}/5
-                </span>
+                </span> */}
               </div>
             )
           }
@@ -346,7 +363,7 @@ const schemaEnrichment = {
       categoriesData && categoriesData.length > 0 && (
         <div class="bg-white space-y-8 py-8">
           {categoriesData.map((category) => (
-            <div class="max-w-6xl mx-auto lg:px-4">
+            <div id={`category-${category.id}`} class="max-w-6xl mx-auto lg:px-4">
               {/* Category with Image Only - Simple Layout */}
               {category.image && (!category.menu_items || category.menu_items.length === 0) && (
                 <div class="mb-8">
@@ -375,7 +392,7 @@ const schemaEnrichment = {
                         {category.description}
                       </p>
                     )}
-                  </div>                  {/* Category Image if exists */}
+                  </div>{/* Category Image if exists */}
                   {category.image && (
                     <div class="mb-8">
                       <img
@@ -384,9 +401,11 @@ const schemaEnrichment = {
                         class="w-full h-64 object-cover rounded-lg shadow-lg clickable-image"
                       />
                     </div>
-                  )}
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {category.menu_items.map((item) => (
+                  )}                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {category.menu_items
+                      .filter(item => item.is_active)
+                      .sort((a, b) => a.display_order - b.display_order)
+                      .map((item) => (
                       <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
                         {/* Item Image */}
                         {item.image && (

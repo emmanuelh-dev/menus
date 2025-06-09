@@ -23,6 +23,25 @@ export default function CategoryNavigation({
 }: CategoryNavigationProps) {
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Función para generar colores de hover dinámicos
+  const getHoverColors = () => {
+    // Si es un background oscuro, hover más claro
+    if (backgroundColor.includes('bg-gray-900') || backgroundColor.includes('bg-black') || 
+        backgroundColor.includes('bg-slate-900') || backgroundColor.includes('bg-zinc-900')) {
+      return 'hover:bg-gray-700 hover:bg-opacity-50';
+    }
+    // Si es un background claro, hover más oscuro
+    if (backgroundColor.includes('bg-white') || backgroundColor.includes('bg-gray-50') || 
+        backgroundColor.includes('bg-gray-100')) {
+      return 'hover:bg-gray-100 hover:bg-opacity-80';
+    }
+    // Para otros colores, usar opacity
+    return 'hover:bg-black hover:bg-opacity-10';
+  };
+
+  const hoverColors = getHoverColors();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -59,7 +78,6 @@ export default function CategoryNavigation({
       window.removeEventListener('scroll', handleScroll);
     };
   }, [categories]);
-
   const scrollToCategory = (categoryId: string) => {
     const element = document.getElementById(categoryId);
     if (element) {
@@ -70,33 +88,55 @@ export default function CategoryNavigation({
         behavior: 'smooth'
       });
     }
+    // Cerrar menú móvil después de navegar
+    setIsMobileMenuOpen(false);
   };
 
   if (!isVisible || categories.length === 0) return null;
-
   return (
     <nav 
       className={`${sticky ? 'fixed top-0 left-0 right-0' : ''} z-40 ${backgroundColor} shadow-md transition-all duration-300 ${
         isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
       }`}
     >
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="px-4 w-full max-w-[100vw] overflow-x-auto">
         <div className="flex items-center justify-between py-3">
-          <h3 className={`font-semibold ${textColor} hidden md:block`}>
-            Categorías del Menú
-          </h3>
+          <div className="flex items-center space-x-3">
+            <h3 className={`font-semibold ${textColor} hidden`}>
+              Secciones del Menú
+            </h3>
+            {/* Título para móvil */}
+            <h3 className={`font-semibold ${textColor} md:hidden text-sm`}>
+              Navegar por Secciones
+            </h3>
+          </div>
           
-          {/* Navegación horizontal scrolleable */}
-          <div className="flex-1 md:flex-initial">
+          {/* Botón hamburguesa - solo móvil */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className={`md:hidden p-2 rounded-lg ${textColor} ${hoverColors} transition-colors`}
+            title={isMobileMenuOpen ? "Cerrar menú de secciones" : "Ver secciones del menú"}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} 
+              />
+            </svg>
+          </button>
+          
+          {/* Navegación horizontal scrolleable - solo desktop */}
+          <div className="hidden md:flex flex-1 md:flex-initial">
             <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
               {categories.map((category) => (
                 <button
                   key={category.id}
-                  onClick={() => scrollToCategory(category.id)}
-                  className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  onClick={() => scrollToCategory(category.id)}                  className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     activeCategory === category.id
                       ? `${category.color || 'bg-indigo-600'} text-white shadow-md transform scale-105`
-                      : `${textColor} hover:bg-gray-100 hover:shadow-sm`
+                      : `${textColor} ${hoverColors} hover:shadow-sm`
                   }`}
                   title={category.description}
                 >
@@ -106,19 +146,63 @@ export default function CategoryNavigation({
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Botón para cerrar/minimizar */}
+          </div>          {/* Botón para cerrar/minimizar - solo desktop */}
           <button
             onClick={() => setIsVisible(false)}
-            className={`ml-4 p-2 rounded-lg ${textColor} hover:bg-gray-100 transition-colors`}
-            title="Ocultar navegación"
+            className={`hidden ml-4 p-2 rounded-lg ${textColor} ${hoverColors} transition-colors`}
+            title="Ocultar navegación de secciones"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
+        {isMobileMenuOpen && (
+          <div className={`md:hidden border-t ${
+            backgroundColor.includes('bg-white') || backgroundColor.includes('bg-gray-50') 
+              ? 'border-gray-200' 
+              : backgroundColor.includes('bg-gray-900') || backgroundColor.includes('bg-black')
+              ? 'border-gray-700'
+              : 'border-gray-300'
+          }`}>            <div className={`px-4 py-2 border-b ${
+              backgroundColor.includes('bg-white') || backgroundColor.includes('bg-gray-50') 
+                ? 'border-gray-200' 
+                : backgroundColor.includes('bg-gray-900') || backgroundColor.includes('bg-black')
+                ? 'border-gray-700'
+                : 'border-gray-300'
+            }`}>
+              <p className={`text-xs ${textColor} opacity-75`}>
+                Toca una sección para saltar a ella.
+              </p>
+            </div>
+            <div className="py-2  max-h-80 overflow-y-auto">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => scrollToCategory(category.id)}
+                  className={`w-full text-left px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                    activeCategory === category.id
+                      ? `${category.color || 'bg-indigo-600'} text-white`
+                      : `${textColor} ${hoverColors}`
+                  }`}
+                  title={category.description}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{category.name}</span>
+                    {activeCategory === category.id && (
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  {category.description && (
+                    <p className="text-xs opacity-75 mt-1">{category.description}</p>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
