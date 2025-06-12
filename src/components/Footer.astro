@@ -1,16 +1,93 @@
 ---
 const today = new Date();
-
-const {textWhite, backgroundColor} = Astro.props;
-
-
+const { textWhite, backgroundColor } = Astro.props;
 ---
 
-<footer class={`${textWhite ? 'text-white' : 'text-black'} ${backgroundColor}`}>
-	<div class="max-w-4xl mx-auto p-4 py-4">
-		<div class="flex items-center justify-between">
-			<p>&copy; {today.getFullYear()} <a href="https://www.bysmax.com" class="hover:underline" target="_blank">Bysmax</a>. Todos los derechos reservados.</p>
-			<a href="/contact" class="hover:underline">Contáctanos</a>
+<footer class="bg-slate-900 text-white py-16">
+	<div class="max-w-7xl mx-auto px-6">
+		<!-- Footer principal -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+			<!-- Columna 1: Marca y descripción -->
+			<div class="lg:col-span-1">
+				<div class="flex items-center space-x-2 mb-4">
+					<div class="p-2 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl">
+						<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+						</svg>
+					</div>
+					<div>
+						<h3 class="font-bold text-lg">BySMax Menús</h3>
+						<p class="text-emerald-400 text-sm font-medium">Menús Digitales GRATIS</p>
+					</div>
+				</div>
+				<p class="text-slate-300 text-sm leading-relaxed mb-4">
+					Crea tu menú digital con código QR en 5 minutos. Sin comisiones, sin anuncios. Más de 10,000 restaurantes confían en nosotros.
+				</p>
+				<div class="flex space-x-3">
+					<a href="https://www.instagram.com/larutadelostragones/" class="text-slate-400 hover:text-emerald-400 transition-colors" aria-label="Instagram">
+						<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M12.017 0C8.396 0 7.989.013 7.041.048 6.094.082 5.485.222 4.976.42a6.5 6.5 0 0 0-2.35 1.53c-.893.883-1.368 1.472-1.53 2.35-.198.509-.338 1.118-.372 2.065C.013 7.989 0 8.396 0 12.017s.013 4.028.048 4.976c.034.947.174 1.556.372 2.065.162.878.637 1.467 1.53 2.35a6.5 6.5 0 0 0 2.35 1.53c.509.198 1.118.338 2.065.372.976.035 1.383.048 4.976.048s4.028-.013 4.976-.048c.947-.034 1.556-.174 2.065-.372a6.5 6.5 0 0 0 2.35-1.53c.893-.883 1.368-1.472 1.53-2.35.198-.509.338-1.118.372-2.065.035-.948.048-1.355.048-4.976s-.013-4.028-.048-4.976c-.034-.947-.174-1.556-.372-2.065a6.5 6.5 0 0 0-1.53-2.35 6.5 6.5 0 0 0-2.35-1.53c-.509-.198-1.118-.338-2.065-.372C16.045.013 15.638 0 12.017 0zm0 2.17c3.544 0 3.968.013 5.369.048.848.034 1.335.142 1.647.236a2.87 2.87 0 0 1 1.06.69 2.87 2.87 0 0 1 .69 1.06c.094.312.202.799.236 1.647.035 1.4.048 1.825.048 5.369s-.013 3.968-.048 5.369c-.034.848-.142 1.335-.236 1.647a2.87 2.87 0 0 1-.69 1.06 2.87 2.87 0 0 1-1.06.69c-.312.094-.799.202-1.647.236-1.4.035-1.825.048-5.369.048s-3.968-.013-5.369-.048c-.848-.034-1.335-.142-1.647-.236a2.87 2.87 0 0 1-1.06-.69 2.87 2.87 0 0 1-.69-1.06c-.094-.312-.202-.799-.236-1.647-.035-1.4-.048-1.825-.048-5.369s.013-3.968.048-5.369c.034-.848.142-1.335.236-1.647a2.87 2.87 0 0 1 .69-1.06 2.87 2.87 0 0 1 1.06-.69c.312-.094.799-.202 1.647-.236 1.4-.035 1.825-.048 5.369-.048z"/>
+							<circle cx="12.017" cy="12.017" r="3.859"/>
+							<circle cx="18.408" cy="5.609" r="1.244"/>
+						</svg>
+					</a>
+				</div>
+			</div>
+
+			<!-- Columna 2: Servicios -->
+			<div>
+				<h4 class="font-semibold text-white mb-4">Servicios</h4>
+				<ul class="space-y-3 text-sm">
+					<li><a href="/menus" class="text-slate-300 hover:text-emerald-400 transition-colors">Menús Digitales GRATIS</a></li>
+					<li><a href="https://www.bysmax.com/tools/qr-code-generator" class="text-slate-300 hover:text-emerald-400 transition-colors">Generador de Códigos QR</a></li>
+					<li><a href="/cafeterias" class="text-slate-300 hover:text-emerald-400 transition-colors">Menús para Cafeterías</a></li>
+					<li><a href="/espadas" class="text-slate-300 hover:text-emerald-400 transition-colors">Menús para Espadas</a></li>
+					<li><a href="/moteles" class="text-slate-300 hover:text-emerald-400 transition-colors">Menús para Moteles</a></li>
+				</ul>
+			</div>
+
+			<!-- Columna 3: Recursos -->
+			<div>
+				<h4 class="font-semibold text-white mb-4">Recursos</h4>
+				<ul class="space-y-3 text-sm">
+					<li><a href="/blog" class="text-slate-300 hover:text-emerald-400 transition-colors">Blog y Consejos</a></li>
+					<li><a href="/precios" class="text-slate-300 hover:text-emerald-400 transition-colors">Precios y Planes</a></li>
+					<li><a href="/contact" class="text-slate-300 hover:text-emerald-400 transition-colors">Soporte y Ayuda</a></li>
+					<li><a href="/admin/login" class="text-slate-300 hover:text-emerald-400 transition-colors">Acceso de Clientes</a></li>
+				</ul>
+			</div>
+
+			<!-- Columna 4: CTA y contacto -->
+			<div>
+				<h4 class="font-semibold text-white mb-4">¿Listo para empezar?</h4>
+				<p class="text-slate-300 text-sm mb-4">
+					Crea tu menú digital profesional en menos de 5 minutos. 100% gratis, sin comisiones.
+				</p>				<a
+					href="/contact"
+					class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-emerald-600 transition-all duration-300 shadow-lg text-sm w-full justify-center"
+				>
+					Crear menú gratis ahora
+				</a>
+			</div>
+		</div>
+
+		<!-- Separador -->
+		<div class="border-t border-slate-800 pt-8">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center">
+				<div class="text-slate-400 text-sm">
+					<p>&copy; {today.getFullYear()} <a href="https://www.bysmax.com" class="text-emerald-400 hover:text-emerald-300 transition-colors" target="_blank">BySMax</a>. Todos los derechos reservados.</p>
+				</div>
+				<div class="flex flex-wrap gap-4 text-sm lg:justify-end">
+					<a href="/privacy" class="text-slate-400 hover:text-emerald-400 transition-colors">Privacidad</a>
+					<a href="/terms" class="text-slate-400 hover:text-emerald-400 transition-colors">Términos</a>
+					<a href="/contact" class="text-slate-400 hover:text-emerald-400 transition-colors">Contacto</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- SEO Keywords ocultos -->
+		<div class="sr-only">
+			<p>menú digital gratis, código qr restaurante, menú qr gratis, menú digital restaurante, carta digital, menú online gratis, qr code menu, digital menu free, restaurant qr code, menu app gratis</p>
 		</div>
 	</div>
 </footer>
