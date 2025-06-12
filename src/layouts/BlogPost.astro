@@ -1,18 +1,20 @@
 ---
+
+
 import type { CollectionEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import FormattedDate from "../components/FormattedDate.astro";
-import RestaurantLayout from "./RestaurantLayout.astro";
 import "../styles/blog.css";
+import DefaultLayout from "./DefaultLayout.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
-<RestaurantLayout
+<DefaultLayout
 	title={title}
 	description={description}
 	image={heroImage}
@@ -84,4 +86,4 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<!-- Related Posts Placeholder -->
 		<!-- Se podría implementar en el futuro para mostrar artículos relacionados -->
 	</main>
-</RestaurantLayout>
+</DefaultLayout>

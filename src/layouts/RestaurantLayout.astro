@@ -180,7 +180,7 @@ if (schemaEnrichment.suitableForDiet) {
 ---
 
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link
@@ -188,8 +188,10 @@ if (schemaEnrichment.suitableForDiet) {
       type="image/svg+xml"
       href={favicon ? favicon : "/favicon.ico"}
     />
-    <meta name="generator" content={Astro.generator} />    <title>
-      Menú - {title} - {schemaEnrichment?.address?.streetAddress} - Menu digital - PDF - QR
+    <meta name="generator" content={Astro.generator} />
+    <title>
+      Menú - {title} - {schemaEnrichment?.address?.streetAddress} - Menu digital
+      - PDF - QR
     </title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical || Astro.url} />
@@ -216,10 +218,16 @@ if (schemaEnrichment.suitableForDiet) {
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
     <!-- Google Fonts for Restaurant Feel -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
+      rel="stylesheet"
+    />
     <!-- <script 
          async 
          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
@@ -241,7 +249,7 @@ if (schemaEnrichment.suitableForDiet) {
                 color: var(--color-text);
             }
             .font-serif {
-                font-family: "Playfair Display", serif;
+                  font-family: "Yeseva One", serif;
             }
         </style> -->
 
@@ -260,7 +268,9 @@ if (schemaEnrichment.suitableForDiet) {
     {
       (path.includes("/menus/") ||
         path.includes("/cafeterias") ||
-        path.includes("/espadas") || path.includes("/moteles")) && (<div
+        path.includes("/espadas") ||
+        path.includes("/moteles")) && (
+        <div
           class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
         >
           <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
@@ -273,27 +283,7 @@ if (schemaEnrichment.suitableForDiet) {
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
     <style>
-      .restaurant-typography {
-        font-family: 'Lora', serif;
-      }
-      
-      .restaurant-typography h1,
-      .restaurant-typography h2,
-      .restaurant-typography h3,
-      .restaurant-typography h4 {
-        font-family: 'Playfair Display', serif;
-        font-weight: 600;
-      }
-      
-      .restaurant-brand {
-        font-family: 'Playfair Display', serif;
-        font-weight: 700;
-      }
-      
-      .menu-item-name {
-        font-family: 'Playfair Display', serif;
-        font-weight: 500;
-      }
+
     </style>
   </body>
 </html>

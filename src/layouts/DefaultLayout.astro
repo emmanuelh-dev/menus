@@ -1,0 +1,128 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+
+const path = Astro.url.pathname;
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: "WebSite" | "Organization" | "WebPage" | "Article";
+  textWhite?: boolean;
+  backgroundColor?: string;
+  favicon?: string;
+  canonical?: string;
+  ogUrl?: string;
+  keywords?: string;
+  author?: string;
+  schema?: any; // Permitir schema personalizado
+}
+
+const {
+  title,
+  description,
+  image,
+  favicon,
+  type = "WebSite",
+  textWhite = false,
+  backgroundColor = "bg-white",
+  canonical,
+  ogUrl,
+  keywords,
+  author,
+  schema: customSchema,
+} = Astro.props;
+
+// Schema.org básico y genérico
+const defaultSchema: any = {
+  "@context": "https://schema.org",
+  "@type": type,
+  name: title,
+  description: description,
+  url: Astro.url.toString(),
+};
+
+if (image) {
+  defaultSchema.image = new URL(image, Astro.url).toString();
+}
+
+if (author) {
+  defaultSchema.author = {
+    "@type": "Person",
+    name: author,
+  };
+}
+
+// Usar schema personalizado si se proporciona, sino usar el por defecto
+const finalSchema = customSchema || defaultSchema;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={favicon ? favicon : "/favicon.ico"}
+    />    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    {author && <meta name="author" content={author} />}
+    <link rel="canonical" href={canonical || Astro.url} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={ogUrl || Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={ogUrl || Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    {
+      image && (
+        <meta property="twitter:image" content={new URL(image, Astro.url)} />
+      )
+    }    <!-- Schema.org for Google -->
+    <script type="application/ld+json" set:html={JSON.stringify(finalSchema)} />
+
+    <!-- Modern Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />    <!-- Analytics (opcional) -->
+    <script
+      src="https://analytics.ahrefs.com/analytics.js"
+      data-key="tBLkU3Ea6HxUBHJiGObWig"
+      async></script>
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
+  </head>
+  <body>
+    <Header textWhite={textWhite} backgroundColor={backgroundColor} />
+    <slot />
+    <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
+
+    <style is:global>
+      html {
+        font-family: "Inter", system-ui, sans-serif;
+        line-height: 1.6;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </body>
+</html>

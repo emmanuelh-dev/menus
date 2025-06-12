@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 const {name} = Astro.params;
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import {getRestaurantByName, supabase} from "../../../lib/supabase";

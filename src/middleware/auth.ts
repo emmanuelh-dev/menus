@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import { createSupabaseClient } from '../lib/supabase';
 
 export async function isAuthenticated(request: Request, cookies: any) {
