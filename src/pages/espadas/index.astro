@@ -103,9 +103,28 @@ const churrascariasList: Churrascaria[] = [
 
 // Configuración para SEO
 const seoData = {
-  title: "Mejores Restaurantes de Espadas Brasileñas en Monterrey",
-  description: "Explora las mejores churrascarías de Monterrey. Encuentra tu restaurante de espadas brasileñas favorito con información detallada sobre precios, ubicación, horarios y servicios.",
-  keywords: ["churrascarías monterrey", "espadas brasileñas", "rodizio", "restaurantes de carne", "churrasco monterrey"],
+  title: "🔥 Restaurantes de Espadas Brasileñas en Monterrey 2025 | Mejores Churrascarías",
+  description: "🥩 Descubre los mejores restaurantes de espadas brasileñas en Monterrey. Rodizio, carnes premium, buffet brasileño y más. ⭐ Reseñas, precios, ubicaciones y menús digitales. ¡Reserva ya!",
+  keywords: [
+    "restaurante de espadas en monterrey", 
+    "restaurantes brasileños en monterrey", 
+    "espadas brasileñas", 
+    "restaurantes de espadas brasileñas en monterrey",
+    "restaurante brasileño monterrey",
+    "restaurante de espadas",
+    "restaurantes de espadas en monterrey",
+    "restaurante las espadas",
+    "espadas brasileñas monterrey",
+    "las espadas - brazilian steakhouse",
+    "rodizio monterrey",
+    "churrascarías monterrey",
+    "buffet brasileño monterrey",
+    "carnes espadas brasileñas",
+    "espadas de carne",
+    "comida brasileña en monterrey",
+    "restaurante de espadas cerca de mi",
+    "cortes de carne espadas"
+  ],
 };
 
 // Configuración para Schema.org
@@ -125,16 +144,103 @@ const schemaEnrichment = {
   backgroundColor="bg-black"
   textWhite={true}
 >
+<!-- Schema.org markup para SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Restaurantes de Espadas Brasileñas en Monterrey",
+  "description": "Descubre los mejores restaurantes de espadas brasileñas en Monterrey. Rodizio, carnes premium, buffet brasileño y más.",
+  "url": "https://tudominio.com/espadas",
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Mejores Churrascarías de Monterrey",
+    "numberOfItems": 6,
+    "itemListElement": [
+      {
+        "@type": "Restaurant",
+        "name": "Fogo de Brasil",
+        "url": "/menus/fogodebrasil", 
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Av. Lázaro Cárdenas 2424",
+          "addressLocality": "Monterrey",
+          "addressRegion": "Nuevo León",
+          "addressCountry": "MX"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating", 
+          "ratingValue": "4.8",
+          "reviewCount": "1250"
+        },
+        "priceRange": "$$$$",
+        "servesCuisine": "Brazilian"
+      },
+      {
+        "@type": "Restaurant",
+        "name": "Las Espadas",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Paseo de los Leones 1501",
+          "addressLocality": "Monterrey", 
+          "addressRegion": "Nuevo León",
+          "addressCountry": "MX"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.7",
+          "reviewCount": "980"
+        },
+        "priceRange": "$$$",
+        "servesCuisine": "Brazilian"
+      }
+    ]
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://tudominio.com"
+      },
+      {
+        "@type": "ListItem", 
+        "position": 2,
+        "name": "Restaurantes de Espadas Brasileñas",
+        "item": "https://tudominio.com/espadas"
+      }
+    ]
+  }
+}
+</script>
+
 <main>
     <section class="relative overflow-hidden">
         <!-- Background Image with Overlay -->
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/espadas.webp'); filter: brightness(0.2);"></div>
-        
-        <!-- Content -->
+          <!-- Content -->
         <div class="relative z-10 max-w-6xl mx-auto px-4 py-24 md:py-32 text-center">
-            <span class="inline-block bg-accent text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse"></span>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#e3b828] font-serif  tracking-tight">{seoData.title}</h1>
-            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">{seoData.description}</p>
+            <span class="inline-block bg-accent text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">🔥 TOP RESTAURANTES 2025</span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#e3b828] font-serif tracking-tight">
+              Restaurantes de Espadas Brasileñas en Monterrey
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">
+              🥩 Descubre las mejores churrascarías con rodizio, carnes premium y auténtica experiencia brasileña. 
+              ⭐ Reseñas reales, precios actualizados y menús digitales.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+              <div class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white">
+                <span class="text-sm">🍖 Rodizio Auténtico</span>
+              </div>
+              <div class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white">
+                <span class="text-sm">📍 Cerca de Ti</span>
+              </div>
+              <div class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white">
+                <span class="text-sm">💳 Mejores Precios</span>
+              </div>
+            </div>
         </div>
 
     </section>
@@ -382,15 +488,374 @@ const schemaEnrichment = {
     
           <!-- Sección de registro de restaurante -->
           <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-[#D4AF37]/20">
-            <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-4 text-center">¿Tienes una churrascaría?</h2>
-            <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">Registra tu restaurante de espadas brasileñas en nuestra plataforma y muestra tu menú digital a miles de amantes de la buena carne.</p>
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-4 text-center">¿Tienes un Restaurante de Espadas Brasileñas?</h2>
+            <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">
+              📈 Registra tu churrascaría en nuestra plataforma y muestra tu menú digital a miles de amantes de la buena carne. 
+              Aumenta tu visibilidad y atrae más clientes buscando "restaurantes de espadas brasileñas en monterrey".
+            </p>
             <div class="text-center">
               <a 
                 href="/contact" 
                 class="inline-block px-8 py-3 bg-[#D4AF37] text-black rounded-lg font-serif hover:bg-[#B8860B] transition-colors"
               >
-                Registrar mi Restaurante
+                🚀 Registrar mi Restaurante GRATIS
               </a>
+            </div>
+          </div>
+
+          <!-- FAQ Section para SEO -->
+          <div class="mt-16 mb-8">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-8 text-center">
+              ❓ Preguntas Frecuentes - Restaurantes de Espadas Brasileñas
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué es un restaurante de espadas brasileñas?</h3>
+                <p class="text-gray-300 text-sm">Un restaurante de espadas brasileñas, también conocido como churrascaría, ofrece el sistema rodizio donde los meseros pasan por las mesas sirviendo diferentes cortes de carne asada directamente de las espadas.</p>
+              </div>
+              
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Cuánto cuesta comer en Las Espadas?</h3>
+                <p class="text-gray-300 text-sm">Los precios en restaurantes de espadas brasileñas en Monterrey van desde $400 hasta $900 por persona, dependiendo del restaurante y los cortes incluidos en el rodizio.</p>
+              </div>
+              
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Dónde están las mejores churrascarías en Monterrey?</h3>
+                <p class="text-gray-300 text-sm">Las mejores churrascarías están ubicadas en Lázaro Cárdenas, San Pedro Garza García, y Paseo de los Leones. Todas ofrecen auténtica comida brasileña y sistema rodizio.</p>
+              </div>
+              
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué incluye el buffet brasileño?</h3>
+                <p class="text-gray-300 text-sm">El buffet brasileño incluye barra de ensaladas, acompañamientos, cortes de carne ilimitados servidos en rodizio, y muchas veces postres y bebidas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- Sección de búsqueda rápida y palabras clave principales -->
+    <section class="bg-[#1E1E1E] py-12 border-t border-[#D4AF37]/20">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-8 text-center">
+                🔍 Encuentra tu Restaurante de Espadas Perfecto
+            </h2>
+            
+            <!-- Búsquedas populares -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-black/30 rounded-lg p-6 text-center hover:bg-black/40 transition-colors">
+                    <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-2">🥩 Restaurante de Espadas</h3>
+                    <p class="text-gray-300 text-sm">Los mejores cortes brasileños servidos directamente en tu mesa</p>
+                </div>
+                <div class="bg-black/30 rounded-lg p-6 text-center hover:bg-black/40 transition-colors">
+                    <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-2">🇧🇷 Restaurantes Brasileños</h3>
+                    <p class="text-gray-300 text-sm">Auténtica experiencia gastronómica brasileña en Monterrey</p>
+                </div>
+                <div class="bg-black/30 rounded-lg p-6 text-center hover:bg-black/40 transition-colors">
+                    <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-2">🍽️ Rodizio y Buffet</h3>
+                    <p class="text-gray-300 text-sm">Sistema rodizio con barra de ensaladas y carnes ilimitadas</p>
+                </div>
+            </div>
+
+            <!-- Palabras clave populares -->
+            <div class="text-center">
+                <h3 class="font-serif text-xl font-semibold text-white mb-4">Búsquedas Populares:</h3>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <span class="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm border border-[#D4AF37]/30">las espadas monterrey</span>
+                    <span class="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm border border-[#D4AF37]/30">espadas brasileñas cerca de mi</span>
+                    <span class="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm border border-[#D4AF37]/30">buffet brasileño monterrey</span>
+                    <span class="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm border border-[#D4AF37]/30">carnes espadas brasileñas</span>
+                    <span class="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm border border-[#D4AF37]/30">restaurante brasileño monterrey</span>
+                    <span class="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm border border-[#D4AF37]/30">espadas steakhouse</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="min-h-screen bg-black text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+          <!-- Filtros interactivos -->
+          <div class="mb-12 flex flex-wrap justify-center gap-4">
+            <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4AF37] text-black rounded-full font-serif hover:bg-[#B8860B] transition-colors" data-filter="all">Todos</button>
+            <button id="filter-nearby" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="nearby">Cerca de mí</button>
+            <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="rated">Mejor calificados</button>
+            <button id="filter-open" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="open">Abiertos ahora</button>
+            <button id="filter-menu" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="menu">Menú digital</button>
+          </div>
+    
+          <!-- Mapa visual de churrascarías (representación estilizada) -->
+          <div class="relative mb-16 overflow-hidden rounded-xl bg-[#1E1E1E] p-4">
+            <div class="absolute top-4 left-4 bg-black/90 px-4 py-2 rounded-lg shadow-md z-10">
+              <h3 class="font-serif text-lg font-semibold text-[#D4AF37]">Mapa de Churrascarías</h3>
+              <p class="text-sm text-gray-300">Explora visualmente las churrascarías cercanas</p>
+            </div>
+            <div class="h-[300px] md:h-[400px] bg-[#1E1E1E] rounded-lg relative overflow-hidden">
+              <!-- Aquí iría un mapa real, por ahora es decorativo -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <p class="font-serif text-gray-400 text-lg">Mapa interactivo (próximamente)</p>
+              </div>
+              <!-- Puntos decorativos representando churrascarías -->
+              {churrascariasList.map((churrascaria, index) => (
+                <div 
+                  class="absolute w-3 h-3 bg-[#D4AF37] rounded-full transform hover:scale-150 transition-transform cursor-pointer"
+                  style={`top: ${30 + Math.random() * 60}%; left: ${20 + Math.random() * 60}%;`}
+                  title={churrascaria.name}
+                ></div>
+              ))}
+            </div>
+          </div>
+    
+          <!-- Grid de churrascarías con diseño creativo -->
+          <div id="churrascarías-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {churrascariasList.map((churrascaria) => (
+              <div 
+                class="churrascaria-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50"
+                data-rating={churrascaria.rating}
+                data-distance={churrascaria.distance ? churrascaria.distance.replace(" km", "") : "0"}
+                data-closed={churrascaria.closed ? "true" : "false"}
+                data-has-menu={churrascaria.menu ? "true" : "false"}
+              >
+                <!-- Imagen con overlay -->
+                <div class="relative h-48 overflow-hidden">
+                  <img
+                    src={churrascaria.image ? churrascaria.image : espadasImg.src} 
+                    alt={churrascaria.name}
+                    width={500}
+                    height={300}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
+                  
+                  <!-- Calificación y precio -->
+                  <div class="absolute bottom-3 left-3 flex items-center space-x-2">
+                    <div class="flex items-center bg-black/90 px-2 py-1 rounded-full">
+                      <Star className="w-4 h-4 text-[#D4AF37] mr-1" />
+                      <span class="text-sm font-medium text-white">{churrascaria.rating}</span>
+                      <span class="text-xs text-gray-400 ml-1">({churrascaria.reviewCount})</span>
+                    </div>
+                    <div class="bg-black/90 px-2 py-1 rounded-full">
+                      <span class="text-sm font-medium text-white">{churrascaria.priceRange}</span>
+                    </div>
+                  </div>
+    
+                  <!-- Distancia -->
+                  {churrascaria.distance && (
+                    <div class="absolute top-3 right-3 bg-black/90 px-2 py-1 rounded-full">
+                      <div class="flex items-center">
+                        <MapPin className="w-3 h-3 text-[#D4AF37] mr-1" />
+                        <span class="text-xs text-white">{churrascaria.distance}</span>
+                      </div>
+                    </div>
+                  )}
+    
+                  <!-- Indicador si está en el menú digital -->
+                  {churrascaria.menu && (
+                    <div class="absolute top-3 left-3 bg-[#D4AF37] text-black px-2 py-1 rounded-full text-xs">
+                      Menú Digital
+                    </div>
+                  )}
+                </div>
+    
+                <!-- Contenido de la tarjeta -->
+                <div class="p-5">
+                  <h3 class="font-serif text-xl font-bold text-[#D4AF37] mb-2 group-hover:text-[#F5CD70] transition-colors">
+                    {churrascaria.menu ? (
+                      <a href={churrascaria.menu} class="hover:underline">{churrascaria.name}</a>
+                    ) : (
+                      churrascaria.name
+                    )}
+                  </h3>
+    
+                  <!-- Estado (abierto/cerrado) -->
+                  <div class="flex items-center mb-3">
+                    <Clock className="w-4 h-4 text-gray-400 mr-2" />
+                    {churrascaria.closed ? (
+                      <span class="text-sm text-red-400">Cerrado · Abre {churrascaria.openingTime}</span>
+                    ) : (
+                      <span class="text-sm text-green-400">Abierto · {churrascaria.hours}</span>
+                    )}
+                  </div>
+    
+                  <!-- Dirección con botón para ver en Google Maps -->
+                  <div class="flex items-start mb-3">
+                    <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                    <div class="flex flex-col">
+                      <span class="text-sm text-gray-300">{churrascaria.address}</span>
+                      <a 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(churrascaria.address)}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="text-xs text-[#D4AF37] hover:text-[#F5CD70] mt-1 flex items-center transition-colors"
+                      >
+                        <span>Ver en el mapa</span>
+                        <ArrowRight className="w-3 h-3 ml-1" />
+                      </a>
+                    </div>
+                  </div>
+    
+                  <!-- Especialidades -->
+                  <div class="flex flex-wrap gap-2 mt-3 mb-3">
+                    {churrascaria.specialties && churrascaria.specialties.map((specialty) => (
+                      <span class="text-xs bg-[#2A2A2A] text-[#D4AF37] px-2 py-1 rounded-full">{specialty}</span>
+                    ))}
+                  </div>
+    
+                  <!-- Servicios disponibles -->
+                  <div class="flex flex-wrap gap-2 mt-4">
+                    {churrascaria.services && churrascaria.services.map((service) => (
+                      <span class="text-xs bg-[#2A2A2A] text-gray-300 px-2 py-1 rounded-full">{service}</span>
+                    ))}
+                  </div>
+    
+                  <!-- Botón de acción -->
+                  <div class="mt-5">
+                    {churrascaria.menu ? (
+                      <a 
+                        href={churrascaria.menu} 
+                        class="inline-block w-full text-center py-2 bg-[#D4AF37] text-black rounded-lg font-serif hover:bg-[#B8860B] transition-colors"
+                      >
+                        Ver Menú
+                      </a>
+                    ) : (
+                      <button 
+                        class="w-full py-2 bg-[#2A2A2A] text-[#D4AF37] rounded-lg font-serif hover:bg-[#3A3A3A] transition-colors"
+                      >
+                        Más Información
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+    
+          <!-- Sección de destacados -->
+          <div class="mt-20 mb-16">
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-[#D4AF37] mb-8 text-center">Churrascarías Destacadas</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Churrascaría destacada 1 -->
+              <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
+                <div class="md:w-2/5 relative">
+                  <Image
+                    src={espadasImg} 
+                    alt="Fogo de Brasil"
+                    width={400}
+                    height={500}
+                    class="w-full h-full object-cover"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
+                  <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
+                    <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
+                      <Star className="w-4 h-4 text-[#D4AF37] inline mr-1" />
+                      <span class="text-sm font-medium text-white">4.8 (1.2K)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="md:w-3/5 p-6">
+                  <h3 class="font-serif text-2xl font-bold text-[#D4AF37] mb-2">Fogo de Brasil</h3>
+                  <p class="text-gray-300 mb-4">La auténtica experiencia brasileña en Monterrey. Disfruta de los mejores cortes de carne servidos directamente en tu mesa por expertos pasadores de espadas.</p>
+                  <div class="flex items-center mb-2">
+                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
+                    <span class="text-sm text-gray-300">Av. Lázaro Cárdenas 2424, Monterrey</span>
+                  </div>
+                  <div class="flex items-center mb-4">
+                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
+                    <span class="text-sm text-gray-300">$600–800 por persona</span>
+                  </div>
+                  <a 
+                    href="/menus/fogodebrasil" 
+                    class="inline-block px-6 py-2 bg-[#D4AF37] text-black rounded-lg font-serif hover:bg-[#B8860B] transition-colors"
+                  >
+                    Ver Menú Completo
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Churrascaría destacada 2 -->
+              <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
+                <div class="md:w-2/5 relative">
+                  <Image
+                    src={espadasImg} 
+                    alt="Fogón do Brasil"
+                    width={400}
+                    height={500}
+                    class="w-full h-full object-cover"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
+                  <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
+                    <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
+                      <Star className="w-4 h-4 text-[#D4AF37] inline mr-1" />
+                      <span class="text-sm font-medium text-white">4.7 (890)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="md:w-3/5 p-6">
+                  <h3 class="font-serif text-2xl font-bold text-[#D4AF37] mb-2">Fogón do Brasil</h3>
+                  <p class="text-gray-300 mb-4">Una experiencia gastronómica premium con los mejores cortes brasileños. Disfruta de un ambiente elegante y un servicio excepcional mientras saboreas carnes de primera calidad.</p>
+                  <div class="flex items-center mb-2">
+                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
+                    <span class="text-sm text-gray-300">Av. Gómez Morín 908, San Pedro Garza García</span>
+                  </div>
+                  <div class="flex items-center mb-4">
+                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
+                    <span class="text-sm text-gray-300">$700–900 por persona</span>
+                  </div>
+                  <a 
+                    href="/menus/fogondobrasil" 
+                    class="inline-block px-6 py-2 bg-[#D4AF37] text-black rounded-lg font-serif hover:bg-[#B8860B] transition-colors"
+                  >
+                    Ver Menú Completo
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+          <!-- Sección de registro de restaurante -->
+          <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-[#D4AF37]/20">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-4 text-center">¿Tienes un Restaurante de Espadas Brasileñas?</h2>
+            <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">
+              📈 Registra tu churrascaría en nuestra plataforma y muestra tu menú digital a miles de amantes de la buena carne. 
+              Aumenta tu visibilidad y atrae más clientes buscando "restaurantes de espadas brasileñas en monterrey".
+            </p>
+            <div class="text-center">
+              <a 
+                href="/contact" 
+                class="inline-block px-8 py-3 bg-[#D4AF37] text-black rounded-lg font-serif hover:bg-[#B8860B] transition-colors"
+              >
+                🚀 Registrar mi Restaurante GRATIS
+              </a>
+            </div>
+          </div>
+
+          <!-- FAQ Section para SEO -->
+          <div class="mt-16 mb-8">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-8 text-center">
+              ❓ Preguntas Frecuentes - Restaurantes de Espadas Brasileñas
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué es un restaurante de espadas brasileñas?</h3>
+                <p class="text-gray-300 text-sm">Un restaurante de espadas brasileñas, también conocido como churrascaría, ofrece el sistema rodizio donde los meseros pasan por las mesas sirviendo diferentes cortes de carne asada directamente de las espadas.</p>
+              </div>
+              
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Cuánto cuesta comer en Las Espadas?</h3>
+                <p class="text-gray-300 text-sm">Los precios en restaurantes de espadas brasileñas en Monterrey van desde $400 hasta $900 por persona, dependiendo del restaurante y los cortes incluidos en el rodizio.</p>
+              </div>
+              
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Dónde están las mejores churrascarías en Monterrey?</h3>
+                <p class="text-gray-300 text-sm">Las mejores churrascarías están ubicadas en Lázaro Cárdenas, San Pedro Garza García, y Paseo de los Leones. Todas ofrecen auténtica comida brasileña y sistema rodizio.</p>
+              </div>
+              
+              <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
+                <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué incluye el buffet brasileño?</h3>
+                <p class="text-gray-300 text-sm">El buffet brasileño incluye barra de ensaladas, acompañamientos, cortes de carne ilimitados servidos en rodizio, y muchas veces postres y bebidas.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -452,7 +917,7 @@ const schemaEnrichment = {
         
         switch(filterType) {
           case 'all':
-            // Mostrar todas las churrascarías
+            // Mostrar todas las churrascarias
             shouldShow = true;
             break;
           case 'nearby':
