@@ -1,9 +1,10 @@
 ---
+export const prerender = false;
+
 import { supabase, createSupabaseClient } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 
-// Middleware-like authentication check
-// Middleware-like authentication check
+
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
