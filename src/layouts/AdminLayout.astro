@@ -1,5 +1,4 @@
 ---
-
 import AdminHeader from "../components/AdminHeader";
 import BaseHead from "../components/BaseHead.astro";
 
@@ -10,7 +9,6 @@ interface Props {
 
 const { title, description = "Panel de administrador" } = Astro.props;
 ---
-
 
 <html lang="es">
   <head>
@@ -31,28 +29,19 @@ const { title, description = "Panel de administrador" } = Astro.props;
       </footer>
     </div>
 
-    <script>
-      // Manejar cierre de sesión
-      document
-        .getElementById("logout-btn")
-        ?.addEventListener("click", async () => {
-          try {
-            const response = await fetch("/api/auth/logout", {
-              method: "POST",
-            });
-            
-            if (response.ok) {
-              window.location.href = "/admin/login";
-            } else {
-              const errorData = await response.json();
-              console.error("Error al cerrar sesión:", errorData);
-              alert("No se pudo cerrar sesión. Intente nuevamente.");
-            }
-          } catch (error) {
-            console.error("Error al cerrar sesión:", error);
-            alert("Ocurrió un error al intentar cerrar sesión.");
-          }
-        });
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] =
+          c[a] ||
+          function () {
+            (c[a].q = c[a].q || []).push(arguments);
+          };
+        t = l.createElement(r);
+        t.async = 1;
+        t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0];
+        y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "s1a8gh6len");
     </script>
   </body>
 </html>
