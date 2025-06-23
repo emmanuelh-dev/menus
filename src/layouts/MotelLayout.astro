@@ -1,0 +1,281 @@
+---
+import Footer from "../components/Footer.astro";
+import MotelHeader from "../components/MotelHeader.astro";
+import ReviewForm from "../components/ReviewForm";
+import ScrollTopAndComment from "../components/ScrollTopAndComment";
+import { supabase } from "../lib/supabase";
+
+const path = Astro.url.pathname;
+
+interface Address {
+  streetAddress?: string;
+  addressLocality?: string;
+  postalCode?: string;
+  addressCountry?: string;
+}
+
+interface OpeningHoursSpecification {
+  "@type": "OpeningHoursSpecification";
+  dayOfWeek: string[];
+  opens: string;
+  closes: string;
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: "LodgingBusiness" | "Motel" | "Hotel";
+  textWhite?: boolean;
+  backgroundColor?: string;
+  favicon?: string;
+  canonical?: string;
+  ogUrl?: string;
+
+  schemaEnrichment?: {
+    address?: Address;
+    telephone?: string;
+    email?: string;
+    priceRange?: string;
+    checkinTime?: string;
+    checkoutTime?: string;
+    openingHours?: string | OpeningHoursSpecification[];
+    paymentAccepted?: string[];
+    currenciesAccepted?: string[];
+    aggregateRating?: {
+      ratingValue: number;
+      reviewCount: number;
+    };
+    amenityFeature?: string[];
+    numberOfRooms?: number;
+    petsAllowed?: boolean;
+  };
+}
+
+const {
+  title,
+  description,
+  image,
+  favicon,
+  type = "LodgingBusiness",
+  textWhite = false,
+  backgroundColor = "bg-white",
+  schemaEnrichment = {},
+  canonical,
+  ogUrl,
+} = Astro.props;
+
+let reviewStats = {
+  ratingValue: 0,
+  reviewCount: 0,
+};
+
+try {
+  const { data: motelData } = await supabase
+    .from("moteles")
+    .select("id")
+    .eq("slug", path)
+    .single();
+
+  if (motelData) {
+    const { data: reviewsData } = await supabase
+      .from("review_moteles")
+      .select("rate")
+      .eq("motel_id", motelData.id);
+
+    if (reviewsData && reviewsData.length > 0) {
+      const totalRating = reviewsData.reduce((sum, review) => sum + review.rate, 0);
+      reviewStats.ratingValue = Number((totalRating / reviewsData.length).toFixed(1));
+      reviewStats.reviewCount = reviewsData.length;
+    }
+  }
+} catch (error) {
+  console.error("Error fetching motel reviews:", error);
+}
+
+// Schema.org structured data para moteles
+const schema: any = {
+  "@context": "https://schema.org",
+  "@type": type,
+  name: title,
+  description: description,
+  url: canonical || Astro.url.toString(),
+};
+
+// Enriquecimiento del schema con datos específicos
+if (schemaEnrichment.address) {
+  schema.address = {
+    "@type": "PostalAddress",
+    ...schemaEnrichment.address,
+  };
+}
+
+if (schemaEnrichment.telephone) {
+  schema.telephone = schemaEnrichment.telephone;
+}
+
+if (schemaEnrichment.email) {
+  schema.email = schemaEnrichment.email;
+}
+
+if (schemaEnrichment.priceRange) {
+  schema.priceRange = schemaEnrichment.priceRange;
+}
+
+if (schemaEnrichment.checkinTime) {
+  schema.checkinTime = schemaEnrichment.checkinTime;
+}
+
+if (schemaEnrichment.checkoutTime) {
+  schema.checkoutTime = schemaEnrichment.checkoutTime;
+}
+
+if (schemaEnrichment.openingHours) {
+  if (typeof schemaEnrichment.openingHours === "string") {
+    schema.openingHours = schemaEnrichment.openingHours;
+  } else {
+    schema.openingHoursSpecification = schemaEnrichment.openingHours;
+  }
+}
+
+if (schemaEnrichment.paymentAccepted) {
+  schema.paymentAccepted = schemaEnrichment.paymentAccepted;
+}
+
+if (schemaEnrichment.currenciesAccepted) {
+  schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
+}
+
+if (schemaEnrichment.amenityFeature) {
+  schema.amenityFeature = schemaEnrichment.amenityFeature.map(amenity => ({
+    "@type": "LocationFeatureSpecification",
+    name: amenity
+  }));
+}
+
+if (schemaEnrichment.numberOfRooms) {
+  schema.numberOfRooms = schemaEnrichment.numberOfRooms;
+}
+
+if (schemaEnrichment.petsAllowed !== undefined) {
+  schema.petsAllowed = schemaEnrichment.petsAllowed;
+}
+
+if (reviewStats.reviewCount > 0) {
+  schema.aggregateRating = {
+    "@type": "AggregateRating",
+    ratingValue: reviewStats.ratingValue,
+    reviewCount: reviewStats.reviewCount,
+    bestRating: 5,
+    worstRating: 1,
+  };
+} else if (schemaEnrichment.aggregateRating) {
+  schema.aggregateRating = {
+    "@type": "AggregateRating",
+    ...schemaEnrichment.aggregateRating,
+  };
+}
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={favicon ? favicon : "/favicon.ico"}
+    />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical || Astro.url} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={ogUrl || Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={ogUrl || Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    {
+      image && (
+        <meta property="twitter:image" content={new URL(image, Astro.url)} />
+      )
+    }
+
+    <!-- Schema.org for Google -->
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+    <!-- Google Fonts for elegant feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script
+      src="https://analytics.ahrefs.com/analytics.js"
+      data-key="tBLkU3Ea6HxUBHJiGObWig"
+      async></script>
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] =
+          c[a] ||
+          function () {
+            (c[a].q = c[a].q || []).push(arguments);
+          };
+        t = l.createElement(r);
+        t.async = 1;
+        t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0];
+        y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "s1a8gh6len");
+    </script>
+  </head>  <body class="motel-typography">
+    <MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
+    <slot />
+    {
+      path.includes("/moteles") && (
+        <div
+          class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
+        >
+          <div class={`max-w-4xl mx-auto px-10 lg:px-4 pt-10 `}>
+            <ReviewForm client:only path={path} restaurantName={title} />
+          </div>
+        </div>
+      )
+    }
+    <ScrollTopAndComment client:only />
+    <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
+
+    <style>
+      .motel-typography {
+        font-family: "Inter", system-ui, sans-serif;
+      }
+      
+      .font-serif {
+        font-family: "Playfair Display", serif;
+      }
+
+      body {
+        background-color: #000;
+        color: #fff;
+      }
+    </style>
+  </body>
+</html>

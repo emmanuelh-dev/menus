@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import MotelLayout from "../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
@@ -333,14 +333,14 @@ const schemaEnrichment = {
 };
 ---
 
-<RestaurantLayout 
+<MotelLayout 
   title={seoData.title}
   description={seoData.description}
   schemaEnrichment={schemaEnrichment}
   backgroundColor="bg-gradient-to-r from-[#4a5568] to-[#553c7b]"
   textWhite={true}  canonical={seoData.canonical}
   ogUrl={seoData.ogUrl}
->  <!-- Motel Business Structured Data -->
+><!-- Motel Business Structured Data -->
   <MotelBusinessSchema moteles={motelesList} />
   
   <!-- Breadcrumb Structured Data -->
@@ -682,7 +682,7 @@ const schemaEnrichment = {
         </div>
       </section>
 </main>
-</RestaurantLayout>
+</MotelLayout>
 
 <script>
 // Funcionalidad de filtros

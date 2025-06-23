@@ -1,0 +1,180 @@
+---
+import { Bed, Menu, X, Heart, ChevronDown } from "lucide-react";
+
+const { textWhite, backgroundColor } = Astro.props;
+
+// Enlaces de navegación específicos para moteles
+const motelNavItems = [
+  { href: "/moteles", label: "Mejores Moteles" },
+  { href: "/moteles?tipo=baratos", label: "Moteles Baratos" },
+  { href: "/moteles?tipo=jacuzzi", label: "Con Jacuzzi" },
+  { href: "/moteles?zona=centro", label: "Centro" },
+  { href: "/moteles?zona=cumbres", label: "Cumbres" },
+  { href: "/contact", label: "Contacto" }
+];
+---
+
+<header
+    class={`${backgroundColor} ${textWhite ? "text-white" : "text-black"} border-b border-pink-500/20 backdrop-blur-sm sticky top-0 z-50 shadow-sm`}
+>
+    <div class="max-w-7xl mx-auto">
+        <div class="flex px-6 py-4 items-center justify-between"> 
+            <!-- Logo -->
+            <a class="flex items-center space-x-2 group" href="/">
+                <div class="p-2 bg-gradient-to-r from-pink-600 to-pink-500 rounded-xl shadow-lg group-hover:shadow-pink-500/25 transition-all duration-300">
+                    <Heart className="h-5 w-5 text-white" />
+                </div>
+                <div class={`${textWhite ? "text-white" : "hidden sm:block"}`}>
+                    <span class={`font-bold ${textWhite ? "text-white" : "text-slate-900"} text-lg font-serif`}>BySMax</span>
+                    <div class={`text-xs ${textWhite ? "text-pink-300" : "text-pink-600"} font-medium`}>Guía de Moteles</div>
+                </div>
+            </a>
+
+            <!-- Navigation Desktop -->
+            <div class="hidden lg:flex items-center space-x-6">
+                <!-- Dropdown Menu -->
+                <div class="relative group">
+                    <button
+                        id="desktopMenuButton"
+                        class={`flex items-center space-x-1 px-3 py-2 rounded-lg ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"} transition-all duration-200 text-sm font-medium`}
+                    >
+                        <span>Explorar</span>
+                        <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+                    </button>
+                    
+                    <!-- Dropdown Content -->
+                    <div
+                        id="desktopDropdown"
+                        class={`absolute top-full left-0 mt-2 w-64 ${backgroundColor || "bg-black"} border border-pink-500/20 rounded-xl shadow-lg backdrop-blur-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50`}
+                    >
+                        <div class="py-3">
+                            <!-- Categorías -->
+                            <div class="pb-2">
+                                <div class={`px-4 py-1 text-xs font-semibold uppercase tracking-wider ${textWhite ? "text-pink-300" : "text-pink-600"}`}>
+                                    Por Tipo
+                                </div>
+                                <div class="mt-1">
+                                    <a
+                                        href="/moteles?tipo=baratos"
+                                        class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+                                    >
+                                        💰 Moteles Baratos
+                                    </a>
+                                    <a
+                                        href="/moteles?tipo=jacuzzi"
+                                        class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+                                    >
+                                        🛁 Con Jacuzzi
+                                    </a>
+                                    <a
+                                        href="/moteles?tipo=12-horas"
+                                        class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+                                    >
+                                        ⏰ 12 Horas
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Zonas -->
+                            <div class="border-t border-pink-500/20 pt-3 pb-2">
+                                <div class={`px-4 py-1 text-xs font-semibold uppercase tracking-wider ${textWhite ? "text-pink-300" : "text-pink-600"}`}>
+                                    Por Zona
+                                </div>
+                                <div class="mt-1">
+                                    <a
+                                        href="/moteles?zona=centro"
+                                        class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+                                    >
+                                        🏛️ Centro
+                                    </a>
+                                    <a
+                                        href="/moteles?zona=universidad"
+                                        class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+                                    >
+                                        🎓 Universidad
+                                    </a>
+                                    <a
+                                        href="/moteles?zona=cumbres"
+                                        class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+                                    >
+                                        🏔️ Cumbres
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enlaces directos -->
+                <a 
+                    href="/moteles"
+                    class={`px-3 py-2 rounded-lg ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"} transition-all duration-200 text-sm font-medium`}
+                >
+                    Todos los Moteles
+                </a>
+
+                <a 
+                    href="/contact"
+                    class={`px-4 py-2 bg-gradient-to-r from-pink-600 to-pink-500 text-white rounded-lg hover:from-pink-500 hover:to-pink-400 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-pink-500/25`}
+                >
+                    Contacto
+                </a>
+            </div>
+
+            <!-- Mobile menu button -->
+            <button
+                id="mobileMenuButton"
+                class={`lg:hidden p-2 rounded-lg ${textWhite ? "text-white hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"} transition-colors duration-200`}
+                aria-label="Abrir menú"
+            >
+                <Menu className="h-6 w-6" />
+            </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div 
+            id="mobileMenu"
+            class="lg:hidden hidden border-t border-pink-500/20 backdrop-blur-sm"
+        >
+            <div class="px-6 py-4 space-y-2">
+                {motelNavItems.map((item) => (
+                    <a
+                        href={item.href}
+                        class={`block px-3 py-2 rounded-lg ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 text-sm font-medium`}
+                    >
+                        {item.label}
+                    </a>
+                ))}
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = mobileMenuButton?.querySelector('svg');
+        
+        mobileMenuButton?.addEventListener('click', function() {
+            if (mobileMenu?.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                if (menuIcon) {
+                    menuIcon.outerHTML = '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                }
+            } else {
+                mobileMenu?.classList.add('hidden');
+                if (menuIcon) {
+                    menuIcon.outerHTML = '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>';
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .font-serif {
+        font-family: "Playfair Display", serif;
+    }
+</style>
