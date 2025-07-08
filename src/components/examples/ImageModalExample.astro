@@ -1,0 +1,65 @@
+<div class="container mx-auto p-4">
+  <h2 class="text-2xl font-bold mb-4">Ejemplo de uso del ImageModal</h2>
+  
+  <!-- Imágenes de ejemplo -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div class="cursor-pointer image-item" data-image="/public/blog-placeholder-1.jpg" data-title="Imagen 1">
+      <img src="/public/blog-placeholder-1.jpg" alt="Imagen 1" class="w-full h-48 object-cover rounded-lg hover:scale-105 transition-transform" />
+      <p class="text-center mt-2" data-image-title>Imagen 1</p>
+    </div>
+    
+    <div class="cursor-pointer image-item" data-image="/public/blog-placeholder-2.jpg" data-title="Imagen 2">
+      <img src="/public/blog-placeholder-2.jpg" alt="Imagen 2" class="w-full h-48 object-cover rounded-lg hover:scale-105 transition-transform" />
+      <p class="text-center mt-2" data-image-title>Imagen 2</p>
+    </div>
+    
+    <div class="cursor-pointer image-item" data-image="/public/blog-placeholder-3.jpg" data-title="Imagen 3">
+      <img src="/public/blog-placeholder-3.jpg" alt="Imagen 3" class="w-full h-48 object-cover rounded-lg hover:scale-105 transition-transform" />
+      <p class="text-center mt-2" data-image-title>Imagen 3</p>
+    </div>
+  </div>
+
+  <!-- Botones para abrir imágenes específicas -->
+  <div class="mt-8 space-x-4">
+    <button id="openImage1" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+      Abrir Imagen 1
+    </button>
+    <button id="openImage2" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+      Abrir Imagen 2
+    </button>
+    <button id="openImage3" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+      Abrir Imagen 3
+    </button>
+  </div>
+</div>
+
+
+<script>
+  function initExampleModal(): void {
+    // Crear instancia del modal
+    const imageModal = (window as any).createImageModal({
+      modalId: 'exampleModal',
+      onOpen: () => console.log('Modal abierto'),
+      onClose: () => console.log('Modal cerrado')
+    });
+
+    // Método 1: Usar attachToElements para elementos clickeables
+    imageModal.attachToElements('.image-item');
+
+    // Método 2: Usar botones específicos para abrir imágenes
+    document.getElementById('openImage1')?.addEventListener('click', () => {
+      imageModal.open('/public/blog-placeholder-1.jpg', 'Imagen 1', 'Esta es la imagen 1');
+    });
+
+    document.getElementById('openImage2')?.addEventListener('click', () => {
+      imageModal.open('/public/blog-placeholder-2.jpg', 'Imagen 2', 'Esta es la imagen 2');
+    });
+
+    document.getElementById('openImage3')?.addEventListener('click', () => {
+      imageModal.open('/public/blog-placeholder-3.jpg', 'Imagen 3', 'Esta es la imagen 3');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initExampleModal);
+  document.addEventListener('astro:page-load', initExampleModal);
+</script>

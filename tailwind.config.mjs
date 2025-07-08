@@ -3,7 +3,10 @@ export default {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
 	theme: {
 		extend: {
-			
+			fontFamily: {
+				'more-sugar': ['More Sugar', 'serif'],
+				'inter': ['Inter', 'sans-serif'],
+			},
 		},
 	},
 	plugins: [

@@ -1,0 +1,38 @@
+/* Fuente More Sugar para Maison Délices */
+@font-face {
+  font-family: 'More Sugar';
+  src: url('./more-sugar.woff2') format('woff2'),
+       url('./more-sugar.woff') format('woff'),
+       url('./more-sugar.otf') format('opentype'),
+       url('./more-sugar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Si tienes variantes (bold, italic, etc.) agrega más @font-face */
+@font-face {
+  font-family: 'More Sugar';
+  src: url('./more-sugar-bold.woff2') format('woff2'),
+       url('./more-sugar-bold.woff') format('woff'),
+       url('./more-sugar-bold.otf') format('opentype'),
+       url('./more-sugar-bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Clases de utilidad */
+.font-more-sugar {
+  font-family: 'More Sugar', serif;
+}
+
+.maison-title {
+  font-family: 'More Sugar', serif;
+  font-weight: normal;
+}
+
+.maison-heading {
+  font-family: 'More Sugar', serif;
+  font-weight: bold;
+}
