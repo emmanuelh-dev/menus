@@ -60,7 +60,7 @@ function AdminHeader() {
                 md:translate-x-0 
                 lg:block
             `}>
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-[100dvh]">
                     <div className="p-6 border-b border-gray-100">
                         <h1 className="text-lg font-semibold text-gray-900">Menús</h1>
                         <p className="text-xs text-gray-500 mt-0.5">Panel de control</p>
