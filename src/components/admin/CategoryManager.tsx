@@ -28,6 +28,8 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
   const [success, setSuccess] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -94,6 +96,36 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
       showMessage('Error de red al cargar categorías', true);
     }
   };
+
+  const openEditModal = (category: Category) => {
+    setEditingCategory(category);
+    setFormData({
+      name: category.name,
+      description: category.description || '',
+      image: category.image || '',
+      parent_id: category.parent_id?.toString() || '',
+      display_order: category.display_order,
+      is_active: category.is_active,
+    });
+    setImagePreview(category.image || '');
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingCategory(null);
+    setFormData({
+      name: '',
+      description: '',
+      image: '',
+      parent_id: '',
+      display_order: 0,
+      is_active: true,
+    });
+    setImageFile(null);
+    setImagePreview('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -101,7 +133,6 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
     try {
       let imageUrl = formData.image;
 
-      // Subir nueva imagen si se seleccionó una
       if (imageFile) {
         imageUrl = await uploadImage(imageFile);
       }
@@ -116,8 +147,14 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
         is_active: formData.is_active,
       };
 
-      const response = await fetch('/api/categories', {
-        method: 'POST',
+      const url = editingCategory 
+        ? `/api/categories/${editingCategory.id}`
+        : '/api/categories';
+      
+      const method = editingCategory ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -127,24 +164,27 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
       const data = await response.json();
 
       if (response.ok) {
-        showMessage('¡Categoría creada exitosamente!');
-        setFormData({
-          name: '',
-          description: '',
-          image: '',
-          parent_id: '',
-          display_order: 0,
-          is_active: true,
-        });
-        setImageFile(null);
-        setImagePreview('');
-        // Recargar categorías
+        showMessage(editingCategory ? '¡Categoría actualizada exitosamente!' : '¡Categoría creada exitosamente!');
+        if (editingCategory) {
+          closeModal();
+        } else {
+          setFormData({
+            name: '',
+            description: '',
+            image: '',
+            parent_id: '',
+            display_order: 0,
+            is_active: true,
+          });
+          setImageFile(null);
+          setImagePreview('');
+        }
         await loadCategories();
       } else {
-        showMessage(data.error || 'Error al crear categoría', true);
+        showMessage(data.error || `Error al ${editingCategory ? 'actualizar' : 'crear'} categoría`, true);
       }
     } catch (err) {
-      showMessage('Error de red al crear categoría', true);
+      showMessage(`Error de red al ${editingCategory ? 'actualizar' : 'crear'} categoría`, true);
     } finally {
       setLoading(false);
     }
@@ -184,7 +224,166 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
   const parentCategories = categories?.filter(cat => !cat.parent_id) || [];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <>
+      {/* Modal de Edición */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div 
+              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+              onClick={closeModal}
+            />
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Editar Categoría
+                  </h3>
+                  <button
+                    onClick={closeModal}
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    Error: {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label htmlFor="modal-name" className="block text-sm font-medium text-gray-700 mb-2">
+                      Nombre *
+                    </label>
+                    <input
+                      type="text"
+                      id="modal-name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="modal-description" className="block text-sm font-medium text-gray-700 mb-2">
+                      Descripción
+                    </label>
+                    <textarea
+                      id="modal-description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="modal-image" className="block text-sm font-medium text-gray-700 mb-2">
+                      Imagen de la Categoría
+                    </label>
+                    
+                    {imagePreview && (
+                      <div className="mb-3">
+                        <img
+                          src={imagePreview}
+                          alt="Vista previa"
+                          className="w-24 h-24 object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                    
+                    <input
+                      type="file"
+                      id="modal-image"
+                      name="image"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="modal-parent_id" className="block text-sm font-medium text-gray-700 mb-2">
+                      Categoría Padre
+                    </label>
+                    <select
+                      id="modal-parent_id"
+                      name="parent_id"
+                      value={formData.parent_id}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    >
+                      <option value="">Sin categoría padre</option>
+                      {parentCategories.filter(c => c.id !== editingCategory?.id).map((category) => (
+                        <option key={category.id} value={category.id}>{category.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="modal-display_order" className="block text-sm font-medium text-gray-700 mb-2">
+                        Orden
+                      </label>
+                      <input
+                        type="number"
+                        id="modal-display_order"
+                        name="display_order"
+                        value={formData.display_order}
+                        onChange={handleInputChange}
+                        min="0"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                      />
+                    </div>
+
+                    <div className="flex items-center pt-8">
+                      <input
+                        type="checkbox"
+                        id="modal-is_active"
+                        name="is_active"
+                        checked={formData.is_active}
+                        onChange={handleInputChange}
+                        className="rounded border-gray-300 focus:ring-indigo-500"
+                      />
+                      <label htmlFor="modal-is_active" className="ml-2 text-sm text-gray-700">
+                        Activa
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                    >
+                      {loading ? 'Guardando...' : 'Guardar Cambios'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Formulario para crear nueva categoría */}
       <div className="lg:col-span-1">
         <div className="bg-white shadow rounded-lg p-6 sticky top-6">
@@ -372,19 +571,19 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
                     <div className="flex space-x-2 ml-4">
                       <a
                         href={`/admin/menus/${menuId}/categories/${category.id}/items`}
-                        className="text-green-600 hover:text-green-900 text-sm"
+                        className="text-green-600 hover:text-green-900 text-sm font-medium"
                       >
                         Ver Platillos
                       </a>
-                      <a
-                        href={`/admin/menus/categories/edit/${category.id}`}
-                        className="text-indigo-600 hover:text-indigo-900 text-sm"
+                      <button
+                        onClick={() => openEditModal(category)}
+                        className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
                       >
                         Editar
-                      </a>
+                      </button>
                       <button
                         onClick={() => handleDelete(category.id)}
-                        className="text-red-600 hover:text-red-900 text-sm"
+                        className="text-red-600 hover:text-red-900 text-sm font-medium"
                       >
                         Eliminar
                       </button>
@@ -402,5 +601,6 @@ export default function CategoryManager({ restaurantId, menuId, initialCategorie
         </div>
       </div>
     </div>
+    </>
   );
 }

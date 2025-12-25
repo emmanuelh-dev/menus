@@ -18,6 +18,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Crear cliente de Supabase con autenticación
     const supabase = createSupabaseClient(accessToken, refreshToken);
     
+    // Obtener usuario autenticado
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'No autorizado' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
     // Obtener datos del cuerpo de la solicitud
     const restaurantData = await request.json();
     
@@ -29,9 +39,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
     
-    // Agregar fecha de creación
+    // Agregar fecha de creación y user_id
     const dataToInsert = {
       ...restaurantData,
+      user_id: user.id,
       created_at: new Date().toISOString()
     };
     
@@ -79,10 +90,21 @@ export const GET: APIRoute = async ({ cookies }) => {
     // Crear cliente de Supabase con autenticación
     const supabase = createSupabaseClient(accessToken, refreshToken);
     
-    // Obtener todos los restaurantes
+    // Obtener usuario autenticado
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'No autorizado' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Obtener solo restaurantes del usuario
     const { data, error } = await supabase
       .from('restaurants')
       .select('*')
+      .eq('user_id', user.id)
       .order('name');
     
     if (error) {

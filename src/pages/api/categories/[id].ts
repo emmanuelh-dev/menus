@@ -2,6 +2,55 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { createSupabaseClient } from '../../../lib/supabase';
 
+export const PUT: APIRoute = async ({ params, request, cookies }) => {
+  const accessToken = cookies.get('sb-access-token')?.value;
+  const refreshToken = cookies.get('sb-refresh-token')?.value;
+
+  if (!accessToken || !refreshToken) {
+    return new Response(
+      JSON.stringify({ error: 'No autorizado' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  try {
+    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const categoryId = params.id;
+    const categoryData = await request.json();
+
+    if (!categoryData.name) {
+      return new Response(
+        JSON.stringify({ error: 'El nombre es obligatorio' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from('menu_categories')
+      .update(categoryData)
+      .eq('id', categoryId)
+      .select()
+      .single();
+
+    if (error) {
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ category: data }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  } catch (e: any) {
+    return new Response(
+      JSON.stringify({ error: 'Error interno del servidor' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+};
+
 export const DELETE: APIRoute = async ({ params, cookies }) => {
   const accessToken = cookies.get('sb-access-token')?.value;
   const refreshToken = cookies.get('sb-refresh-token')?.value;

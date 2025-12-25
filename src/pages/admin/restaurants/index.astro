@@ -24,10 +24,18 @@ const supabaseAuth = createSupabaseClient(
   refreshTokenCookie.value
 );
 
-// Obtener todos los restaurantes
+// Obtener usuario actual
+const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
+
+if (!user) {
+  return Astro.redirect("/admin/login");
+}
+
+// Obtener restaurantes del usuario
 const { data: restaurants, error } = await supabaseAuth
   .from('restaurants')
   .select('*')
+  .eq('user_id', user.id)
   .order('name');
 
 if (error) {

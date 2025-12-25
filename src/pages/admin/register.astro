@@ -1,0 +1,189 @@
+---
+export const prerender = false;
+
+import { supabase, createSupabaseClient } from "../../lib/supabase";
+import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (accessTokenCookie && refreshTokenCookie) {
+  try {
+    const supabaseWithAuth = createSupabaseClient(
+      accessTokenCookie.value,
+      refreshTokenCookie.value
+    );
+    const { data } = await supabaseWithAuth.auth.getUser();
+    if (data?.user) {
+      return Astro.redirect("/admin/dashboard");
+    }
+  } catch (error) {
+    console.error("Token validation error:", error);
+  }
+}
+---
+
+<RestaurantLayout title="Crear Cuenta" description="Crear una nueva cuenta">
+  <div class="h-screen flex items-center justify-center w-screen -mt-20">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+      <h1 class="text-2xl font-bold text-center mb-2">
+        Crear Cuenta
+      </h1>
+      <p class="text-center text-gray-600 mb-6">
+        Administra tus menús digitales
+      </p>
+
+      <div
+        id="error-message"
+        class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4"
+        role="alert"
+      >
+      </div>
+
+      <div
+        id="success-message"
+        class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4"
+        role="alert"
+      >
+      </div>
+
+      <form id="register-form" class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            minlength="6"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres</p>
+        </div>
+
+        <div>
+          <label for="confirm-password" class="block text-sm font-medium text-gray-700">
+            Confirmar Contraseña
+          </label>
+          <input
+            type="password"
+            id="confirm-password"
+            name="confirm-password"
+            required
+            minlength="6"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">
+            Nombre completo (opcional)
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Crear cuenta
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          ¿Ya tienes cuenta?
+          <a href="/admin/login" class="font-medium text-indigo-600 hover:text-indigo-500">
+            Iniciar sesión
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</RestaurantLayout>
+
+<script>
+  const form = document.getElementById("register-form") as HTMLFormElement;
+  const errorMessage = document.getElementById("error-message");
+  const successMessage = document.getElementById("success-message");
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirm-password") as string;
+    const name = formData.get("name") as string;
+
+    if (password !== confirmPassword) {
+      errorMessage!.textContent = "Las contraseñas no coinciden";
+      errorMessage!.classList.remove("hidden");
+      successMessage!.classList.add("hidden");
+      return;
+    }
+
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitButton.disabled = true;
+    submitButton.textContent = "Creando cuenta...";
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          email, 
+          password,
+          name 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        successMessage!.textContent = "Cuenta creada exitosamente. Redirigiendo...";
+        successMessage!.classList.remove("hidden");
+        errorMessage!.classList.add("hidden");
+        
+        setTimeout(() => {
+          window.location.href = "/admin/dashboard";
+        }, 1500);
+      } else {
+        errorMessage!.textContent = data.error || "Error al crear la cuenta";
+        errorMessage!.classList.remove("hidden");
+        successMessage!.classList.add("hidden");
+        submitButton.disabled = false;
+        submitButton.textContent = "Crear cuenta";
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      errorMessage!.textContent = "Error de conexión. Intenta de nuevo.";
+      errorMessage!.classList.remove("hidden");
+      successMessage!.classList.add("hidden");
+      submitButton.disabled = false;
+      submitButton.textContent = "Crear cuenta";
+    }
+  });
+</script>

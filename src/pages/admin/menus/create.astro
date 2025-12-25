@@ -22,12 +22,19 @@ const supabase = createSupabaseClient(
   refreshTokenCookie.value
 );
 
+const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+if (!user) {
+  return Astro.redirect("/admin/login");
+}
+
 let error = '';
 
-// Obtener restaurantes
+// Obtener restaurantes del usuario
 const { data: restaurants } = await supabase
   .from("restaurants")
   .select("id, name")
+  .eq("user_id", user.id)
   .order("name");
 
 // Procesar formulario
@@ -85,6 +92,7 @@ if (Astro.request.method === "POST") {  try {
       availability_end: formData.get("availability_end") as string || null,
       display_order: parseInt(formData.get("display_order") as string) || 0,
       availability_days: availabilityDays.length > 0 ? availabilityDays : null,
+      user_id: user.id,
     };
 
     const { error: insertError } = await supabase
