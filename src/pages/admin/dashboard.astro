@@ -126,7 +126,7 @@ const { data: recentRestaurants } = await supabase
                       {comment.restaurants?.name || comment.restaurant || 'Restaurante no especificado'}
                     </p>
                     <p class="text-sm text-gray-500 truncate">
-                      {comment.comment.substring(0, 500)}...
+                      {comment.comment}
                     </p>
                   </div>
                   <span class="text-xs text-gray-500">
@@ -156,8 +156,8 @@ const { data: recentRestaurants } = await supabase
                     <p class="text-sm font-medium text-gray-900 truncate">
                       {contact.email}
                     </p>
-                    <p class="text-sm text-gray-500 truncate">
-                      {contact.message.substring(0, 500)}...
+                    <p class="text-sm text-gray-500">
+                      {contact.message}
                     </p>
                   </div>
                   <span class="text-xs text-gray-500">

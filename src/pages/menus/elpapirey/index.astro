@@ -8,33 +8,7 @@ import { Facebook, Instagram } from "lucide-react";
 import menuImage from "./menu.jpg";
 import CopyClabe from "../../../components/CopyClabe";
 import { FaWhatsapp } from "react-icons/fa";
-import WhatsappButton from "../../../components/WhatsappButton";
-import RecommendationButton from "../../../components/RecommendationButton";
-import { supabase } from "../../../lib/supabase";
-
-const { data: restaurant } = await supabase
-  .from("restaurants")
-  .select("*")
-  .eq("menu", 'elpapirey')
-  .single();
-
-const { data: menu } = await supabase
-  .from("menus")
-  .select("*")
-  .eq("restaurant_id", restaurant?.id)
-  .eq("is_active", true)
-
-const { data: categoriesData } = await supabase
-  .from("menu_categories")
-  .select(`
-    *,
-    menu_items (
-      *
-    )
-  `)
-  .eq("restaurant_id", restaurant.id)
-  .eq("is_active", true)
-  .order("display_order");
+import MenuLoader from "../../../components/MenuLoader";
 
 const categoryColors = [
   "text-orange-500",
@@ -48,34 +22,6 @@ const categoryColors = [
   "text-indigo-500",
   "text-teal-500"
 ];
-
-const menuItems = categoriesData?.flatMap((category, categoryIndex) => {
-  const categoryItem = {
-    name: category.name.toUpperCase(),
-    category: true,
-    color: categoryColors[categoryIndex % categoryColors.length],
-    description: category.description
-  };
-
-  const items = category.menu_items
-    ?.filter(item => item.is_active)
-    ?.sort((a, b) => a.display_order - b.display_order)
-    ?.map(item => ({
-      name: item.name,
-      price: item.base_price,
-      color: "text-white",
-      description: item.description,
-      category: false,
-      is_vegetarian: item.is_vegetarian,
-      is_vegan: item.is_vegan,
-      is_gluten_free: item.is_gluten_free,
-      is_spicy: item.is_spicy,
-      allergens: item.allergens,
-      ingredients: item.ingredients
-    })) || [];
-
-  return [categoryItem, ...items];
-}) || [];
 
 const socialMedia = {
   instagram: {
@@ -103,6 +49,8 @@ const restaurantData = {
   name: "El Papi Rey",
   description: "Hamburguesas, Hot Dogs y Antojitos Mexicanos",
 };
+
+const menuSlug = "elpapirey";
 
 const schemaEnrichment = {
   address: {
@@ -141,7 +89,7 @@ const schemaEnrichment = {
 <RestaurantLayout  title={restaurantData.name}
   description={restaurantData.name}
   schemaEnrichment={schemaEnrichment}
-  image={restaurant?.image}
+  image="/logo.jpg"
   favicon={logo.src}
   textWhite={true}
   backgroundColor="bg-black"
@@ -153,7 +101,7 @@ const schemaEnrichment = {
       <!-- Header with Logo and Social Media -->
       <div class="flex flex-col items-center mb-8">
         <div class="flex items-center gap-4 mb-4">
-          <Image src={restaurant.image} alt="El Papi Rey Logo" width="500" height="500" class="w-full max-w-[500px]"/>
+          <Image src={logo} alt="El Papi Rey Logo" width="500" height="500" class="w-full max-w-[500px]"/>
         </div>
         <div class="flex gap-4 text-white mb-4">
           <a href={socialMedia.instagram.url} class="flex items-center gap-2 font-bold">
@@ -166,73 +114,27 @@ const schemaEnrichment = {
           </a>
         </div>
         <h1
-          class="sr-ony hidden text-orange-500 text-4xl font-bold text-center mb-2"
+          class="sr-only hidden text-orange-500 text-4xl font-bold text-center mb-2"
         >
           EL PAPI REY
         </h1>
         <p class="sr-ony hidden text-orange-500 text-xl">DEJATE CAYETANO</p>
       </div>
-      <CopyClabe client:load clabes={[contactInfo.clabe, contactInfo.clabe2]}/>      <!-- Menu Items -->
-      <div class="space-y-6 mb-8">
-        {
-          menuItems.map((item) => (
-            <div class={`${item.category ? "mt-6" : "px-4"}`}>
-              <div class="flex justify-between items-start">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2">
-                    <span
-                      class={`${item.color} ${item.category ? "text-xl font-bold" : "text-lg"} font-medium tracking-wide`}
-                    >
-                      {item.name}
-                    </span>
-                    {!item.category && (
-                      <div class="flex gap-1">
-                        {item.is_vegetarian && (
-                          <span class="text-green-400 text-xs" title="Vegetariano">🌱</span>
-                        )}
-                        {item.is_vegan && (
-                          <span class="text-green-500 text-xs" title="Vegano">🌿</span>
-                        )}
-                        {item.is_gluten_free && (
-                          <span class="text-blue-400 text-xs" title="Sin Gluten">🚫🌾</span>
-                        )}
-                        {item.is_spicy && (
-                          <span class="text-red-400 text-xs" title="Picante">🌶️</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {!item.category && item.description && (
-                    <p class="text-gray-400 text-sm mt-1">{item.description}</p>
-                  )}
-                  {item.category && item.description && (
-                    <p class="text-gray-400 text-sm mt-1">{item.description}</p>
-                  )}
-                  {!item.category && item.ingredients && (
-                    <p class="text-gray-500 text-xs mt-1">
-                      Ingredientes: {item.ingredients.join(", ")}
-                    </p>
-                  )}
-                  {!item.category && item.allergens && item.allergens.length > 0 && (
-                    <p class="text-orange-400 text-xs mt-1">
-                      ⚠️ Contiene: {item.allergens.join(", ")}
-                    </p>
-                  )}
-                </div>
-                <span class="text-yellow-400 text-xl font-bold ml-4">
-                  {item.price ? `$${item.price}` : null}
-                </span>
-              </div>
-            </div>
-          ))
-        }
-      </div>
-
-      {/* WhatsApp Floating Button */}
-      <WhatsappButton client:load phone={Number(contactInfo.whatsapp)} />
+      <CopyClabe client:load clabes={[contactInfo.clabe, contactInfo.clabe2]}/>
       
-      {/* AI Recommendation Button */}
-      <RecommendationButton client:load menuItems={menuItems} menuText={null} restaurantName={restaurantData.name} />
+      <MenuLoader 
+        client:load
+        menuSlug={menuSlug}
+        categoryColors={categoryColors}
+        whatsappPhone={Number(contactInfo.whatsapp)}
+        restaurantName={restaurantData.name}
+        layout="simple"
+        restaurantType="fast-food"
+        showWhatsApp={true}
+        showRecommendation={true}
+        backgroundColor="bg-black"
+        textColor="text-white"
+      />
     </div>
   </div>
 </RestaurantLayout>
