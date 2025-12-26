@@ -19,8 +19,9 @@ if (accessTokenCookie && refreshTokenCookie) {
       refreshTokenCookie.value
     );
     const { data } = await supabaseWithAuth.auth.getUser();
+    
     if (data?.user) {
-      return Astro.redirect("/admin/dashboard");
+      return window.location.href("/admin/dashboard");
     }
   } catch (error) {
     // If token validation fails, continue to login page
