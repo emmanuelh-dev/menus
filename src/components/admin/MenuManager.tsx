@@ -207,11 +207,15 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
   return (
     <>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Gestión de Menús</h1>
+        <h2 className="text-xl font-semibold text-gray-900">Mis Menús</h2>
         <button
           onClick={openCreateModal}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+          data-create-menu
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
+          <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
           Crear Nuevo Menú
         </button>
       </div>
