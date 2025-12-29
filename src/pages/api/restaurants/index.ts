@@ -1,6 +1,6 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { createSupabaseClient } from '../../../lib/supabase';
+import { createAuthenticatedClient } from '../../../lib/supabase';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // Verificar autenticación
@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     // Crear cliente de Supabase con autenticación
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     
     // Obtener usuario autenticado
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -88,7 +88,7 @@ export const GET: APIRoute = async ({ cookies }) => {
 
   try {
     // Crear cliente de Supabase con autenticación
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     
     // Obtener usuario autenticado
     const { data: { user }, error: userError } = await supabase.auth.getUser();

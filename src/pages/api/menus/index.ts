@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { createSupabaseClient } from "../../../lib/supabase";
+import { createAuthenticatedClient } from "../../../lib/supabase";
 
 export const prerender = false;
 
@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
   }
 
-  const supabase = createSupabaseClient(accessToken.value, refreshToken.value);
+  const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
 
   const { data: { user }, error: userError } = await supabase.auth.getUser();
 

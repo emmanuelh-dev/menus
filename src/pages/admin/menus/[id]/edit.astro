@@ -2,7 +2,7 @@
 export const prerender = false;
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
 import { isAuthenticated } from '../../../../middleware/auth';
-import { createSupabaseClient } from '../../../../lib/supabase';
+import { createAuthenticatedClient, createSupabaseClient } from '../../../../lib/supabase';
 
 // Verificar autenticación
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
@@ -17,7 +17,7 @@ if (!accessTokenCookie || !refreshTokenCookie) {
   return Astro.redirect("/admin/login");
 }
 
-const supabase = createSupabaseClient(
+const supabase = await createAuthenticatedClient(
   accessTokenCookie.value,
   refreshTokenCookie.value
 );

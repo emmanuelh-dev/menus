@@ -6,19 +6,16 @@ import tailwind from "@astrojs/tailwind";
 
 import react from '@astrojs/react';
 
-import vercel from '@astrojs/vercel/serverless';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://menus.bysmax.com',
   integrations: [mdx(), sitemap(), tailwind(), react()],
-  output: 'hybrid',
+  output: 'static',
   adapter: vercel({
     webAnalytics: {
       enabled: true,
-    },
-    isr: {
-      expiration: 3600,
     }
   })
 });

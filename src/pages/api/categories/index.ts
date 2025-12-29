@@ -1,6 +1,6 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { createSupabaseClient } from '../../../lib/supabase';
+import { createAuthenticatedClient } from '../../../lib/supabase';
 
 export const GET: APIRoute = async ({ url, cookies }) => {
   const accessToken = cookies.get('sb-access-token')?.value;
@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ url, cookies }) => {
   }
 
   try {
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     const restaurantId = url.searchParams.get('restaurant_id');
 
     if (!restaurantId) {
@@ -67,7 +67,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   try {
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     const categoryData = await request.json();
 
     if (!categoryData.name || !categoryData.restaurant_id) {

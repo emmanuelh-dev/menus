@@ -1,6 +1,6 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { createSupabaseClient } from '../../../lib/supabase';
+import { createAuthenticatedClient } from '../../../lib/supabase';
 
 export const PUT: APIRoute = async ({ params, request, cookies }) => {
   const accessToken = cookies.get('sb-access-token')?.value;
@@ -14,7 +14,7 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
   }
 
   try {
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     const categoryId = params.id;
     const categoryData = await request.json();
 
@@ -63,7 +63,7 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
   }
 
   try {
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     const categoryId = params.id;
 
     if (!categoryId) {

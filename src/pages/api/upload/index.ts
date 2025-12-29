@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
-import { createSupabaseClient } from '../../../lib/supabase';
+import { createAuthenticatedClient } from '../../../lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -18,7 +18,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     // Crear cliente de Supabase con autenticación
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     
     // Procesar la solicitud multipart/form-data
     const formData = await request.formData();

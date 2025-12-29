@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import { supabase, createSupabaseClient } from "../../lib/supabase";
+import { supabase, createSupabaseClient, createAuthenticatedClient } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
@@ -9,7 +9,7 @@ const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
 if (accessTokenCookie && refreshTokenCookie) {
   try {
-    const supabaseWithAuth = createSupabaseClient(
+    const supabaseWithAuth = await createAuthenticatedClient(
       accessTokenCookie.value,
       refreshTokenCookie.value
     );

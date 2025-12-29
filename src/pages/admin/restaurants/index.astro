@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import { supabase, createSupabaseClient } from '../../../lib/supabase';
+import { supabase, createSupabaseClient, createAuthenticatedClient } from '../../../lib/supabase';
 import { isAuthenticated } from '../../../middleware/auth';
 
 // Verificar autenticación
@@ -19,7 +19,7 @@ if (!accessTokenCookie || !refreshTokenCookie) {
 }
 
 // Crear cliente de Supabase con autenticación
-const supabaseAuth = createSupabaseClient(
+const supabaseAuth = await createAuthenticatedClient(
   accessTokenCookie.value,
   refreshTokenCookie.value
 );
@@ -350,6 +350,8 @@ if (error) {
       </div>
     )}
   </div>  <script>
+import { createSupabaseClient } from '../../../lib/supabase.js';
+
     // Types
     interface RestaurantData {
       id: string;
@@ -612,16 +614,14 @@ if (error) {
       }
     }    async function deleteRestaurant(id) {
       try {
-        // Usar Supabase directamente para eliminar
-        const { createSupabaseClient } = await import('../../../lib/supabase.js');
-        const supabase = createSupabaseClient();
+        const response = await fetch(`/api/restaurants/${id}`, {
+          method: 'DELETE'
+        });
         
-        const { error } = await supabase
-          .from('restaurants')
-          .delete()
-          .eq('id', id);
-        
-        if (error) throw error;
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Error al eliminar el restaurante');
+        }
         
         window.location.reload();
       } catch (error) {
@@ -637,18 +637,11 @@ if (error) {
       }
 
       try {
-        // Usar Supabase directamente para eliminación masiva
-        const { createSupabaseClient } = await import('../../../lib/supabase.js');
-        const supabase = createSupabaseClient();
+        const deletePromises = Array.from(selectedRestaurants).map(id =>
+          fetch(`/api/restaurants/${id}`, { method: 'DELETE' })
+        );
         
-        const idsArray = Array.from(selectedRestaurants);
-        const { error } = await supabase
-          .from('restaurants')
-          .delete()
-          .in('id', idsArray);
-        
-        if (error) throw error;
-        
+        await Promise.all(deletePromises);
         window.location.reload();
       } catch (error) {
         console.error('Error:', error);
@@ -667,20 +660,15 @@ if (error) {
       try {
         const restaurantIds = Array.from(selectedRestaurants);
         
-        // Usar Supabase directamente para actualizar restaurantes
-        const { createSupabaseClient } = await import('../../../lib/supabase.js');
-        const supabase = createSupabaseClient();
+        const updatePromises = restaurantIds.map(id =>
+          fetch(`/api/restaurants/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ featured })
+          })
+        );
         
-        const { error } = await supabase
-          .from('restaurants')
-          .update({ featured })
-          .in('id', restaurantIds);
-        
-        if (error) {
-          console.error('Error al actualizar restaurantes:', error);
-          alert('Error al actualizar los restaurantes');
-          return;
-        }
+        await Promise.all(updatePromises);
         
         // Actualizar la UI localmente
         restaurantIds.forEach(id => {
@@ -910,16 +898,19 @@ if (error) {
         };
         
         if (restaurant?.id) {
-          // Actualizar restaurante existente con Supabase directamente
-          const { createSupabaseClient } = await import('../../../lib/supabase.js');
-          const supabase = createSupabaseClient();
+          // Actualizar restaurante existente
+          const response = await fetch(`/api/restaurants/${restaurant.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(restaurantData)
+          });
           
-          const { error } = await supabase
-            .from('restaurants')
-            .update(restaurantData)
-            .eq('id', restaurant.id);
-            
-          if (error) throw error;
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Error al actualizar el restaurante');
+          }
         } else {
           // Crear nuevo restaurante usando la API
           const response = await fetch('/api/restaurants', {
