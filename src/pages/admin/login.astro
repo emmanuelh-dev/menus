@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import { supabase, createSupabaseClient } from "../../lib/supabase";
+import { supabase, createAuthenticatedClient } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 
 
@@ -14,14 +14,14 @@ console.log("Refresh Token:", refreshTokenCookie);
 if (accessTokenCookie && refreshTokenCookie) {
   try {
     // Crear cliente con los tokens existentes
-  const supabaseWithAuth = createSupabaseClient(
+    const supabaseWithAuth = await createAuthenticatedClient(
       accessTokenCookie.value,
       refreshTokenCookie.value
     );
     const { data } = await supabaseWithAuth.auth.getUser();
     
     if (data?.user) {
-      return window.location.href("/admin/dashboard");
+      return Astro.redirect("/admin/dashboard");
     }
   } catch (error) {
     // If token validation fails, continue to login page

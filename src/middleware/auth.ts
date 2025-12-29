@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { createSupabaseClient } from '../lib/supabase';
+import { createAuthenticatedClient, createSupabaseClient } from '../lib/supabase';
 
 export async function isAuthenticated(request: Request, cookies: any) {
   const accessToken = cookies.get('sb-access-token')?.value;
@@ -15,10 +15,10 @@ export async function isAuthenticated(request: Request, cookies: any) {
 
   try {
     // Crear cliente de Supabase con los tokens de la sesión
-    const supabase = createSupabaseClient(accessToken, refreshToken);
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     
     // Verificar si el token es válido
-    const { data, error } = await supabase.auth.getUser(accessToken);
+    const { data, error } = await supabase.auth.getUser();
 
     if (error || !data?.user) {
       console.warn('⚠️ Token inválido, intentando refrescar sesión...');

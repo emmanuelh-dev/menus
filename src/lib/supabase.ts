@@ -5,31 +5,39 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 /**
- * Crea un cliente de Supabase con opciones personalizadas
- * @param {string} accessToken - Token de acceso opcional para autenticación
- * @param {string} refreshToken - Token de actualización opcional para renovar la sesión
- * @returns Cliente de Supabase configurado
+ * Crea un cliente de Supabase para requests sin autenticación
  */
-export function createSupabaseClient(accessToken?: string, refreshToken?: string) {
-  const options = {};
+export function createSupabaseClient() {
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false
+    }
+  });
+}
+
+/**
+ * Crea un cliente de Supabase autenticado con tokens de sesión
+ * @param {string} accessToken - Token de acceso para autenticación
+ * @param {string} refreshToken - Token de actualización para renovar la sesión
+ * @returns Promise con cliente de Supabase configurado
+ */
+export async function createAuthenticatedClient(accessToken: string, refreshToken: string) {
+  const client = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: false,
+      detectSessionInUrl: false
+    }
+  });
   
-  // Si se proporcionan tokens, configurar opciones de autenticación
-  if (accessToken && refreshToken) {
-    Object.assign(options, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      }
-    });
-  }
+  await client.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken
+  });
   
-  return createClient(supabaseUrl, supabaseKey, options);
+  return client;
 }
 
 // Crear el cliente de Supabase por defecto

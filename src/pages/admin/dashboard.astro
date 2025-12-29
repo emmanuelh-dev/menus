@@ -3,7 +3,7 @@ export const prerender = false;
 
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../middleware/auth";
-import { createSupabaseClient } from "../../lib/supabase";
+import { createAuthenticatedClient } from "../../lib/supabase";
 import MenuManager from "../../components/admin/MenuManager";
 import RestaurantManager from "../../components/admin/RestaurantManager";
 
@@ -20,45 +20,21 @@ if (!accessTokenCookie || !refreshTokenCookie) {
 if (!accessTokenCookie || !refreshTokenCookie) {
 	return Astro.redirect("/admin/login");
 }
-const supabase = createSupabaseClient(
+
+const supabase = await createAuthenticatedClient(
 	accessTokenCookie.value,
 	refreshTokenCookie.value
 );
-
-// Obtener estadísticas
-const { count: restaurantsCount } = await supabase
-	.from("restaurants")
-	.select("*", { count: "exact", head: true });
-
-const { count: contactsCount } = await supabase
-	.from("contact")
-	.select("*", { count: "exact", head: true });
-
-const { count: menusCount } = await supabase
-	.from("menus")
-	.select("*", { count: "exact", head: true });
-
-const { count: menuItemsCount } = await supabase
-	.from("menu_items")
-	.select("*", { count: "exact", head: true });
-
-// Obtener últimos contactos
-const { data: recentContacts } = await supabase
-	.from("contact")
-	.select("*")
-	.order("created_at", { ascending: false })
-	.limit(10);
-// Obtener últimos restaurantes
-const { data: recentRestaurants } = await supabase
-	.from("restaurants")
-	.select("*")
-	.order("created_at", { ascending: false })
-	.limit(5);
 
 const {
 	data: { user },
 	error: userError,
 } = await supabase.auth.getUser();
+
+if (userError || !user) {
+	console.error("Error al obtener usuario:", userError);
+	return Astro.redirect("/admin/login");
+}
 
 // Obtener restaurantes del usuario
 const { data: restaurants, error: restaurantsError } = await supabase
