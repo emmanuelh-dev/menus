@@ -102,8 +102,6 @@ if (accessTokenCookie && refreshTokenCookie) {
   </div>
 
   <script>
-    import { supabase, createSupabaseClient } from "../../lib/supabase";
-
     document.addEventListener("DOMContentLoaded", () => {
       const form = document.getElementById("login-form");
       const errorMessage = document.getElementById("error-message");
@@ -128,7 +126,6 @@ if (accessTokenCookie && refreshTokenCookie) {
         return;
       }
     
-      // Enable login button only when both email and password are valid
       const validateInputs = () => {
         const isEmailValid = emailInput.checkValidity();
         const isPasswordValid = passwordInput.checkValidity();
@@ -141,7 +138,6 @@ if (accessTokenCookie && refreshTokenCookie) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // Additional null checks
         if (!loginButton || !errorMessage || !emailInput || !passwordInput)
           return;
 
@@ -152,33 +148,29 @@ if (accessTokenCookie && refreshTokenCookie) {
         const password = passwordInput.value;
 
         try {
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
           });
 
-          if (error) {
-            throw new Error(error.message || "Error al iniciar sesión");
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Error al iniciar sesión');
           }
 
-          // Store the access token in a cookie
-          const accessToken = data.session?.access_token;
-          const refreshToken = data.session?.refresh_token;
-
-          if (accessToken && refreshToken) {
-            // Establecer cookies con las mismas opciones que en el middleware
-            // Nota: En el cliente no podemos usar httpOnly, pero establecemos las demás opciones
-            const maxAge = 30 * 24 * 60 * 60; // 30 días en segundos
-            document.cookie = `sb-access-token=${accessToken}; path=/; max-age=${maxAge}; secure; samesite=strict;`;
-            document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=${maxAge}; secure; samesite=strict;`;
-            
-            window.location.href = "/admin/dashboard";
+          if (data.success) {
+            window.location.href = '/admin/dashboard';
+          } else {
+            throw new Error('Error al iniciar sesión');
           }
-
         } catch (error) {
           if (errorMessage) {
             errorMessage.textContent =
-              error instanceof Error ? error.message : "Unknown error";
+              error instanceof Error ? error.message : "Error desconocido";
             errorMessage.classList.remove("hidden");
           }
 
