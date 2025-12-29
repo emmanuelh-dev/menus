@@ -10,9 +10,9 @@ import RestaurantManager from "../../components/admin/RestaurantManager";
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
 if (!isAuth) {
-	console.log(isAuth);
-	return Astro.redirect("/admin/login");
+  return Astro.redirect("/admin/login");
 }
+
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 if (!accessTokenCookie || !refreshTokenCookie) {
