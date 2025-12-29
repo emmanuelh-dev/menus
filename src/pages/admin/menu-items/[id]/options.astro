@@ -135,7 +135,7 @@ if (Astro.request.method === "POST") {
 <AdminLayout title={`Opciones - ${menuItem.name}`}>
   <div class="max-w-7xl mx-auto">
     <div class="flex items-center mb-6">
-      <a href={`/admin/menus/${menuItem.menu_categories.restaurant_id}/categories/${menuItem.category_id}/items`} class="text-indigo-600 hover:text-indigo-800 mr-4">
+      <a href={`/admin/menus/${menuItem.menu_categories.restaurant_id}/categories/${menuItem.category_id}/items`} class="text-black -600 hover:text-black -800 mr-4">
         ← Volver a Platillos
       </a>
       <div>
@@ -175,7 +175,7 @@ if (Astro.request.method === "POST") {
                   id="option_type"
                   name="option_type"
                   required
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 >
                   <option value="">Seleccionar tipo</option>
                   <option value="size">Tamaño</option>
@@ -199,7 +199,7 @@ if (Astro.request.method === "POST") {
                   name="name"
                   required
                   placeholder="Ej: Grande, Extra queso, Sin cebolla"
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 />
               </div>
 
@@ -212,7 +212,7 @@ if (Astro.request.method === "POST") {
                   name="description"
                   rows="2"
                   placeholder="Descripción opcional..."
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 ></textarea>
               </div>
 
@@ -227,7 +227,7 @@ if (Astro.request.method === "POST") {
                   step="0.01"
                   value="0"
                   placeholder="0.00"
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 />
                 <p class="text-xs text-gray-500 mt-1">Precio adicional (+) o descuento (-)</p>
               </div>
@@ -243,7 +243,7 @@ if (Astro.request.method === "POST") {
                     name="max_selections"
                     min="1"
                     value="1"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
 
@@ -257,25 +257,25 @@ if (Astro.request.method === "POST") {
                     name="display_order"
                     min="0"
                     value="0"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
               </div>
 
               <div class="space-y-2">
                 <label class="flex items-center">
-                  <input type="checkbox" name="is_required" class="rounded border-gray-300 focus:ring-indigo-500 mr-2" />
+                  <input type="checkbox" name="is_required" class="rounded border-gray-300 focus:ring-black -500 mr-2" />
                   <span class="text-sm">Opción obligatoria</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" name="is_active" checked class="rounded border-gray-300 focus:ring-indigo-500 mr-2" />
+                  <input type="checkbox" name="is_active" checked class="rounded border-gray-300 focus:ring-black -500 mr-2" />
                   <span class="text-sm">Activa</span>
                 </label>
               </div>
 
               <button
                 type="submit"
-                class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+                class="w-full bg-black -600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-black -700"
               >
                 Crear Opción
               </button>
@@ -299,7 +299,7 @@ if (Astro.request.method === "POST") {
                   name="group_name"
                   required
                   placeholder="Ej: Tamaños, Extras, Salsas"
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 />
               </div>
 
@@ -312,7 +312,7 @@ if (Astro.request.method === "POST") {
                   name="group_description"
                   rows="2"
                   placeholder="Descripción del grupo..."
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 ></textarea>
               </div>
 
@@ -327,7 +327,7 @@ if (Astro.request.method === "POST") {
                     name="group_min_selections"
                     min="0"
                     value="0"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
 
@@ -341,7 +341,7 @@ if (Astro.request.method === "POST") {
                     name="group_max_selections"
                     min="1"
                     value="1"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
 
@@ -355,14 +355,14 @@ if (Astro.request.method === "POST") {
                     name="group_display_order"
                     min="0"
                     value="0"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
               </div>
 
               <div>
                 <label class="flex items-center">
-                  <input type="checkbox" name="group_is_required" class="rounded border-gray-300 focus:ring-indigo-500 mr-2" />
+                  <input type="checkbox" name="group_is_required" class="rounded border-gray-300 focus:ring-black -500 mr-2" />
                   <span class="text-sm">Grupo obligatorio</span>
                 </label>
               </div>
@@ -438,7 +438,7 @@ if (Astro.request.method === "POST") {
                       
                       <div class="flex space-x-2 ml-4">
                         <button
-                          class="text-indigo-600 hover:text-indigo-900 text-sm"
+                          class="text-black -600 hover:text-black -900 text-sm"
                           onclick={`editOption(${option.id})`}
                         >
                           Editar
@@ -495,7 +495,7 @@ if (Astro.request.method === "POST") {
                       
                       <div class="flex space-x-2">
                         <button
-                          class="text-indigo-600 hover:text-indigo-900 text-sm"
+                          class="text-black -600 hover:text-black -900 text-sm"
                           onclick={`editGroup(${group.id})`}
                         >
                           Editar

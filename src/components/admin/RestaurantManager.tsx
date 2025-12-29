@@ -184,7 +184,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
         <h2 className="text-xl font-semibold text-gray-900">Mis Restaurantes</h2>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black -600 hover:bg-black -700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500"
         >
           <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -203,7 +203,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
           <div className="mt-6">
             <button
               onClick={openCreateModal}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black -600 hover:bg-black -700"
             >
               <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -317,7 +317,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                         required
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
 
@@ -332,7 +332,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                         value={formData.type}
                         onChange={handleInputChange}
                         placeholder="Ej: Mexicana, Italiana"
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
@@ -348,7 +348,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                       required
                       value={formData.address}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
 
@@ -367,7 +367,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                         required
                         value={formData.rating}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
 
@@ -380,7 +380,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                         id="priceRange"
                         value={formData.priceRange}
                         onChange={handleInputChange}
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       >
                         <option value="$">$ - Económico</option>
                         <option value="$$">$$ - Moderado</option>
@@ -400,7 +400,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                         value={formData.menu}
                         onChange={handleInputChange}
                         placeholder="nombre-menu"
-                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
@@ -416,7 +416,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                       value={formData.hours}
                       onChange={handleInputChange}
                       placeholder="Ej: Lun-Dom 9:00 AM - 10:00 PM"
-                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   </div>
 
@@ -442,7 +442,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                       accept="image/*"
                       onChange={handleImageChange}
                       disabled={uploadingImage}
-                      className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-800 disabled:opacity-50"
+                      className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 dark:file:bg-black -900 file:text-black -700 dark:file:text-black -300 hover:file:bg-black -100 dark:hover:file:bg-black -800 disabled:opacity-50"
                     />
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">PNG, JPG o WEBP (máx. 2MB)</p>
                   </div>
@@ -456,7 +456,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                         checked={formData.featured}
                         onChange={handleInputChange}
                         disabled={uploadingImage}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded disabled:opacity-50"
+                        className="h-4 w-4 text-black -600 focus:ring-black -500 border-gray-300 dark:border-gray-600 rounded disabled:opacity-50"
                       />
                       <label htmlFor="featured" className="ml-2 block text-sm text-gray-900 dark:text-gray-100">
                         Marcar como destacado
@@ -476,7 +476,7 @@ export default function RestaurantManager({ initialRestaurants }: RestaurantMana
                     <button
                       type="submit"
                       disabled={loading || uploadingImage}
-                      className="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black -600 hover:bg-black -700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading && (
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

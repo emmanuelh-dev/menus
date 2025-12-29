@@ -211,7 +211,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
         <button
           onClick={openCreateModal}
           data-create-menu
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black -600 hover:bg-black -700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500"
         >
           <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -287,7 +287,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       <div className="flex justify-end space-x-3">
                         <a
                           href={`/admin/menus/${menu.id}/categories`}
-                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-indigo-600 bg-indigo-100 rounded hover:bg-indigo-200 transition-colors"
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-black -600 bg-black -100 rounded hover:bg-black -200 transition-colors"
                         >
                           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
@@ -324,7 +324,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
             <p className="text-gray-500 text-lg mb-4">No hay menús creados</p>
             <button
               onClick={openCreateModal}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+              className="bg-black -600 hover:bg-black -700 text-white px-4 py-2 rounded-md text-sm font-medium"
             >
               Crear Primer Menú
             </button>
@@ -365,7 +365,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                     name="restaurant_id"
                     required
                     defaultValue={editingMenu?.restaurant_id || ''}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                   >
                     <option value="">Seleccionar restaurante</option>
                     {restaurants.map((restaurant) => (
@@ -381,7 +381,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                   <select
                     name="menu_type"
                     defaultValue={editingMenu?.menu_type || 'main'}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                   >
                     <option value="main">Principal</option>
                     <option value="kids">Infantil</option>
@@ -406,7 +406,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                   required
                   defaultValue={editingMenu?.name || ''}
                   placeholder="Ej: Menú Principal, Menú Infantil, etc."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                 />
               </div>
 
@@ -419,7 +419,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                   name="menu"
                   defaultValue={editingMenu?.menu || ''}
                   placeholder="Ej: Principal, Infantil, etc."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                 />
               </div>
 
@@ -432,7 +432,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                   rows={3}
                   defaultValue={editingMenu?.description || ''}
                   placeholder="Descripción del menú..."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                 />
               </div>
 
@@ -445,7 +445,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                   name="address"
                   defaultValue={editingMenu?.address || ''}
                   placeholder="Ej: Calle Principal 123, Colonia Centro"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                 />
               </div>
 
@@ -470,7 +470,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                   name="image"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
                 />
                 <p className="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
               </div>
@@ -487,7 +487,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       type="date"
                       name="start_date"
                       defaultValue={editingMenu?.start_date || ''}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                     />
                   </div>
 
@@ -499,7 +499,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       type="date"
                       name="end_date"
                       defaultValue={editingMenu?.end_date || ''}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                     />
                   </div>
                 </div>
@@ -513,7 +513,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       type="time"
                       name="availability_start"
                       defaultValue={editingMenu?.availability_start || ''}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                     />
                   </div>
 
@@ -525,7 +525,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       type="time"
                       name="availability_end"
                       defaultValue={editingMenu?.availability_end || ''}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                     />
                   </div>
                 </div>
@@ -541,7 +541,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                           type="checkbox"
                           checked={availabilityDays.includes(day.value)}
                           onChange={() => toggleDay(day.value)}
-                          className="rounded border-gray-300 focus:ring-indigo-500"
+                          className="rounded border-gray-300 focus:ring-black -500"
                         />
                         <span className="text-sm text-gray-700">{day.label}</span>
                       </label>
@@ -563,7 +563,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       name="display_order"
                       min="0"
                       defaultValue={editingMenu?.display_order || 0}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
                     />
                   </div>
 
@@ -572,7 +572,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       type="checkbox"
                       name="is_active"
                       defaultChecked={editingMenu?.is_active ?? true}
-                      className="rounded border-gray-300 focus:ring-indigo-500"
+                      className="rounded border-gray-300 focus:ring-black -500"
                     />
                     <label className="text-sm font-medium text-gray-700">
                       Menú activo
@@ -592,7 +592,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-black -600 text-white rounded-md text-sm font-medium hover:bg-black -700 disabled:opacity-50"
                 >
                   {loading ? 'Guardando...' : (editingMenu ? 'Actualizar' : 'Crear')}
                 </button>

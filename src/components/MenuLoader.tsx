@@ -54,7 +54,7 @@ export default function MenuLoader({
     "text-pink-400",
     "text-blue-500",
     "text-yellow-500",
-    "text-indigo-500",
+    "text-black -500",
     "text-teal-500"
   ], 
   whatsappPhone,

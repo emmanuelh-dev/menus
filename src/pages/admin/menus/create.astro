@@ -112,7 +112,7 @@ if (Astro.request.method === "POST") {  try {
 <AdminLayout title="Crear Nuevo Menú">
   <div class="max-w-4xl mx-auto">
     <div class="flex items-center mb-6">
-      <a href="/admin/menus" class="text-indigo-600 hover:text-indigo-800 mr-4">
+      <a href="/admin/menus" class="text-black -600 hover:text-black -800 mr-4">
         ← Volver a Menús
       </a>
       <h1 class="text-2xl font-bold">Crear Nuevo Menú</h1>
@@ -132,7 +132,7 @@ if (Astro.request.method === "POST") {  try {
               id="restaurant_id"
               name="restaurant_id"
               required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
             >
               <option value="">Seleccionar restaurante</option>
               {restaurants?.map((restaurant) => (
@@ -148,7 +148,7 @@ if (Astro.request.method === "POST") {  try {
             <select
               id="menu_type"
               name="menu_type"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
             >
               <option value="main">Principal</option>
               <option value="kids">Infantil</option>
@@ -173,7 +173,7 @@ if (Astro.request.method === "POST") {  try {
             name="name"
             required
             placeholder="Ej: Menú Principal, Menú Infantil, etc."
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
           />
         </div>
         <div>
@@ -186,7 +186,7 @@ if (Astro.request.method === "POST") {  try {
             name="menu"
             required
             placeholder="Ej: Menú Principal, Menú Infantil, etc."
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
           />
         </div>        <div>
           <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
@@ -196,7 +196,7 @@ if (Astro.request.method === "POST") {  try {
             name="description"
             rows="3"
             placeholder="Descripción del menú..."
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
           ></textarea>
         </div>
 
@@ -209,7 +209,7 @@ if (Astro.request.method === "POST") {  try {
             id="address"
             name="address"
             placeholder="Ej: Calle Principal 123, Colonia Centro"
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
           />
         </div>        <div>
           <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
@@ -230,7 +230,7 @@ if (Astro.request.method === "POST") {  try {
             id="image"
             name="image"
             accept="image/*"
-            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
           />
           <p class="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
         </div>
@@ -248,7 +248,7 @@ if (Astro.request.method === "POST") {  try {
                 type="date"
                 id="start_date"
                 name="start_date"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
               />
             </div>
 
@@ -260,7 +260,7 @@ if (Astro.request.method === "POST") {  try {
                 type="date"
                 id="end_date"
                 name="end_date"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
               />
             </div>
           </div>
@@ -274,7 +274,7 @@ if (Astro.request.method === "POST") {  try {
                 type="time"
                 id="availability_start"
                 name="availability_start"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
               />
             </div>
 
@@ -286,7 +286,7 @@ if (Astro.request.method === "POST") {  try {
                 type="time"
                 id="availability_end"
                 name="availability_end"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
               />
             </div>
           </div>
@@ -310,7 +310,7 @@ if (Astro.request.method === "POST") {  try {
                     type="checkbox"
                     name={`day_${day.value}`}
                     value={day.value}
-                    class="rounded border-gray-300 focus:ring-indigo-500"
+                    class="rounded border-gray-300 focus:ring-black -500"
                   />
                   <span class="text-sm text-gray-700">{day.label}</span>
                 </label>
@@ -334,7 +334,7 @@ if (Astro.request.method === "POST") {  try {
                 name="display_order"
                 min="0"
                 value="0"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
               />
             </div>
 
@@ -344,7 +344,7 @@ if (Astro.request.method === "POST") {  try {
                 id="is_active"
                 name="is_active"
                 checked
-                class="rounded border-gray-300 focus:ring-indigo-500"
+                class="rounded border-gray-300 focus:ring-black -500"
               />
               <label for="is_active" class="text-sm font-medium text-gray-700">
                 Menú activo
@@ -362,7 +362,7 @@ if (Astro.request.method === "POST") {  try {
           </a>
           <button
             type="submit"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
+            class="px-4 py-2 bg-black -600 text-white rounded-md text-sm font-medium hover:bg-black -700"
           >
             Crear Menú
           </button>

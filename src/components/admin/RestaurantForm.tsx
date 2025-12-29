@@ -165,7 +165,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
               required
               value={formData.name}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm"
             />
           </div>
 
@@ -180,7 +180,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
               value={formData.type || ''}
               onChange={handleInputChange}
               placeholder="Ej: Mexicana, Italiana, Comida Rápida"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm"
             />
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
             required
             value={formData.address}
             onChange={handleInputChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm"
           />
         </div>
 
@@ -215,7 +215,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
               required
               value={formData.rating}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm"
             />
           </div>
 
@@ -228,7 +228,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
               id="priceRange"
               value={formData.priceRange}
               onChange={handleInputChange}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm rounded-md"
             >
               <option value="$">$ - Económico</option>
               <option value="$$">$$ - Moderado</option>
@@ -248,7 +248,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
               value={formData.menu || ''}
               onChange={handleInputChange}
               placeholder="nombre-del-menu"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm"
             />
           </div>
         </div>
@@ -264,7 +264,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
             value={formData.hours}
             onChange={handleInputChange}
             placeholder="Ej: Lunes a Domingo 9:00 AM - 10:00 PM"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-black -500 focus:border-black -500 sm:text-sm"
           />
         </div>
 
@@ -289,7 +289,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
             id="image"
             accept="image/*"
             onChange={handleImageChange}
-            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
           />
           <p className="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
         </div>
@@ -302,7 +302,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
               type="checkbox"
               checked={formData.featured}
               onChange={handleInputChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 text-black -600 focus:ring-black -500 border-gray-300 rounded"
             />
             <label htmlFor="featured" className="ml-2 block text-sm text-gray-900">
               Marcar como destacado
@@ -314,14 +314,14 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black -600 hover:bg-black -700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Procesando...' : (isEditing ? 'Actualizar' : 'Crear')} Restaurante
           </button>

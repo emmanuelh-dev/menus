@@ -196,7 +196,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
           </div>
           <button
             onClick={openCreateModal}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+            className="bg-black -600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-black -700"
           >
             + Nuevo Platillo
           </button>
@@ -278,7 +278,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     <div className="flex space-x-2">
                       <button
                         onClick={() => openEditModal(item)}
-                        className="text-indigo-600 hover:text-indigo-900 text-xs"
+                        className="text-black -600 hover:text-black -900 text-xs"
                       >
                         Editar
                       </button>
@@ -337,7 +337,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     required
                     defaultValue={editingItem?.name || ''}
                     placeholder="Nombre del platillo"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
 
@@ -353,7 +353,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     required
                     defaultValue={editingItem?.base_price || ''}
                     placeholder="0.00"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
               </div>
@@ -367,7 +367,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                   rows={3}
                   defaultValue={editingItem?.description || ''}
                   placeholder="Descripción del platillo..."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 />
               </div>
 
@@ -388,7 +388,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                   name="image"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
                 />
                 <p className="text-xs text-gray-500 mt-1">PNG, JPG o WEBP (máx. 2MB)</p>
               </div>
@@ -402,7 +402,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                   rows={2}
                   defaultValue={editingItem?.ingredients?.join(', ') || ''}
                   placeholder="Ingrediente 1, Ingrediente 2, ..."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 />
                 <p className="text-xs text-gray-500 mt-1">Separar con comas</p>
               </div>
@@ -416,7 +416,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                   name="allergens"
                   defaultValue={editingItem?.allergens?.join(', ') || ''}
                   placeholder="Gluten, Lácteos, Frutos secos..."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                 />
                 <p className="text-xs text-gray-500 mt-1">Separar con comas</p>
               </div>
@@ -431,7 +431,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     name="calories"
                     min="0"
                     defaultValue={editingItem?.calories || ''}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
 
@@ -444,7 +444,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     name="preparation_time"
                     min="0"
                     defaultValue={editingItem?.preparation_time || ''}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
               </div>
@@ -459,7 +459,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     name="display_order"
                     min="0"
                     defaultValue={editingItem?.display_order || 0}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
 
@@ -472,7 +472,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     name="stock_quantity"
                     min="0"
                     defaultValue={editingItem?.stock_quantity || ''}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500 text-sm"
                   />
                 </div>
               </div>
@@ -483,7 +483,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     type="checkbox" 
                     name="is_active" 
                     defaultChecked={editingItem?.is_active ?? true} 
-                    className="rounded border-gray-300 focus:ring-indigo-500 mr-2" 
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
                   />
                   <span className="text-sm">Activo</span>
                 </label>
@@ -492,7 +492,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     type="checkbox" 
                     name="is_featured" 
                     defaultChecked={editingItem?.is_featured || false} 
-                    className="rounded border-gray-300 focus:ring-indigo-500 mr-2" 
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
                   />
                   <span className="text-sm">Destacado</span>
                 </label>
@@ -501,7 +501,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     type="checkbox" 
                     name="is_vegetarian" 
                     defaultChecked={editingItem?.is_vegetarian || false} 
-                    className="rounded border-gray-300 focus:ring-indigo-500 mr-2" 
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
                   />
                   <span className="text-sm">Vegetariano</span>
                 </label>
@@ -510,7 +510,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     type="checkbox" 
                     name="is_vegan" 
                     defaultChecked={editingItem?.is_vegan || false} 
-                    className="rounded border-gray-300 focus:ring-indigo-500 mr-2" 
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
                   />
                   <span className="text-sm">Vegano</span>
                 </label>
@@ -519,7 +519,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     type="checkbox" 
                     name="is_gluten_free" 
                     defaultChecked={editingItem?.is_gluten_free || false} 
-                    className="rounded border-gray-300 focus:ring-indigo-500 mr-2" 
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
                   />
                   <span className="text-sm">Sin gluten</span>
                 </label>
@@ -528,7 +528,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     type="checkbox" 
                     name="is_spicy" 
                     defaultChecked={editingItem?.is_spicy || false} 
-                    className="rounded border-gray-300 focus:ring-indigo-500 mr-2" 
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
                   />
                   <span className="text-sm">Picante</span>
                 </label>
@@ -563,7 +563,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-white bg-black -600 rounded-md hover:bg-black -700 disabled:opacity-50"
                 >
                   {loading ? 'Guardando...' : (editingItem ? 'Actualizar' : 'Crear')}
                 </button>

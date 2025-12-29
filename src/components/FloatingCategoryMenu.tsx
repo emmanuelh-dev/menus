@@ -38,7 +38,7 @@ export default function FloatingCategoryMenu({
       {/* Botón flotante */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 left-4 z-50 bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-200 hover:scale-105"
+        className="fixed bottom-20 left-4 z-50 bg-black -600 text-white p-3 rounded-full shadow-lg hover:bg-black -700 transition-all duration-200 hover:scale-105"
         title="Navegación rápida"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ export default function FloatingCategoryMenu({
                   >
                     <div className="flex items-center space-x-3">
                       <div 
-                        className={`w-3 h-3 rounded-full ${category.color || 'bg-indigo-500'}`}
+                        className={`w-3 h-3 rounded-full ${category.color || 'bg-black -500'}`}
                         style={category.color?.startsWith('text-') ? { 
                           backgroundColor: category.color.replace('text-', '').replace('-400', '').replace('-500', '') 
                         } : {}}

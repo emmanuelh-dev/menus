@@ -135,7 +135,7 @@ export default function CategoryNavigation({
                   key={category.id}
                   onClick={() => scrollToCategory(category.id)}                  className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     activeCategory === category.id
-                      ? `${category.color || 'bg-indigo-600'} text-white shadow-md transform scale-105`
+                      ? `${category.color || 'bg-black -600'} text-white shadow-md transform scale-105`
                       : `${textColor} ${hoverColors} hover:shadow-sm`
                   }`}
                   title={category.description}
@@ -182,7 +182,7 @@ export default function CategoryNavigation({
                   onClick={() => scrollToCategory(category.id)}
                   className={`w-full text-left px-4 py-2 text-sm font-medium transition-all duration-200 ${
                     activeCategory === category.id
-                      ? `${category.color || 'bg-indigo-600'} text-white`
+                      ? `${category.color || 'bg-black -600'} text-white`
                       : `${textColor} ${hoverColors}`
                   }`}
                   title={category.description}

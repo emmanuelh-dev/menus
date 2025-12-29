@@ -46,7 +46,7 @@ export default function RestaurantModal({ isOpen, onClose, restaurant, onSuccess
               </h3>
               <button
                 type="button"
-                className="bg-white rounded-md text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="bg-white rounded-md text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500"
                 onClick={onClose}
               >
                 <span className="sr-only">Cerrar</span>
