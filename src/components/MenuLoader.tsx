@@ -131,9 +131,9 @@ export default function MenuLoader({
     };
 
     const items = category.menu_items
-      ?.filter(item => item.is_active)
-      ?.sort((a, b) => a.display_order - b.display_order)
-      ?.map(item => ({
+      ?.filter((item: MenuItem) => item.is_active)
+      ?.sort((a: MenuItem, b: MenuItem) => a.display_order - b.display_order)
+      ?.map((item: MenuItem) => ({
         name: item.name,
         price: item.base_price,
         color: "text-white",
@@ -209,9 +209,9 @@ export default function MenuLoader({
               </div>
               
               {category.menu_items
-                ?.filter(item => item.is_active)
-                ?.sort((a, b) => a.display_order - b.display_order)
-                ?.map((item) => (
+                ?.filter((item: MenuItem) => item.is_active)
+                ?.sort((a: MenuItem, b: MenuItem) => a.display_order - b.display_order)
+                ?.map((item: MenuItem) => (
                   <div key={item.id} className="px-4">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">

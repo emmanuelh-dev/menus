@@ -403,9 +403,9 @@ const schemaEnrichment = {
                     </div>
                   )}                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {category.menu_items
-                      .filter(item => item.is_active)
-                      .sort((a, b) => a.display_order - b.display_order)
-                      .map((item) => (
+                      .filter((item: any) => item.is_active)
+                      .sort((a: any, b: any) => a.display_order - b.display_order)
+                      .map((item: any) => (
                       <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
                         {/* Item Image */}
                         {item.image && (
