@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 
+import Gallery from "../../../../components/Gallery.astro";
 import { supabase } from "../../../../lib/supabase";
 
 const { data: place } = await supabase
@@ -71,13 +72,7 @@ const { blocks = [], gallery = [], view_settings = {} } = place.content || {};
         return (
           <div class="max-w-4xl mx-auto px-4 mb-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {block.data.images?.map((img) => (
-                <img 
-                  src={img.src} 
-                  alt={img.alt || ''} 
-                  class="w-full aspect-square object-cover rounded-lg"
-                />
-              ))}
+              <Gallery images={block.data.images || []} />
             </div>
           </div>
         );

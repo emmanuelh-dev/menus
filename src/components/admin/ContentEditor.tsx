@@ -9,6 +9,38 @@ interface Block {
   data: any;
 }
 
+const migrateFlatToNested = (content: any): Block[] => {
+  if (!content?.blocks) return [];
+
+  const nestedBlocks: Block[] = [];
+  let currentSection: Block | null = null;
+
+  content.blocks.forEach((block: any) => {
+    if (block.type === 'section') {
+      currentSection = {
+        ...block,
+        data: {
+          ...block.data,
+          items: []
+        }
+      };
+      nestedBlocks.push(currentSection as any);
+    } else if (block.type === 'item') {
+      if (currentSection) {
+        currentSection.data.items.push({
+          id: block.id,
+          ...block.data
+        });
+      }
+    } else if (block.type === 'gallery') {
+      nestedBlocks.push(block);
+      currentSection = null;
+    }
+  });
+
+  return nestedBlocks;
+};
+
 interface ItemData {
   id: string;
   name: string;
@@ -31,6 +63,12 @@ interface GalleryData {
 export default function ContentEditor({ placeId, initialContent }: { placeId: number; initialContent: any }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialContent?.blocks) {
+      const hasOldStructure = initialContent.blocks.some((block: any) => block.type === 'item');
+      
+      if (hasOldStructure) {
+        return migrateFlatToNested(initialContent);
+      }
+      
       return initialContent.blocks;
     }
     

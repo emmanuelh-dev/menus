@@ -24,18 +24,32 @@ const categoryColors = [
   "text-teal-500"
 ];
 
-// Mapear sections del content a menuItems
-const menuItems = place?.content?.sections?.flatMap((section: any, sectionIndex: number) => {
+// Detectar estructura y extraer secciones
+const sections = place?.content?.blocks 
+  ? place.content.blocks.filter((block: any) => block.type === 'section')
+  : place?.content?.sections?.map((section: any) => ({ 
+      data: { 
+        title: section.title, 
+        description: section.description, 
+        image: section.image, 
+        items: section.items || [] 
+      } 
+    })) || [];
+
+// Mapear sections a menuItems
+const menuItems = sections.flatMap((section: any, sectionIndex: number) => {
+  const sectionData = section.data || section;
+  
   const categoryItem = {
     id: `category-${sectionIndex}`,
-    name: section.title.toUpperCase(),
+    name: sectionData.title.toUpperCase(),
     category: true,
     color: categoryColors[sectionIndex % categoryColors.length],
-    description: section.description || '',
-    image: section.image || `/campomar/entradas.png`
+    description: sectionData.description || '',
+    image: sectionData.image || `/campomar/entradas.png`
   };
 
-  const items = section.items?.map((item: any) => ({
+  const items = sectionData.items?.map((item: any) => ({
     name: item.name,
     price: item.price,
     color: "text-white",
@@ -52,15 +66,18 @@ const menuItems = place?.content?.sections?.flatMap((section: any, sectionIndex:
   })) || [];
 
   return [categoryItem, ...items];
-}) || [];
+});
 
 // Crear lista de categorías para navegación
-const navigationCategories = place?.content?.sections?.map((section: any, sectionIndex: number) => ({
-  id: `category-${sectionIndex}`,
-  name: section.title,
-  color: categoryColors[sectionIndex % categoryColors.length],
-  description: section.description || ''
-})) || [];
+const navigationCategories = sections.map((section: any, sectionIndex: number) => {
+  const sectionData = section.data || section;
+  return {
+    id: `category-${sectionIndex}`,
+    name: sectionData.title,
+    color: categoryColors[sectionIndex % categoryColors.length],
+    description: sectionData.description || ''
+  };
+});
 
 const restaurantData = {
   name: place?.name || "Campomar San Pedro Garza García",

@@ -27,7 +27,7 @@ export default function ReviewForm({ restaurantName, path }) {
       const { data, error } = await supabase
         .from("places")
         .select("*")
-        .eq("menu", menu)
+        .eq("menu", short_name)
         .single();
 
       if (error && error.code !== 'PGRST116') {
@@ -43,7 +43,7 @@ export default function ReviewForm({ restaurantName, path }) {
         .from("places")
         .insert([{
           name: restaurantName || menu,
-          menu: menu,
+          short_name: menu,
         }])
         .select()
         .single();
