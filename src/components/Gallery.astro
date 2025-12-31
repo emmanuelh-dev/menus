@@ -19,7 +19,7 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
 ---
 
 <div class="mx-auto">
-  <div class={`grid grid-cols-2 gap-2 ${images.length > 3 ? 'md:grid-cols-3 ' : images.length > 4 ? 'lg:grid-cols-4' : ''}`} >
+  <div class={`grid grid-cols-2 gap-2 ${images.length > 2 ? 'md:grid-cols-3 ' : images.length > 4 ? 'lg:grid-cols-4' : ''}`} >
     {
       images.map((image: ImageData, index: number) => (
         <div 

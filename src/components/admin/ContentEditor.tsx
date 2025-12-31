@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ManualUploader } from '../ManualUploader';
 
 type BlockType = 'section' | 'gallery';
@@ -105,6 +105,9 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
   
   const [isSaving, setIsSaving] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState<number | boolean>(false);
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [aiProcessing, setAiProcessing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addBlock = (type: BlockType, afterIndex?: number) => {
     const newBlock: Block = {
@@ -192,18 +195,168 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
     }
   };
 
+  const analyzeMenuImage = async (file: File) => {
+    setAiProcessing(true);
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      await new Promise((resolve) => {
+        reader.onloadend = resolve;
+      });
+
+      const base64Image = (reader.result as string).split(',')[1];
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${import.meta.env.PUBLIC_GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                {
+                  text: `Analiza esta imagen de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
+{
+  "sections": [
+    {
+      "title": "NOMBRE DE LA SECCION",
+      "description": "descripcion opcional",
+      "items": [
+        {
+          "name": "nombre del platillo",
+          "price": 150.00,
+          "description": "descripcion del platillo"
+        }
+      ]
+    }
+  ]
+}
+
+IMPORTANTE: 
+- Extrae TODOS los platillos y precios que veas
+- Si no hay precio, usa 0
+- Agrupa por secciones logicas
+- Responde SOLO con el JSON, sin texto adicional`
+                },
+                {
+                  inline_data: {
+                    mime_type: file.type,
+                    data: base64Image
+                  }
+                }
+              ]
+            }]
+          })
+        }
+      );
+
+      const result = await response.json();
+      const textContent = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      
+      const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No se encontro JSON en la respuesta');
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      
+      const newBlocks: Block[] = parsed.sections.map((section: any) => ({
+        id: `block-${Date.now()}-${Math.random()}`,
+        type: 'section',
+        data: {
+          title: section.title,
+          description: section.description || '',
+          image: '',
+          items: section.items.map((item: any) => ({
+            id: `item-${Date.now()}-${Math.random()}`,
+            name: item.name,
+            price: item.price || 0,
+            description: item.description || '',
+            image: ''
+          }))
+        }
+      }));
+
+      setBlocks([...blocks, ...newBlocks]);
+      setShowAIChat(false);
+      alert(`Se agregaron ${newBlocks.length} secciones con ${newBlocks.reduce((sum, b) => sum + b.data.items.length, 0)} platillos`);
+      
+    } catch (err) {
+      console.error('Error al analizar imagen:', err);
+      alert('Error al procesar la imagen con IA');
+    } finally {
+      setAiProcessing(false);
+    }
+  };
+
+  const handleAIImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      analyzeMenuImage(file);
+    }
+  };
+
   return (
     <div className="space-y-6 pb-20">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 bg-white/90 backdrop-blur-md z-10 py-4 px-4 sm:px-0 border-b border-gray-100">
         <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tighter">Editor de Contenido</h1>
-        <button 
-          onClick={saveChanges} 
-          disabled={isSaving}
-          className="w-full sm:w-auto bg-black text-white px-6 sm:px-8 py-3 sm:py-2 rounded-full font-bold hover:bg-gray-800 disabled:opacity-50 transition-all"
-        >
-          {isSaving ? 'Guardando...' : 'Publicar'}
-        </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button 
+            onClick={() => setShowAIChat(!showAIChat)}
+            className="flex-1 sm:flex-none bg-purple-600 text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-purple-700 transition-all"
+          >
+            IA
+          </button>
+          <button 
+            onClick={saveChanges} 
+            disabled={isSaving}
+            className="flex-1 sm:flex-none bg-black text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-gray-800 disabled:opacity-50 transition-all"
+          >
+            {isSaving ? 'Guardando...' : 'Publicar'}
+          </button>
+        </div>
       </header>
+
+      {showAIChat && (
+        <div className="mx-4 sm:mx-0 p-6 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl border-2 border-purple-300 shadow-lg">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h2 className="text-lg font-black uppercase mb-1">Asistente IA</h2>
+              <p className="text-sm text-gray-600">Sube una imagen del menu para extraer automaticamente</p>
+            </div>
+            <button 
+              onClick={() => setShowAIChat(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >✕</button>
+          </div>
+          
+          <input 
+            ref={fileInputRef}
+            type="file" 
+            accept="image/*" 
+            onChange={handleAIImageUpload}
+            className="hidden"
+          />
+          
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={aiProcessing}
+            className="w-full bg-white border-2 border-dashed border-purple-400 rounded-lg p-8 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {aiProcessing ? (
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
+                <p className="font-bold text-purple-700">Analizando imagen...</p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <span className="text-4xl block mb-2">📸</span>
+                <p className="font-bold text-purple-700">Click para subir imagen del menu</p>
+                <p className="text-xs text-gray-500 mt-1">JPG, PNG o WEBP</p>
+              </div>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* LISTADO DE BLOQUES */}
       <div className="space-y-4 px-4 sm:px-0">

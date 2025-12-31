@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ManualUploader } from '../ManualUploader';
+import { FaEye } from 'react-icons/fa';
 
 interface Restaurant {
   id: number;
@@ -128,6 +129,9 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
               <p className="text-gray-400 text-sm mb-4">{r.address}</p>
               
               <div className="flex gap-2">
+              <a href={`/menus/${r.short_name}`} target='_blank' className="flex-1 bg-black text-white text-center py-2 rounded-lg font-bold text-sm items-center justify-center">
+                  <FaEye className="inline" />
+                </a>
                 <button onClick={() => openModal(r)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
                   Editar Info
                 </button>

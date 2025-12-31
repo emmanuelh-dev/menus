@@ -1,8 +1,12 @@
 ---
 export const prerender = false;
 
+import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../../components/Gallery.astro";
+import WhatsappButton from "../../../../components/WhatsappButton";
+import CopyClabe from "../../../../components/CopyClabe";
 import { supabase } from "../../../../lib/supabase";
+import { Facebook, Instagram } from "lucide-react";
 
 const { data: place } = await supabase
   .from("places")
@@ -10,73 +14,152 @@ const { data: place } = await supabase
   .eq("short_name", 'antojitos-tauro-comida-mexicana')
   .single();
 
-const { blocks = [], gallery = [], view_settings = {} } = place.content || {};
+const { blocks = [], view_settings = {} } = place.content || {};
+
+const categoryColors = [
+  "text-red-600", "text-green-600", "text-yellow-600", "text-orange-600",
+  "text-pink-600", "text-purple-600", "text-blue-600", "text-lime-600"
+];
+
+const socialMedia = {
+  instagram: { name: "antojitos_tauro", url: "#" },
+  facebook: { name: "Antojitos Tauro", url: "#" },
+};
+
+const contactInfo = {
+  whatsapp: "8180000000",
+  clabes: [],
+};
 ---
 
-<div class="w-full">
-  {
-    blocks.map((block) => {
-      if (block.type === 'section') {
-        return (
-          <div class="mb-8">
-            {block.data.image && (
-              <div class="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
-                <img 
-                  src={block.data.image} 
-                  alt={block.data.title}
-                  class="w-full h-auto object-cover"
-                />
-              </div>
-            )}
-            
-            <div class="max-w-4xl mx-auto px-4 py-6">
-              <h2 class="text-3xl font-black uppercase mb-2">{block.data.title}</h2>
-              {block.data.description && (
-                <p class="text-gray-600 mb-6">{block.data.description}</p>
-              )}
-
-              {block.data.items?.length > 0 && (
-                <div class="space-y-4">
-                  {block.data.items.map((item) => (
-                    <div class="flex gap-4 p-4 bg-white rounded-lg border border-gray-200">
-                      {item.image && (
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          class="w-24 h-24 object-cover rounded-lg"
-                        />
-                      )}
-                      <div class="flex-1">
-                        <div class="flex justify-between items-start">
-                          <h3 class="text-lg font-bold">{item.name}</h3>
-                          {item.price > 0 && (
-                            <span class="text-lg font-black text-red-600">
-                              ${item.price}
-                            </span>
-                          )}
-                        </div>
-                        {item.description && (
-                          <p class="text-sm text-gray-600 mt-1">{item.description}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      }
+<RestaurantLayout 
+  title={place.name}
+  description={`Menu de ${place.name} - Autentica comida mexicana`}
+  image={place.image}
+  textWhite={false}
+  backgroundColor="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50"
+>
+  <div class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
+    <div class="max-w-4xl mx-auto px-4 py-8">
       
-      if (block.type === 'gallery') {
-        return (
-          <div class="max-w-4xl mx-auto px-4 mb-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Gallery images={block.data.images || []} />
-            </div>
-          </div>
-        );
-      }
-    })
-  }
-</div>
+      <div class="flex flex-col items-center mb-12">
+        <div class="relative mb-6">
+          <div class="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 blur-2xl opacity-30 rounded-full"></div>
+          <img 
+            src={place.image} 
+            alt={place.name} 
+            class="relative w-full max-w-md rounded-2xl shadow-2xl border-4 border-white"
+          />
+        </div>
+        
+        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-yellow-600 to-green-600 mb-4 text-center">
+          {place.name}
+        </h1>
+
+        <div class="flex gap-6 mb-6">
+          <a href={socialMedia.instagram.url} class="flex items-center gap-2 text-pink-600 hover:text-pink-700 font-bold transition-colors">
+            <Instagram size={24} /> {socialMedia.instagram.name}
+          </a>
+          <a href={socialMedia.facebook.url} class="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold transition-colors">
+            <Facebook size={24} /> {socialMedia.facebook.name}
+          </a>
+        </div>
+
+        {contactInfo.clabes.length > 0 && (
+          <CopyClabe client:load clabes={contactInfo.clabes}/>
+        )}
+      </div>
+
+      <div class="space-y-12">
+        {blocks.map((block, blockIdx) => {
+          if (block.type === 'section') {
+            return (
+              <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-amber-200">
+                {block.data.image && (
+                  <div class="relative h-48 overflow-hidden">
+                    <img 
+                      src={block.data.image} 
+                      alt={block.data.title}
+                      class="w-full h-full object-cover"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <h2 class="absolute bottom-4 left-6 text-4xl font-black text-white drop-shadow-lg uppercase">
+                      {block.data.title}
+                    </h2>
+                  </div>
+                )}
+                
+                <div class="p-6">
+                  {!block.data.image && (
+                    <h2 class={`${categoryColors[blockIdx % categoryColors.length]} text-4xl font-black uppercase mb-4 tracking-tight`}>
+                      {block.data.title}
+                    </h2>
+                  )}
+                  
+                  {block.data.description && (
+                    <p class="text-gray-700 text-lg mb-6 italic border-l-4 border-yellow-500 pl-4">
+                      {block.data.description}
+                    </p>
+                  )}
+
+                  {block.data.items?.length > 0 && (
+                    <div class="grid gap-4">
+                      {block.data.items.map((item, itemIdx) => (
+                        <div class="group hover:bg-amber-50 p-4 rounded-xl transition-all duration-300 border border-transparent hover:border-amber-300">
+                          <div class="flex gap-4">
+                            {item.image && (
+                              <div class="relative flex-shrink-0">
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name}
+                                  class="w-28 h-28 object-cover rounded-xl shadow-md group-hover:shadow-xl transition-shadow border-2 border-white"
+                                />
+                                <div class="absolute -top-2 -left-2 bg-red-600 text-white text-xs font-black px-2 py-1 rounded-full shadow-lg">
+                                  #{itemIdx + 1}
+                                </div>
+                              </div>
+                            )}
+                            
+                            <div class="flex-1 min-w-0">
+                              <div class="flex justify-between items-start gap-4 mb-2">
+                                <h3 class="text-xl font-black text-gray-900 uppercase tracking-tight">
+                                  {item.name}
+                                </h3>
+                                {view_settings.show_prices && item.price > 0 && (
+                                  <span class="flex-shrink-0 text-2xl font-black text-red-600 bg-yellow-100 px-3 py-1 rounded-lg shadow-sm">
+                                    ${item.price}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              {item.description && (
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                  {item.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          }
+          
+          if (block.type === 'gallery') {
+            return (
+              <div class="bg-white rounded-2xl shadow-xl p-6 border-2 border-amber-200">
+                <h3 class="text-3xl font-black text-orange-600 mb-6 uppercase">Galeria</h3>
+                <Gallery images={block.data.images || []} />
+              </div>
+            );
+          }
+        })}
+      </div>
+
+      <WhatsappButton client:load phone={Number(contactInfo.whatsapp)} />
+    </div>
+  </div>
+</RestaurantLayout>
