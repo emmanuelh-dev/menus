@@ -39,16 +39,18 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
     
-    // Agregar fecha de creación y user_id
+    // Mapear category a type para la base de datos
+    const { category, ...rest } = restaurantData;
     const dataToInsert = {
-      ...restaurantData,
+      ...rest,
+      type: category || rest.type,
       user_id: user.id,
       created_at: new Date().toISOString()
     };
     
     // Insertar en la base de datos
     const { data, error } = await supabase
-      .from('restaurants')
+      .from('places')
       .insert(dataToInsert)
       .select()
       .single();
@@ -102,7 +104,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     
     // Obtener solo restaurantes del usuario
     const { data, error } = await supabase
-      .from('restaurants')
+      .from('places')
       .select('*')
       .eq('user_id', user.id)
       .order('name');

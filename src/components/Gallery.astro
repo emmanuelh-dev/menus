@@ -30,7 +30,8 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
           <Image
             src={image.src}
             alt={image.alt}
-            width={800}
+            width={400}
+            height={400}
             class="w-full aspect-square object-cover object-center"
             quality="mid"
           />

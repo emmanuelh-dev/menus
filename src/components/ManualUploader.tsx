@@ -1,4 +1,5 @@
-import { useState, ChangeEvent } from 'react'
+import { useState } from 'react'
+import type { ChangeEvent } from 'react'
 
 interface ManualUploaderProps {
   onFileUploaded: (url: string) => void
@@ -17,6 +18,16 @@ export function ManualUploader({
 
   const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvdq078aa'
   const uploadPreset = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'
+
+  const optimizeImageUrl = (url: string) => {
+    const watermarkParams =
+      'f_auto,q_auto,w_800'
+    
+    if (url.includes('/upload/')) {
+      return url.replace('/upload/', `/upload/${watermarkParams}/`)
+    }
+    return url
+  }
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -38,10 +49,8 @@ export function ManualUploader({
 
       if (!response.ok) throw new Error(data.error?.message || 'Upload failed')
 
-      const watermarkParams =
-        'f_auto,q_auto/b_white,co_black,l_text:arial_20:restaurantmenu.com.mx,g_south_east,x_10,y_10'
-
-      const optimizedUrl = data.secure_url.replace('/upload/', `/upload/${watermarkParams}/`)
+      const optimizedUrl = optimizeImageUrl(data.secure_url)
+      console.log('URL optimizada guardada:', optimizedUrl)
       onFileUploaded(optimizedUrl)
     } catch (error) {
       onUploadError?.()
@@ -51,28 +60,30 @@ export function ManualUploader({
     }
   }
 
+  const displayImage = currentImage ? optimizeImageUrl(currentImage) : ''
+
   return (
     <div className="space-y-3">
-      {currentImage && (
-        <div className="mb-3">
+      {displayImage && (
+        <div className="relative group">
           <img 
-            src={currentImage} 
+            src={displayImage} 
             alt="Vista previa" 
-            className="h-32 w-auto object-contain rounded border border-gray-300"
+            className="h-40 w-full object-cover rounded-2xl border border-gray-100 shadow-sm" 
           />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
+            <p className="text-white text-xs font-bold uppercase">Cambiar Imagen</p>
+          </div>
         </div>
       )}
-      <div className="rounded-lg border-2 border-dashed border-gray-300 p-4">
+      <div className="rounded-2xl border-2 border-dashed border-gray-200 p-4 hover:border-black transition-colors">
         <input
           type="file"
           accept="image/*"
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+          className="block w-full text-xs text-gray-400 file:mr-4 file:rounded-full file:border-0 file:bg-black file:text-white file:px-4 file:py-2 file:font-bold cursor-pointer"
         />
-        {uploading && (
-          <p className="mt-2 animate-pulse text-xs text-blue-600">Subiendo a Cloudinary...</p>
-        )}
       </div>
     </div>
   )

@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ params, cookies }) => {
     
     // Obtener el restaurante por ID
     const { data, error } = await supabase
-      .from('restaurants')
+      .from('places')
       .select('*')
       .eq('id', id)
       .single();
@@ -88,22 +88,26 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
     // Obtener datos del cuerpo de la solicitud
     const restaurantData = await request.json();
     
-    // Validar datos mínimos requeridos
-    if (!restaurantData.name || !restaurantData.address) {
+    // Validar datos mínimos requeridos solo si no es una actualización de content únicamente
+    const isContentOnlyUpdate = Object.keys(restaurantData).length === 1 && 'content' in restaurantData;
+    
+    if (!isContentOnlyUpdate && (!restaurantData.name || !restaurantData.address)) {
       return new Response(
         JSON.stringify({ error: 'El nombre y la dirección son obligatorios' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
     
-    // Agregar fecha de actualización
+    // Mapear category a type para la base de datos
+    const { category, ...rest } = restaurantData;
     const dataToUpdate = {
-      ...restaurantData,
+      ...rest,
+      type: category || rest.type,
     };
     
     // Actualizar en la base de datos
     const { data, error } = await supabase
-      .from('restaurants')
+      .from('places')
       .update(dataToUpdate)
       .eq('id', id)
       .select()
@@ -156,7 +160,7 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
     
     // Eliminar de la base de datos
     const { error } = await supabase
-      .from('restaurants')
+      .from('places')
       .delete()
       .eq('id', id);
     

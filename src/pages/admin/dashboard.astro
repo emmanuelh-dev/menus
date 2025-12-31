@@ -5,7 +5,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../middleware/auth";
 import { createAuthenticatedClient } from "../../lib/supabase";
 import MenuManager from "../../components/admin/MenuManager";
-import RestaurantManager from "../../components/admin/RestaurantManager";
+import PlaceManager from "../../components/admin/PlaceManager";
 
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
@@ -78,9 +78,8 @@ const { data: recentComments } = await supabase
 <AdminLayout title="Dashboard | Panel de Administrador">
 	<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 	
-	<RestaurantManager client:load initialRestaurants={restaurants || []} />
+	<PlaceManager client:load initialRestaurants={restaurants || []} />
 	
-	<MenuManager client:load initialMenus={menus || []} restaurants={restaurants || []} />
 	
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
 		<div class="bg-white rounded-lg shadow p-6">

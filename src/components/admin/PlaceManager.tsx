@@ -15,7 +15,7 @@ interface Restaurant {
   content?: any;
 }
 
-export default function RestaurantManager({ initialRestaurants }: { initialRestaurants: Restaurant[] }) {
+export default function PlaceManager({ initialRestaurants }: { initialRestaurants: Restaurant[] }) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -131,7 +131,7 @@ export default function RestaurantManager({ initialRestaurants }: { initialResta
                 <button onClick={() => openModal(r)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
                   Editar Info
                 </button>
-                <a href={`/admin/restaurants/content/${r.id}`} className="flex-1 bg-black text-white text-center py-2 rounded-lg font-bold text-sm">
+                <a href={`/admin/place/${r.id}`} className="flex-1 bg-black text-white text-center py-2 rounded-lg font-bold text-sm">
                   Editar Menú
                 </a>
               </div>

@@ -1,0 +1,91 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { isAuthenticated } from "../../../middleware/auth";
+import { createAuthenticatedClient } from "../../../lib/supabase";
+import ContentEditor from "../../../components/admin/ContentEditor"; // El que maneja el JSONB
+
+const { id } = Astro.params;
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) return Astro.redirect("/admin/login");
+
+const accessToken = Astro.cookies.get("sb-access-token");
+const refreshToken = Astro.cookies.get("sb-refresh-token");
+
+const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
+
+// 1. OBTENER EL LUGAR ESPECÍFICO (Ya no buscamos 'menus')
+const { data: place, error: placeError } = await supabase
+  .from("places")
+  .select("*")
+  .eq("id", id)
+  .single();
+
+if (placeError || !place) return Astro.redirect("/admin/dashboard");
+
+// 2. OBTENER REVIEWS DE ESTE LUGAR
+const { data: reviews } = await supabase
+  .from("review")
+  .select("*")
+  .eq("restaurant_id", id) // Ajustar nombre de columna si cambió a place_id
+  .order("created_at", { ascending: false });
+
+---
+
+<AdminLayout title={`Editar | ${place.name}`}>
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <a href="/admin/dashboard" class="text-sm text-gray-500 hover:underline">← Volver al Dashboard</a>
+      <h1 class="text-3xl font-black uppercase tracking-tighter mt-2">{place.name}</h1>
+    </div>
+    
+    <div class="flex gap-3">
+      <a 
+        href={`/menus/${place.short_name}`} 
+        target="_blank" 
+        class="bg-gray-100 px-4 py-2 rounded-lg text-sm font-bold"
+      >
+        Ver Sitio Público
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <h2 class="text-xl font-bold mb-6">Contenido Dinámico (Menú/Galería)</h2>
+        {/* Aquí vive tu componente React que manipula el JSONB */}
+        <ContentEditor client:load placeId={place.id} initialContent={place.content} />
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <h2 class="text-lg font-bold mb-4">Información General</h2>
+        <div class="space-y-3 text-sm">
+          <p><span class="text-gray-400 uppercase font-bold text-xs">Categoría:</span> {place.category}</p>
+          <p><span class="text-gray-400 uppercase font-bold text-xs">Dirección:</span> {place.address}</p>
+          <p><span class="text-gray-400 uppercase font-bold text-xs">Rating:</span> {place.rating} ★</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <h2 class="text-lg font-bold mb-4">Últimos Comentarios</h2>
+        <div class="space-y-4">
+          {reviews && reviews.length > 0 ? (
+            reviews.map((rev) => (
+              <div class="border-b border-gray-50 pb-3 last:border-0">
+                <p class="text-sm font-medium italic">"{rev.comment}"</p>
+                <span class="text-xs text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</span>
+              </div>
+            ))
+          ) : (
+            <p class="text-gray-400 text-sm italic">Sin reseñas aún.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
