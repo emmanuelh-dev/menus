@@ -87,7 +87,7 @@ let reviewStats = {
 
 try {
   const { data: restaurantData } = await supabase
-    .from("restaurants")
+    .from("places")
     .select("id")
     .eq("menu", path)
     .single();

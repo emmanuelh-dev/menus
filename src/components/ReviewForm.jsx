@@ -25,7 +25,7 @@ export default function ReviewForm({ restaurantName, path }) {
   const findOrCreateRestaurant = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from("restaurants")
+        .from("places")
         .select("*")
         .eq("menu", menu)
         .single();
@@ -40,7 +40,7 @@ export default function ReviewForm({ restaurantName, path }) {
       }
 
       const { data: newRestaurant, error: createError } = await supabase
-        .from("restaurants")
+        .from("places")
         .insert([{
           name: restaurantName || menu,
           menu: menu,
@@ -91,7 +91,7 @@ export default function ReviewForm({ restaurantName, path }) {
 
     try {
       const { error } = await supabase
-        .from("restaurants")
+        .from("places")
         .update({ rating: averageRating })
         .eq("id", restaurant.id);
 

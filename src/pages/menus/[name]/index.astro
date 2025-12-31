@@ -22,8 +22,6 @@ const { data: menu } = await supabase
   .eq("restaurant_id", restaurant?.id)
   .eq("is_active", true)
 
-  console.log(menu)
-
 const schemaEnrichment = {
   address: restaurant.address ? {
     streetAddress: restaurant.address,

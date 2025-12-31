@@ -27,7 +27,7 @@ const { id } = Astro.params;
 
 // Obtener información del restaurante
 const { data: restaurant, error: restaurantError } = await supabase
-  .from("restaurants")
+  .from("places")
   .select("*")
   .eq("id", id)
   .single();

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { ManualUploader } from '../ManualUploader';
 
 interface Restaurant {
   id?: string;
@@ -33,8 +34,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
     ...restaurant
   });
   
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
 
@@ -44,7 +44,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
     if (restaurant) {
       setFormData({ ...restaurant });
       if (restaurant.image) {
-        setImagePreview(restaurant.image);
+        setImageUrl(restaurant.image);
       }
     }
   }, [restaurant]);
@@ -59,34 +59,12 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageUploaded = (url: string) => {
+    setImageUrl(url);
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al subir la imagen');
-    }
-
-    const result = await response.json();
-    return result.url;
+  const handleUploadError = () => {
+    setError('Error al subir la imagen');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,17 +73,10 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
     setError('');
 
     try {
-      let imageUrl = formData.image;
-
-      // Subir nueva imagen si se seleccionó una
-      if (imageFile) {
-        imageUrl = await uploadImage(imageFile);
-      }
-
       const restaurantData = {
         ...formData,
         rating: parseFloat(formData.rating.toString()),
-        image: imageUrl
+        image: imageUrl || formData.image
       };
 
       if (isEditing) {
@@ -270,28 +241,16 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
 
         <div>
           <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-            Imagen del Restaurante
+            Logo del Restaurante
           </label>
-          
-          {imagePreview && (
-            <div className="mt-2 mb-4">
-              <img 
-                src={imagePreview} 
-                alt="Vista previa" 
-                className="w-32 h-32 object-cover rounded-lg shadow-sm"
-              />
-            </div>
-          )}
-          
-          <input
-            type="file"
-            name="image"
-            id="image"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
-          />
-          <p className="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
+          <div className="mt-2">
+            <ManualUploader
+              onFileUploaded={handleImageUploaded}
+              onUploadError={handleUploadError}
+              currentImage={imageUrl || formData.image}
+            />
+          </div>
+          <p className="mt-1 text-sm text-gray-500">PNG, JPG o WEBP. Se subirá a Cloudinary con marca de agua</p>
         </div>
 
         <div>

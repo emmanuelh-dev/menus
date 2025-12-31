@@ -40,7 +40,7 @@ const { data: menus, error } = await supabase
 
 // Obtener restaurantes para el selector
 const { data: restaurants } = await supabase
-  .from("restaurants")
+  .from("places")
   .select("id, name")
   .eq("user_id", user?.id)
   .order("name");

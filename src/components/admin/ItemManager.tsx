@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ManualUploader } from '../ManualUploader';
 
 interface MenuItem {
   id: number;
@@ -34,21 +35,21 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
   const [items, setItems] = useState<MenuItem[]>(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [spicyLevel, setSpicyLevel] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const openCreateModal = () => {
     setEditingItem(null);
-    setImagePreview(null);
+    setImageUrl(null);
     setSpicyLevel(0);
     setIsModalOpen(true);
   };
 
   const openEditModal = (item: MenuItem) => {
     setEditingItem(item);
-    setImagePreview(item.image);
+    setImageUrl(item.image);
     setSpicyLevel(item.spicy_level);
     setIsModalOpen(true);
   };
@@ -56,22 +57,17 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
-    setImagePreview(null);
+    setImageUrl(null);
     setSpicyLevel(0);
     setError(null);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(editingItem?.image || null);
-    }
+  const handleImageUploaded = (url: string) => {
+    setImageUrl(url);
+  };
+
+  const handleUploadError = () => {
+    setError('Error al subir la imagen');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -82,26 +78,6 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
     const formData = new FormData(e.currentTarget);
     
     try {
-      let imageUrl = editingItem?.image || null;
-      
-      const imageFile = formData.get('image') as File;
-      if (imageFile && imageFile.size > 0) {
-        const uploadFormData = new FormData();
-        uploadFormData.append('image', imageFile);
-        
-        const uploadResponse = await fetch('/api/upload', {
-          method: 'POST',
-          body: uploadFormData,
-        });
-
-        if (uploadResponse.ok) {
-          const uploadResult = await uploadResponse.json();
-          imageUrl = uploadResult.url;
-        } else {
-          const errorData = await uploadResponse.json();
-          throw new Error(errorData.error || 'Error al subir la imagen');
-        }
-      }
 
       const ingredientsText = formData.get("ingredients") as string;
       const allergensText = formData.get("allergens") as string;
@@ -115,7 +91,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
         name: formData.get("name") as string,
         description: formData.get("description") as string || null,
         base_price: parseFloat(formData.get("base_price") as string),
-        image: imageUrl,
+        image: imageUrl || editingItem?.image || null,
         ingredients: ingredients.length > 0 ? ingredients : null,
         allergens: allergens.length > 0 ? allergens : null,
         calories: formData.get("calories") ? parseInt(formData.get("calories") as string) : null,
@@ -375,22 +351,12 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Imagen del Platillo
                 </label>
-                
-                {imagePreview && (
-                  <div className="mb-3">
-                    <img src={imagePreview} alt="Vista previa" className="w-32 h-32 object-cover rounded-lg" />
-                    <p className="text-sm text-gray-500 mt-1">Vista previa de la imagen</p>
-                  </div>
-                )}
-                
-                <input
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
+                <ManualUploader
+                  onFileUploaded={handleImageUploaded}
+                  onUploadError={handleUploadError}
+                  currentImage={imageUrl || editingItem?.image || undefined}
                 />
-                <p className="text-xs text-gray-500 mt-1">PNG, JPG o WEBP (máx. 2MB)</p>
+                <p className="text-xs text-gray-500 mt-1">PNG, JPG o WEBP. Se subirá a Cloudinary con marca de agua</p>
               </div>
 
               <div>

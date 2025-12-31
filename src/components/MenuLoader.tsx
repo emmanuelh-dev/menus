@@ -80,7 +80,7 @@ export default function MenuLoader({
       setIsLoading(true);
       
       const { data: restaurant, error: restaurantError } = await supabase
-        .from("restaurants")
+        .from("places")
         .select("*")
         .eq("menu", menuSlug)
         .single();

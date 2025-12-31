@@ -8,7 +8,7 @@ import { supabase } from "../../../../lib/supabase";
 import { menu } from "./menu";
 
 const { data: restaurant } = await supabase
-  .from("restaurants")
+  .from("places")
   .select("*")
   .eq("menu", 'campomar')
   .single();

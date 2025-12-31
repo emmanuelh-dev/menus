@@ -287,7 +287,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       <div className="flex justify-end space-x-3">
                         <a
                           href={`/admin/menus/${menu.id}/categories`}
-                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-black -600 bg-black -100 rounded hover:bg-black -200 transition-colors"
+                          className="inline-flex items-center px-2 py-1 text-xs font-medium text-white -600 bg-black -100 rounded hover:bg-black -200 transition-colors"
                         >
                           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>

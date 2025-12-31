@@ -11,16 +11,19 @@ import RecommendationButton from "../../../components/RecommendationButton";
 import { supabase } from "../../../lib/supabase";
 
 const { data: restaurant } = await supabase
-  .from("restaurants")
+  .from("places")
   .select("*")
   .eq("menu", 'elpapirey')
   .single();
 
+  console.log(restaurant)
 const { data: menu } = await supabase
   .from("menus")
   .select("*")
   .eq("restaurant_id", restaurant?.id)
   .eq("is_active", true)
+
+  console.log(menu)
 
 const { data: categoriesData } = await supabase
   .from("menu_categories")
@@ -33,6 +36,8 @@ const { data: categoriesData } = await supabase
   .eq("restaurant_id", restaurant.id)
   .eq("is_active", true)
   .order("display_order");
+
+  console.log(categoriesData)
 
 const categoryColors = [
   "text-orange-500",
