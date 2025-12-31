@@ -21,18 +21,17 @@ export default function ReviewForm({ restaurantName, path }) {
     }
     return path?.split('/').pop() || DEFAULT_MENU;
   }, [path]);
-
   const findOrCreateRestaurant = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("places")
         .select("*")
-        .eq("menu", short_name)
+        .eq("short_name", menu)
         .single();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
-      }
+      } 
 
       if (data) {
         setRestaurant(data);
