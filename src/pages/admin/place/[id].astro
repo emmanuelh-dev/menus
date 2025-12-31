@@ -11,10 +11,17 @@ const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
 if (!isAuth) return Astro.redirect("/admin/login");
 
-const accessToken = Astro.cookies.get("sb-access-token");
-const refreshToken = Astro.cookies.get("sb-refresh-token");
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
-const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
+if (!accessTokenCookie || !refreshTokenCookie) {
+	return Astro.redirect("/admin/login");
+}
+
+const supabase = await createAuthenticatedClient(
+	accessTokenCookie.value,
+	refreshTokenCookie.value
+);
 
 // 1. OBTENER EL LUGAR ESPECÍFICO (Ya no buscamos 'menus')
 const { data: place, error: placeError } = await supabase

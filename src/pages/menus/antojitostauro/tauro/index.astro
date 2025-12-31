@@ -1,0 +1,85 @@
+---
+import { supabase } from "../../../../lib/supabase";
+
+const { data: place } = await supabase
+  .from("places")
+  .select("*")
+  .eq("short_name", 'antojitos-tauro-comida-mexicana')
+  .single();
+
+const { blocks = [], gallery = [], view_settings = {} } = place.content || {};
+---
+
+<div class="w-full">
+  {
+    blocks.map((block) => {
+      if (block.type === 'section') {
+        return (
+          <div class="mb-8">
+            {block.data.image && (
+              <div class="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+                <img 
+                  src={block.data.image} 
+                  alt={block.data.title}
+                  class="w-full h-auto object-cover"
+                />
+              </div>
+            )}
+            
+            <div class="max-w-4xl mx-auto px-4 py-6">
+              <h2 class="text-3xl font-black uppercase mb-2">{block.data.title}</h2>
+              {block.data.description && (
+                <p class="text-gray-600 mb-6">{block.data.description}</p>
+              )}
+
+              {block.data.items?.length > 0 && (
+                <div class="space-y-4">
+                  {block.data.items.map((item) => (
+                    <div class="flex gap-4 p-4 bg-white rounded-lg border border-gray-200">
+                      {item.image && (
+                        <img 
+                          src={item.image} 
+                          alt={item.name}
+                          class="w-24 h-24 object-cover rounded-lg"
+                        />
+                      )}
+                      <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                          <h3 class="text-lg font-bold">{item.name}</h3>
+                          {item.price > 0 && (
+                            <span class="text-lg font-black text-red-600">
+                              ${item.price}
+                            </span>
+                          )}
+                        </div>
+                        {item.description && (
+                          <p class="text-sm text-gray-600 mt-1">{item.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+      
+      if (block.type === 'gallery') {
+        return (
+          <div class="max-w-4xl mx-auto px-4 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {block.data.images?.map((img) => (
+                <img 
+                  src={img.src} 
+                  alt={img.alt || ''} 
+                  class="w-full aspect-square object-cover rounded-lg"
+                />
+              ))}
+            </div>
+          </div>
+        );
+      }
+    })
+  }
+</div>

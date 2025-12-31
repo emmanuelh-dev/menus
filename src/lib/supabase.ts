@@ -114,9 +114,9 @@ export async function getOpinionesCafeteria(cafeteriaId: number) {
 
 export async function getRestaurantByName({ name }: { name: string }) {
   const { data, error } = await supabase
-    .from('restaurants')
+    .from('places')
     .select('*')
-    .eq('menu', name)
+    .eq('short_name', name)
   if (error) {
     console.error('Error fetching cafeterias:', error);
     return [];

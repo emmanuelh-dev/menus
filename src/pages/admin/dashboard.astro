@@ -15,8 +15,7 @@ if (!isAuth) {
 
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
-if (!accessTokenCookie || !refreshTokenCookie) {
-}
+
 if (!accessTokenCookie || !refreshTokenCookie) {
 	return Astro.redirect("/admin/login");
 }
