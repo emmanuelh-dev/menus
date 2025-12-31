@@ -5,30 +5,11 @@ import CategoryNavigation from "../../../components/CategoryNavigation";
 import { supabase } from "../../../lib/supabase";
 import { menu } from "./menu";
 
-const { data: restaurant } = await supabase
+const { data: place } = await supabase
   .from("places")
   .select("*")
-  .eq("menu", 'campomar')
+  .eq("short_name", 'campomar')
   .single();
-
-const { data: menu_data } = await supabase
-  .from("menus")
-  .select("*")
-  .eq("restaurant_id", restaurant?.id)
-  .eq("is_active", true)
-  .single();
-
-const { data: categoriesData } = await supabase
-  .from("menu_categories")
-  .select(`
-    *,
-    menu_items (
-      *
-    )
-  `)
-  .eq("restaurant_id", restaurant.id)
-  .eq("is_active", true)
-  .order("display_order");
 
 const categoryColors = [
   "text-blue-400",
@@ -39,73 +20,72 @@ const categoryColors = [
   "text-green-400",
   "text-pink-400",
   "text-yellow-500",
-  "text-black -500",
+  "text-indigo-500",
   "text-teal-500"
 ];
 
-const menuItems = categoriesData?.flatMap((category, categoryIndex) => {
+// Mapear sections del content a menuItems
+const menuItems = place?.content?.sections?.flatMap((section: any, sectionIndex: number) => {
   const categoryItem = {
-    id: `category-${category.id}`,
-    name: category.name.toUpperCase(),
+    id: `category-${sectionIndex}`,
+    name: section.title.toUpperCase(),
     category: true,
-    color: categoryColors[categoryIndex % categoryColors.length],
-    description: category.description,
-    image: category.image
+    color: categoryColors[sectionIndex % categoryColors.length],
+    description: section.description || '',
+    image: section.image || `/campomar/entradas.png`
   };
 
-  const items = category.menu_items
-    ?.filter((item: any) => item.is_active)
-    ?.sort((a: any, b: any) => a.display_order - b.display_order)
-    ?.map((item: any) => ({
-      name: item.name,
-      price: item.base_price,
-      color: "text-white",
-      description: item.description,
-      category: false,
-      is_vegetarian: item.is_vegetarian,
-      is_vegan: item.is_vegan,
-      is_gluten_free: item.is_gluten_free,
-      is_spicy: item.is_spicy,
-      allergens: item.allergens,
-      ingredients: item.ingredients,
-      weight: item.weight
-    })) || [];
+  const items = section.items?.map((item: any) => ({
+    name: item.name,
+    price: item.price,
+    color: "text-white",
+    description: item.description || '',
+    category: false,
+    is_vegetarian: item.is_vegetarian || false,
+    is_vegan: item.is_vegan || false,
+    is_gluten_free: item.is_gluten_free || false,
+    is_spicy: item.is_spicy || false,
+    allergens: item.allergens || [],
+    ingredients: item.ingredients || [],
+    weight: item.weight || '',
+    image: item.image || ''
+  })) || [];
 
   return [categoryItem, ...items];
 }) || [];
 
 // Crear lista de categorías para navegación
-const navigationCategories = categoriesData?.map((category, categoryIndex) => ({
-  id: `category-${category.id}`,
-  name: category.name,
-  color: categoryColors[categoryIndex % categoryColors.length],
-  description: category.description
+const navigationCategories = place?.content?.sections?.map((section: any, sectionIndex: number) => ({
+  id: `category-${sectionIndex}`,
+  name: section.title,
+  color: categoryColors[sectionIndex % categoryColors.length],
+  description: section.description || ''
 })) || [];
 
 const restaurantData = {
-  name: restaurant?.name || "Campomar Arboleda - San Pedro Garza García",
-  description: restaurant?.description || "La mejor comida de la zona",
+  name: place?.name || "Campomar San Pedro Garza García",
+  description: "La mejor comida de mariscos en San Pedro",
 };
 
 
 const schemaEnrichment = {
     address: {
-        streetAddress: restaurant?.address || "Av. del Roble 535",
+        streetAddress: place?.address || "Av. del Roble 535",
         addressLocality: "San Pedro Garza García", 
         addressRegion: "N.L.",
         postalCode: "66266",
         addressCountry: "MX"
     },
-    name: restaurant?.name || restaurantData.name,
+    name: place?.name || restaurantData.name,
     telephone: "+52 81 3675 1161",
-    priceRange: restaurant?.priceRange || "$$$",  
+    priceRange: place?.priceRange || "$$$",  
     servesCuisine: ["Mariscos", "Seafood", "Mexican"],
-    openingHours: restaurant?.hours || "12:30-23:00",
+    openingHours: place?.hours || "12:30-23:00",
     acceptsReservations: true,
     paymentAccepted: ["Credit Card", "Cash"],
     currenciesAccepted: ["MXN"],
     aggregateRating: {
-        ratingValue: restaurant?.rating || 4.5,
+        ratingValue: place?.rating || 4.5,
         reviewCount: 1
     },
     email: "",
@@ -145,12 +125,12 @@ const schemaEnrichment = {
         <link rel="stylesheet" href="/campomar/wow.css" />    </head>
     
     <!-- Componentes de navegación -->
-    <CategoryNavigation 
+    <!-- <CategoryNavigation 
         client:load 
         categories={navigationCategories} 
         backgroundColor="bg-gray-900" 
         textColor="text-white" 
-    />
+    /> -->
     <!-- HEADER -->
     <div class="bg-[#ebebeb]">
         <div class="max-w-4xl mx-auto">

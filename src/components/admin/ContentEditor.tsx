@@ -109,7 +109,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
         </div>
 
         {content.sections.map((section: Section, sIdx: number) => (
-          <div key={sIdx} className="bg-white border-2 border-gray-100 rounded-3xl p-6 relative">
+          <div key={sIdx}>
             {/* Controles de orden de sección */}
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2">
               <button onClick={() => moveItem(content.sections, sIdx, 'up', 'sections')} className="bg-white border shadow-sm p-1 rounded-full">↑</button>
@@ -128,10 +128,10 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-4">
               {section.items.map((item, iIdx) => (
-                <div key={iIdx} className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group">
-                  <div className="w-24 shrink-0">
+                <div key={iIdx} className="flex flex-col xl:flex-row gap-6 p-6 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-colors">
+                  <div className="xl:w-32 w-full shrink-0">
                     <ManualUploader 
                       currentImage={item.image} 
                       onFileUploaded={(url) => updateItem(sIdx, iIdx, 'image', url)}
@@ -139,28 +139,34 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
                       onUploadError={() => console.error('Error al subir imagen del item')}
                     />
                   </div>
-                  <div className="flex-1 grid grid-cols-4 gap-3">
-                    <input 
-                      value={item.name} 
-                      onChange={(e) => updateItem(sIdx, iIdx, 'name', e.target.value)}
-                      placeholder="Nombre" 
-                      className="col-span-3 font-bold bg-transparent border-b border-gray-200 outline-none focus:border-black"
-                    />
-                    <input 
-                      type="number" 
-                      value={item.price} 
-                      onChange={(e) => updateItem(sIdx, iIdx, 'price', parseFloat(e.target.value))}
-                      placeholder="Precio" 
-                      className="text-right font-black text-red-600 bg-transparent border-b border-gray-200 outline-none focus:border-black"
-                    />
+                  <div className="flex-1 space-y-4">
+                    <div className="grid grid-cols-4 gap-4">
+                      <input 
+                        value={item.name} 
+                        onChange={(e) => updateItem(sIdx, iIdx, 'name', e.target.value)}
+                        placeholder="Nombre del platillo" 
+                        className="col-span-3 text-lg font-bold bg-transparent border-b-2 border-gray-200 pb-2 outline-none focus:border-black transition-colors"
+                      />
+                      <input 
+                        type="number" 
+                        value={item.price} 
+                        onChange={(e) => updateItem(sIdx, iIdx, 'price', parseFloat(e.target.value))}
+                        placeholder="0.00" 
+                        className="text-right text-lg font-black text-red-600 bg-transparent border-b-2 border-gray-200 pb-2 outline-none focus:border-black transition-colors"
+                      />
+                    </div>
                     <textarea 
                       value={item.description} 
                       onChange={(e) => updateItem(sIdx, iIdx, 'description', e.target.value)}
-                      placeholder="Descripción detallada..." 
-                      className="col-span-4 text-xs p-2 rounded-lg bg-white border border-gray-100 outline-none resize-none"
+                      placeholder="Descripción del platillo..." 
+                      rows={3}
+                      className="w-full text-sm text-gray-700 p-3 rounded-lg bg-gray-50 border border-gray-200 outline-none focus:border-black focus:bg-white transition-colors resize-none"
                     />
                   </div>
-                  <button onClick={() => removeItem(sIdx, iIdx)} className="text-gray-300 hover:text-red-500 self-center">✕</button>
+                  <button 
+                    onClick={() => removeItem(sIdx, iIdx)} 
+                    className="shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                  >✕</button>
                 </div>
               ))}
             </div>
@@ -169,22 +175,22 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
       </div>
 
       {/* SECCIÓN DE GALERÍA */}
-      <div className="bg-gray-900 text-white p-8 rounded-[3rem]">
-        <h2 className="text-xl font-bold uppercase mb-6 tracking-tighter italic">Galería del Lugar</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="bg-gray-900 text-white p-10 rounded-3xl">
+        <h2 className="text-xl font-bold uppercase mb-8 tracking-tight">Galería del Lugar</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {content.gallery?.map((img: any, gIdx: number) => (
-            <div key={gIdx} className="relative aspect-square group overflow-hidden rounded-2xl">
-              <img src={img.src} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+            <div key={gIdx} className="relative aspect-square group overflow-hidden rounded-xl">
+              <img src={img.src} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
               <button 
                 onClick={() => {
                   const newGal = content.gallery.filter((_: any, i: number) => i !== gIdx);
                   setContent({...content, gallery: newGal});
                 }}
-                className="absolute top-2 right-2 bg-red-600 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
               >✕</button>
             </div>
           ))}
-          <div className="aspect-square flex items-center justify-center border-2 border-dashed border-gray-700 rounded-2xl">
+          <div className="aspect-square flex items-center justify-center border-2 border-dashed border-gray-700 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors">
             <ManualUploader 
               onFileUploaded={(url) => setContent({...content, gallery: [...(content.gallery || []), { src: url, alt: '', title: '' }]})}
               onUploadStart={() => console.log('Subiendo imagen a galería...')}

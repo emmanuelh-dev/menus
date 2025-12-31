@@ -45,6 +45,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Interfaz para las cafeterías
 export interface Restaurant {
+  short_name: string;
   id: number;
   name: string;
   rating: number;
@@ -66,7 +67,7 @@ export interface Restaurant {
 export async function getRestaurants({type}: {type: string | null}) {
 
   let query = supabase
-    .from('restaurants')
+    .from('places')
     .select('*')
 
   if (type){

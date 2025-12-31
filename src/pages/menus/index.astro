@@ -33,44 +33,6 @@ const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"]
 const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet"];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const case_studies: Restaurant[] = [
-    {
-        name: "La Santa Kitchen bar",
-        description: "American - Hamburguesas - Alitas - Boneless",
-        restaurantLink: "/menus/la-santa",
-        image: la_santa,
-        link: "/blog/la-santa",
-        industry: "Restaurante",
-        type: "Fast Food",
-    },
-    {
-        name: "Antojitos Doña Guille",
-        description: "El Auténtico Sabor Tapatío",
-        restaurantLink: "/menus/antojitosdonaguille",
-        image: antojitosdonaguillelogo,
-        link: "/menus/antojitosdonaguille",
-        industry: "Bar",
-        type: "Formal",
-    },
-    {
-        name: "AlchemistCoffeLab",
-        description: "AlchemistCoffeLab",
-        restaurantLink: "/menus/alchemycoffeelab",
-        image: alchemycoffeelablogo,
-        link: "/menus/alchemycoffeelab",
-        industry: "Café",
-        type: "Formal",
-    },
-    {
-        name: "Papachinis Zona de Snack",
-        description: "Elotes, nachos, hot dogs hamburguesas tostadas tostitos y más...",
-        restaurantLink: "/menus/papachinis",
-        image: papachinislogo,
-        link: "/menus/papachinis",
-        industry: "Restaurante",
-        type: "Fast Food",
-    },
-];
 
 
 const restaurants = await getRestaurants({type: null})
@@ -116,8 +78,8 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
                         data-type={restaurant.type}
                     >
                         <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
-                            {restaurant.menu ? (
-                                <a href={'/menus/' + restaurant.menu}>
+                            {restaurant.short_name ? (
+                                <a href={'/menus/' + restaurant.short_name}>
                                     <img
                                         src={restaurant.image}
                                         alt={restaurant.name}
@@ -133,14 +95,14 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
                             )}
                         </div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            <a href={'/menus/'+ restaurant.menu}>{restaurant.name}</a>
+                            <a href={'/menus/'+ restaurant.short_name}>{restaurant.name}</a>
                         </h2>
                         <p class="text-gray-600">{}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
                             <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
                         </div>
-                        {restaurant.menu && <a href={'/menus/' + restaurant.menu} class="group mt-4 block">
+                        {restaurant.short_name && <a href={'/menus/' + restaurant.short_name} class="group mt-4 block">
                             <span class="flex items-center justify-between">
                                 Leer la historia completa
                                 <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
@@ -150,37 +112,7 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
                         </a>}
                     </div>
                 ))}
-                {case_studies.map((restaurant) => (
-                    <div 
-                        class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
-                        data-industry={restaurant.industry}
-                        data-type={restaurant.type}
-                    >
-                        <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
-                            <Image
-                                src={restaurant.image}
-                                alt={restaurant.name}
-                                class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
-                            />
-                        </div>
-                        <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            <a href={restaurant.restaurantLink}>{restaurant.name}</a>
-                        </h2>
-                        <p class="text-gray-600">{restaurant.description}</p>
-                        <div class="mt-4 flex flex-wrap gap-2">
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.industry}</span>
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
-                        </div>
-                        <a href={restaurant.link} class="group mt-4 block">
-                            <span class="flex items-center justify-between">
-                                Leer la historia completa
-                                <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
-                                    <ArrowRight />
-                                </div>
-                            </span>
-                        </a>
-                    </div>
-                ))}
+           
             </div>
         </div>
     </div>

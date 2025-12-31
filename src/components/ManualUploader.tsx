@@ -65,25 +65,26 @@ export function ManualUploader({
   return (
     <div className="space-y-3">
       {displayImage && (
-        <div className="relative group">
+        <div className="mb-3">
           <img 
             src={displayImage} 
-            alt="Vista previa" 
-            className="h-40 w-full object-cover rounded-2xl border border-gray-100 shadow-sm" 
+            alt="Vista previa optimizada" 
+            className="h-32 w-auto object-contain rounded border border-gray-300"
           />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
-            <p className="text-white text-xs font-bold uppercase">Cambiar Imagen</p>
-          </div>
+          <p className="text-xs text-gray-500 mt-1">Imagen optimizada automáticamente</p>
         </div>
       )}
-      <div className="rounded-2xl border-2 border-dashed border-gray-200 p-4 hover:border-black transition-colors">
+      <div className="rounded-lg border-2 border-dashed border-gray-300 p-4">
         <input
           type="file"
           accept="image/*"
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full text-xs text-gray-400 file:mr-4 file:rounded-full file:border-0 file:bg-black file:text-white file:px-4 file:py-2 file:font-bold cursor-pointer"
+          className="block w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
         />
+        {uploading && (
+          <p className="mt-2 animate-pulse text-xs text-blue-600">Subiendo a Cloudinary...</p>
+        )}
       </div>
     </div>
   )
