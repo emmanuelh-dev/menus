@@ -195,6 +195,26 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
     }
   };
 
+  const normalizeTitle = (title: string) => {
+    return title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '');
+  };
+
+  const findSimilarSection = (title: string) => {
+    const normalized = normalizeTitle(title);
+    return blocks.findIndex(
+      block => block.type === 'section' && normalizeTitle(block.data.title) === normalized
+    );
+  };
+
+  const isItemDuplicate = (sectionItems: ItemData[], newItem: any) => {
+    const normalizedName = normalizeTitle(newItem.name);
+    return sectionItems.some(item => normalizeTitle(item.name) === normalizedName);
+  };
+
   const analyzeMenuImage = async (file: File) => {
     setAiProcessing(true);
     try {
@@ -259,26 +279,69 @@ IMPORTANTE:
 
       const parsed = JSON.parse(jsonMatch[0]);
       
-      const newBlocks: Block[] = parsed.sections.map((section: any) => ({
-        id: `block-${Date.now()}-${Math.random()}`,
-        type: 'section',
-        data: {
-          title: section.title,
-          description: section.description || '',
-          image: '',
-          items: section.items.map((item: any) => ({
-            id: `item-${Date.now()}-${Math.random()}`,
-            name: item.name,
-            price: item.price || 0,
-            description: item.description || '',
-            image: ''
-          }))
-        }
-      }));
+      const updatedBlocks = [...blocks];
+      let sectionsAdded = 0;
+      let itemsAdded = 0;
+      let itemsSkipped = 0;
 
-      setBlocks([...blocks, ...newBlocks]);
+      parsed.sections.forEach((section: any) => {
+        const existingSectionIndex = findSimilarSection(section.title);
+        
+        if (existingSectionIndex !== -1) {
+          const existingSection = updatedBlocks[existingSectionIndex];
+          const newItems = section.items
+            .filter((item: any) => !isItemDuplicate(existingSection.data.items, item))
+            .map((item: any) => ({
+              id: `item-${Date.now()}-${Math.random()}`,
+              name: item.name,
+              price: item.price || 0,
+              description: item.description || '',
+              image: ''
+            }));
+          
+          itemsSkipped += section.items.length - newItems.length;
+          itemsAdded += newItems.length;
+          
+          updatedBlocks[existingSectionIndex] = {
+            ...existingSection,
+            data: {
+              ...existingSection.data,
+              items: [...existingSection.data.items, ...newItems]
+            }
+          };
+        } else {
+          sectionsAdded++;
+          itemsAdded += section.items.length;
+          
+          updatedBlocks.push({
+            id: `block-${Date.now()}-${Math.random()}`,
+            type: 'section',
+            data: {
+              title: section.title,
+              description: section.description || '',
+              image: '',
+              items: section.items.map((item: any) => ({
+                id: `item-${Date.now()}-${Math.random()}`,
+                name: item.name,
+                price: item.price || 0,
+                description: item.description || '',
+                image: ''
+              }))
+            }
+          });
+        }
+      });
+
+      setBlocks(updatedBlocks);
       setShowAIChat(false);
-      alert(`Se agregaron ${newBlocks.length} secciones con ${newBlocks.reduce((sum, b) => sum + b.data.items.length, 0)} platillos`);
+      
+      const message = [
+        sectionsAdded > 0 && `${sectionsAdded} secciones nuevas`,
+        itemsAdded > 0 && `${itemsAdded} platillos agregados`,
+        itemsSkipped > 0 && `${itemsSkipped} platillos omitidos (ya existían)`
+      ].filter(Boolean).join(', ');
+      
+      alert(`✓ ${message || 'No se encontraron cambios'}`);
       
     } catch (err) {
       console.error('Error al analizar imagen:', err);
@@ -321,7 +384,7 @@ IMPORTANTE:
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-lg font-black uppercase mb-1">Asistente IA</h2>
-              <p className="text-sm text-gray-600">Sube una imagen del menu para extraer automaticamente</p>
+              <p className="text-sm text-gray-600">Detecta automaticamente secciones existentes y agrega solo lo que falta</p>
             </div>
             <button 
               onClick={() => setShowAIChat(false)}
@@ -334,6 +397,7 @@ IMPORTANTE:
             type="file" 
             accept="image/*" 
             onChange={handleAIImageUpload}
+            className="hidden"
           />
           
           <button
