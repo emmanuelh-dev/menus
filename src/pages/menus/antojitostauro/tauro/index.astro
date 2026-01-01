@@ -16,11 +16,6 @@ const { data: place } = await supabase
 
 const { blocks = [], view_settings = {} } = place.content || {};
 
-const categoryColors = [
-  "text-red-600", "text-green-600", "text-yellow-600", "text-orange-600",
-  "text-pink-600", "text-purple-600", "text-blue-600", "text-lime-600"
-];
-
 const socialMedia = {
   instagram: { name: "antojitos_tauro", url: "#" },
   facebook: { name: "Antojitos Tauro", url: "#" },
@@ -34,130 +29,113 @@ const contactInfo = {
 
 <RestaurantLayout 
   title={place.name}
-  description={`Menu de ${place.name} - Autentica comida mexicana`}
+  description={`Menú de ${place.name} - Auténtica comida mexicana`}
   image={place.image}
   textWhite={false}
-  backgroundColor="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50"
+  backgroundColor="bg-stone-50"
 >
-  <div class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
-    <div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="min-h-screen bg-stone-50 font-sans antialiased text-stone-900">
+    <div class="max-w-3xl mx-auto px-6 py-12">
       
-      <div class="flex flex-col items-center mb-12">
-        <div class="relative mb-6">
-          <div class="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 blur-2xl opacity-30 rounded-full"></div>
-          <img 
-            src={place.image} 
-            alt={place.name} 
-            class="relative w-full max-w-md rounded-2xl shadow-2xl border-4 border-white"
-          />
-        </div>
+      {/* Header Minimalista */}
+      <header class="flex flex-col items-center mb-16 text-center">
+        <img 
+          src={place.image} 
+          alt={place.name} 
+          class="w-32 h-32 rounded-full object-cover mb-6 shadow-sm border border-stone-200"
+        />
         
-        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-yellow-600 to-green-600 mb-4 text-center">
+        <h1 class="text-4xl font-bold tracking-tight text-stone-900 mb-2">
           {place.name}
         </h1>
+        <p class="text-stone-500 text-sm mb-6 uppercase tracking-widest font-medium">Comida Mexicana Tradicional</p>
 
-        <div class="flex gap-6 mb-6">
-          <a href={socialMedia.instagram.url} class="flex items-center gap-2 text-pink-600 hover:text-pink-700 font-bold transition-colors">
-            <Instagram size={24} /> {socialMedia.instagram.name}
+        <div class="flex gap-4">
+          <a href={socialMedia.instagram.url} class="p-2 text-stone-600 hover:text-stone-900 transition-colors">
+            <Instagram size={20} />
           </a>
-          <a href={socialMedia.facebook.url} class="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold transition-colors">
-            <Facebook size={24} /> {socialMedia.facebook.name}
+          <a href={socialMedia.facebook.url} class="p-2 text-stone-600 hover:text-stone-900 transition-colors">
+            <Facebook size={20} />
           </a>
         </div>
 
         {contactInfo.clabes.length > 0 && (
-          <CopyClabe client:load clabes={contactInfo.clabes}/>
+          <div class="mt-4">
+            <CopyClabe client:load clabes={contactInfo.clabes}/>
+          </div>
         )}
-      </div>
+      </header>
 
-      <div class="space-y-12">
-        {blocks.map((block, blockIdx) => {
+      {/* Menú */}
+      <div class="space-y-16">
+        {blocks.map((block) => {
           if (block.type === 'section') {
             return (
-              <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-amber-200">
-                {block.data.image && (
-                  <div class="relative h-48 overflow-hidden">
-                    <img 
-                      src={block.data.image} 
-                      alt={block.data.title}
-                      class="w-full h-full object-cover"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h2 class="absolute bottom-4 left-6 text-4xl font-black text-white drop-shadow-lg uppercase">
-                      {block.data.title}
-                    </h2>
-                  </div>
-                )}
-                
-                <div class="p-6">
-                  {!block.data.image && (
-                    <h2 class={`${categoryColors[blockIdx % categoryColors.length]} text-4xl font-black uppercase mb-4 tracking-tight`}>
-                      {block.data.title}
-                    </h2>
-                  )}
-                  
+              <section>
+                <div class="mb-8 border-b border-stone-200 pb-2">
+                  <h2 class="text-2xl font-bold text-stone-800 uppercase tracking-wider">
+                    {block.data.title}
+                  </h2>
                   {block.data.description && (
-                    <p class="text-gray-700 text-lg mb-6 italic border-l-4 border-yellow-500 pl-4">
+                    <p class="text-stone-500 text-sm mt-1 italic">
                       {block.data.description}
                     </p>
                   )}
-
-                  {block.data.items?.length > 0 && (
-                    <div class="grid gap-4">
-                      {block.data.items.map((item, itemIdx) => (
-                        <div class="group hover:bg-amber-50 p-4 rounded-xl transition-all duration-300 border border-transparent hover:border-amber-300">
-                          <div class="flex gap-4">
-                            {item.image && (
-                              <div class="relative flex-shrink-0">
-                                <img 
-                                  src={item.image} 
-                                  alt={item.name}
-                                  class="w-28 h-28 object-cover rounded-xl shadow-md group-hover:shadow-xl transition-shadow border-2 border-white"
-                                />
-                                <div class="absolute -top-2 -left-2 bg-red-600 text-white text-xs font-black px-2 py-1 rounded-full shadow-lg">
-                                  #{itemIdx + 1}
-                                </div>
-                              </div>
-                            )}
-                            
-                            <div class="flex-1 min-w-0">
-                              <div class="flex justify-between items-start gap-4 mb-2">
-                                <h3 class="text-xl font-black text-gray-900 uppercase tracking-tight">
-                                  {item.name}
-                                </h3>
-                                {view_settings.show_prices && item.price > 0 && (
-                                  <span class="flex-shrink-0 text-2xl font-black text-red-600 bg-yellow-100 px-3 py-1 rounded-lg shadow-sm">
-                                    ${item.price}
-                                  </span>
-                                )}
-                              </div>
-                              
-                              {item.description && (
-                                <p class="text-gray-600 text-sm leading-relaxed">
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
-              </div>
+
+                <div class="grid gap-y-8">
+                  {block.data.items?.map((item) => (
+                    <div class="flex gap-6 group">
+                      {item.image && (
+                        <div class="flex-shrink-0">
+                          <img 
+                            src={item.image} 
+                            alt={item.name}
+                            class="w-24 h-24 object-cover rounded-lg bg-stone-200 shadow-sm"
+                          />
+                        </div>
+                      )}
+                      
+                      <div class="flex-1">
+                        <div class="flex justify-between items-baseline gap-4 mb-1">
+                          <h3 class="text-lg font-semibold text-stone-900 group-hover:text-red-800 transition-colors">
+                            {item.name}
+                          </h3>
+                          <div class="flex-1 border-b border-dotted border-stone-300 mx-2 hidden sm:block"></div>
+                          {view_settings.show_prices && item.price > 0 && (
+                            <span class="text-lg font-medium text-stone-900">
+                              ${item.price}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {item.description && (
+                          <p class="text-stone-500 text-sm leading-relaxed max-w-xl">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             );
           }
           
           if (block.type === 'gallery') {
             return (
-              <div class="bg-white rounded-2xl shadow-xl p-6 border-2 border-amber-200">
-                <h3 class="text-3xl font-black text-orange-600 mb-6 uppercase">Galeria</h3>
+              <div class="py-8">
+                <h3 class="text-sm font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 text-center">Nuestros Platos</h3>
                 <Gallery images={block.data.images || []} />
               </div>
             );
           }
         })}
       </div>
+
+      <footer class="mt-20 py-8 border-t border-stone-200 text-center">
+        <p class="text-stone-400 text-xs tracking-widest uppercase">Hecho con estructura, no con adornos.</p>
+      </footer>
 
       <WhatsappButton client:load phone={Number(contactInfo.whatsapp)} />
     </div>
