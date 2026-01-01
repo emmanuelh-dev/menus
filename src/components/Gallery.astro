@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import ImageModal from './ImageModal.astro';
 
+// Quitamos ImageMetadata para que acepte tanto assets locales como URLs de Cloudinary (strings)
 interface ImageData {
-  src: ImageMetadata;
+  src: any; 
   alt: string;
   title?: string;
 }
@@ -18,39 +18,51 @@ interface Props {
 const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
 ---
 
-<div class="mx-auto">
-  <div class={`grid grid-cols-2 gap-2 ${images.length > 2 ? 'md:grid-cols-3 ' : images.length > 4 ? 'lg:grid-cols-4' : ''}`} >
+<div class="mx-auto px-4 md:px-0">
+  {/* Grid Asimétrico: El primer item es grande, los demás siguen un ritmo */}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[150px] md:auto-rows-[200px]">
     {
-      images.map((image: ImageData, index: number) => (
-        <div 
-          class="relative overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-[1.03] group"
-          data-visible={index < 6 ? 'true' : 'false'}
-          style={index >= 6 ? 'display: none;' : ''}
-        >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            width={400}
-            height={400}
-            class="w-full aspect-square object-cover object-center"
-            quality="mid"
-          />
-          {image.title && (
-            <p class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 m-0 text-sm text-center" data-image-title>
-              {image.title}
-            </p>
-          )}
-        </div>
-      ))
+      images.map((image, index) => {
+        // Lógica de "Bento": La 1ra y la 6ta foto son destacadas
+        const isFeatured = index === 0 || index === 5;
+        
+        return (
+          <div 
+            class={`relative overflow-hidden rounded-sm cursor-pointer group transition-all duration-700 ease-out shadow-sm
+                   ${isFeatured ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}
+                   ${index >= 8 ? 'hidden' : 'flex'}`}
+            data-gallery-item
+            data-index={index}
+          >
+            <img
+              src={image.src?.src || image.src}
+              alt={image.alt}
+              class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+              loading="lazy"
+            />
+            
+            {/* Overlay minimalista: Solo aparece en hover */}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+              {image.title && (
+                <span class="text-[10px] uppercase tracking-[0.2em] text-white font-light">
+                  {image.title}
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })
     }
   </div>
-  {images.length > 6 && (
-    <div class="text-center mt-8">
+
+  {images.length > 8 && (
+    <div class="flex justify-center mt-12">
       <button
         id="loadMoreBtn"
-        class={buttonClasses ? buttonClasses : 'bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'}
+        class="group flex flex-col items-center gap-2 outline-none"
       >
-        Cargar más
+        <span class="text-[10px] uppercase tracking-[0.4em] text-stone-400 group-hover:text-black transition-colors">Ver Galería Completa</span>
+        <div class="h-[1px] w-8 bg-stone-200 group-hover:w-16 group-hover:bg-black transition-all duration-500"></div>
       </button>
     </div>
   )}
@@ -59,33 +71,13 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
 <ImageModal id={modalId} />
 
 <script>
-  let visibleCount = 6;
-  const INCREMENT = 6;
-
-  function initGallery(): void {
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    
-    // Load More functionality
-    loadMoreBtn?.addEventListener('click', () => {
-      const items = document.querySelectorAll('[data-visible="false"]');
-      items.forEach((item, index) => {
-        if (index < INCREMENT) {
-          (item as HTMLElement).style.display = '';
-          item.setAttribute('data-visible', 'true');
-        }
-      });
-      
-      if (items.length <= INCREMENT) {
-        loadMoreBtn.style.display = 'none';
-      }
-    });
-
-    // Initialize image modal
+  function initGallery() {
+    // Reutilizamos tu lógica de modal pero sin botones azules feos
     const modalId = document.querySelector('[id$="Modal"]')?.id || 'galleryModal';
-    const imageModal = (window as any).createImageModal({ modalId });
-    
-    // Attach modal to gallery items
-    imageModal.attachToElements('.grid > div');
+    if ((window as any).createImageModal) {
+       const imageModal = (window as any).createImageModal({ modalId });
+       imageModal.attachToElements('[data-gallery-item]');
+    }
   }
 
   document.addEventListener('DOMContentLoaded', initGallery);

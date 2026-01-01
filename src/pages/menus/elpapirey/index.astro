@@ -9,15 +9,13 @@ import RecommendationButton from "../../../components/RecommendationButton";
 import { supabase } from "../../../lib/supabase";
 import Gallery from "../../../components/Gallery.astro";
 
-// 1. UNA SOLA CONSULTA. Ya no necesitas categoriesData ni menu_items por separado.
 const { data: place } = await supabase
   .from("places")
   .select("*")
   .eq("short_name", 'elpapirey')
   .single();
 
-// 2. Extraemos el contenido dinámico del JSONB
-const { sections = [], gallery = [], view_settings = {} } = place.content || {};
+const { blocks = [], view_settings = {} } = place.content || {};
 
 const categoryColors = [
   "text-orange-500", "text-cyan-400", "text-red-500", "text-purple-500",
@@ -25,7 +23,6 @@ const categoryColors = [
   "text-teal-500"
 ];
 
-// Datos estáticos (que luego podrías meter también al JSON si quieres ser 100% frugal)
 const socialMedia = {
   instagram: { name: "Elpapi_rey_05", url: "https://instagram.com/Elpapi_rey_05" },
   facebook: { name: "EL papi rey", url: "https://www.facebook.com/profile.php?id=100090381744195" },
@@ -61,35 +58,45 @@ const contactInfo = {
       </div>
 
       <CopyClabe client:load clabes={contactInfo.clabes}/>
-      <Gallery images={gallery} buttonClasses="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10" />
 
       <div class="space-y-6 mb-8">
-        {sections.map((section, sectionIdx) => (
-          <div class="mt-6">
-            {/* Título de Categoría */}
-            <h2 class={`${categoryColors[sectionIdx % categoryColors.length]} text-xl font-bold tracking-wide mb-4`}>
-              {section.title.toUpperCase()}
-            </h2>
+        {blocks.map((block, blockIdx) => {
+          if (block.type === 'section') {
+            return (
+              <div class="mt-6">
+                <h2 class={`${categoryColors[blockIdx % categoryColors.length]} text-xl font-bold tracking-wide mb-4`}>
+                  {block.data.title.toUpperCase()}
+                </h2>
 
-            {/* Items de la sección */}
-            <div class="space-y-4">
-              {section.items.map((item) => (
-                <div class="px-4 flex justify-between items-start">
-                  <div class="flex-1">
-                    <span class="text-white text-lg font-medium">{item.name}</span>
-                    {item.description && <p class="text-gray-400 text-sm mt-1">{item.description}</p>}
-                  </div>
-                  {view_settings.show_prices && (
-                    <span class="text-yellow-400 text-xl font-bold ml-4">${item.price}</span>
-                  )}
+                <div class="space-y-4">
+                  {block.data.items?.map((item) => (
+                    <div class="px-4 flex justify-between items-start">
+                      <div class="flex-1">
+                        <span class="text-white text-lg font-medium">{item.name}</span>
+                        {item.description && <p class="text-gray-400 text-sm mt-1">{item.description}</p>}
+                      </div>
+                      {view_settings.show_prices && item.price > 0 && (
+                        <span class="text-yellow-400 text-xl font-bold ml-4">${item.price}</span>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        ))}
+              </div>
+            );
+          }
+          
+          if (block.type === 'gallery') {
+            return (
+              <Gallery 
+                images={block.data.images || []} 
+                buttonClasses="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10" 
+              />
+            );
+          }
+        })}
       </div>
+      
       <WhatsappButton client:load phone={Number(contactInfo.whatsapp)} />
-      {/* Pasamos sections directamente para la IA */}
     </div>
   </div>
 </RestaurantLayout>
