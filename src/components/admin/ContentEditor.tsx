@@ -334,7 +334,6 @@ IMPORTANTE:
             type="file" 
             accept="image/*" 
             onChange={handleAIImageUpload}
-            className="hidden"
           />
           
           <button
