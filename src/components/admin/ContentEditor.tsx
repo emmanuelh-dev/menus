@@ -104,7 +104,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
   });
   
   const [isSaving, setIsSaving] = useState(false);
-  const [showBlockMenu, setShowBlockMenu] = useState<number | boolean>(false);
+  const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiProcessing, setAiProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -362,6 +362,36 @@ IMPORTANTE:
       <div className="space-y-4 px-4 sm:px-0">
         {blocks.map((block, index) => (
           <div key={block.id} className="relative">
+            {/* Botón para agregar antes del primer bloque */}
+            {index === 0 && (
+              <>
+                <div className="flex justify-center my-4">
+                  <button
+                    onClick={() => setShowBlockMenu(`before-${index}`)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold transition-colors"
+                  >
+                    + Agregar Bloque
+                  </button>
+                </div>
+
+                {showBlockMenu === `before-${index}` && (
+                  <div className="mb-3 p-4 bg-white border rounded-xl shadow-lg">
+                    <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index - 1)} />
+                      <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index - 1)} />
+                    </div>
+                    <button
+                      onClick={() => setShowBlockMenu(false)}
+                      className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
             {/* Controles del bloque - Mobile friendly */}
             <div className="flex justify-end gap-2 mb-2 sm:absolute sm:-left-12 sm:top-4 sm:flex-col">
               <button 
@@ -388,18 +418,17 @@ IMPORTANTE:
             {/* Renderizar bloque según tipo */}
             {renderBlock(block, index)}
 
-            {/* Botón para agregar bloque después */}
-            <div className="flex justify-center mt-3">
+            {/* Botón para agregar después de cada bloque */}
+            <div className="flex justify-center my-4">
               <button
-                onClick={() => setShowBlockMenu(index)}
+                onClick={() => setShowBlockMenu(`after-${index}`)}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold transition-colors"
               >
                 + Agregar Bloque
               </button>
             </div>
 
-            {/* Menú de selección de tipo de bloque */}
-            {showBlockMenu === index && (
+            {showBlockMenu === `after-${index}` && (
               <div className="mt-3 p-4 bg-white border rounded-xl shadow-lg">
                 <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
                 <div className="grid grid-cols-2 gap-2">
