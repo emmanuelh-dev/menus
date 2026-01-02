@@ -21,7 +21,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -127,9 +127,9 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
             <div className="p-5">
               <h3 className="font-bold text-xl">{r.name}</h3>
               <p className="text-gray-400 text-sm mb-4">{r.address}</p>
-              
+
               <div className="flex gap-2">
-              <a href={`/menus/${r.short_name}`} target='_blank' className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center">
+                <a href={`/menus/${r.short_name}`} target='_blank' className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center">
                   <FaEye className="inline" />
                 </a>
                 <button onClick={() => openModal(r)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
@@ -146,21 +146,21 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <form 
+          <form
             key={editingId || 'new'}
-            onSubmit={handleSubmit} 
+            onSubmit={handleSubmit}
             className="bg-white w-full max-w-lg p-8 rounded-3xl shadow-2xl space-y-4"
           >
             <h3 className="text-xl font-black uppercase mb-6">{editingId ? 'Actualizar' : 'Crear'} Registro</h3>
-            
+
             <input name="name" placeholder="Nombre" value={formData.name} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
             <input name="address" placeholder="Dirección" value={formData.address} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
-            
+
             <div className="grid grid-cols-2 gap-4">
-              <select 
-                name="type" 
-                value={formData.type} 
-                onChange={handleInputChange} 
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
                 className="border-b-2 py-2 outline-none focus:border-black"
               >
                 <option value="restaurant">Restaurante</option>
@@ -173,7 +173,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-700">Logo del Restaurante</label>
               <ManualUploader
-                onFileUploaded={handleImageUploaded}
+                onFilesUploaded={(urls) => handleImageUploaded(urls[0])}
                 onUploadError={handleUploadError}
                 currentImage={formData.image}
               />

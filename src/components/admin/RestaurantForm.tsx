@@ -245,7 +245,7 @@ export default function RestaurantForm({ restaurant, onSuccess, onCancel }: Rest
           </label>
           <div className="mt-2">
             <ManualUploader
-              onFileUploaded={handleImageUploaded}
+              onFilesUploaded={(urls) => handleImageUploaded(urls[0])}
               onUploadError={handleUploadError}
               currentImage={imageUrl || formData.image}
             />

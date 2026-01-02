@@ -171,7 +171,7 @@ export default function RestaurantManager({ initialRestaurants }: { initialResta
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-700">Logo del Lugar</label>
               <ManualUploader
-                onFileUploaded={handleImageUploaded}
+                onFilesUploaded={handleImageUploaded[0]}
                 onUploadError={handleUploadError}
                 currentImage={formData.image}
               />

@@ -352,7 +352,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                   Imagen del Platillo
                 </label>
                 <ManualUploader
-                  onFileUploaded={handleImageUploaded}
+                  onFilesUploaded={(urls) => handleImageUploaded(urls[0])}
                   onUploadError={handleUploadError}
                   currentImage={imageUrl || editingItem?.image || undefined}
                 />

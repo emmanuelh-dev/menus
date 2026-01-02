@@ -763,7 +763,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
           <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN DE FONDO (opcional):</label>
           <ManualUploader
             currentImage={data.image}
-            onFileUploaded={(url) => onChange({ ...data, image: url })}
+            onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
             onUploadStart={() => console.log('Subiendo imagen de sección...')}
             onUploadError={() => console.error('Error al subir imagen')}
           />
@@ -864,7 +864,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
               <div className="w-full">
                 <ManualUploader
                   currentImage={item.image}
-                  onFileUploaded={(url) => updateItem(itemIndex, { image: url })}
+                  onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
                   onUploadStart={() => console.log('Subiendo imagen del item...')}
                   onUploadError={() => console.error('Error al subir imagen')}
                 />
@@ -920,8 +920,7 @@ function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: 
 
         <div className="aspect-square flex items-center justify-center border-2 border-dashed border-gray-700 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors">
           <ManualUploader
-            onFileUploaded={addImageToGallery}
-            onUploadStart={() => console.log('Subiendo imagen a galería...')}
+            onFilesUploaded={(urls) => addImageToGallery(urls[0])}
             onUploadError={() => console.error('Error al subir imagen')}
           />
         </div>
@@ -956,7 +955,7 @@ function ImageBlock({ data, onChange }: { data: ImageData; onChange: (data: Imag
 
         <ManualUploader
           currentImage={data.src}
-          onFileUploaded={(url) => onChange({ ...data, src: url })}
+          onFilesUploaded={(url) => onChange({ ...data, src: url[0] })}
           onUploadStart={() => console.log('Subiendo imagen...')}
           onUploadError={() => console.error('Error al subir imagen')}
         />
