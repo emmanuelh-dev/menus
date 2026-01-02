@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { ManualUploader } from '../ManualUploader';
 
-type BlockType = 'section' | 'gallery';
+type BlockType = 'section' | 'gallery' | 'image';
 
 interface Block {
   id: string;
@@ -133,6 +133,8 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
         return { title: 'NUEVA SECCIÓN', description: '', image: '', items: [] };
       case 'gallery':
         return { images: [] };
+      case 'image':
+        return { src: '', alt: '', caption: '' };
       default:
         return {};
     }
@@ -440,8 +442,9 @@ IMPORTANTE:
                 {showBlockMenu === `before-${index}` && (
                   <div className="mb-3 p-4 bg-white border rounded-xl shadow-lg">
                     <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index - 1)} />
+                      <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image', index - 1)} />
                       <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index - 1)} />
                     </div>
                     <button
@@ -494,8 +497,9 @@ IMPORTANTE:
             {showBlockMenu === `after-${index}` && (
               <div className="mt-3 p-4 bg-white border rounded-xl shadow-lg">
                 <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index)} />
+                  <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image', index)} />
                   <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index)} />
                 </div>
                 <button
@@ -523,8 +527,9 @@ IMPORTANTE:
             {showBlockMenu === true && (
               <div className="mt-6 max-w-md mx-auto p-6 bg-white border rounded-xl shadow-lg">
                 <p className="text-xs font-bold text-gray-500 mb-4">¿QUÉ QUIERES AGREGAR?</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section')} />
+                  <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image')} />
                   <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery')} />
                 </div>
               </div>
@@ -541,6 +546,8 @@ IMPORTANTE:
         return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
       case 'gallery':
         return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+      case 'image':
+        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
       default:
         return null;
     }
@@ -736,6 +743,56 @@ function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: 
             onUploadError={() => console.error('Error al subir imagen')}
           />
         </div>
+      </div>
+    </div>
+  );
+}
+
+interface ImageData {
+  src: string;
+  alt?: string;
+  caption?: string;
+}
+
+function ImageBlock({ data, onChange }: { data: ImageData; onChange: (data: ImageData) => void }) {
+  return (
+    <div className="bg-blue-50 p-4 sm:p-6 rounded-xl border-2 border-blue-200">
+      <div className="space-y-4">
+        {data.src ? (
+          <div className="relative">
+            <img 
+              src={data.src} 
+              alt={data.alt || ''} 
+              className="w-full rounded-lg shadow-lg"
+            />
+          </div>
+        ) : (
+          <div className="bg-white/50 rounded-lg p-8 text-center text-gray-400">
+            Sube una imagen
+          </div>
+        )}
+        
+        <ManualUploader
+          currentImage={data.src}
+          onFileUploaded={(url) => onChange({ ...data, src: url })}
+          onUploadStart={() => console.log('Subiendo imagen...')}
+          onUploadError={() => console.error('Error al subir imagen')}
+        />
+        
+        <input
+          value={data.alt || ''}
+          onChange={(e) => onChange({ ...data, alt: e.target.value })}
+          placeholder="Texto alternativo (opcional)"
+          className="w-full text-sm bg-white/50 p-3 rounded-lg border border-blue-200 outline-none focus:border-blue-600"
+        />
+        
+        <textarea
+          value={data.caption || ''}
+          onChange={(e) => onChange({ ...data, caption: e.target.value })}
+          placeholder="Pie de imagen (opcional)"
+          rows={2}
+          className="w-full text-sm bg-white/50 p-3 rounded-lg border border-blue-200 outline-none focus:border-blue-600 resize-none"
+        />
       </div>
     </div>
   );
