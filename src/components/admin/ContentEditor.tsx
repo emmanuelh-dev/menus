@@ -1,6 +1,23 @@
 /**
  * ESTRUCTURA DEL CONTENT JSONB:
  * {
+ *   semantic_data?: {
+ *     areas?: string[],
+ *     address?: string,
+ *     price_range?: string,
+ *     ambiance?: string,
+ *     hours?: string,
+ *     website?: string,
+ *     payment_options?: string[],
+ *     dress_code?: string,
+ *     phone?: string,
+ *     cuisine_type?: string,
+ *     zone?: string,
+ *     cross_street?: string,
+ *     parking?: string,
+ *     variety?: string,
+ *     additional_features?: string[]
+ *   },
  *   blocks: Block[],
  *   view_settings: { layout: 'grid' | 'list', show_prices: boolean }
  * }
@@ -80,6 +97,24 @@ interface GalleryData {
   images: { src: string; alt?: string; title?: string }[];
 }
 
+interface SemanticData {
+  areas?: string[];
+  address?: string;
+  price_range?: string;
+  ambiance?: string;
+  hours?: string;
+  website?: string;
+  payment_options?: string[];
+  dress_code?: string;
+  phone?: string;
+  cuisine_type?: string;
+  zone?: string;
+  cross_street?: string;
+  parking?: string;
+  variety?: string;
+  additional_features?: string[];
+}
+
 export default function ContentEditor({ placeId, initialContent }: { placeId: number; initialContent: any }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialContent?.blocks) {
@@ -92,7 +127,6 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
       return initialContent.blocks;
     }
 
-    // Migrar estructura antigua a bloques con items dentro de secciones
     const migratedBlocks: Block[] = [];
     if (initialContent?.sections) {
       initialContent.sections.forEach((section: any) => {
@@ -123,6 +157,8 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
     return migratedBlocks;
   });
 
+  const [semanticData, setSemanticData] = useState<SemanticData>(initialContent?.semantic_data || {});
+  const [showSemanticData, setShowSemanticData] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
@@ -199,6 +235,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: {
+            semantic_data: semanticData,
             blocks,
             view_settings: { layout: 'grid', show_prices: true }
           }
@@ -262,6 +299,15 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
                 {
                   text: `Analiza esta imagen de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
 {
+  "semantic_data": {
+    "address": "direccion completa si aparece",
+    "phone": "telefono si aparece",
+    "price_range": "rango de precios aproximado (ej: MXN100-300, más de MXN500)",
+    "hours": "horarios si aparecen",
+    "parking": "informacion sobre estacionamiento si aparece",
+    "payment_options": ["efectivo", "tarjeta", etc],
+    "additional_features": ["wifi", "terraza", etc]
+  },
   "sections": [
     {
       "title": "NOMBRE DE LA SECCION",
@@ -279,8 +325,10 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
 
 IMPORTANTE: 
 - Extrae TODOS los platillos y precios que veas
+- Extrae datos del restaurante (direccion, telefono, horarios, estacionamiento)
+- Si no ves algun dato, omite ese campo del JSON
 - Si no hay precio, usa 0
-- Agrupa por secciones logicas
+- Agrupa platillos por secciones logicas
 - Responde SOLO con el JSON, sin texto adicional`
                 },
                 {
@@ -319,6 +367,15 @@ IMPORTANTE:
               parts: [{
                 text: `Analiza este texto de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
 {
+  "semantic_data": {
+    "address": "direccion completa si aparece",
+    "phone": "telefono si aparece",
+    "price_range": "rango de precios aproximado (ej: MXN100-300, más de MXN500)",
+    "hours": "horarios si aparecen",
+    "parking": "informacion sobre estacionamiento si aparece (ej: Servicio de estacionamiento, Estacionamiento en calle, Sin estacionamiento)",
+    "payment_options": ["efectivo", "tarjeta", etc],
+    "additional_features": ["wifi", "terraza", etc]
+  },
   "sections": [
     {
       "title": "NOMBRE DE LA SECCION",
@@ -336,8 +393,11 @@ IMPORTANTE:
 
 IMPORTANTE: 
 - Extrae TODOS los platillos y precios que veas
+- Extrae datos del restaurante (direccion, telefono, horarios, estacionamiento)
+- Si no ves algun dato, omite ese campo del JSON
+- Para estacionamiento se MUY especifico: "Servicio de estacionamiento", "Estacionamiento en calle", "Sin estacionamiento", etc
 - Si no hay precio, usa 0
-- Agrupa por secciones logicas
+- Agrupa platillos por secciones logicas
 - Responde SOLO con el JSON, sin texto adicional
 
 TEXTO DEL MENU:
@@ -369,10 +429,28 @@ ${text}`
 
       const parsed = JSON.parse(jsonMatch[0]);
 
+      if (parsed.semantic_data) {
+        const mergedSemanticData = { ...semanticData };
+        
+        Object.keys(parsed.semantic_data).forEach(key => {
+          const value = parsed.semantic_data[key];
+          if (value && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+            if (Array.isArray(value) && Array.isArray(mergedSemanticData[key])) {
+              mergedSemanticData[key] = [...new Set([...(mergedSemanticData[key] || []), ...value])];
+            } else {
+              mergedSemanticData[key] = value;
+            }
+          }
+        });
+        
+        setSemanticData(mergedSemanticData);
+      }
+
       const updatedBlocks = [...blocks];
       let sectionsAdded = 0;
       let itemsAdded = 0;
       let itemsSkipped = 0;
+      let semanticFieldsAdded = 0;
 
       parsed.sections.forEach((section: any) => {
         const existingSectionIndex = findSimilarSection(section.title);
@@ -425,10 +503,18 @@ ${text}`
       setBlocks(updatedBlocks);
       setShowAIChat(false);
 
+      if (parsed.semantic_data) {
+        semanticFieldsAdded = Object.keys(parsed.semantic_data).filter(key => {
+          const value = parsed.semantic_data[key];
+          return value && value !== '' && (!Array.isArray(value) || value.length > 0);
+        }).length;
+      }
+
       const message = [
         sectionsAdded > 0 && `${sectionsAdded} secciones nuevas`,
         itemsAdded > 0 && `${itemsAdded} platillos agregados`,
-        itemsSkipped > 0 && `${itemsSkipped} platillos omitidos (ya existían)`
+        itemsSkipped > 0 && `${itemsSkipped} platillos omitidos (ya existían)`,
+        semanticFieldsAdded > 0 && `${semanticFieldsAdded} datos del lugar extraídos`
       ].filter(Boolean).join(', ');
 
       alert(`✓ ${message || 'No se encontraron cambios'}`);
@@ -445,6 +531,19 @@ ${text}`
       analyzeMenuImage(file);
     }
   };
+
+  function renderBlock(block: Block, index: number) {
+    switch (block.type) {
+      case 'section':
+        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+      case 'gallery':
+        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+      case 'image':
+        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+      default:
+        return null;
+    }
+  }
 
   return (
     <div className="space-y-6 pb-20">
@@ -467,6 +566,228 @@ ${text}`
         </div>
       </header>
 
+      <div className="mx-4 sm:mx-0">
+        <button
+          onClick={() => setShowSemanticData(!showSemanticData)}
+          className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <span className="font-black uppercase text-sm">Datos del Lugar</span>
+          </div>
+          <span className="text-2xl">{showSemanticData ? '−' : '+'}</span>
+        </button>
+
+        {showSemanticData && (
+          <div className="mt-3 p-6 bg-white rounded-xl border-2 border-blue-100 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">DIRECCIÓN:</label>
+                <input
+                  value={semanticData.address || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, address: e.target.value })}
+                  placeholder="Av. Principal #123, Colonia, Ciudad"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">TELÉFONO:</label>
+                <input
+                  value={semanticData.phone || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, phone: e.target.value })}
+                  placeholder="81 1234 5678"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">RANGO DE PRECIOS:</label>
+                <input
+                  value={semanticData.price_range || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, price_range: e.target.value })}
+                  placeholder="más de MXN500"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">TIPO DE COCINA:</label>
+                <input
+                  value={semanticData.cuisine_type || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, cuisine_type: e.target.value })}
+                  placeholder="Mexicana contemporánea"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">AMBIENTE:</label>
+                <input
+                  value={semanticData.ambiance || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, ambiance: e.target.value })}
+                  placeholder="Casual elegante"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">CÓDIGO DE VESTIMENTA:</label>
+                <input
+                  value={semanticData.dress_code || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, dress_code: e.target.value })}
+                  placeholder="Ropa formal"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">ZONA:</label>
+                <input
+                  value={semanticData.zone || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, zone: e.target.value })}
+                  placeholder="San Pedro Garza García"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-600 mb-2 block">INTERSECCIÓN:</label>
+                <input
+                  value={semanticData.cross_street || ''}
+                  onChange={(e) => setSemanticData({ ...semanticData, cross_street: e.target.value })}
+                  placeholder="Jose Vasconcelos"
+                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">SITIO WEB:</label>
+              <input
+                value={semanticData.website || ''}
+                onChange={(e) => setSemanticData({ ...semanticData, website: e.target.value })}
+                placeholder="https://www.ejemplo.com"
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">HORARIOS:</label>
+              <textarea
+                value={semanticData.hours || ''}
+                onChange={(e) => setSemanticData({ ...semanticData, hours: e.target.value })}
+                placeholder="Lun-Vie 13:00-23:00, Sáb-Dom 12:00-00:00"
+                rows={3}
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">ESTACIONAMIENTO:</label>
+              <input
+                value={semanticData.parking || ''}
+                onChange={(e) => setSemanticData({ ...semanticData, parking: e.target.value })}
+                placeholder="Servicio de estacionamiento"
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">VARIEDAD:</label>
+              <input
+                value={semanticData.variety || ''}
+                onChange={(e) => setSemanticData({ ...semanticData, variety: e.target.value })}
+                placeholder="Pantalla HD de 9 x 4 mts"
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">ÁREAS DEL RESTAURANTE:</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {semanticData.areas?.map((area, idx) => (
+                  <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                    {area}
+                    <button
+                      onClick={() => setSemanticData({ ...semanticData, areas: semanticData.areas?.filter((_, i) => i !== idx) })}
+                      className="hover:text-red-600"
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Agregar área (Enter para añadir)"
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    const newArea = e.currentTarget.value.trim();
+                    setSemanticData({ ...semanticData, areas: [...(semanticData.areas || []), newArea] });
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">OPCIONES DE PAGO:</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {semanticData.payment_options?.map((option, idx) => (
+                  <span key={idx} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                    {option}
+                    <button
+                      onClick={() => setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter((_, i) => i !== idx) })}
+                      className="hover:text-red-600"
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Agregar método de pago (Enter)"
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    const newOption = e.currentTarget.value.trim();
+                    setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), newOption] });
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS ADICIONALES:</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {semanticData.additional_features?.map((feature, idx) => (
+                  <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                    {feature}
+                    <button
+                      onClick={() => setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter((_, i) => i !== idx) })}
+                      className="hover:text-red-600"
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Agregar característica (Enter)"
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    const newFeature = e.currentTarget.value.trim();
+                    setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), newFeature] });
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {showAIChat && (
         <div className="mx-4 sm:mx-0 p-6 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl border-2 border-purple-300 shadow-lg">
           <div className="flex justify-between items-start mb-4">
@@ -480,7 +801,6 @@ ${text}`
             >✕</button>
           </div>
 
-          {/* Toggle entre Imagen y Texto */}
           <div className="flex gap-2 mb-4">
             <button
               onClick={() => setAiInputMode('image')}
@@ -504,7 +824,6 @@ ${text}`
             </button>
           </div>
 
-          {/* Input de Imagen */}
           {aiInputMode === 'image' && (
             <>
               <input
@@ -512,6 +831,7 @@ ${text}`
                 type="file"
                 accept="image/*"
                 onChange={handleAIImageUpload}
+                style={{ display: 'none' }}
               />
 
               <button
@@ -535,7 +855,6 @@ ${text}`
             </>
           )}
 
-          {/* Input de Texto */}
           {aiInputMode === 'text' && (
             <div className="space-y-3">
               <textarea
@@ -565,11 +884,9 @@ ${text}`
         </div>
       )}
 
-      {/* LISTADO DE BLOQUES */}
       <div className="space-y-4 lg:px-4 sm:px-0">
         {blocks.map((block, index) => (
           <div key={block.id} className="relative">
-            {/* Botón para agregar antes del primer bloque */}
             {index === 0 && (
               <>
                 <div className="flex justify-center my-4">
@@ -600,7 +917,6 @@ ${text}`
               </>
             )}
 
-            {/* Controles del bloque - Mobile friendly */}
             <div className="flex justify-end gap-2 mb-2 sm:absolute sm:-left-12 sm:top-4 sm:flex-col">
               <button
                 onClick={() => moveBlock(index, 'up')}
@@ -623,10 +939,8 @@ ${text}`
               >✕</button>
             </div>
 
-            {/* Renderizar bloque según tipo */}
             {renderBlock(block, index)}
 
-            {/* Botón para agregar después de cada bloque */}
             <div className="flex justify-center my-4">
               <button
                 onClick={() => setShowBlockMenu(`after-${index}`)}
@@ -655,7 +969,6 @@ ${text}`
           </div>
         ))}
 
-        {/* Botón inicial si no hay bloques */}
         {blocks.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-400 mb-4">No hay bloques. Comienza agregando uno.</p>
@@ -681,19 +994,6 @@ ${text}`
       </div>
     </div>
   );
-
-  function renderBlock(block: Block, index: number) {
-    switch (block.type) {
-      case 'section':
-        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
-      case 'gallery':
-        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
-      case 'image':
-        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
-      default:
-        return null;
-    }
-  }
 }
 
 function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
@@ -768,7 +1068,6 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
           />
         </div>
 
-        {/* ITEMS DENTRO DE LA SECCIÓN */}
         <div className="mt-6 space-y-3">
           <div className="flex justify-between items-center">
             <h4 className="text-sm font-bold text-purple-700 uppercase">Items de esta sección:</h4>
@@ -804,7 +1103,6 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
               </div>
 
               <div className="space-y-3">
-
                 <div className="grid grid-cols-4 gap-2">
                   <input
                     value={item.name}
@@ -859,25 +1157,18 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                     }}
                   />
                 </div>
+
+                <div className="w-full">
+                  <ManualUploader
+                    currentImage={item.image}
+                    onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
+                    onUploadStart={() => console.log('Subiendo imagen del item...')}
+                    onUploadError={() => console.error('Error al subir imagen')}
+                  />
+                </div>
               </div>
-              <div className="w-full">
-                <ManualUploader
-                  currentImage={item.image}
-                  onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
-                  onUploadStart={() => console.log('Subiendo imagen del item...')}
-                  onUploadError={() => console.error('Error al subir imagen')}
-                />
-              </div>
-              <button
-                onClick={addItem}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors"
-              >
-                + Item
-              </button>
             </div>
-
           ))}
-
         </div>
       </div>
     </div>

@@ -66,6 +66,52 @@ const contactInfo = {
           Mesa Tradicional • San Nicolás
         </p>
         
+        {place.content?.semantic_data && (
+          <div class="w-full max-w-lg space-y-4 text-center mb-8">
+            {place.content.semantic_data.address && (
+              <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">Ubicación</p>
+                <p class="text-sm text-stone-600">{place.content.semantic_data.address}</p>
+              </div>
+            )}
+            
+            {place.content.semantic_data.price_range && (
+              <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">Precios</p>
+                <p class="text-sm text-stone-600">{place.content.semantic_data.price_range}</p>
+              </div>
+            )}
+            
+            {place.content.semantic_data.parking && (
+              <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">Estacionamiento</p>
+                <p class="text-sm text-stone-600">{place.content.semantic_data.parking}</p>
+              </div>
+            )}
+            
+            {place.content.semantic_data.hours && (
+              <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">Horarios</p>
+                <p class="text-sm text-stone-600 whitespace-pre-line">{place.content.semantic_data.hours}</p>
+              </div>
+            )}
+            
+            {place.content.semantic_data.phone && (
+              <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">Teléfono</p>
+                <p class="text-sm text-stone-600">{place.content.semantic_data.phone}</p>
+              </div>
+            )}
+            
+            {place.content.semantic_data.payment_options && place.content.semantic_data.payment_options.length > 0 && (
+              <div class="space-y-1">
+                <p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">Métodos de Pago</p>
+                <p class="text-sm text-stone-600">{place.content.semantic_data.payment_options.join(', ')}</p>
+              </div>
+            )}
+          </div>
+        )}
+        
         <div class="h-[1px] w-12 bg-stone-200"></div>
       </header>
 
