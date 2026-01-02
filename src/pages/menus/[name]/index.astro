@@ -24,7 +24,7 @@ blocks = blocks.map(block => {
   if (block.type === 'gallery' && block.data.images) {
     const imagesWithAlt = block.data.images.map((img, idx) => ({
       ...img,
-      alt: img.alt || `${place.name} - ${place.description || 'Galería'} ${idx + 1}`
+      alt: img.alt || `${place.name} - ${place.description || 'Galería Menú PDF ONLINE QR'} ${idx + 1}`
     }));
     return { ...block, data: { ...block.data, images: imagesWithAlt } };
   }
