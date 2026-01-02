@@ -62,10 +62,13 @@ const contactInfo = {
           if (block.type === 'section') {
             return (
               <section class="relative">
-                <div class="sticky top-0 bg-[#FCFCFC]/80 backdrop-blur-md z-10 py-4 mb-12 border-b border-stone-100">
-                  <h2 class="text-xs uppercase tracking-[0.3em] font-black text-stone-800">
+                <div class="sticky top-0 bg-[#FCFCFC]/80 backdrop-blur-md z-10 py-4 border-b border-stone-100 tex-2xl">
+                  <h2 class="text-2xl uppercase tracking-[0.3em] font-black text-stone-800">
                     {block.data.title}
                   </h2>
+                </div>
+
+                <div class="space-y-12">
                   {block.data.image && (
                     <img src={block.data.image} alt={block.data.title} class="mt-2 rounded-sm" />
                   )}                  
@@ -74,10 +77,6 @@ const contactInfo = {
                       {block.data.description}
                     </p>
                   )}
-
-                </div>
-
-                <div class="space-y-12">
                   {block.data.items?.map((item) => (
                     <div class="group grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start">
                       <div class="order-2 sm:order-1">
