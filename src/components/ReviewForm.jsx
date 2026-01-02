@@ -1,291 +1,209 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { FaStar, FaRegStar, FaWhatsapp, FaCamera, FaReply } from "react-icons/fa";
 import { supabase } from "../lib/supabase";
+import { ManualUploader } from "./ManualUploader";
 
-const STAR_COUNT = 5;
-const DEFAULT_MENU = "campomar";
-
-export default function ReviewForm({ restaurantName, path }) {
-  const [reviews, setReviews] = useState([]);
+export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
   const [restaurant, setRestaurant] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [error, setError] = useState(null);
+  const [authorName, setAuthorName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const reviewsRef = useRef(null);
+  const [replyText, setReplyText] = useState({});
+  const [viewerImage, setViewerImage] = useState(null);
 
   const menu = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      return window.location.pathname.split('/').pop() || DEFAULT_MENU;
-    }
-    return path?.split('/').pop() || DEFAULT_MENU;
+    const p = path || (typeof window !== 'undefined' ? window.location.pathname : "");
+    return p.split('/').filter(Boolean).pop() || "default";
   }, [path]);
-  const findOrCreateRestaurant = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from("places")
-        .select("*")
-        .eq("short_name", menu)
-        .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      } 
-
-      if (data) {
-        setRestaurant(data);
-        return;
-      }
-
-      const { data: newRestaurant, error: createError } = await supabase
-        .from("places")
-        .insert([{
-          name: restaurantName || menu,
-          short_name: menu,
-        }])
-        .select()
-        .single();
-
-      if (createError) throw createError;
-
-      setRestaurant(newRestaurant);
-    } catch (err) {
-      console.error("Restaurant operation failed:", err);
-      setError("Failed to load restaurant data");
-    }
-  }, [menu, restaurantName]);
-
-  const loadReviews = useCallback(async () => {
-    if (!restaurant?.id) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("review")
-        .select("rate, comment, created_at")
-        .eq("restaurant_id", restaurant.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      const mappedReviews = data.map(review => ({
-        rating: review.rate,
-        comment: review.comment,
-        created_at: review.created_at,
-        restaurant_id: restaurant.id,
-      }));
-
-      setReviews(mappedReviews);
-    } catch (err) {
-      console.error("Failed to load reviews:", err);
-      setError("Failed to load reviews");
-    }
-  }, [restaurant?.id]);
-
-  const updateRestaurantRating = useCallback(async (newReviews) => {
-    if (!restaurant?.id || newReviews.length === 0) return;
-
-    const totalRating = newReviews.reduce((sum, review) => sum + review.rating, 0);
-    const averageRating = (totalRating / newReviews.length).toFixed(1);
-
-    try {
-      const { error } = await supabase
-        .from("places")
-        .update({ rating: averageRating })
-        .eq("id", restaurant.id);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error("Failed to update restaurant rating:", err);
-    }
-  }, [restaurant?.id]);
-
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    
-    if (rating === 0 || !comment.trim()) {
-      setError("Please complete all fields");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const { data, error } = await supabase
-        .from("review")
-        .insert([{
-          rate: rating,
-          comment: comment.trim(),
-          restaurant: restaurant.name,
-          restaurant_id: restaurant.id,
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      const newReview = {
-        rating: data.rate,
-        comment: data.comment,
-        created_at: data.created_at,
-        restaurant_id: restaurant.id
-      };
-
-      const updatedReviews = [newReview, ...reviews];
-      setReviews(updatedReviews);
-      
-      await updateRestaurantRating(updatedReviews);
-
-      setRating(0);
-      setComment("");
-    } catch (err) {
-      console.error("Failed to submit review:", err);
-      setError("Failed to submit review");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [rating, comment, restaurant, reviews, updateRestaurantRating]);
-
-  const averageRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
-    return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-  }, [reviews]);
-
-  const isFormValid = rating > 0 && comment.trim().length > 0;
-
-  useEffect(() => {
-    findOrCreateRestaurant();
-  }, [findOrCreateRestaurant]);
-
-  useEffect(() => {
-    loadReviews();
-  }, [loadReviews]);
-
-  const renderStars = useCallback((count, interactive = false) => {
-    return Array.from({ length: STAR_COUNT }, (_, index) => {
-      const starNumber = index + 1;
-      const isActive = starNumber <= count;
-      
-      return (
-        <button
-          key={starNumber}
-          type="button"
-          {...(interactive && {
-            onClick: () => setRating(starNumber),
-            onMouseEnter: () => setHoverRating(starNumber),
-            onMouseLeave: () => setHoverRating(0),
-          })}
-          className={`text-2xl transition-colors ${
-            interactive ? 'focus:outline-none hover:scale-110' : ''
-          }`}
-          aria-label={`${starNumber} star${starNumber !== 1 ? 's' : ''}`}
-          disabled={!interactive}
-        >
-          {isActive ? (
-            <FaStar className="text-yellow-500" />
-          ) : (
-            <FaRegStar className={interactive ? "text-gray-300 hover:text-yellow-400" : "text-gray-300"} />
-          )}
-        </button>
-      );
-    });
+  const loadReviews = useCallback(async (id) => {
+    const { data } = await supabase
+      .from("review")
+      .select("*")
+      .eq("restaurant_id", id)
+      .order("created_at", { ascending: false });
+    if (data) setReviews(data);
   }, []);
 
-  if (!restaurant) {
-    return (
-      <div className="p-4 text-center">
-        <div className="animate-pulse">
-          <p className="text-gray-600 mb-2">Setting up review system...</p>
-          <p className="text-sm text-gray-500">Configuring restaurant for reviews.</p>
-        </div>
-      </div>
-    );
-  }
+  const findOrCreatePlace = useCallback(async () => {
+    let { data, error } = await supabase.from("places").select("*").eq("short_name", menu).single();
+    if (error && error.code === 'PGRST116') {
+      const { data: newData } = await supabase.from("places")
+        .insert([{ name: restaurantName || menu, short_name: menu, content: { blocks: [], view_settings: {} } }])
+        .select().single();
+      data = newData;
+    }
+    if (data) {
+      setRestaurant(data);
+      loadReviews(data.id);
+    }
+  }, [menu, restaurantName, loadReviews]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const payload = {
+      restaurant_id: restaurant.id,
+      rate: rating,
+      comment: comment.trim(),
+      content: {
+        author: { name: authorName || "Anónimo", whatsapp: whatsapp.replace(/\D/g, '') },
+        images: images,
+        device_id: localStorage.getItem('device_id') || 'anon-123'
+      },
+      status: 'approved'
+    };
+    const { error } = await supabase.from("review").insert([payload]);
+    if (!error) {
+      alert("Reseña publicada.");
+      setRating(0); setComment(""); setImages([]);
+      loadReviews(restaurant.id);
+    }
+    setIsSubmitting(false);
+  };
+
+  // Función para responder (Lógica de Admin)
+  const handleReply = async (reviewId) => {
+    const review = reviews.find(r => r.id === reviewId);
+    const updatedContent = {
+      ...review.content,
+      reply: {
+        text: replyText[reviewId],
+        admin_name: "Administrador",
+        created_at: new Date().toISOString()
+      }
+    };
+
+    const { error } = await supabase
+      .from("review")
+      .update({ content: updatedContent })
+      .eq("id", reviewId);
+
+    if (!error) {
+      setReplyText({ ...replyText, [reviewId]: "" });
+      loadReviews(restaurant.id);
+    }
+  };
+
+  useEffect(() => { findOrCreatePlace(); }, [findOrCreatePlace]);
+
+  if (!restaurant) return <div className="p-10 text-center animate-pulse text-xs tracking-widest">CARGANDO...</div>;
 
   return (
-    <>
-      <h2 className="text-xl font-semibold mb-4" id="comment">
-        Leave your review for {restaurant.name}
-      </h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Rating (1 to 5 stars)
-          </label>
-          <div className="flex space-x-1">
-            {renderStars(hoverRating || rating, true)}
-          </div>
+    <div className="space-y-12 max-w-4xl mx-auto">
+      {/* Formulario de Reseña */}
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+        <h2 className="text-2xl font-black uppercase italic mb-6 tracking-tighter">Tu opinión importa</h2>
+        <div className="flex gap-2 mb-8">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button key={s} type="button" onClick={() => setRating(s)} className="text-3xl transition-transform hover:scale-110">
+              {rating >= s ? <FaStar className="text-red-600" /> : <FaRegStar className="text-gray-200" />}
+            </button>
+          ))}
         </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Comment
-          </label>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Write your review..."
-            rows="4"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-black resize-y"
-            required
-            disabled={isSubmitting}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <input placeholder="Nombre" value={authorName} onChange={e => setAuthorName(e.target.value)} className="p-4 bg-gray-50 rounded-2xl outline-none border border-transparent focus:border-black" />
+          <input placeholder="WhatsApp" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="p-4 bg-gray-50 rounded-2xl outline-none border border-transparent focus:border-black" />
         </div>
-
-        {error && (
-          <div className="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-200">
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={!isFormValid || isSubmitting}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit Review'}
-        </button>
+        <textarea placeholder="Cuéntanos los detalles..." value={comment} onChange={e => setComment(e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl h-32 mb-4 outline-none border border-transparent focus:border-black resize-none" />
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          {images.length > 0 && (
+            <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-6">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative aspect-square group">
+                  <img src={img} className="size-full object-cover rounded-2xl border border-gray-100" />
+                  <button
+                    type="button"
+                    onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
+                    className="absolute -top-2 -right-2 bg-red-600 text-white size-6 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                  >
+                    <span className="text-[10px] font-bold">✕</span>
+                  </button>
+                </div>
+              ))}
+              <ManualUploader multiple onFilesUploaded={urls => setImages([...images, ...urls])} />
+            </div>
+          )}
+          <button type="submit" disabled={rating === 0 || isSubmitting} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase text-[10px] tracking-[0.2em] disabled:opacity-20">
+            Publicar
+          </button>
+        </div>
       </form>
 
-      <div className="mt-8" ref={reviewsRef}>
-        <h3 className="text-lg font-semibold mb-4">Previous Reviews</h3>
-
-        {reviews.length > 0 ? (
-          <div className="space-y-4">
-            {reviews.map((review, index) => (
-              <article key={`${review.restaurant_id}-${index}`} className="border-b pb-4 last:border-b-0">
-                <div className="flex items-center mb-2">
-                  <div className="flex">
-                    {renderStars(review.rating)}
-                  </div>
-                  {review.created_at && (
-                    <time className="ml-2 text-xs">
-                      {new Date(review.created_at).toLocaleDateString()}
-                    </time>
-                  )}
-                </div>
-                <p className="">{review.comment}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p className="">No reviews yet</p>
-        )}
-
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium mb-2">Average Rating:</h4>
-          <div className="flex items-center">
-            <div className="flex">
-              {renderStars(Math.round(averageRating))}
+      {/* Listado de Reseñas */}
+      <div className="space-y-8">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 px-4">Feed de experiencias</h3>
+        {reviews.map((rev) => (
+          <div key={rev.id} className="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <span className="block font-bold text-black text-lg">{rev.content?.author?.name || "Anónimo"}</span>
+                <span className="text-red-600 text-xs">{'★'.repeat(rev.rate)}</span>
+              </div>
+              <time className="text-[10px] text-gray-400 uppercase tracking-widest">
+                {new Date(rev.created_at).toLocaleDateString()}
+              </time>
             </div>
-            <span className="ml-2 text-gray-600">
-              ({averageRating.toFixed(1)} out of 5 • {reviews.length} review{reviews.length !== 1 ? 's' : ''})
-            </span>
+            <p className="text-stone-600 leading-relaxed mb-4">{rev.comment}</p>
+
+            {rev.content?.images?.length > 0 && (
+              <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                {rev.content.images.map((img, idx) => (
+                  <img 
+                    key={idx} 
+                    src={img} 
+                    onClick={() => setViewerImage(img)}
+                    className="size-20 rounded-xl object-cover ring-1 ring-gray-100 cursor-pointer hover:ring-2 hover:ring-red-600 transition-all" 
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* MUESTRA LA RESPUESTA SI EXISTE */}
+            {rev.content?.reply && (
+              <div className="mt-6 ml-4 md:ml-10 p-5 bg-stone-50 border-l-4 border-red-600 rounded-r-2xl relative">
+                <span className="absolute -top-3 left-4 bg-red-600 text-white text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-tighter">Staff Reply</span>
+                <p className="text-sm text-stone-800 italic">"{rev.content.reply.text}"</p>
+                <p className="text-[9px] text-stone-400 mt-2 uppercase font-bold">— {rev.content.reply.admin_name}</p>
+              </div>
+            )}
+
+            {/* OPCIÓN DE RESPONDER (Visible solo para Admin) */}
+            <div className="mt-4 flex gap-2">
+              <input
+                value={replyText[rev.id] || ""}
+                onChange={e => setReplyText({ ...replyText, [rev.id]: e.target.value })}
+                placeholder="Escribe una respuesta..."
+                className="flex-1 bg-gray-50 p-2 rounded-lg text-xs outline-none border focus:border-red-600"
+              />
+              <button onClick={() => handleReply(rev.id)} className="bg-red-600 text-white p-2 rounded-lg"><FaReply /></button>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
-    </>
+
+      {viewerImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={() => setViewerImage(null)}
+        >
+          <button
+            onClick={() => setViewerImage(null)}
+            className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 transition-colors"
+          >
+            ×
+          </button>
+          <img 
+            src={viewerImage} 
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-full max-h-full object-contain rounded-lg"
+          />
+        </div>
+      )}
+    </div>
   );
 }
