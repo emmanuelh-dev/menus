@@ -654,14 +654,6 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
               </div>
 
               <div className="space-y-3">
-                <div className="w-full">
-                  <ManualUploader
-                    currentImage={item.image}
-                    onFileUploaded={(url) => updateItem(itemIndex, { image: url })}
-                    onUploadStart={() => console.log('Subiendo imagen del item...')}
-                    onUploadError={() => console.error('Error al subir imagen')}
-                  />
-                </div>
 
                 <div className="grid grid-cols-4 gap-2">
                   <input
@@ -687,6 +679,15 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                   className="w-full text-sm text-gray-700 p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600 resize-none"
                 />
               </div>
+              <div className="w-full">
+                  <ManualUploader
+                    currentImage={item.image}
+                    onFileUploaded={(url) => updateItem(itemIndex, { image: url })}
+                    onUploadStart={() => console.log('Subiendo imagen del item...')}
+                    onUploadError={() => console.error('Error al subir imagen')}
+                  />
+                </div>
+
             </div>
           ))}
         </div>
