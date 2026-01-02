@@ -111,11 +111,12 @@ blocks = blocks.map(block => {
             let sectionCounter = 0; // Contador para rastrear solo bloques de sección
             return blocks.map((block) => {
               if (block.type === 'section') {
-                const isOpen = sectionCounter < 2; // Solo los primeros 2 están abiertos
+                //const isOpen = sectionCounter < 2; // Solo los primeros 2 están abiertos
                 sectionCounter++;
       
                 return (
-                  <details class="group border-b border-stone-100 pb-4" open={isOpen}>
+           //       <details class="group border-b border-stone-100 pb-4" open={isOpen}>
+                  <details class="group border-b border-stone-100 pb-4">
                     <summary class="flex justify-between items-center cursor-pointer list-none sticky top-0 bg-[#FCFCFC]/95 backdrop-blur-md z-10 py-6 outline-none">
                       <h2 class="text-xl uppercase tracking-[0.3em] font-black text-stone-800 transition-all group-open:text-red-900">
                         {block.data.title}
