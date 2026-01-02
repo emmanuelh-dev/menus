@@ -60,18 +60,11 @@ const { data: menus, error } = await supabase
 
 const { data: recentComments } = await supabase
 	.from("review")
-	.select(
-		`
-    *,
-    restaurants (
-      name
-    )
-  `
-	)
-	.eq("restaurant_id", menus?.map(m => m.restaurant_id))
+	.select('*')
 	.order("created_at", { ascending: false })
 	.limit(10);
 
+  console.log(recentComments)
 ---
 
 <AdminLayout title="Dashboard | Panel de Administrador">
