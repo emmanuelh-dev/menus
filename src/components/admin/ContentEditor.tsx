@@ -1,3 +1,22 @@
+/**
+ * ESTRUCTURA DEL CONTENT JSONB:
+ * {
+ *   blocks: Block[],
+ *   view_settings: { layout: 'grid' | 'list', show_prices: boolean }
+ * }
+ * 
+ * TIPOS DE BLOQUES:
+ * - section: { title, description?, image?, items: ItemData[] }
+ * - gallery: { images: Array<{ src, alt?, title? }> }
+ * - image: { src, alt?, caption? }
+ * 
+ * ITEM (platillo/habitación):
+ * - name: string
+ * - price: number
+ * - description: string
+ * - image: string
+ * - features?: string[] // ["Jacuzzi", "Clima", "Smart TV"] para moteles
+ */
 import { useState, useRef } from 'react';
 import { ManualUploader } from '../ManualUploader';
 
@@ -47,6 +66,7 @@ interface ItemData {
   price: number;
   description: string;
   image: string;
+  features?: string[];
 }
 
 interface SectionData {
@@ -573,7 +593,8 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
       name: '',
       price: 0,
       description: '',
-      image: ''
+      image: '',
+      features: []
     };
     onChange({ ...data, items: [...data.items, newItem] });
   };
@@ -685,6 +706,37 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                   rows={2}
                   className="w-full text-sm text-gray-700 p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600 resize-none"
                 />
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS (ej: Jacuzzi, Clima):</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {item.features?.map((feature, fIdx) => (
+                      <span key={fIdx} className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                        {feature}
+                        <button
+                          onClick={() => {
+                            const newFeatures = item.features?.filter((_, i) => i !== fIdx);
+                            updateItem(itemIndex, { features: newFeatures });
+                          }}
+                          className="hover:text-red-600"
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Agregar característica (Enter para añadir)"
+                    className="w-full text-sm p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        const newFeature = e.currentTarget.value.trim();
+                        const currentFeatures = item.features || [];
+                        updateItem(itemIndex, { features: [...currentFeatures, newFeature] });
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
+                </div>
               </div>
               <div className="w-full">
                   <ManualUploader

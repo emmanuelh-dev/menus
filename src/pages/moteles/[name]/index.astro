@@ -1,317 +1,148 @@
 ---
 export const prerender = false;
-
 const {name} = Astro.params;
+
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import Gallery from "../../../components/Gallery.astro";
+import WhatsappButton from "../../../components/WhatsappButton";
+import CopyClabe from "../../../components/CopyClabe";
 import {getRestaurantByName, supabase} from "../../../lib/supabase";
+import MotelLayout from "../../../layouts/MotelLayout.astro";
 
 if (!name) {
   throw new Error("No se ha especificado el nombre del restaurante");
 }
-const menuData = await getRestaurantByName({name});
-
-if (!menuData || menuData.length === 0) {
-  throw new Error(`No se encontró el restaurante: ${name}`);
-}
-
-const restaurant = menuData[0];
-
-const { data: menu } = await supabase
-  .from("menus")
+const { data: place } = await supabase
+  .from("places")
   .select("*")
-  .eq("restaurant_id", restaurant?.id)
-  .eq("is_active", true)
+  .eq("short_name", name)
+  .single();
 
-const schemaEnrichment = {
-  address: restaurant.address ? {
-    streetAddress: restaurant.address,
-    addressLocality: "Ciudad",
-    addressCountry: "MX"
-  } : undefined,
-  telephone: undefined,
-  priceRange: restaurant.priceRange || "$$",
-  servesCuisine: restaurant.type ? [restaurant.type] : ["Restaurant"],
-  openingHours: restaurant.hours || undefined,
-  acceptsReservations: true,
-  paymentAccepted: ["Cash", "Credit Card"],
-  currenciesAccepted: ["MXN"],
-  aggregateRating: restaurant.rating ? {
-    ratingValue: restaurant.rating,
-    reviewCount: restaurant.reviewCount || 1
-  } : undefined,
+const { blocks = [], view_settings = {} } = place.content || {};
+
+const socialMedia = {
+  instagram: { name: "antojitos_tauro", url: "#" },
+  facebook: { name: "Antojitos Tauro", url: "#" },
 };
 
+const contactInfo = {
+  whatsapp: "8180000000",
+  clabes: [],
+};
 ---
-
-<RestaurantLayout
-  title={restaurant.name || name}
-  description={`Menú de ${restaurant.name || name}`}
-  image={restaurant.image}
-  textWhite={false}
-  backgroundColor="bg-white"
-  schemaEnrichment={schemaEnrichment}  type="Restaurant"
->  <style>
-    .hover-lift {
-      transition: all 0.3s ease;
-    }
-    
-    .hover-lift:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-    
-    .star-rating {
-      filter: drop-shadow(0 2px 4px rgba(255,215,0,0.3));
-    }
-    
-    .review-form-section {
-      scroll-margin-top: 100px;
-    }
-    
-    .font-serif {
-      font-family: "Playfair Display", serif;
-    }
-    
-    .motel-gradient {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .motel-card {
-      transition: all 0.3s ease;
-    }
-    
-    .motel-card:hover {
-      transform: translateY(-5px);
-    }
-  </style>
-
-  <div class="min-h-screen bg-black text-white">    <!-- Hero Section - Motel Style -->
-    <section class="relative overflow-hidden">
-      <!-- Background with motel theme -->
-      <div class="absolute inset-0 motel-gradient" style="filter: brightness(0.3);"></div>
+<MotelLayout 
+  description={place.description}
+  title={place.name}
+  backgroundColor="bg-[#0A0A0A]"
+>
+  <div class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white">
+    <div class="max-w-3xl mx-auto px-6 py-24">
       
-      <!-- Content -->
-      <div class="relative z-10 max-w-4xl mx-auto px-4 py-24 text-center">
-        <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">💕 Romance & Privacidad</span>
-        
-        {restaurant.image && (
-          <div class="mb-8">
-            <img 
-              src={restaurant.image} 
-              alt={restaurant.name}
-              class="w-48 h-48 mx-auto rounded-full shadow-xl border-4 border-pink-400 object-cover"
-            />
-          </div>
-        )}          
-        
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">
-          {restaurant.name}
+      {/* Header Sensual y Nocturno */}
+      <header class="mb-32 flex flex-col items-center">
+        <div class="relative mb-10 group">
+           {/* Glow de Neón sutil detrás del logo */}
+           <div class="absolute inset-0 bg-red-900/20 blur-3xl rounded-full group-hover:bg-red-900/40 transition-all duration-1000"></div>
+           <img 
+            src={place.image} 
+            alt={place.name} 
+            class="size-52 rounded-full relative z-10 object-cover ring-1 ring-white/10 ring-offset-8 ring-offset-[#0A0A0A] grayscale group-hover:grayscale-0 transition-all duration-1000"
+          />
+        </div>
+        <h1 class="text-6xl text-center font-light tracking-tighter serif italic text-white mb-4">
+          {place.name}
         </h1>
-
-        <!-- Rating Display -->
-        {restaurant.rating && (
-          <div class="flex items-center justify-center mb-8">
-            <div class="flex items-center space-x-1">
-              {Array.from({length: 5}, (_, i) => (
-                <svg 
-                  class={`w-8 h-8 ${i < Math.floor(restaurant.rating) ? 'text-pink-400' : 'text-gray-500'}`} 
-                  fill="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                </svg>
-              ))}
-            </div>
-            <span class="ml-3 text-2xl font-semibold text-white">
-              {restaurant.rating}/5
-            </span>
-          </div>
-        )}
-
-        <!-- Main CTA for Reviews -->
-        <div class="bg-gradient-to-r from-pink-900/60 to-purple-900/60 p-8 rounded-2xl shadow-2xl border border-pink-500/30">
-          <h2 class="text-3xl font-bold text-pink-300 mb-4 font-serif">
-            🌟 ¡Comparte tu Experiencia!
-          </h2>
-          <p class="text-pink-100 text-lg mb-6 max-w-xl mx-auto">
-            ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros visitantes. 
-            ¡Cuéntanos qué tal estuvo tu experiencia romántica!
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-              class="bg-pink-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-pink-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-serif"
-            >
-              ⭐ Escribir Reseña
-            </button>
-            <span class="text-pink-200 text-sm">
-              Solo toma 2 minutos
-            </span>
-          </div>
-        </div>
-      </div>
-    </section>    <!-- Restaurant Info - Motel Style -->
-    <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="bg-[#1E1E1E] rounded-2xl shadow-lg p-6 mb-8 border border-pink-500/20">
-        <h3 class="text-2xl font-semibold text-pink-300 mb-6 text-center font-serif">
-          📍 Información del Establecimiento
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {restaurant.address && (
-            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
-              <svg class="w-5 h-5 mr-3 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-pink-200 uppercase font-semibold">Dirección</div>
-                <div class="text-sm text-white">{restaurant.address}</div>
-              </div>
-            </div>
-          )}
-          
-          {restaurant.hours && (
-            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
-              <svg class="w-5 h-5 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-pink-200 uppercase font-semibold">Horarios</div>
-                <div class="text-sm text-white">{restaurant.hours}</div>
-              </div>
-            </div>
-          )}
-          
-          {restaurant.priceRange && (
-            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
-              <svg class="w-5 h-5 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-pink-200 uppercase font-semibold">Precios</div>
-                <div class="text-sm text-white">{restaurant.priceRange}</div>
-              </div>
-            </div>
-          )}
-          
-          {restaurant.type && (
-            <div class="flex items-center p-3 bg-[#2A2A2A] rounded-lg border border-pink-500/20">
-              <svg class="w-5 h-5 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-              </svg>
-              <div>
-                <div class="text-xs text-pink-200 uppercase font-semibold">Tipo</div>
-                <div class="text-sm text-white">{restaurant.type}</div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <!-- Secondary CTA Section -->
-      <div class="bg-gradient-to-r from-pink-900/60 to-purple-900/60 rounded-2xl p-8 text-center text-white mb-8 border border-pink-500/30">
-        <h3 class="text-2xl font-bold mb-4 font-serif text-pink-300">
-          💬 ¿Ya visitaste este lugar?
-        </h3>
-        <p class="text-pink-100 mb-6">
-          Ayuda a otros visitantes compartiendo tu experiencia romántica. Tu opinión cuenta mucho para la comunidad.
+        <p class="text-[11px] uppercase tracking-[0.6em] text-red-800 font-bold mb-10">
+          Experiencia Privada • Exclusive Rooms
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button 
-            onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-            class="bg-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-pink-400 transition-colors font-serif"
-          >
-            📝 Calificar ahora
-          </button>
-          <a 
-            href="/contact" 
-            class="border-2 border-pink-400 text-pink-300 px-6 py-3 rounded-lg font-semibold hover:bg-pink-500 hover:text-white transition-colors font-serif"
-          >
-            📞 Contactar establecimiento
-          </a>
-        </div>
-      </div>      <!-- Available Menus/Branches Section -->
-      {menu && menu.length > 0 ? (
-        <div class="bg-[#1E1E1E] rounded-2xl shadow-lg p-8 mb-8 border border-pink-500/20">
-          <h3 class="text-2xl font-bold text-pink-300 mb-6 text-center font-serif">
-            🏨 Sucursales Disponibles
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menu.map((menuItem) => (
-              <div class="bg-gradient-to-br from-pink-900/30 to-purple-900/30 rounded-xl p-6 border border-pink-500/30 hover-lift motel-card">
-                <div class="flex items-center mb-4">
-                  <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-2 4h2M7 7h.01M7 11h.01M7 15h.01"></path>
-                    </svg>
-                  </div>
-                  <h4 class="text-lg font-semibold text-pink-300 font-serif">{menuItem.name}</h4>
+        <div class="h-[1px] w-20 bg-gradient-to-r from-transparent via-red-900 to-transparent"></div>
+      </header>
+
+      {/* Suites y Servicios */}
+      <div class="space-y-32">
+        {blocks.map((block) => {
+          if (block.type === 'section') {
+            return (
+              <section class="relative">
+                <div class="sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 py-6 border-b border-white/5 mb-16">
+                  <h2 class="text-3xl font-light serif italic text-white tracking-tight">
+                    {block.data.title}
+                  </h2>
                 </div>
-                
-                {menuItem.description && (
-                  <p class="text-gray-300 mb-4 text-sm">{menuItem.description}</p>
-                )}
-                
-                <div class="space-y-2 text-sm">
-                  <div class="flex items-center text-gray-400">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                    <span class="capitalize text-pink-200">{menuItem.menu_type}</span>
-                  </div>
-                  
-                  {menuItem.availability_days && (
-                    <div class="flex items-center text-gray-400">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                      <span class="text-pink-200">{menuItem.availability_days}</span>
+
+                <div class="space-y-20">
+                  {block.data.image && (
+                    <div class="overflow-hidden rounded-sm group">
+                        <img 
+                            src={block.data.image} 
+                            alt={block.data.title} 
+                            class="w-full h-80 object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" 
+                        />
                     </div>
-                  )}
+                  )}                  
                   
-                  {menuItem.availability_start && menuItem.availability_end && (
-                    <div class="flex items-center text-gray-400">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <span class="text-pink-200">{menuItem.availability_start} - {menuItem.availability_end}</span>
-                    </div>
-                  )}
+                  <div class="grid gap-y-16">
+                    {block.data.items?.map((item) => (
+                      <div class="group flex flex-col md:flex-row gap-8 items-center md:items-start border-l border-white/5 pl-6 hover:border-red-900 transition-colors duration-500">
+                        <div class="flex-1 order-2 md:order-1">
+                          <div class="flex justify-between items-baseline mb-3">
+                            <h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
+                              {item.name}
+                            </h3>
+                            <div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block"></div>
+                            <span class="text-xl font-light text-stone-500">
+                              {view_settings.show_prices && `$${item.price}`}
+                            </span>
+                          </div>
+                          <p class="text-stone-500 text-sm font-light leading-relaxed mb-4">
+                            {item.description}
+                          </p>
+                          {/* Tags de amenidades ficticias o reales */}
+                          <div class="flex gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
+                             <span>Jacuzzi</span>
+                             <span>•</span>
+                             <span>Smart TV</span>
+                             <span>•</span>
+                             <span>Room Service</span>
+                          </div>
+                        </div>
+                        
+                        {item.image && (
+                          <div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
+                            <img 
+                              src={item.image} 
+                              alt={item.name}
+                              class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                
-                <div class="mt-6">
-                  <a 
-                    href={`/menus/${name}/${menuItem.menu}`}
-                    class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-pink-400 transition-colors flex items-center justify-center font-serif"
-                  >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    Ver Menú
-                  </a>
-                </div>
+              </section>
+            );
+          }
+
+          if (block.type === 'gallery') {
+            return (
+              <div class="py-20 border-y border-white/5">
+                <p class="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-12">Instalaciones</p>
+                <Gallery
+                  images={block.data.images || []} 
+                  buttonClasses="bg-white/5 text-white border border-white/10 px-8 py-3 rounded-sm hover:bg-white/10 transition-all uppercase text-[10px] tracking-widest" 
+                />
               </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <!-- Menu Coming Soon -->
-        <div class="bg-[#1E1E1E] rounded-2xl shadow-lg p-8 text-center border border-pink-500/20">
-          <div class="text-6xl mb-4">🚀</div>
-          <h3 class="text-2xl font-bold text-pink-300 mb-4 font-serif">
-            ¡Menú Digital en Construcción!
-          </h3>
-          <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Estamos trabajando para traerte el menú completo de {restaurant.name} muy pronto. 
-            Mientras tanto, ¡tu reseña nos ayuda a mejorar la experiencia!
-          </p>
-          <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-4 max-w-md mx-auto">
-            <p class="text-pink-300 font-semibold">
-              🎯 ¡Sé de los primeros en calificar!
-            </p>
-          </div>
-        </div>
-      )}
+            );
+          }
+        })}
+      </div>
+
+      <footer class="mt-40 pb-20 text-center">
+        <p class="text-[10px] text-stone-600 uppercase tracking-[0.5em]">
+          Privacy Guaranteed • {place.name} • 2026
+        </p>
+      </footer>
     </div>
   </div>
-</RestaurantLayout>
+</MotelLayout>

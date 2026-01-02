@@ -22,6 +22,10 @@ const { data: menu } = await supabase
   .eq("is_active", true)
   .single();
 
+// Obtener el contenido del menú (estructura de bloques)
+const menuContent = menu?.content;
+const blocks = menuContent?.blocks || [];
+
 
 const { data: categoriesData } = await supabase
   .from("menu_categories")
@@ -360,7 +364,155 @@ const schemaEnrichment = {
       )
     }    <!-- Menu Categories Section -->
     {
-      categoriesData && categoriesData.length > 0 && (
+      blocks && blocks.length > 0 ? (
+        <div class="bg-black text-white space-y-8 py-8">
+          {blocks.map((block: any) => (
+            <div class="max-w-6xl mx-auto lg:px-4">
+              
+              {/* BLOQUE DE SECCIÓN (con items/habitaciones) */}
+              {block.type === 'section' && (
+                <div class="mb-12 px-4">
+                  <div class="bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-xl p-8 border border-pink-500/20 mb-8">
+                    <h3 class="text-4xl font-bold text-pink-300 mb-2 font-serif text-center">
+                      {block.data.title}
+                    </h3>
+                    {block.data.description && (
+                      <p class="text-pink-100 text-lg max-w-2xl mx-auto text-center">
+                        {block.data.description}
+                      </p>
+                    )}
+                    {block.data.image && (
+                      <div class="mt-6">
+                        <img
+                          src={block.data.image}
+                          alt={block.data.title}
+                          class="w-full h-64 object-cover rounded-lg shadow-lg clickable-image"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ITEMS/HABITACIONES DE LA SECCIÓN */}
+                  {block.data.items && block.data.items.length > 0 && (
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {block.data.items.map((item: any) => (
+                        <div class="bg-[#1E1E1E] rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-pink-500/20 group">
+                          {/* Item Image */}
+                          {item.image && (
+                            <div class="h-64 overflow-hidden relative">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 clickable-image"
+                              />
+                            </div>
+                          )}
+                          
+                          {/* Item Content */}
+                          <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                              <h4 class="text-xl font-bold text-pink-300 flex-1 pr-2 font-serif">
+                                {item.name}
+                              </h4>
+                              {item.price > 0 && (
+                                <div class="text-right">
+                                  <span class="text-2xl font-bold text-pink-400">
+                                    ${item.price}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Description */}
+                            {item.description && (
+                              <p class="text-gray-300 text-sm mb-4">
+                                {item.description}
+                              </p>
+                            )}
+
+                            {/* Features/Amenidades */}
+                            {item.features && item.features.length > 0 && (
+                              <div class="flex flex-wrap gap-2 mt-4">
+                                {item.features.map((feature: string) => (
+                                  <span class="bg-pink-900/30 text-pink-300 text-xs px-3 py-1 rounded-full font-semibold border border-pink-500/30">
+                                    {feature}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* BLOQUE DE IMAGEN INDIVIDUAL */}
+              {block.type === 'image' && block.data.src && (
+                <div class="mb-8 px-4">
+                  <div class="bg-[#1E1E1E] rounded-xl p-6 border border-pink-500/20">
+                    <img
+                      src={block.data.src}
+                      alt={block.data.alt || ''}
+                      class="w-full h-auto rounded-lg shadow-lg clickable-image"
+                    />
+                    {block.data.caption && (
+                      <p class="text-pink-200 text-center mt-4 text-sm italic">
+                        {block.data.caption}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* BLOQUE DE GALERÍA */}
+              {block.type === 'gallery' && block.data.images && block.data.images.length > 0 && (
+                <div class="mb-8 px-4">
+                  <div class="bg-[#1E1E1E] rounded-xl p-6 border border-pink-500/20">
+                    <h3 class="text-2xl font-bold text-pink-300 mb-6 text-center font-serif">
+                      📸 Galería
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {block.data.images.map((img: any) => (
+                        <div class="aspect-square overflow-hidden rounded-lg group">
+                          <img
+                            src={img.src}
+                            alt={img.alt || img.title || ''}
+                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 clickable-image"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="max-w-4xl mx-auto bg-[#1E1E1E] rounded-2xl shadow-lg p-8 text-center mb-8 border border-pink-500/20">
+          <div class="text-6xl mb-4">🏨</div>
+          <h3 class="text-2xl font-bold text-pink-300 mb-4 font-serif">
+            ¡Habitaciones en Construcción!
+          </h3>
+          <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+            Estamos trabajando para traerte la información completa de las habitaciones de
+            {restaurant.name} muy pronto. Mientras tanto, ¡tu reseña nos ayuda a mejorar!
+          </p>
+          <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-4 max-w-md mx-auto">
+            <p class="text-pink-300 font-semibold">
+              🎯 ¡Sé de los primeros en calificar!
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    {/* Sección antigua de categorías - solo si no hay bloques */}
+    {
+      categoriesData && categoriesData.length > 0 && (!blocks || blocks.length === 0) && (
         <div class="bg-white space-y-8 py-8">
           {categoriesData.map((category) => (
             <div id={`category-${category.id}`} class="max-w-6xl mx-auto lg:px-4">

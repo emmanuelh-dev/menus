@@ -1,13 +1,21 @@
 ---
+export const prerender = false;
+
 import { Image } from "astro:assets";
 import MotelLayout from "../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
+import { getRestaurants } from "../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
+
+// Traer moteles de Supabase
+const motelesData = await getRestaurants({ type: 'motel' });
 
 // Definir la estructura de datos para los moteles
 interface Motel {
+  id?: number;
   name: string;
+  short_name?: string;
   rating: number;
   reviewCount: number;
   priceRange: string;
@@ -25,8 +33,30 @@ interface Motel {
   destacado?: boolean;
 }
 
-// Datos de moteles basados en La Guía M, Google Maps y recomendaciones de Reddit
-const motelesList: Motel[] = [
+// Mapear datos de Supabase a la estructura esperada
+const motelesList: Motel[] = motelesData.map((motel) => ({
+  id: motel.id,
+  name: motel.name,
+  short_name: motel.short_name,
+  rating: motel.rating || 4.0,
+  reviewCount: motel.reviewCount || 0,
+  priceRange: motel.priceRange || "$$",
+  address: motel.address || "",
+  hours: motel.hours || "24 horas",
+  amenities: motel.services || [],
+  image: motel.image,
+  menu: motel.menu,
+  distance: motel.distance,
+  closed: motel.closed,
+  openingTime: motel.openingTime,
+  specialties: [],
+  highlight: motel.featured,
+  phone: undefined,
+  destacado: motel.featured
+}));
+
+// Mantener datos hardcodeados como respaldo si no hay datos en Supabase
+const motelesFallback: Motel[] = [
   {
     name: "Motel Love",
     rating: 4.6,
@@ -204,6 +234,9 @@ const motelesList: Motel[] = [
   }
 ];
 
+// Usar moteles de Supabase, o fallback si no hay datos
+const finalMotelesList = motelesList.length > 0 ? motelesList : motelesFallback;
+
 // Obtener parámetros de URL para SEO dinámico
 const url = new URL(Astro.request.url);
 const zona = url.searchParams.get('zona') || undefined;
@@ -341,7 +374,7 @@ const schemaEnrichment = {
   textWhite={true}  canonical={seoData.canonical}
   ogUrl={seoData.ogUrl}
 ><!-- Motel Business Structured Data -->
-  <MotelBusinessSchema moteles={motelesList} />
+  <MotelBusinessSchema moteles={finalMotelesList} />
   
   <!-- Breadcrumb Structured Data -->
   <MotelBreadcrumbSchema zona={zona} tipo={tipo} />
@@ -408,7 +441,7 @@ const schemaEnrichment = {
     
           <!-- Grid de moteles con diseño creativo -->
           <div id="moteles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {motelesList.sort((a, b) => b.rating - a.rating).map((motel) => (
+            {finalMotelesList.sort((a, b) => b.rating - a.rating).map((motel) => (
               <div 
                 class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border ${motel.highlight ? 'border-pink-500/50 bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
                 data-rating={motel.rating}
@@ -505,12 +538,28 @@ const schemaEnrichment = {
     
                   <!-- Botón de acción -->
                   <div class="mt-5">
-                    {motel.menu ? (
+                    {motel.short_name ? (
+                      <a 
+                        href={`/moteles/${motel.short_name}`}
+                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                      >
+                        Ver Habitaciones
+                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    ) : motel.menu ? (
                       <a 
                         href={motel.menu} 
                         class="inline-block w-full text-center py-2 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
                       >
                         Ver Información
+                      </a>
+                    ) : motel.phone ? (
+                      <a 
+                        href={`tel:${motel.phone}`}
+                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                      >
+                        <Phone className="mr-2 w-4 h-4" />
+                        Llamar ahora
                       </a>
                     ) : (
                       <button 
@@ -530,7 +579,7 @@ const schemaEnrichment = {
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles Destacados</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {motelesList.filter(motel => motel.highlight === true).map(motel => (
+              {finalMotelesList.filter(motel => motel.highlight === true).map(motel => (
                 <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
                   <div class="md:w-2/5 relative">
                     <img
