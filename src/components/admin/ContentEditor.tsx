@@ -98,6 +98,7 @@ interface GalleryData {
 }
 
 interface SemanticData {
+  description?: string;
   areas?: string[];
   address?: string;
   price_range?: string;
@@ -300,13 +301,14 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
                   text: `Analiza esta imagen de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
 {
   "semantic_data": {
+    "description": "descripcion breve del restaurante basada en el menu (1-2 lineas)",
     "address": "direccion completa si aparece",
     "phone": "telefono si aparece",
     "price_range": "rango de precios aproximado (ej: MXN100-300, más de MXN500)",
     "hours": "horarios si aparecen",
     "parking": "informacion sobre estacionamiento si aparece",
-    "payment_options": ["efectivo", "tarjeta", etc],
-    "additional_features": ["wifi", "terraza", etc]
+    "payment_options": [usa EXACTAMENTE estos valores: "Efectivo", "Tarjetas de crédito", "AMEX", "Visa", "Mastercard", "Transferencia", "Vales"],
+    "additional_features": [usa EXACTAMENTE estos valores: "WiFi", "Terraza", "Bar", "Estacionamiento valet", "Música en vivo", "Pet friendly", "Reservaciones", "Delivery", "Para llevar", "Aire acondicionado", "TV", "Acceso para silla de ruedas"]
   },
   "sections": [
     {
@@ -324,8 +326,10 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
 }
 
 IMPORTANTE: 
+- GENERA una descripcion del lugar basada en el tipo de comida y ambiente que percibes
 - Extrae TODOS los platillos y precios que veas
 - Extrae datos del restaurante (direccion, telefono, horarios, estacionamiento)
+- Para payment_options y additional_features usa EXACTAMENTE los valores listados arriba
 - Si no ves algun dato, omite ese campo del JSON
 - Si no hay precio, usa 0
 - Agrupa platillos por secciones logicas
@@ -368,13 +372,14 @@ IMPORTANTE:
                 text: `Analiza este texto de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
 {
   "semantic_data": {
+    "description": "descripcion breve del restaurante basada en el menu y contexto (1-2 lineas)",
     "address": "direccion completa si aparece",
     "phone": "telefono si aparece",
     "price_range": "rango de precios aproximado (ej: MXN100-300, más de MXN500)",
     "hours": "horarios si aparecen",
     "parking": "informacion sobre estacionamiento si aparece (ej: Servicio de estacionamiento, Estacionamiento en calle, Sin estacionamiento)",
-    "payment_options": ["efectivo", "tarjeta", etc],
-    "additional_features": ["wifi", "terraza", etc]
+    "payment_options": [usa EXACTAMENTE estos valores: "Efectivo", "Tarjetas de crédito", "AMEX", "Visa", "Mastercard", "Transferencia", "Vales"],
+    "additional_features": [usa EXACTAMENTE estos valores: "WiFi", "Terraza", "Bar", "Estacionamiento valet", "Música en vivo", "Pet friendly", "Reservaciones", "Delivery", "Para llevar", "Aire acondicionado", "TV", "Acceso para silla de ruedas"]
   },
   "sections": [
     {
@@ -392,8 +397,10 @@ IMPORTANTE:
 }
 
 IMPORTANTE: 
+- GENERA una descripcion del lugar basada en el tipo de comida, estilo y ambiente que percibes del menu
 - Extrae TODOS los platillos y precios que veas
 - Extrae datos del restaurante (direccion, telefono, horarios, estacionamiento)
+- Para payment_options y additional_features usa EXACTAMENTE los valores listados arriba
 - Si no ves algun dato, omite ese campo del JSON
 - Para estacionamiento se MUY especifico: "Servicio de estacionamiento", "Estacionamiento en calle", "Sin estacionamiento", etc
 - Si no hay precio, usa 0
@@ -579,6 +586,17 @@ ${text}`
 
         {showSemanticData && (
           <div className="mt-3 p-6 bg-white rounded-xl border-2 border-blue-100 space-y-4">
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block">DESCRIPCIÓN DEL LUGAR:</label>
+              <textarea
+                value={semanticData.description || ''}
+                onChange={(e) => setSemanticData({ ...semanticData, description: e.target.value })}
+                placeholder="Breve descripción del restaurante, su especialidad y ambiente..."
+                rows={3}
+                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-bold text-gray-600 mb-2 block">DIRECCIÓN:</label>
@@ -733,12 +751,36 @@ ${text}`
 
             <div>
               <label className="text-xs font-bold text-gray-600 mb-2 block">OPCIONES DE PAGO:</label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].map((option) => {
+                  const isSelected = semanticData.payment_options?.includes(option);
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) });
+                        } else {
+                          setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), option] });
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
+                        isSelected
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {isSelected && '✓ '}{option}
+                    </button>
+                  );
+                })}
+              </div>
               <div className="flex flex-wrap gap-2 mb-2">
-                {semanticData.payment_options?.map((option, idx) => (
+                {semanticData.payment_options?.filter(o => !['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].includes(o)).map((option, idx) => (
                   <span key={idx} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
                     {option}
                     <button
-                      onClick={() => setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter((_, i) => i !== idx) })}
+                      onClick={() => setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) })}
                       className="hover:text-red-600"
                     >×</button>
                   </span>
@@ -746,7 +788,7 @@ ${text}`
               </div>
               <input
                 type="text"
-                placeholder="Agregar método de pago (Enter)"
+                placeholder="Agregar método personalizado (Enter)"
                 className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
@@ -760,12 +802,36 @@ ${text}`
 
             <div>
               <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS ADICIONALES:</label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {['WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 'Aire acondicionado', 'TV', 'Acceso para silla de ruedas'].map((feature) => {
+                  const isSelected = semanticData.additional_features?.includes(feature);
+                  return (
+                    <button
+                      key={feature}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) });
+                        } else {
+                          setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), feature] });
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
+                        isSelected
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {isSelected && '✓ '}{feature}
+                    </button>
+                  );
+                })}
+              </div>
               <div className="flex flex-wrap gap-2 mb-2">
-                {semanticData.additional_features?.map((feature, idx) => (
+                {semanticData.additional_features?.filter(f => !['WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 'Aire acondicionado', 'TV', 'Acceso para silla de ruedas'].includes(f)).map((feature, idx) => (
                   <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
                     {feature}
                     <button
-                      onClick={() => setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter((_, i) => i !== idx) })}
+                      onClick={() => setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) })}
                       className="hover:text-red-600"
                     >×</button>
                   </span>
@@ -773,7 +839,7 @@ ${text}`
               </div>
               <input
                 type="text"
-                placeholder="Agregar característica (Enter)"
+                placeholder="Agregar característica personalizada (Enter)"
                 className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
