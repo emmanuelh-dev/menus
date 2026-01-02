@@ -110,28 +110,28 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
           <input placeholder="WhatsApp" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} className="p-4 bg-gray-50 rounded-2xl outline-none border border-transparent focus:border-black" />
         </div>
         <textarea placeholder="Cuéntanos los detalles..." value={comment} onChange={e => setComment(e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl h-32 mb-4 outline-none border border-transparent focus:border-black resize-none" />
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          {images.length > 0 && (
-            <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-6">
-              {images.map((img, idx) => (
-                <div key={idx} className="relative aspect-square group">
-                  <img src={img} className="size-full object-cover rounded-2xl border border-gray-100" />
-                  <button
-                    type="button"
-                    onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
-                    className="absolute -top-2 -right-2 bg-red-600 text-white size-6 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
-                  >
-                    <span className="text-[10px] font-bold">✕</span>
-                  </button>
-                </div>
-              ))}
-              <ManualUploader multiple onFilesUploaded={urls => setImages([...images, ...urls])} />
+
+        <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-6">
+          {images.map((img, idx) => (
+            <div key={idx} className="relative aspect-square group">
+              <img src={img} className="size-full object-cover rounded-2xl border border-gray-100" />
+              <button
+                type="button"
+                onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
+                className="absolute -top-2 -right-2 bg-red-600 text-white size-6 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+              >
+                <span className="text-[10px] font-bold">✕</span>
+              </button>
             </div>
-          )}
-          <button type="submit" disabled={rating === 0 || isSubmitting} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase text-[10px] tracking-[0.2em] disabled:opacity-20">
-            Publicar
-          </button>
+          ))}
+          <div className="col-span-2">
+            <ManualUploader multiple onFilesUploaded={urls => setImages([...images, ...urls])} />
+          </div>
         </div>
+
+        <button type="submit" disabled={rating === 0 || isSubmitting} className="w-full bg-black text-white px-12 py-4 rounded-full font-bold uppercase text-[10px] tracking-[0.2em] disabled:opacity-20">
+          Publicar
+        </button>
       </form>
 
       {/* Listado de Reseñas */}
@@ -153,11 +153,11 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
             {rev.content?.images?.length > 0 && (
               <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
                 {rev.content.images.map((img, idx) => (
-                  <img 
-                    key={idx} 
-                    src={img} 
+                  <img
+                    key={idx}
+                    src={img}
                     onClick={() => setViewerImage(img)}
-                    className="size-20 rounded-xl object-cover ring-1 ring-gray-100 cursor-pointer hover:ring-2 hover:ring-red-600 transition-all" 
+                    className="size-20 rounded-xl object-cover ring-1 ring-gray-100 cursor-pointer hover:ring-2 hover:ring-red-600 transition-all"
                   />
                 ))}
               </div>
@@ -187,7 +187,7 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
       </div>
 
       {viewerImage && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
           onClick={() => setViewerImage(null)}
         >
@@ -197,8 +197,8 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
           >
             ×
           </button>
-          <img 
-            src={viewerImage} 
+          <img
+            src={viewerImage}
             onClick={(e) => e.stopPropagation()}
             className="max-w-full max-h-full object-contain rounded-lg"
           />
