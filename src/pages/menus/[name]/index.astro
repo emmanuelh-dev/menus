@@ -17,7 +17,19 @@ const { data: place } = await supabase
   .eq("short_name", name)
   .single();
 
-const { blocks = [], view_settings = {} } = place.content || {};
+let { blocks = [], view_settings = {} } = place.content || {};
+
+// Agregar alt automático a imágenes de galería que no lo tengan
+blocks = blocks.map(block => {
+  if (block.type === 'gallery' && block.data.images) {
+    const imagesWithAlt = block.data.images.map((img, idx) => ({
+      ...img,
+      alt: img.alt || `${place.name} - ${place.description || 'Galería'} ${idx + 1}`
+    }));
+    return { ...block, data: { ...block.data, images: imagesWithAlt } };
+  }
+  return block;
+});
 
 const socialMedia = {
   instagram: { name: "antojitos_tauro", url: "#" },
