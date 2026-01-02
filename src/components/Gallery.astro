@@ -30,7 +30,7 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
           <div 
             class={`relative overflow-hidden rounded-sm cursor-pointer group transition-all duration-700 ease-out shadow-sm
                    ${isFeatured ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}
-                   ${index >= 8 ? 'hidden' : 'flex'}`}
+                   ${index >= 10 ? 'hidden' : 'flex'}`}
             data-gallery-item
             data-index={index}
           >
@@ -55,13 +55,13 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
     }
   </div>
 
-  {images.length > 8 && (
+  {images.length > 10 && (
     <div class="flex justify-center mt-12">
       <button
         id="loadMoreBtn"
         class="group flex flex-col items-center gap-2 outline-none"
       >
-        <span class="text-[10px] uppercase tracking-[0.4em] text-stone-400 group-hover:text-black transition-colors">Ver Galería Completa</span>
+        <span class="text-[10px] uppercase tracking-[0.4em] text-black group-hover:text-black transition-colors">Ver Galería Completa</span>
         <div class="h-[1px] w-8 bg-stone-200 group-hover:w-16 group-hover:bg-black transition-all duration-500"></div>
       </button>
     </div>
@@ -72,11 +72,19 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
 
 <script>
   function initGallery() {
-    // Reutilizamos tu lógica de modal pero sin botones azules feos
     const modalId = document.querySelector('[id$="Modal"]')?.id || 'galleryModal';
     if ((window as any).createImageModal) {
        const imageModal = (window as any).createImageModal({ modalId });
        imageModal.attachToElements('[data-gallery-item]');
+    }
+
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        const hiddenItems = document.querySelectorAll('[data-gallery-item].hidden');
+        hiddenItems.forEach(item => item.classList.remove('hidden'));
+        loadMoreBtn.style.display = 'none';
+      });
     }
   }
 

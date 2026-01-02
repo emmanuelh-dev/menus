@@ -46,7 +46,7 @@ export interface Props {
   favicon?: string;
   canonical?: string;
   ogUrl?: string;
-
+  place?: any;
   schemaEnrichment?: {
     address?: Address;
     telephone?: string;
@@ -78,6 +78,7 @@ const {
   schemaEnrichment = {},
   canonical,
   ogUrl,
+  place = {},
 } = Astro.props;
 
 let reviewStats = {
@@ -203,6 +204,9 @@ if (schemaEnrichment.suitableForDiet) {
     <meta property="og:description" content={description} />
     {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
+    {place.image && (
+      <meta property="og:image" content={place.image} />
+    )}
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={ogUrl || Astro.url} />

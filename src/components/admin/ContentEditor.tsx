@@ -885,10 +885,11 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
 }
 
 function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: GalleryData) => void }) {
-  const addImageToGallery = (url: string) => {
+  const addImageToGallery = (urls: string[]) => {
+    const newImages = urls.map(url => ({ src: url, alt: '', title: '' }));
     onChange({
       ...data,
-      images: [...(data.images || []), { src: url, alt: '', title: '' }]
+      images: [...(data.images || []), ...newImages]
     });
   };
 
@@ -919,7 +920,8 @@ function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: 
 
         <div className="aspect-square flex items-center justify-center border-2 border-dashed border-gray-700 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors">
           <ManualUploader
-            onFilesUploaded={(urls) => addImageToGallery(urls[0])}
+            onFilesUploaded={addImageToGallery}
+            multiple
             onUploadError={() => console.error('Error al subir imagen')}
           />
         </div>
