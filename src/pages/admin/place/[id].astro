@@ -4,7 +4,7 @@ export const prerender = false;
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../../middleware/auth";
 import { createAuthenticatedClient } from "../../../lib/supabase";
-import ContentEditor from "../../../components/admin/ContentEditor"; // El que maneja el JSONB
+import ContentEditor from "../../../components/admin/ContentEditor";
 
 const { id } = Astro.params;
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
@@ -71,7 +71,7 @@ const { data: reviews } = await supabase
       <div class="bg-white rounded-3xl lg:p-6 shadow-sm border border-gray-100">
         <h2 class="text-lg font-bold mb-4">Información General</h2>
         <div class="space-y-3 text-sm">
-          <p><span class="text-gray-400 uppercase font-bold text-xs">Categoría:</span> {place.category}</p>
+          <p><span class="text-gray-400 uppercase font-bold text-xs">Categoría:</span> {place.type}</p>
           <p><span class="text-gray-400 uppercase font-bold text-xs">Dirección:</span> {place.address}</p>
           <p><span class="text-gray-400 uppercase font-bold text-xs">Rating:</span> {place.rating} ★</p>
         </div>

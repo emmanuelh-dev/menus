@@ -7,34 +7,11 @@ import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
 import { getRestaurants } from "../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
+import type { Place } from "../../types/app";
 
-// Traer moteles de Supabase
 const motelesData = await getRestaurants({ type: 'motel' });
 
-// Definir la estructura de datos para los moteles
-interface Motel {
-  id?: number;
-  name: string;
-  short_name?: string;
-  rating: number;
-  reviewCount: number;
-  priceRange: string;
-  address: string;
-  hours: string;
-  amenities: string[];
-  image?: any;
-  menu?: string;
-  distance?: string;
-  closed?: boolean;
-  openingTime?: string;
-  specialties?: string[];
-  highlight?: boolean;
-  phone?: string;
-  destacado?: boolean;
-}
-
-// Mapear datos de Supabase a la estructura esperada
-const motelesList: Motel[] = motelesData.map((motel) => ({
+const motelesList: Place[] = motelesData.map((motel) => ({
   id: motel.id,
   name: motel.name,
   short_name: motel.short_name,

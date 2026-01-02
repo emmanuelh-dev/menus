@@ -129,7 +129,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
               <p className="text-gray-400 text-sm mb-4">{r.address}</p>
 
               <div className="flex gap-2">
-                <a href={`/menus/${r.short_name}`} target='_blank' className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center">
+                <a href={`/${r.type === 'motel' ? 'moteles' : r.type === 'restaurant' ? 'restaurantes' : 'cafeterias'}/${r.short_name}`} target='_blank' className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center">
                   <FaEye className="inline" />
                 </a>
                 <button onClick={() => openModal(r)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
