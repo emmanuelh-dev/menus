@@ -55,187 +55,10 @@ const motelesList: Motel[] = motelesData.map((motel) => ({
   destacado: motel.featured
 }));
 
-// Mantener datos hardcodeados como respaldo si no hay datos en Supabase
-const motelesFallback: Motel[] = [
-  {
-    name: "Motel Love",
-    rating: 4.6,
-    reviewCount: 1100,
-    priceRange: "$$$",
-    address: "José Mariano Salas 232, Regina, 64290 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento gratuito", "Aire acondicionado", "Restaurante 24/7"],
-    specialties: ["Habitaciones temáticas", "Servicio 24/7", "Ambiente romántico"],
-    highlight: true,
 
-  },  {
-    name: "Motel Canarias",
-    rating: 4.5,
-    reviewCount: 730,
-    priceRange: "$$$$",
-    address: "Av. Abraham Lincoln y Av. San Bernabé 12001, 64108 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera privada", "TV por cable"],
-    specialties: ["Ubicación premium", "Servicios completos", "Privacidad total"],
-    phone: "+52 81 8306 3434"
-  },  {
-    name: "Motel Marbella", 
-    rating: 4.5,
-    reviewCount: 728,
-    priceRange: "$$$$",
-    address: "México 40D 39, 67116 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Jacuzzi", "TV premium"],
-    specialties: ["Lujo y confort", "Instalaciones premium", "Ambiente exclusivo"],
-    highlight: true,
-    phone: "+52 81 8140 0100"
-  },
-  {
-    name: "Kyoto Suites Motel",
-    rating: 4.5,
-    reviewCount: 951,
-    priceRange: "$$$",
-    address: "Monterrey, Nuevo León",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento privado", "Cocheras cerradas"],
-    specialties: ["Privacidad total", "Cocheras privadas", "Ambiente japonés"],
-    distance: "8-12 horas entre semana, fines de semana pueden tener fila",
-    highlight: true,
-  },  {
-    name: "Motel Hacienda Cumbres",
-    rating: 4.4,
-    reviewCount: 801,
-    priceRange: "$$$",
-    address: "Av. Abraham Lincoln 12003, San Bernabé, 64100 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera cerrada"],
-    specialties: ["Zona Cumbres", "Discreción garantizada", "Fácil acceso"],
-    phone: "+52 81 8306 0329"
-  },  {
-    name: "Hotel White",
-    rating: 4.4,
-    reviewCount: 378,
-    priceRange: "$$",
-    address: "Camelia 445, Moderna, 64530 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "TV por cable", "Restaurante"],
-    specialties: ["Habitaciones desde $300", "12 horas de estancia", "Excelente precio"],
-    phone: "+52 81 8372 2025"
-  },  {
-    name: "Motel Señorial",
-    rating: 4.4,
-    reviewCount: 694,
-    priceRange: "$$$",
-    address: "Av. Francisco I. Madero 4223 A, Fierro, 64590 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento privado", "Aire acondicionado", "Cochera", "Servicio a cuarto"],
-    specialties: ["Muy recomendado en Reddit", "Comodidad y discreción", "Buen servicio"],
-    phone: "+52 81 8191 9101"
-  },  {
-    name: "Hotel Los Angeles",
-    rating: 4.4,
-    reviewCount: 736,
-    priceRange: "$$",
-    address: "C. Aramberri #419 Ote, Centro, 64000 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Ubicación céntrica"],
-    specialties: ["Centro de Monterrey", "Fácil acceso", "Tradición local"],
-    phone: "+52 81 8344 6862"
-  },  {
-    name: "ATM Motel",
-    rating: 4.3,
-    reviewCount: 2339,
-    priceRange: "$$$",
-    address: "Av. Raúl Rangel Frías 5617, Del Maestro, 64180 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera privada", "TV premium"],
-    specialties: ["Más de 2K reseñas", "Muy popular", "Rangel Frías"],
-    phone: "+52 81 8140 0100"
-  },  {
-    name: "Motel Tío Pepe",
-    rating: 4.3,
-    reviewCount: 677,
-    priceRange: "$$",
-    address: "Av. Benito Juárez 5840, Las Huertas, 67190 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera"],
-    specialties: ["Tradición familiar", "Zona Las Huertas", "Ambiente acogedor"],
-    phone: "+52 81 1895 6468"
-  },  {
-    name: "Super Motel",
-    rating: 4.2,
-    reviewCount: 502,
-    priceRange: "$$",
-    address: "Av. Raúl Rangel Frías 5615, Marvel, 64180 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Buena ubicación"],
-    specialties: ["Buena relación calidad-precio", "Rangel Frías", "Ubicación conveniente"],
-    phone: "+52 81 1133 9695"
-  },  {
-    name: "Grand Motel",
-    rating: 4.2,
-    reviewCount: 464,
-    priceRange: "$$",
-    address: "Vicente Guerrero Norte 1511, Treviño, 64570 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Cochera cerrada"],
-    specialties: ["Zona Treviño", "Instalaciones amplias", "Buen servicio"],
-    phone: "+52 81 2525 1199"
-  },  {
-    name: "Motel Mirador",
-    rating: 4.2,
-    reviewCount: 555,
-    priceRange: "$$",
-    address: "Antiguo Camino a Pedreras 4400, Villa del Obispo, 64650 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Vista panorámica"],
-    specialties: ["Vista al valle", "Zona Villa del Obispo", "Ambiente tranquilo"],
-    phone: "+52 81 1158 8684"
-  },
-  {
-    name: "Motel Porto Belo",
-    rating: 4.1,
-    reviewCount: 383,
-    priceRange: "$$$",
-    address: "Monterrey, Nuevo León", 
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento gratuito", "Alberca techada", "Jacuzzi", "Bar", "Servicio a cuarto"],
-    specialties: ["Alberca techada", "Jacuzzi", "Servicios completos"]
-  },  {
-    name: "Motel Pedregal",
-    rating: 4.1,
-    reviewCount: 350,
-    priceRange: "$$",
-    address: "Av. Manuel Jesús Clouthier, Cumbres del Valle, 64650 Monterrey, N.L.",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Zona Cumbres"],
-    specialties: ["Cumbres del Valle", "Zona residencial", "Privacidad"],
-    phone: "+52 81 8315 6047"
-  },  {
-    name: "Motel Niu",
-    rating: 4.6,
-    reviewCount: 195,
-    priceRange: "$$",
-    address: "Monterrey, Nuevo León",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado"],
-    specialties: ["Limpieza excepcional", "Buen servicio"],
-    highlight: true,
-  },
-  {
-    name: "M Suites Monterrey", 
-    rating: 4.2,
-    reviewCount: 124,
-    priceRange: "$$$$",
-    address: "Monterrey, Nuevo León",
-    hours: "24 horas",
-    amenities: ["WiFi gratis", "Estacionamiento", "Aire acondicionado", "Suites premium"],
-    specialties: ["Suites de lujo", "Privacidad", "Diseño moderno"]
-  }
-];
 
 // Usar moteles de Supabase, o fallback si no hay datos
-const finalMotelesList = motelesList.length > 0 ? motelesList : motelesFallback;
+const finalMotelesList = motelesList;
 
 // Obtener parámetros de URL para SEO dinámico
 const url = new URL(Astro.request.url);
@@ -364,6 +187,8 @@ const schemaEnrichment = {
     addressCountry: "MX",
   },
 };
+
+console.log("Final moteles list:", finalMotelesList);
 ---
 
 <MotelLayout 
@@ -451,7 +276,7 @@ const schemaEnrichment = {
                 <!-- Imagen con overlay -->
                 <div class="relative h-48 overflow-hidden">
                   <img
-                    src={motel.image?.src || '/motel.png'} 
+                    src={motel.image || '/motel.png'} 
                     alt={motel.name}
                     width={500}
                     height={300}
@@ -583,7 +408,7 @@ const schemaEnrichment = {
                 <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
                   <div class="md:w-2/5 relative">
                     <img
-                      src={motel.image?.src || '/motel.png'} 
+                      src={motel.image || '/motel.png'} 
                       alt={motel.name}
                       width={400}
                       height={500}

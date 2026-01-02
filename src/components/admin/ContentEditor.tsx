@@ -84,14 +84,14 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialContent?.blocks) {
       const hasOldStructure = initialContent.blocks.some((block: any) => block.type === 'item');
-      
+
       if (hasOldStructure) {
         return migrateFlatToNested(initialContent);
       }
-      
+
       return initialContent.blocks;
     }
-    
+
     // Migrar estructura antigua a bloques con items dentro de secciones
     const migratedBlocks: Block[] = [];
     if (initialContent?.sections) {
@@ -111,7 +111,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
         });
       });
     }
-    
+
     if (initialContent?.gallery?.length > 0) {
       migratedBlocks.push({
         id: `block-${Date.now()}-${Math.random()}`,
@@ -119,14 +119,16 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
         data: { images: initialContent.gallery }
       });
     }
-    
+
     return migratedBlocks;
   });
-  
+
   const [isSaving, setIsSaving] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiProcessing, setAiProcessing] = useState(false);
+  const [aiInputMode, setAiInputMode] = useState<'image' | 'text'>('image');
+  const [textInput, setTextInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addBlock = (type: BlockType, afterIndex?: number) => {
@@ -135,14 +137,14 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
       type,
       data: getDefaultDataForBlockType(type)
     };
-    
+
     const newBlocks = [...blocks];
     if (afterIndex !== undefined) {
       newBlocks.splice(afterIndex + 1, 0, newBlock);
     } else {
       newBlocks.push(newBlock);
     }
-    
+
     setBlocks(newBlocks);
     setShowBlockMenu(false);
   };
@@ -173,7 +175,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
   const moveBlock = (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= blocks.length) return;
-    
+
     const newBlocks = [...blocks];
     [newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]];
     setBlocks(newBlocks);
@@ -195,11 +197,11 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
       const response = await fetch(`/api/restaurants/${placeId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          content: { 
+        body: JSON.stringify({
+          content: {
             blocks,
             view_settings: { layout: 'grid', show_prices: true }
-          } 
+          }
         })
       });
       if (response.ok) {
@@ -242,7 +244,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
     try {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      
+
       await new Promise((resolve) => {
         reader.onloadend = resolve;
       });
@@ -294,13 +296,79 @@ IMPORTANTE:
       );
 
       const result = await response.json();
+      processAIResponse(result);
+
+    } catch (err) {
+      console.error('Error al analizar imagen:', err);
+      alert('Error al procesar la imagen con IA');
+    } finally {
+      setAiProcessing(false);
+    }
+  };
+
+  const analyzeMenuText = async (text: string) => {
+    setAiProcessing(true);
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${import.meta.env.PUBLIC_GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Analiza este texto de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
+{
+  "sections": [
+    {
+      "title": "NOMBRE DE LA SECCION",
+      "description": "descripcion opcional",
+      "items": [
+        {
+          "name": "nombre del platillo",
+          "price": 150.00,
+          "description": "descripcion del platillo"
+        }
+      ]
+    }
+  ]
+}
+
+IMPORTANTE: 
+- Extrae TODOS los platillos y precios que veas
+- Si no hay precio, usa 0
+- Agrupa por secciones logicas
+- Responde SOLO con el JSON, sin texto adicional
+
+TEXTO DEL MENU:
+${text}`
+              }]
+            }]
+          })
+        }
+      );
+
+      const result = await response.json();
+      processAIResponse(result);
+      setTextInput('');
+
+    } catch (err) {
+      console.error('Error al analizar texto:', err);
+      alert('Error al procesar el texto con IA');
+    } finally {
+      setAiProcessing(false);
+    }
+  };
+
+  const processAIResponse = (result: any) => {
+    try {
       const textContent = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      
+
       const jsonMatch = textContent.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('No se encontro JSON en la respuesta');
 
       const parsed = JSON.parse(jsonMatch[0]);
-      
+
       const updatedBlocks = [...blocks];
       let sectionsAdded = 0;
       let itemsAdded = 0;
@@ -308,7 +376,7 @@ IMPORTANTE:
 
       parsed.sections.forEach((section: any) => {
         const existingSectionIndex = findSimilarSection(section.title);
-        
+
         if (existingSectionIndex !== -1) {
           const existingSection = updatedBlocks[existingSectionIndex];
           const newItems = section.items
@@ -320,10 +388,10 @@ IMPORTANTE:
               description: item.description || '',
               image: ''
             }));
-          
+
           itemsSkipped += section.items.length - newItems.length;
           itemsAdded += newItems.length;
-          
+
           updatedBlocks[existingSectionIndex] = {
             ...existingSection,
             data: {
@@ -334,7 +402,7 @@ IMPORTANTE:
         } else {
           sectionsAdded++;
           itemsAdded += section.items.length;
-          
+
           updatedBlocks.push({
             id: `block-${Date.now()}-${Math.random()}`,
             type: 'section',
@@ -356,20 +424,18 @@ IMPORTANTE:
 
       setBlocks(updatedBlocks);
       setShowAIChat(false);
-      
+
       const message = [
         sectionsAdded > 0 && `${sectionsAdded} secciones nuevas`,
         itemsAdded > 0 && `${itemsAdded} platillos agregados`,
         itemsSkipped > 0 && `${itemsSkipped} platillos omitidos (ya existían)`
       ].filter(Boolean).join(', ');
-      
+
       alert(`✓ ${message || 'No se encontraron cambios'}`);
-      
+
     } catch (err) {
-      console.error('Error al analizar imagen:', err);
-      alert('Error al procesar la imagen con IA');
-    } finally {
-      setAiProcessing(false);
+      console.error('Error en processAIResponse:', err);
+      throw err;
     }
   };
 
@@ -385,14 +451,14 @@ IMPORTANTE:
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 bg-white/90 backdrop-blur-md z-10 py-4 px-4 sm:px-0 border-b border-gray-100">
         <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tighter">Editor de Contenido</h1>
         <div className="flex gap-2 w-full sm:w-auto">
-          <button 
+          <button
             onClick={() => setShowAIChat(!showAIChat)}
             className="flex-1 sm:flex-none bg-purple-600 text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-purple-700 transition-all"
           >
             IA
           </button>
-          <button 
-            onClick={saveChanges} 
+          <button
+            onClick={saveChanges}
             disabled={isSaving}
             className="flex-1 sm:flex-none bg-black text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-gray-800 disabled:opacity-50 transition-all"
           >
@@ -408,38 +474,95 @@ IMPORTANTE:
               <h2 className="text-lg font-black uppercase mb-1">Asistente IA</h2>
               <p className="text-sm text-gray-600">Detecta automaticamente secciones existentes y agrega solo lo que falta</p>
             </div>
-            <button 
+            <button
               onClick={() => setShowAIChat(false)}
               className="text-gray-500 hover:text-gray-700"
             >✕</button>
           </div>
-          
-          <input 
-            ref={fileInputRef}
-            type="file" 
-            accept="image/*" 
-            onChange={handleAIImageUpload}
-            className="hidden"
-          />
-          
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={aiProcessing}
-            className="w-full bg-white border-2 border-dashed border-purple-400 rounded-lg p-8 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {aiProcessing ? (
-              <div className="text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
-                <p className="font-bold text-purple-700">Analizando imagen...</p>
-              </div>
-            ) : (
-              <div className="text-center">
-                <span className="text-4xl block mb-2">📸</span>
-                <p className="font-bold text-purple-700">Click para subir imagen del menu</p>
-                <p className="text-xs text-gray-500 mt-1">JPG, PNG o WEBP</p>
-              </div>
-            )}
-          </button>
+
+          {/* Toggle entre Imagen y Texto */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setAiInputMode('image')}
+              className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
+                aiInputMode === 'image'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-purple-600 border border-purple-300'
+              }`}
+            >
+              📸 Imagen
+            </button>
+            <button
+              onClick={() => setAiInputMode('text')}
+              className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
+                aiInputMode === 'text'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-purple-600 border border-purple-300'
+              }`}
+            >
+              📝 Texto
+            </button>
+          </div>
+
+          {/* Input de Imagen */}
+          {aiInputMode === 'image' && (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAIImageUpload}
+                className="hidden"
+              />
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={aiProcessing}
+                className="w-full bg-white border-2 border-dashed border-purple-400 rounded-lg p-8 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {aiProcessing ? (
+                  <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
+                    <p className="font-bold text-purple-700">Analizando imagen...</p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <span className="text-4xl block mb-2">📸</span>
+                    <p className="font-bold text-purple-700">Click para subir imagen del menu</p>
+                    <p className="text-xs text-gray-500 mt-1">JPG, PNG o WEBP</p>
+                  </div>
+                )}
+              </button>
+            </>
+          )}
+
+          {/* Input de Texto */}
+          {aiInputMode === 'text' && (
+            <div className="space-y-3">
+              <textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Pega aqui el contenido del menu completo&#10;&#10;Ejemplo:&#10;ENTRADAS&#10;Guacamole - $120&#10;Queso fundido con chorizo - $150&#10;&#10;PLATOS FUERTES&#10;Tacos al pastor (3 piezas) - $90&#10;..."
+                rows={12}
+                disabled={aiProcessing}
+                className="w-full p-4 rounded-lg border-2 border-purple-300 outline-none focus:border-purple-600 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+              />
+              <button
+                onClick={() => textInput.trim() && analyzeMenuText(textInput)}
+                disabled={aiProcessing || !textInput.trim()}
+                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {aiProcessing ? (
+                  <span className="flex items-center justify-center">
+                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Analizando texto...
+                  </span>
+                ) : (
+                  '🤖 Analizar con IA'
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -480,22 +603,22 @@ IMPORTANTE:
 
             {/* Controles del bloque - Mobile friendly */}
             <div className="flex justify-end gap-2 mb-2 sm:absolute sm:-left-12 sm:top-4 sm:flex-col">
-              <button 
-                onClick={() => moveBlock(index, 'up')} 
+              <button
+                onClick={() => moveBlock(index, 'up')}
                 disabled={index === 0}
                 className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-gray-50 disabled:opacity-30 flex items-center justify-center text-xs"
               >↑</button>
-              <button 
-                onClick={() => moveBlock(index, 'down')} 
+              <button
+                onClick={() => moveBlock(index, 'down')}
                 disabled={index === blocks.length - 1}
                 className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-gray-50 disabled:opacity-30 flex items-center justify-center text-xs"
               >↓</button>
-              <button 
+              <button
                 onClick={() => duplicateBlock(index)}
                 className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-blue-50 flex items-center justify-center text-xs"
                 title="Duplicar"
               >⧉</button>
-              <button 
+              <button
                 onClick={() => removeBlock(index)}
                 className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center text-xs"
               >✕</button>
@@ -543,7 +666,7 @@ IMPORTANTE:
             >
               + Agregar Primer Bloque
             </button>
-            
+
             {showBlockMenu === true && (
               <div className="mt-6 max-w-md mx-auto p-6 bg-white border rounded-xl shadow-lg">
                 <p className="text-xs font-bold text-gray-500 mb-4">¿QUÉ QUIERES AGREGAR?</p>
@@ -612,7 +735,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
   const moveItem = (itemIndex: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
     if (targetIndex < 0 || targetIndex >= data.items.length) return;
-    
+
     const newItems = [...data.items];
     [newItems[itemIndex], newItems[targetIndex]] = [newItems[targetIndex], newItems[itemIndex]];
     onChange({ ...data, items: newItems });
@@ -627,7 +750,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
           placeholder="Título de la Sección"
           className="w-full text-xl sm:text-2xl font-black uppercase bg-transparent border-b-2 border-purple-300 pb-2 outline-none focus:border-purple-600"
         />
-        
+
         <textarea
           value={data.description || ''}
           onChange={(e) => onChange({ ...data, description: e.target.value })}
@@ -635,7 +758,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
           rows={2}
           className="w-full text-sm bg-white/50 p-3 rounded-lg border border-purple-200 outline-none focus:border-purple-600"
         />
-        
+
         <div>
           <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN DE FONDO (opcional):</label>
           <ManualUploader
@@ -649,17 +772,17 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
         {/* ITEMS DENTRO DE LA SECCIÓN */}
         <div className="mt-6 space-y-3">
           <div className="flex justify-between items-center">
-            <h4 className="text-sm font-bold text-purple-700 uppercase">Platillos de esta sección:</h4>
+            <h4 className="text-sm font-bold text-purple-700 uppercase">Items de esta sección:</h4>
             <button
               onClick={addItem}
               className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors"
             >
-              + Platillo
+              + Item
             </button>
           </div>
 
           {data.items.length === 0 && (
-            <p className="text-center text-gray-400 text-sm py-4">No hay platillos. Agrega uno.</p>
+            <p className="text-center text-gray-400 text-sm py-4">No hay items. Agrega uno.</p>
           )}
 
           {data.items.map((item, itemIndex) => (
@@ -739,16 +862,23 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                 </div>
               </div>
               <div className="w-full">
-                  <ManualUploader
-                    currentImage={item.image}
-                    onFileUploaded={(url) => updateItem(itemIndex, { image: url })}
-                    onUploadStart={() => console.log('Subiendo imagen del item...')}
-                    onUploadError={() => console.error('Error al subir imagen')}
-                  />
-                </div>
-
+                <ManualUploader
+                  currentImage={item.image}
+                  onFileUploaded={(url) => updateItem(itemIndex, { image: url })}
+                  onUploadStart={() => console.log('Subiendo imagen del item...')}
+                  onUploadError={() => console.error('Error al subir imagen')}
+                />
+              </div>
+              <button
+                onClick={addItem}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors"
+              >
+                + Item
+              </button>
             </div>
+
           ))}
+
         </div>
       </div>
     </div>
@@ -776,7 +906,7 @@ function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: 
         <span className="text-xl sm:text-2xl">🎨</span>
         <span className="text-xs font-bold text-gray-300 uppercase">Galería</span>
       </div>
-      
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {data.images?.map((img, gIdx) => (
           <div key={gIdx} className="relative aspect-square group overflow-hidden rounded-xl">
@@ -787,7 +917,7 @@ function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: 
             >✕</button>
           </div>
         ))}
-        
+
         <div className="aspect-square flex items-center justify-center border-2 border-dashed border-gray-700 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors">
           <ManualUploader
             onFileUploaded={addImageToGallery}
@@ -812,9 +942,9 @@ function ImageBlock({ data, onChange }: { data: ImageData; onChange: (data: Imag
       <div className="space-y-4">
         {data.src ? (
           <div className="relative">
-            <img 
-              src={data.src} 
-              alt={data.alt || ''} 
+            <img
+              src={data.src}
+              alt={data.alt || ''}
               className="w-full rounded-lg shadow-lg"
             />
           </div>
@@ -823,21 +953,21 @@ function ImageBlock({ data, onChange }: { data: ImageData; onChange: (data: Imag
             Sube una imagen
           </div>
         )}
-        
+
         <ManualUploader
           currentImage={data.src}
           onFileUploaded={(url) => onChange({ ...data, src: url })}
           onUploadStart={() => console.log('Subiendo imagen...')}
           onUploadError={() => console.error('Error al subir imagen')}
         />
-        
+
         <input
           value={data.alt || ''}
           onChange={(e) => onChange({ ...data, alt: e.target.value })}
           placeholder="Texto alternativo (opcional)"
           className="w-full text-sm bg-white/50 p-3 rounded-lg border border-blue-200 outline-none focus:border-blue-600"
         />
-        
+
         <textarea
           value={data.caption || ''}
           onChange={(e) => onChange({ ...data, caption: e.target.value })}

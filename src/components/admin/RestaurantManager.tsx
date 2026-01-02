@@ -142,14 +142,23 @@ export default function RestaurantManager({ initialRestaurants }: { initialResta
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="bg-white w-full max-w-lg p-8 rounded-3xl shadow-2xl space-y-4">
+          <form 
+            key={editingId || 'new'}
+            onSubmit={handleSubmit} 
+            className="bg-white w-full max-w-lg p-8 rounded-3xl shadow-2xl space-y-4"
+          >
             <h3 className="text-xl font-black uppercase mb-6">{editingId ? 'Actualizar' : 'Crear'} Registro</h3>
             
             <input name="name" placeholder="Nombre" value={formData.name} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
             <input name="address" placeholder="Dirección" value={formData.address} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
             
             <div className="grid grid-cols-2 gap-4">
-              <select name="category" value={formData.category} onChange={handleInputChange} className="border-b-2 py-2 outline-none">
+              <select 
+                name="category" 
+                value={formData.category} 
+                onChange={handleInputChange} 
+                className="border-b-2 py-2 outline-none focus:border-black"
+              >
                 <option value="restaurant">Restaurante</option>
                 <option value="motel">Motel</option>
                 <option value="cafe">Cafetería</option>
@@ -158,7 +167,7 @@ export default function RestaurantManager({ initialRestaurants }: { initialResta
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-700">Logo del Restaurante</label>
+              <label className="block text-sm font-bold text-gray-700">Logo del Lugar</label>
               <ManualUploader
                 onFileUploaded={handleImageUploaded}
                 onUploadError={handleUploadError}

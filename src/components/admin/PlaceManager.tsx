@@ -162,7 +162,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-700">Logo del Restaurante</label>
+              <label className="block text-sm font-bold text-gray-700">Logo del Lugar</label>
               <ManualUploader
                 onFileUploaded={handleImageUploaded}
                 onUploadError={handleUploadError}

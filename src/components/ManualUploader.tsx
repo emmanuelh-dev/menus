@@ -83,7 +83,7 @@ export function ManualUploader({
           className="block w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
         />
         {uploading && (
-          <p className="mt-2 animate-pulse text-xs text-blue-600">Subiendo a Cloudinary...</p>
+          <p className="mt-2 animate-pulse text-xs text-blue-600">Subiendo...</p>
         )}
       </div>
     </div>
