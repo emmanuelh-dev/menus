@@ -11,7 +11,7 @@ interface Restaurant {
   hours: string;
   featured: boolean;
   image?: string;
-  category?: string;
+  type?: string;
   short_name?: string;
   content?: any;
 }
@@ -29,7 +29,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     priceRange: '$$',
     hours: '',
     featured: false,
-    category: 'restaurant',
+    type: 'restaurant',
     short_name: '',
     image: '',
   });
@@ -44,13 +44,13 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         priceRange: restaurant.priceRange,
         hours: restaurant.hours,
         featured: restaurant.featured,
-        category: restaurant.category || 'restaurant',
+        type: restaurant.type || 'restaurant',
         short_name: restaurant.short_name || '',
         image: restaurant.image || '',
       });
     } else {
       setEditingId(null);
-      setFormData({ name: '', address: '', rating: 4.0, priceRange: '$$', hours: '', featured: false, category: 'restaurant', short_name: '', image: '' });
+      setFormData({ name: '', address: '', rating: 4.0, priceRange: '$$', hours: '', featured: false, type: 'restaurant', short_name: '', image: '' });
     }
     setIsModalOpen(true);
   };
@@ -100,7 +100,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         priceRange: '$$',
         hours: '',
         featured: false,
-        category: 'restaurant',
+        type: 'restaurant',
         short_name: '',
         image: '',
       });
@@ -123,7 +123,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {restaurants.map((r) => (
           <div key={r.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-            <img key={r.image} src={r.image || '/placeholder.png'} alt={r.name} className="w-full h-44 object-cover" />
+            <img key={r.image} src={r.image || '/placeholder.svg'} alt={r.name} className="w-full h-44 object-cover" />
             <div className="p-5">
               <h3 className="font-bold text-xl">{r.name}</h3>
               <p className="text-gray-400 text-sm mb-4">{r.address}</p>
@@ -146,14 +146,23 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="bg-white w-full max-w-lg p-8 rounded-3xl shadow-2xl space-y-4">
+          <form 
+            key={editingId || 'new'}
+            onSubmit={handleSubmit} 
+            className="bg-white w-full max-w-lg p-8 rounded-3xl shadow-2xl space-y-4"
+          >
             <h3 className="text-xl font-black uppercase mb-6">{editingId ? 'Actualizar' : 'Crear'} Registro</h3>
             
             <input name="name" placeholder="Nombre" value={formData.name} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
             <input name="address" placeholder="Dirección" value={formData.address} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
             
             <div className="grid grid-cols-2 gap-4">
-              <select name="category" value={formData.category} onChange={handleInputChange} className="border-b-2 py-2 outline-none">
+              <select 
+                name="type" 
+                value={formData.type} 
+                onChange={handleInputChange} 
+                className="border-b-2 py-2 outline-none focus:border-black"
+              >
                 <option value="restaurant">Restaurante</option>
                 <option value="motel">Motel</option>
                 <option value="cafe">Cafetería</option>
@@ -162,7 +171,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-700">Logo del Lugar</label>
+              <label className="block text-sm font-bold text-gray-700">Logo del Restaurante</label>
               <ManualUploader
                 onFileUploaded={handleImageUploaded}
                 onUploadError={handleUploadError}

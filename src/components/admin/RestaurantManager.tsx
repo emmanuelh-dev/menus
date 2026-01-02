@@ -35,6 +35,8 @@ export default function RestaurantManager({ initialRestaurants }: { initialResta
 
   const openModal = (restaurant?: Restaurant) => {
     if (restaurant) {
+      console.log('Abriendo modal para editar:', restaurant);
+      console.log('Category del restaurant:', restaurant.category);
       setEditingId(restaurant.id);
       setFormData({
         name: restaurant.name,
@@ -122,7 +124,7 @@ export default function RestaurantManager({ initialRestaurants }: { initialResta
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {restaurants.map((r) => (
           <div key={r.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-            <img key={r.image} src={r.image || '/placeholder.png'} alt={r.name} className="w-full h-44 object-cover" />
+            <img key={r.image} src={r.image || '/placeholder.svg'} alt={r.name} className="w-full h-44 object-cover" />
             <div className="p-5">
               <h3 className="font-bold text-xl">{r.name}</h3>
               <p className="text-gray-400 text-sm mb-4">{r.address}</p>

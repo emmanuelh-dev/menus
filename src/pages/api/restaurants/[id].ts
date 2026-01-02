@@ -98,11 +98,11 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
     
-    // Mapear category a type para la base de datos
-    const { category, ...rest } = restaurantData;
+    // Mapear type a type para la base de datos
+    const { type, ...rest } = restaurantData;
     const dataToUpdate = {
       ...rest,
-      type: category || rest.type,
+      type: type || rest.type,
     };
     
     // Actualizar en la base de datos
