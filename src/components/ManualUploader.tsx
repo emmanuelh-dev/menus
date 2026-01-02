@@ -23,7 +23,7 @@ export function ManualUploader({
   const uploadPreset = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'
 
   const optimizeImageUrl = (url: string) => {
-    const params = 'f_auto,q_auto,w_800'
+    const params = 'f_auto,q_auto,w_1000'
     return url.includes('/upload/') ? url.replace('/upload/', `/upload/${params}/`) : url
   }
 
@@ -73,7 +73,7 @@ export function ManualUploader({
         <input
           type="file"
           accept="image/*"
-          multiple={multiple} // Atributo clave
+          multiple={multiple}
           onChange={handleFileChange}
           disabled={uploading}
           className="block w-full text-xs text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-black file:text-white file:px-4 file:py-2 file:font-bold cursor-pointer"
