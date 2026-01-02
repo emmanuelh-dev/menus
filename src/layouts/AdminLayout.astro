@@ -18,17 +18,17 @@ const { title, description = "Panel de administrador" } = Astro.props;
     <AdminHeader client:load />
 
     <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
-      <main class="flex-grow w-full px-4 sm:px-6 lg:px-8 py-8">
+      <main >
         <div class="max-w-7xl mx-auto">
           <slot />
         </div>
       </main>
 
-      <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+      <!-- <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
         <div class="px-8 text-center text-gray-500 text-xs">
           &copy; {new Date().getFullYear()} Menús BysMax. Todos los derechos reservados.
         </div>
-      </footer>
+      </footer> -->
     </div>
 
     <script type="text/javascript">

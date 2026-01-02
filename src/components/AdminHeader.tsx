@@ -151,6 +151,9 @@ function AdminHeader() {
               </svg>
               ¿Algun problema?
             </a>
+            <div className="px-8 text-center text-gray-500 text-xs">
+          &copy; {new Date().getFullYear()} Menús BysMax.
+        </div>
           </div>
         </div>
       </aside>

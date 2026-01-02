@@ -422,7 +422,7 @@ IMPORTANTE:
       )}
 
       {/* LISTADO DE BLOQUES */}
-      <div className="space-y-4 px-4 sm:px-0">
+      <div className="space-y-4 lg:px-4 sm:px-0">
         {blocks.map((block, index) => (
           <div key={block.id} className="relative">
             {/* Botón para agregar antes del primer bloque */}
@@ -663,12 +663,12 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <input
                     value={item.name}
                     onChange={(e) => updateItem(itemIndex, { name: e.target.value })}
                     placeholder="Nombre del platillo"
-                    className="sm:col-span-3 text-sm sm:text-base font-bold bg-gray-50 border border-gray-200 rounded px-3 py-2 outline-none focus:border-purple-600"
+                    className="col-span-3 text-sm sm:text-base font-bold bg-gray-50 border border-gray-200 rounded px-3 py-2 outline-none focus:border-purple-600"
                   />
                   <input
                     type="number"
