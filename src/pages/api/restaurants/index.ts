@@ -39,6 +39,24 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
     
+    // Verificar si ya existe un lugar con el mismo short_name
+    if (restaurantData.short_name) {
+      const { data: existing } = await supabase
+        .from('places')
+        .select('id, name')
+        .eq('short_name', restaurantData.short_name)
+        .single();
+      
+      if (existing) {
+        return new Response(
+          JSON.stringify({ 
+            error: `Ya existe un lugar con el slug "${restaurantData.short_name}". Por favor usa otro nombre.`
+          }),
+          { status: 409, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+    
     // Mapear category a type para la base de datos
     const { category, ...rest } = restaurantData;
     const dataToInsert = {
