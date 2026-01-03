@@ -1,162 +1,179 @@
 ---
 export const prerender = false;
-const {name} = Astro.params;
+const { name } = Astro.params;
 
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../components/Gallery.astro";
 import WhatsappButton from "../../../components/WhatsappButton";
 import CopyClabe from "../../../components/CopyClabe";
-import {getRestaurantByName, supabase} from "../../../lib/supabase";
+import { getRestaurantByName, supabase } from "../../../lib/supabase";
 import MotelLayout from "../../../layouts/MotelLayout.astro";
 
 if (!name) {
-  throw new Error("No se ha especificado el nombre del restaurante");
+	throw new Error("No se ha especificado el nombre del restaurante");
 }
 const { data: place } = await supabase
-  .from("places")
-  .select("*")
-  .eq("short_name", name)
-  .single();
+	.from("places")
+	.select("*")
+	.eq("short_name", name)
+	.single();
 
 const { blocks = [], view_settings = {} } = place.content || {};
 
 const socialMedia = {
-  instagram: { name: "antojitos_tauro", url: "#" },
-  facebook: { name: "Antojitos Tauro", url: "#" },
+	instagram: { name: "antojitos_tauro", url: "#" },
+	facebook: { name: "Antojitos Tauro", url: "#" },
 };
 
 const contactInfo = {
-  whatsapp: "8180000000",
-  clabes: [],
+	whatsapp: "8180000000",
+	clabes: [],
 };
 ---
-<MotelLayout 
-  description={place.description}
-  title={place.name}
-  image={place.image ? place.image : '/placeholder.svg'}
-  backgroundColor="bg-[#0A0A0A]"
+
+<MotelLayout
+	description={place.description}
+	title={place.name}
+	image={place.image ? place.image : "/placeholder.svg"}
+	backgroundColor="bg-[#0A0A0A]"
 >
-  <div class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white">
-    <div class="max-w-3xl mx-auto px-6 py-24">
-      
-      {/* Header Sensual y Nocturno */}
-      <header class="mb-32 flex flex-col items-center">
-        <div class="relative mb-10 group">
-           {/* Glow de Neón sutil detrás del logo */}
-           <div class="absolute inset-0 bg-red-900/20 blur-3xl rounded-full group-hover:bg-red-900/40 transition-all duration-1000"></div>
-           <img 
-            src={place.image} 
-            alt={place.name} 
-            class="size-52 rounded-full relative z-10 object-cover ring-1 ring-white/10 ring-offset-8 ring-offset-[#0A0A0A] grayscale group-hover:grayscale-0 transition-all duration-1000"
-          />
-        </div>
-        <h1 class="text-6xl text-center font-light tracking-tighter serif italic text-white mb-4">
-          {place.name}
-        </h1>
-        <p class="text-[11px] uppercase tracking-[0.6em] text-red-800 font-bold mb-10">
-          Experiencia Privada • Exclusive Rooms
-        </p>
-        <div class="h-[1px] w-20 bg-gradient-to-r from-transparent via-red-900 to-transparent"></div>
-      </header>
+	<div
+		class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white"
+	>
+		<div class="max-w-3xl mx-auto px-6 py-24">
+			{/* Header Sensual y Nocturno */}
+			<header class="mb-32 flex flex-col items-center">
+				<div class="relative mb-10 group">
+					{/* Glow de Neón sutil detrás del logo */}
+					<div
+						class="absolute inset-0 bg-red-900/20 blur-3xl rounded-full group-hover:bg-red-900/40 transition-all duration-1000"
+					>
+					</div>
+					<img
+						src={place.image}
+						alt={place.name}
+						class="size-52 rounded-full relative z-10 object-cover ring-1 ring-white/10 ring-offset-8 ring-offset-[#0A0A0A] grayscale group-hover:grayscale-0 transition-all duration-1000"
+					/>
+				</div>
+				<h1
+					class="text-6xl text-center font-light tracking-tighter serif italic text-white mb-4"
+				>
+					{place.name}
+				</h1>
+				<p
+					class="text-[11px] uppercase tracking-[0.6em] text-red-800 font-bold mb-10"
+				>
+					Experiencia Privada • Exclusive Rooms
+				</p>
+				<div
+					class="h-[1px] w-20 bg-gradient-to-r from-transparent via-red-900 to-transparent"
+				>
+				</div>
+			</header>
 
-      {/* Suites y Servicios */}
-      <div class="space-y-32">
-        {blocks.map((block) => {
-          if (block.type === 'section') {
-            return (
-              <section class="relative">
-                <div class="sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 py-6 border-b border-white/5 mb-16">
-                  <h2 class="text-3xl font-light serif italic text-white tracking-tight">
-                    {block.data.title}
-                  </h2>
-                </div>
+			{/* Suites y Servicios */}
+			<div class="space-y-32">
+				{
+					blocks.map((block) => {
+						if (block.type === "section") {
+							return (
+								<section class="relative">
+									<div class="sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 py-6 mb-16">
+										<h2 class="text-3xl font-light serif italic text-white tracking-tight">
+											{block.data.title}
+										</h2>
+									</div>
 
-                <div class="space-y-20">
-                  {block.data.image && (
-                    <div class="overflow-hidden rounded-sm group">
-                        <img 
-                            src={block.data.image} 
-                            alt={block.data.title} 
-                            class="w-full h-80 object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" 
-                        />
-                    </div>
-                  )}                  
-                  
-                  <div class="grid gap-y-16">
-                    {block.data.items?.map((item) => (
-                      <div class="space-y-8">
-                        <div class="group flex flex-col md:flex-row gap-8 items-center md:items-start border-l border-white/5 hover:border-red-900 transition-colors duration-500">
-                          <div class="flex-1 order-2 md:order-1">
-                            <div class="flex justify-between items-baseline mb-3">
-                              <h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
-                                {item.name}
-                              </h3>
-                              <div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block"></div>
-                              <span class="text-xl font-light text-stone-500">
-                                {view_settings.show_prices && `$${item.price}`}
-                              </span>
-                            </div>
-                            <p class="text-stone-500 text-sm font-light leading-relaxed mb-4">
-                              {item.description}
-                            </p>
-                            {item.features && item.features.length > 0 && (
-                              <div class="flex flex-wrap gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
-                                {item.features.map((feature, idx) => (
-                                  <>
-                                    <span>{feature}</span>
-                                    {idx < item.features.length - 1 && <span>•</span>}
-                                  </>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {item.image && item.image.trim() !== "" && (
-                            <div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
-                              <img 
-                                src={item.image} 
-                                alt={item.name}
-                                class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
-                              />
-                            </div>
-                          )}
-                        </div>
+									<div class="space-y-20">
+										{block.data.image && (
+											<div class="overflow-hidden rounded-sm group">
+												<img
+													src={block.data.image}
+													alt={block.data.title}
+													class="w-full h-80 object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
+												/>
+											</div>
+										)}
 
-                        {item.gallery && item.gallery.length > 0 && (
-                          <div class="pl-6 border-l border-white/5">
-                            <Gallery 
-                              images={item.gallery}
-                              buttonClasses="bg-white/5 text-white border border-white/10 px-6 py-2 rounded-sm hover:bg-white/10 transition-all uppercase text-[9px] tracking-widest"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            );
-          }
+										<div class="grid gap-y-16">
+											{block.data.items?.map((item) => (
+												<div class="space-y-8">
+													<div class="group flex flex-col md:flex-row gap-8 items-center md:items-start transition-colors duration-500">
+														<div class="w-full">
+															<div class="flex justify-between items-baseline mb-3">
+																<h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
+																	{item.name}
+																</h3>
+																<div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block" />
+																<span class="text-xl font-light text-stone-500">
+																	{view_settings.show_prices &&
+																		`$${item.price}`}
+																</span>
+															</div>
+															<p class="text-stone-500 text-sm font-light leading-relaxed mb-4">
+																{item.description}
+															</p>
+															{item.features && item.features.length > 0 && (
+																<div class="flex flex-wrap gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
+																	{item.features.map((feature, idx) => (
+																		<>
+																			<span>{feature}</span>
+																			{idx < item.features.length - 1 && (
+																				<span>•</span>
+																			)}
+																		</>
+																	))}
+																</div>
+															)}
+														</div>
 
-          if (block.type === 'gallery') {
-            return (
-              <div class="py-20 border-y border-white/5">
-                <p class="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-12">Instalaciones</p>
-                <Gallery
-                  images={block.data.images || []} 
-                  buttonClasses="bg-white/5 text-white border border-white/10 px-8 py-3 rounded-sm hover:bg-white/10 transition-all uppercase text-[10px] tracking-widest" 
-                />
-              </div>
-            );
-          }
-        })}
-      </div>
+														{item.image && item.image.trim() !== "" && (
+															<div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
+																<img
+																	src={item.image}
+																	alt={item.name}
+																	class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
+																/>
+															</div>
+														)}
+													</div>
 
-      <footer class="mt-40 pb-20 text-center">
-        <p class="text-[10px] text-stone-600 uppercase tracking-[0.5em]">
-          Privacy Guaranteed • {place.name} • 2026
-        </p>
-      </footer>
-    </div>
-  </div>
+													{item.gallery && item.gallery.length > 0 && (
+														<Gallery
+															images={item.gallery}
+															buttonClasses="bg-white/5 text-white border border-white/10 px-6 py-2 rounded-sm hover:bg-white/10 transition-all uppercase text-[9px] tracking-widest"
+														/>
+													)}
+												</div>
+											))}
+										</div>
+									</div>
+								</section>
+							);
+						}
+
+						if (block.type === "gallery") {
+							return (
+								<div class="py-20 border-y border-white/5">
+									<p class="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-12">
+										Instalaciones
+									</p>
+									<Gallery
+										images={block.data.images || []}
+										buttonClasses="bg-white/5 text-white border border-white/10 px-8 py-3 rounded-sm hover:bg-white/10 transition-all uppercase text-[10px] tracking-widest"
+									/>
+								</div>
+							);
+						}
+					})
+				}
+			</div>
+
+			<footer class="mt-40 pb-20 text-center">
+				<p class="text-[10px] text-stone-600 uppercase tracking-[0.5em]">
+					Privacy Guaranteed • {place.name} • 2026
+				</p>
+			</footer>
+		</div>
+	</div>
 </MotelLayout>
