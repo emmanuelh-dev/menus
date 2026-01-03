@@ -84,36 +84,49 @@ const contactInfo = {
                   
                   <div class="grid gap-y-16">
                     {block.data.items?.map((item) => (
-                      <div class="group flex flex-col md:flex-row gap-8 items-center md:items-start border-l border-white/5 hover:border-red-900 transition-colors duration-500">
-                        <div class="flex-1 order-2 md:order-1">
-                          <div class="flex justify-between items-baseline mb-3">
-                            <h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
-                              {item.name}
-                            </h3>
-                            <div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block"></div>
-                            <span class="text-xl font-light text-stone-500">
-                              {view_settings.show_prices && `$${item.price}`}
-                            </span>
+                      <div class="space-y-8">
+                        <div class="group flex flex-col md:flex-row gap-8 items-center md:items-start border-l border-white/5 hover:border-red-900 transition-colors duration-500">
+                          <div class="flex-1 order-2 md:order-1">
+                            <div class="flex justify-between items-baseline mb-3">
+                              <h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
+                                {item.name}
+                              </h3>
+                              <div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block"></div>
+                              <span class="text-xl font-light text-stone-500">
+                                {view_settings.show_prices && `$${item.price}`}
+                              </span>
+                            </div>
+                            <p class="text-stone-500 text-sm font-light leading-relaxed mb-4">
+                              {item.description}
+                            </p>
+                            {item.features && item.features.length > 0 && (
+                              <div class="flex flex-wrap gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
+                                {item.features.map((feature, idx) => (
+                                  <>
+                                    <span>{feature}</span>
+                                    {idx < item.features.length - 1 && <span>•</span>}
+                                  </>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                          <p class="text-stone-500 text-sm font-light leading-relaxed mb-4">
-                            {item.description}
-                          </p>
-                          {/* Tags de amenidades ficticias o reales */}
-                          <div class="flex gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
-                             <span>Jacuzzi</span>
-                             <span>•</span>
-                             <span>Smart TV</span>
-                             <span>•</span>
-                             <span>Room Service</span>
-                          </div>
+                          
+                          {item.image && item.image.trim() !== "" && (
+                            <div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
+                              <img 
+                                src={item.image} 
+                                alt={item.name}
+                                class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
+                              />
+                            </div>
+                          )}
                         </div>
-                        
-                        {item.image && (
-                          <div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
-                            <img 
-                              src={item.image} 
-                              alt={item.name}
-                              class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
+
+                        {item.gallery && item.gallery.length > 0 && (
+                          <div class="pl-6 border-l border-white/5">
+                            <Gallery 
+                              images={item.gallery}
+                              buttonClasses="bg-white/5 text-white border border-white/10 px-6 py-2 rounded-sm hover:bg-white/10 transition-all uppercase text-[9px] tracking-widest"
                             />
                           </div>
                         )}
