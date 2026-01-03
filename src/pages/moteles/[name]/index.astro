@@ -42,33 +42,103 @@ const contactInfo = {
 	>
 		<div class="max-w-3xl mx-auto px-6 py-24">
 			{/* Header Sensual y Nocturno */}
-			<header class="mb-32 flex flex-col items-center">
-				<div class="relative mb-10 group">
-					{/* Glow de Neón sutil detrás del logo */}
-					<div
-						class="absolute inset-0 bg-red-900/20 blur-3xl rounded-full group-hover:bg-red-900/40 transition-all duration-1000"
-					>
-					</div>
+			<header class="mb-24 flex flex-col items-center">
+				<div class="relative mb-8">
 					<img
 						src={place.image}
 						alt={place.name}
-						class="size-52 rounded-full relative z-10 object-cover ring-1 ring-white/10 ring-offset-8 ring-offset-[#0A0A0A] grayscale group-hover:grayscale-0 transition-all duration-1000"
+						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
 					/>
 				</div>
 				<h1
-					class="text-6xl text-center font-light tracking-tighter serif italic text-white mb-4"
+					class="text-5xl text-center font-light tracking-tighter serif italic mb-2 text-balance"
 				>
 					{place.name}
 				</h1>
 				<p
-					class="text-[11px] uppercase tracking-[0.6em] text-red-800 font-bold mb-10"
+					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-pretty"
 				>
-					Experiencia Privada • Exclusive Rooms
+					{
+						place?.content?.semantic_data?.description ||
+							place?.description ||
+							place.name
+					}
 				</p>
-				<div
-					class="h-[1px] w-20 bg-gradient-to-r from-transparent via-red-900 to-transparent"
-				>
-				</div>
+
+				{
+					place.content?.semantic_data && (
+						<div class="w-full mx-auto max-w-lg space-y-4 text-center mb-8">
+							{place.content.semantic_data.address && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Ubicación
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.address}
+									</p>
+								</div>
+							)}
+
+							{place.content.semantic_data.price_range && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Precios
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.price_range}
+									</p>
+								</div>
+							)}
+
+							{place.content.semantic_data.parking && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Estacionamiento
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.parking}
+									</p>
+								</div>
+							)}
+
+							{place.content.semantic_data.hours && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Horarios
+									</p>
+									<p class="text-sm text-stone-600 whitespace-pre-line">
+										{place.content.semantic_data.hours}
+									</p>
+								</div>
+							)}
+
+							{place.content.semantic_data.phone && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Teléfono
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.phone}
+									</p>
+								</div>
+							)}
+
+							{place.content.semantic_data.payment_options &&
+								place.content.semantic_data.payment_options.length > 0 && (
+									<div class="space-y-1">
+										<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+											Métodos de Pago
+										</p>
+										<p class="text-sm text-stone-600">
+											{place.content.semantic_data.payment_options.join(", ")}
+										</p>
+									</div>
+								)}
+						</div>
+					)
+				}
+
+				<div class="h-[1px] w-12 bg-stone-200"></div>
 			</header>
 
 			{/* Suites y Servicios */}
