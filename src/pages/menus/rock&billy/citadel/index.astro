@@ -1,19 +1,15 @@
 ---
 export const prerender = false;
-const { name } = Astro.params;
 
-import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
-import Gallery from "../../../components/Gallery.astro";
-import WhatsappButton from "../../../components/WhatsappButton";
-import { supabase } from "../../../lib/supabase";
+import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
+import Gallery from "../../../../components/Gallery.astro";
+import WhatsappButton from "../../../../components/WhatsappButton";
+import { supabase } from "../../../../lib/supabase";
 
-if (!name) {
-	throw new Error("No se ha especificado el nombre del restaurante");
-}
 const { data: place } = await supabase
 	.from("places")
 	.select("*")
-	.eq("short_name", name)
+	.eq("short_name", 'rock&billy')
 	.single();
 
 if (!place) {

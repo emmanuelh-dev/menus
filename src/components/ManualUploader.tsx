@@ -2,18 +2,19 @@ import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 
 interface ManualUploaderProps {
-  // Ahora devuelve un array para soportar una o varias fotos
   onFilesUploaded: (urls: string[]) => void 
   onUploadStart?: () => void
   onUploadError?: () => void
+  onImageRemove?: () => void
   currentImage?: string
-  multiple?: boolean // Nueva prop
+  multiple?: boolean
 }
 
 export function ManualUploader({
   onFilesUploaded,
   onUploadStart,
   onUploadError,
+  onImageRemove,
   currentImage,
   multiple = false,
 }: ManualUploaderProps) {
@@ -65,8 +66,19 @@ export function ManualUploader({
 
   return (
     <div className="space-y-3">
-      {currentImage && !multiple && (
-        <img src={optimizeImageUrl(currentImage)} className="h-32 rounded border" alt="Preview" />
+      {currentImage && currentImage.trim() !== '' && !multiple && (
+        <div className="relative inline-block">
+          <img src={optimizeImageUrl(currentImage)} className="h-32 rounded border" alt="Preview" />
+          {onImageRemove && (
+            <button
+              type="button"
+              onClick={onImageRemove}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md transition-colors"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       )}
       
       <div className="rounded-xl border-2 border-dashed border-gray-200 p-4 hover:border-black transition-colors">

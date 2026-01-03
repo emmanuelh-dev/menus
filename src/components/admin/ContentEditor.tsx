@@ -84,6 +84,7 @@ interface ItemData {
   description: string;
   image: string;
   features?: string[];
+  gallery?: { src: string; alt?: string; title?: string }[];
 }
 
 interface SectionData {
@@ -1228,6 +1229,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
           <ManualUploader
             currentImage={data.image}
             onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
+            onImageRemove={() => onChange({ ...data, image: '' })}
             onUploadStart={() => console.log('Subiendo imagen de sección...')}
             onUploadError={() => console.error('Error al subir imagen')}
           />
@@ -1324,12 +1326,49 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                 </div>
 
                 <div className="w-full">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN PRINCIPAL:</label>
                   <ManualUploader
                     currentImage={item.image}
                     onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
+                    onImageRemove={() => updateItem(itemIndex, { image: '' })}
                     onUploadStart={() => console.log('Subiendo imagen del item...')}
                     onUploadError={() => console.error('Error al subir imagen')}
                   />
+                </div>
+
+                <div className="w-full">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">GALERÍA DEL ITEM (opcional):</label>
+                  <ManualUploader
+                    currentImage=""
+                    multiple={true}
+                    onFilesUploaded={(urls) => {
+                      const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
+                      const currentGallery = item.gallery || [];
+                      updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
+                    }}
+                    onUploadStart={() => console.log('Subiendo galería...')}
+                    onUploadError={() => console.error('Error al subir galería')}
+                  />
+                  
+                  {item.gallery && item.gallery.length > 0 && (
+                    <div className="mt-3 grid grid-cols-4 gap-2">
+                      {item.gallery.map((img, gIdx) => (
+                        <div key={gIdx} className="relative group">
+                          <img src={img.src} alt={img.alt || ''} className="w-full h-20 object-cover rounded" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
+                              updateItem(itemIndex, { gallery: newGallery });
+                            }}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
