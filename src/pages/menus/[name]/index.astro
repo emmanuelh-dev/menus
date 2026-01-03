@@ -33,6 +33,10 @@ blocks = blocks.map((block) => {
 	}
 	return block;
 });
+
+const address = place.content?.semantic_data?.address || place.address || "";
+const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
+const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
 
 <RestaurantLayout
@@ -68,21 +72,40 @@ blocks = blocks.map((block) => {
 							place.name
 					}
 				</p>
-
+        {
+					address && (
+						<div class="space-y-1">
+							<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold text-center">
+								Ubicación
+							</p>
+							<a
+								href={googleMapsUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-center text-lg text-stone-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 group"
+							>
+								{address}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="size-3 opacity-50 group-hover:opacity-100 transition-opacity"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+									/>
+								</svg>
+							</a>
+						</div>
+					)
+				}
 				{
 					place.content?.semantic_data && (
 						<div class="w-full mx-auto max-w-lg space-y-4 text-center mb-8">
-							{place.content.semantic_data.address && (
-								<div class="space-y-1">
-									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-										Ubicación
-									</p>
-									<p class="text-sm text-stone-600">
-										{place.content.semantic_data.address}
-									</p>
-								</div>
-							)}
-
 							{place.content.semantic_data.price_range && (
 								<div class="space-y-1">
 									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
@@ -180,6 +203,7 @@ blocks = blocks.map((block) => {
 										</summary>
 
 										<div class="space-y-12 pt-8 animate-in fade-in slide-in-from-top-2 duration-500 overflow-hidden">
+                      
 											{block.data.description && (
 												<p class="text-stone-400 text-sm font-light italic mb-8 border-l-2 border-red-50 px-4">
 													{block.data.description}
