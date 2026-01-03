@@ -16,6 +16,10 @@ const { data: place } = await supabase
   .eq("short_name", name)
   .single();
 
+if (!place) {
+  throw new Error(`No se encontró el restaurante: ${name}`);
+}
+
 let { blocks = [], view_settings = {} } = place.content || {};
 
 // Limpieza de bloques

@@ -164,7 +164,7 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiProcessing, setAiProcessing] = useState(false);
-  const [aiInputMode, setAiInputMode] = useState<'image' | 'text'>('image');
+  const [aiInputMode, setAiInputMode] = useState<'image' | 'text' | 'json'>('image');
   const [textInput, setTextInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -355,6 +355,70 @@ IMPORTANTE:
       alert('Error al procesar la imagen con IA');
     } finally {
       setAiProcessing(false);
+    }
+  };
+
+  const analyzeMenuJSON = (jsonText: string) => {
+    try {
+      const parsed = JSON.parse(jsonText);
+      
+      const updatedBlocks = [...blocks];
+      let sectionsAdded = 0;
+      let itemsAdded = 0;
+
+      const categories = parsed.categorias || parsed;
+      categories.forEach((category: any) => {
+        category.subcategorias?.forEach((subcategory: any) => {
+          const sectionTitle = subcategory.nombre || category.nombre;
+          
+          const items = subcategory.platillos?.map((platillo: any) => {
+            itemsAdded++;
+            
+            let description = platillo.descripcion || '';
+            if (platillo.descripcionLista && Array.isArray(platillo.descripcionLista)) {
+              description = platillo.descripcionLista
+                .filter(item => !Array.isArray(item))
+                .join(' • ');
+            }
+
+            const precio = typeof platillo.precio === 'string' 
+              ? parseFloat(platillo.precio.replace(/[^0-9.]/g, '')) || 0
+              : platillo.precio || 0;
+
+            return {
+              id: `item-${Date.now()}-${Math.random()}`,
+              name: platillo.nombre || '',
+              price: precio,
+              description: description,
+              image: platillo.imagenUrl && platillo.imagenUrl !== 'noexiste.png' ? platillo.imagenUrl : ''
+            };
+          }) || [];
+
+          if (items.length > 0) {
+            sectionsAdded++;
+            updatedBlocks.push({
+              id: `block-${Date.now()}-${Math.random()}`,
+              type: 'section',
+              data: {
+                title: sectionTitle,
+                description: '',
+                image: '',
+                items
+              }
+            });
+          }
+        });
+      });
+
+      setBlocks(updatedBlocks);
+      setShowAIChat(false);
+      setTextInput('');
+      
+      alert(`✓ ${sectionsAdded} secciones y ${itemsAdded} platillos importados con sus imágenes`);
+
+    } catch (err) {
+      console.error('Error al analizar JSON:', err);
+      alert('Error: El JSON no es válido. Verifica el formato.');
     }
   };
 
@@ -888,6 +952,16 @@ ${text}`
             >
               📝 Texto
             </button>
+            <button
+              onClick={() => setAiInputMode('json')}
+              className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
+                aiInputMode === 'json'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-purple-600 border border-purple-300'
+              }`}
+            >
+              🔗 JSON
+            </button>
           </div>
 
           {aiInputMode === 'image' && (
@@ -944,6 +1018,31 @@ ${text}`
                 ) : (
                   '🤖 Analizar con IA'
                 )}
+              </button>
+            </div>
+          )}
+
+          {aiInputMode === 'json' && (
+            <div className="space-y-3">
+              <div className="bg-purple-50 p-3 rounded-lg text-xs text-gray-700 mb-3">
+                <p className="font-bold mb-1">Formato esperado:</p>
+                <code className="block bg-white p-2 rounded text-[10px] overflow-x-auto">
+                  [{'{'}"nombre": "CATEGORIA", "subcategorias": [{'{'}"nombre": "SUBCATEGORIA", "platillos": [{'{'}"nombre": "...", "precio": 120, "descripcion": "...", "imagenUrl": "https://..."{'}'}]{'}'}]{'}'}]
+                </code>
+              </div>
+              <textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Pega aquí tu JSON con el menú completo incluyendo imágenes..."
+                rows={12}
+                className="w-full p-4 rounded-lg border-2 border-purple-300 outline-none focus:border-purple-600 resize-none font-mono text-xs"
+              />
+              <button
+                onClick={() => textInput.trim() && analyzeMenuJSON(textInput)}
+                disabled={!textInput.trim()}
+                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                📥 Importar JSON con imágenes
               </button>
             </div>
           )}

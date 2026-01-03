@@ -1,33 +1,13 @@
 ---
 export const prerender = false;
-import { Image } from "astro:assets";
-import main_menu from "../phone_with_menu.png";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight } from "lucide-react";
-import tacos from './quesabirrias.laregia.mty/tacos.jpg';
-import pizza from './fast-food/pizza.png';
-import antojitosdonaguillelogo from './antojitosdonaguille/logo.jpg';
-import alchemycoffeelablogo from './alchemycoffeelab/espuma.jpg';
-import antojitostauro from './antojitostauro/logo.jpg';
-import papachinislogo from './papachinis/logo.jpg';
-import fosforo from './fosforocafe/media/menu.jpg';
-import la_santa from './la-santa/la-santa.jpeg';
 import { getRestaurants } from "../../lib/supabase";
 
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
 type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
-
-interface Restaurant {
-    name: string;
-    description: string;
-    image: ImageMetadata;
-    link: string;
-    restaurantLink: string;
-    industry: Industry;
-    type: BusinessType;
-}
 
 // Add filter options with type safety
 const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"];
