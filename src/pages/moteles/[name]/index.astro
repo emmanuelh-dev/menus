@@ -50,7 +50,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 					{place.name}
 				</h1>
 				<p
-					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-pretty"
+					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-balance text-center"
 				>
 					{
 						place?.content?.semantic_data?.description ||
@@ -193,7 +193,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 																		`$${item.price}`}
 																</span>
 															</div>
-															<p class="text-stone-500 text-sm font-light leading-relaxed mb-4">
+															<p class="text-stone-500 text-sm font-light leading-relaxed mb-4 text-balance">
 																{item.description}
 															</p>
 															{item.features && item.features.length > 0 && (
