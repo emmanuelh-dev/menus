@@ -17,5 +17,9 @@ export default defineConfig({
     webAnalytics: {
       enabled: true,
     }
-  })
+  }),
+  prefetch: {
+    prefetchAll: true, // Esto hace que TODOS los <a href> tengan prefetch por defecto
+    defaultStrategy: 'tap' // Opciones: 'hover', 'tap', 'viewport', 'load'
+  },
 });
