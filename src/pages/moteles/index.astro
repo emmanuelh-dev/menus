@@ -43,7 +43,7 @@ const zona = url.searchParams.get('zona') || undefined;
 const tipo = url.searchParams.get('tipo') || undefined;
 
 const getDynamicSEO = () => {
-  const baseTitle = "Mejores Moteles en Monterrey 2025";
+  const baseTitle = "Mejores Moteles en Monterrey 2026";
   const baseDescription = "Guía completa de moteles en Monterrey";
   const baseKeywords = ["moteles monterrey", "motel monterrey"];
   const baseUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : Astro.url.toString();
@@ -53,7 +53,7 @@ const getDynamicSEO = () => {
     switch (zona.toLowerCase()) {
       case 'centro':
         return {
-          title: `Moteles en Centro de Monterrey 2025 | Hotel Los Angeles y Más`,
+          title: `Moteles en Centro de Monterrey 2026 | Hotel Los Angeles y Más`,
           description: `Mejores moteles en el centro de Monterrey. Hotel Los Angeles, opciones económicas y ubicación céntrica. Guía completa con precios.`,
           keywords: [...baseKeywords, "moteles en el centro de monterrey", "motel en monterrey centro", "moteles centro monterrey", "hotel los angeles monterrey"],
           heading: "Moteles en Centro de Monterrey",
@@ -64,7 +64,7 @@ const getDynamicSEO = () => {
       
       case 'universidad':
         return {
-          title: `Moteles cerca de Universidad Monterrey 2025 | Motel Love Recomendado`,
+          title: `Moteles cerca de Universidad Monterrey 2026 | Motel Love Recomendado`,
           description: `Moteles cerca de Universidad en Monterrey. Motel Love (favorito del autor), opciones premium y ubicación conveniente. Precios y horarios.`,
           keywords: [...baseKeywords, "motel cerca universidad monterrey", "motel love monterrey", "moteles universidad"],
           heading: "Moteles cerca de Universidad",
@@ -75,7 +75,7 @@ const getDynamicSEO = () => {
         
       case 'cumbres':
         return {
-          title: `Moteles en Cumbres Monterrey 2025 | Hacienda Cumbres y Más`,
+          title: `Moteles en Cumbres Monterrey 2026 | Hacienda Cumbres y Más`,
           description: `Moteles en zona Cumbres, Monterrey. Motel Hacienda Cumbres, opciones de lujo y privacidad. Guía con precios actualizados.`,
           keywords: [...baseKeywords, "moteles cumbres monterrey", "motel hacienda cumbres", "moteles zona cumbres"],
           heading: "Moteles en Cumbres",
@@ -91,8 +91,8 @@ const getDynamicSEO = () => {
     switch (tipo.toLowerCase()) {
       case 'baratos':
         return {
-          title: `Moteles Baratos en Monterrey 2025 | Desde $300 por 4 Horas`,
-          description: `Moteles baratos en Monterrey con los mejores precios. Hotel White, Grand Motel y más opciones económicas. Guía de precios 2025.`,
+          title: `Moteles Baratos en Monterrey 2026 | Desde $300 por 4 Horas`,
+          description: `Moteles baratos en Monterrey con los mejores precios. Hotel White, Grand Motel y más opciones económicas. Guía de precios 2026.`,
           keywords: [...baseKeywords, "moteles baratos en monterrey", "motel barato monterrey", "moteles economicos monterrey", "moteles precio bajo"],
           heading: "Moteles Baratos en Monterrey",
           subheading: "Las mejores opciones económicas sin sacrificar calidad",
@@ -102,7 +102,7 @@ const getDynamicSEO = () => {
       
       case 'jacuzzi':
         return {
-          title: `Moteles con Jacuzzi en Monterrey 2025 | Marbella, Canarias y Más`,
+          title: `Moteles con Jacuzzi en Monterrey 2026 | Marbella, Canarias y Más`,
           description: `Moteles con jacuzzi en Monterrey. Motel Marbella, Canarias y opciones de lujo con jacuzzi privado. Precios y ubicaciones.`,
           keywords: [...baseKeywords, "motel con jacuzzi monterrey", "moteles con jacuzzi en monterrey", "motel jacuzzi privado", "moteles lujo jacuzzi"],
           heading: "Moteles con Jacuzzi en Monterrey",
@@ -113,7 +113,7 @@ const getDynamicSEO = () => {
         
       case '12-horas':
         return {
-          title: `Moteles de 12 Horas en Monterrey 2025 | Hotel White y Más`,
+          title: `Moteles de 12 Horas en Monterrey 2026 | Hotel White y Más`,
           description: `Moteles con estancia de 12 horas en Monterrey. Hotel White y opciones para escapadas largas. Precios especiales para 12 horas.`,
           keywords: [...baseKeywords, "motel 12 horas monterrey", "motel de 12 horas en monterrey", "estancia larga motel"],
           heading: "Moteles de 12 Horas",
@@ -147,7 +147,7 @@ const getDynamicSEO = () => {
       "marbella motel monterrey",
       "motel love monterrey"
     ],
-    heading: "Mejores Moteles en Monterrey 2025",
+    heading: "Mejores Moteles en Monterrey 2026",
     subheading: "Encuentra el lugar perfecto para tu escapada romántica en la ciudad",
     canonical: baseUrl,
     ogUrl: baseUrl
