@@ -1,707 +1,295 @@
 ---
 export const prerender = false;
-const { name, sucursal } = Astro.params;
+
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, s-maxage=60, stale-while-revalidate=600'
+);
+
+
+const { name } = Astro.params;
 
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
-import CategoryNavigation from "../../../../components/CategoryNavigation";
-import { getRestaurantByName, supabase } from "../../../../lib/supabase";
+import Gallery from "../../../../components/Gallery.astro";
+import WhatsappButton from "../../../../components/WhatsappButton";
+import { supabase } from "../../../../lib/supabase";
 
 if (!name) {
-  throw new Error("No se ha especificado el nombre del restaurante");
+	throw new Error("No se ha especificado el nombre del restaurante");
 }
-const menuData = await getRestaurantByName({ name });
+const { data: place } = await supabase
+	.from("places")
+	.select("*")
+	.eq("short_name", name)
+	.single();
 
-const restaurant = menuData[0];
-
-const { data: menu } = await supabase
-  .from("menus")
-  .select("*")
-  .eq("restaurant_id", restaurant?.id)
-  .eq("menu", sucursal)
-  .eq("is_active", true)
-  .single();
-
-const { data: categoriesData } = await supabase
-  .from("menu_categories")
-  .select(
-    `
-    *,
-    menu_items (
-      *
-    )
-  `
-  )
-  .eq("restaurant_id", restaurant.id)
-  .eq("is_active", true)
-  .order("display_order");
-
-// Crear lista de categorías para navegación
-const navigationCategories =
-  categoriesData?.map((category) => ({
-    id: `category-${category.id}`,
-    name: category.name,
-    description: category.description,
-  })) || [];
-
-if (!menuData || menuData.length === 0) {
-  throw new Error(`No se encontró el restaurante: ${name}`);
+if (!place) {
+	throw new Error(`No se encontró el restaurante: ${name}`);
 }
 
-const schemaEnrichment = {
-  address: menu?.address
-    ? {
-        streetAddress: menu.address || restaurant.address,
-        addressLocality: "Ciudad",
-        addressCountry: "MX",
-      }
-    : undefined,
-  telephone: undefined,
-  priceRange: restaurant.priceRange || "$$",
-  servesCuisine: restaurant.type ? [restaurant.type] : ["Restaurant"],
-  openingHours: restaurant.hours || undefined,
-  acceptsReservations: true,
-  paymentAccepted: ["Cash", "Credit Card"],
-  currenciesAccepted: ["MXN"],
-  aggregateRating: restaurant.rating
-    ? {
-        ratingValue: restaurant.rating,
-        reviewCount: restaurant.reviewCount || 1,
-      }
-    : undefined,
-};
+let { blocks = [], view_settings = {} } = place.content || {};
+
+// Limpieza de bloques
+blocks = blocks.map((block) => {
+	if (block.type === "gallery" && block.data.images) {
+		const imagesWithAlt = block.data.images.map((img, idx) => ({
+			...img,
+			alt: img.alt || `${place.name} - Galería ${idx + 1}`,
+		}));
+		return { ...block, data: { ...block.data, images: imagesWithAlt } };
+	}
+	return block;
+});
+
+const address = place.content?.semantic_data?.address || place.address || "";
+const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
+const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
 
 <RestaurantLayout
-  title={restaurant.name + (" - " + menu?.name || "") || name}
-  description={`Menú de ${restaurant.name || name}`}
-  image={restaurant.image}
-  textWhite={false}
-  backgroundColor="bg-white"
-  schemaEnrichment={schemaEnrichment}
-  type="Restaurant"
+	description={place?.content?.semantic_data?.description ||
+		place?.description ||
+		place.name}
+	title={place.name}
+	place={place}
+	backgroundColor="bg-[#FCFCFC]"
 >
-  <!-- Componentes de navegación -->
-  <CategoryNavigation
-    client:load
-    categories={navigationCategories}
-    backgroundColor="bg-white"
-    textColor="text-gray-700"
-  /><style>
-    .hover-lift {
-      transition: all 0.3s ease;
-    }
-
-    .hover-lift:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-    .star-rating {
-      filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
-    }
-
-    .review-form-section {
-      scroll-margin-top: 100px;
-    }
-
-    /* Line clamp utility for description text */
-    .line-clamp-3 {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    } /* Mobile-first menu images */
-
-    @media (min-width: 769px) {
-      .menu-image-mobile {
-        object-fit: cover;
-        max-height: 600px;
-      }
-    }
-
-    /* Smooth animations for menu items */
-    .menu-item-card {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .menu-item-card:hover {
-      transform: translateY(-4px) scale(1.02);
-    } /* Price styling */
-    .price-highlight {
-      background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    } /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .modal.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      max-width: 90%;
-      max-height: 90%;
-      position: relative;
-      animation: zoomIn 0.3s ease-in-out;
-    }
-
-    .modal-image {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-close {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      color: white;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      background: rgba(0, 0, 0, 0.5);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
-    }
-
-    .modal-close:hover {
-      background: rgba(0, 0, 0, 0.8);
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes zoomIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .clickable-image {
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .clickable-image:hover {
-      transform: scale(1.02);
-    }
-  </style>
-
-  <!-- Image Modal -->
-  <div id="imageModal" class="modal">
-    <div class="modal-content">
-      <span class="modal-close">&times;</span>
-      <img id="modalImage" src="" alt="" class="modal-image" />
-    </div>
-  </div>
-  <script>
-    // Modal functionality
-    document.addEventListener("DOMContentLoaded", function () {
-      const modal = document.getElementById("imageModal") as HTMLElement;
-      const modalImage = document.getElementById(
-        "modalImage"
-      ) as HTMLImageElement;
-      const closeBtn = document.querySelector(".modal-close") as HTMLElement;
-
-      if (!modal || !modalImage || !closeBtn) return;
-
-      // Function to open modal
-      function openModal(imageSrc: string, imageAlt: string) {
-        modalImage.src = imageSrc;
-        modalImage.alt = imageAlt;
-        modal.classList.add("show");
-        document.body.style.overflow = "hidden";
-      }
-
-      // Function to close modal
-      function closeModal() {
-        modal.classList.remove("show");
-        document.body.style.overflow = "auto";
-      }
-
-      // Add click listeners to all clickable images
-      const clickableImages = document.querySelectorAll(".clickable-image");
-      clickableImages.forEach(function (img) {
-        const imageElement = img as HTMLImageElement;
-        imageElement.addEventListener("click", function () {
-          if (this.src && this.alt !== undefined) {
-            openModal(this.src, this.alt);
-          }
-        });
-      });
-
-      // Close modal events
-      closeBtn.addEventListener("click", closeModal);
-
-      modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
-
-      // Close with Escape key
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && modal.classList.contains("show")) {
-          closeModal();
-        }
-      });
-    });
-  </script>
-  <div class="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-50">
-    <!-- Hero Section - Focused on Review Invitation -->
-    <div class="bg-white shadow-lg">
-      <div class="mx-auto px-4 py-12">
-        <div class="text-center">
-          {
-            restaurant.image && (
-              <div class="mb-8">
-                <img
-                  src={restaurant.image}
-                  alt={restaurant.name}
-                  class="w-48 h-48  mx-auto rounded-full shadow-xl border-4 border-amber-200 object-cover"
-                />
-              </div>
-            )
-          }
-          <h1 class="text-5xl font-bold text-gray-900 mb-4">
-            {restaurant.name}
-            {menu ? ` - ${menu.name}` : sucursal?.toUpperCase()}
-          </h1>
-
-          <!-- Rating Display -->
-          {
-            restaurant.rating && (
-              <div class="flex items-center justify-center mb-8">
-                <div class="flex items-center space-x-1">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <svg
-                      class={`w-8 h-8 ${i < Math.floor(restaurant.rating) ? "text-yellow-400" : "text-gray-300"}`}
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-                {/* <span class="ml-3 text-2xl font-semibold text-gray-700">
-                  {restaurant.rating}/5
-                </span> */}
-              </div>
-            )
-          }
-          <!-- Main CTA for Reviews -->
-          <div
-            class={`max-w-4xl mx-auto bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-2xl shadow-2xl ${restaurant.type === "cafeteria" ? "from-amber-100 to-yellow-100 border-2 border-amber-200" : ""}`}
-          >
-            <h2
-              class={`text-3xl font-bold mb-4 ${restaurant.type === "cafeteria" ? "text-amber-900" : "text-white"}`}
-            >
-              ☕ ¡Comparte tu Experiencia Cafetera!
-            </h2>
-            <p
-              class={`text-lg mb-6 max-w-xl mx-auto ${restaurant.type === "cafeteria" ? "text-amber-800" : "text-amber-100"}`}
-            >
-              ¿Has visitado {restaurant.name}? Tu opinión es valiosa para otros
-              amantes del café. ¡Cuéntanos qué tal estuvo tu experiencia!
-            </p>
-            <div
-              class="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            >
-              <button
-                onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-                class={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ${restaurant.type === "cafeteria" ? "bg-amber-800 text-white hover:bg-amber-700" : "bg-white text-amber-700 hover:bg-amber-50"}`}
-              >
-                ⭐ Escribir Reseña
-              </button>
-              <span
-                class={`text-sm ${restaurant.type === "cafeteria" ? "text-amber-700" : "text-amber-200"}`}
-              >
-                Solo toma 2 minutos
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Menu Section -->
-    {
-      !menu && (
-        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center mb-8">
-          <div class="text-6xl mb-4">🚀</div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-4">
-            ¡Menú Digital en Construcción!
-          </h3>
-          <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Estamos trabajando para traerte el menú completo de
-            {restaurant.name} muy pronto. Mientras tanto, ¡tu reseña nos ayuda a
-            mejorar!
-          </p>{" "}
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-md mx-auto">
-            <p class="text-amber-800 font-semibold">
-              🎯 ¡Sé de los primeros en calificar!
-            </p>
-          </div>
-        </div>
-      )
-    }
-    <!-- Menu Categories Section -->
-    {
-      categoriesData && categoriesData.length > 0 && (
-        <div class="bg-white space-y-8 py-8">
-          {categoriesData.map((category) => (
-            <div
-              id={`category-${category.id}`}
-              class="max-w-6xl mx-auto lg:px-4"
-            >
-              {/* Category with Image Only - Simple Layout */}
-              {category.image &&
-                (!category.menu_items || category.menu_items.length === 0) && (
-                  <div class="mb-8">
-                    <h3 class="text-3xl font-bold mb-4 text-center text-gray-900">
-                      {category.name}
-                    </h3>
-                    <div class="w-full">
-                      <img
-                        src={category.image}
-                        alt={`Menú ${category.name}`}
-                        class="w-full h-auto md:rounded-lg shadow-lg clickable-image"
-                      />
-                    </div>
-                  </div>
-                )}
-
-              {/* Category with Items - Rich Layout */}
-              {category.menu_items && category.menu_items.length > 0 && (
-                <div class="mb-12 px-4 max-w-4xl mx-auto">
-                  <div class="text-center mb-8">
-                    <h3 class={`text-4xl font-extrabold mb-2  ${restaurant.type === "cafeteria" ? "text-amber-800" : "text-gray-900"}`}>
-                      {category.name}
-                    </h3>
-                    {category.description && (
-                      <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-                        {category.description}
-                      </p>
-                    )}
-                  </div>
-                  {/* Category Image if exists */}
-                  {category.image && (
-                    <div class="mb-8">
-                      <img
-                        src={category.image}
-                        alt={`Categoría ${category.name}`}
-                        class="w-full h-64 object-cover rounded-lg shadow-lg clickable-image"
-                      />
-                    </div>
-                  )}
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {restaurant.type !== "cafeteria" &&
-                      category.menu_items
-                        .filter((item) => item.is_active)
-                        .sort((a, b) => a.display_order - b.display_order)
-                        .map((item) => (
-                          <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden menu-item-card">
-                            {/* Item Image */}
-                            {item.image && (
-                              <div class="h-64 overflow-hidden relative">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  class="w-full h-full object-cover transition-transform duration-300 hover:scale-105 clickable-image"
-                                />
-                                {/* Featured badge overlay */}
-                                {item.is_featured && (
-                                  <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
-                                    ⭐ Destacado
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                            {/* Item Content */}
-                            <div class="p-2">
-                              <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-xl font-bold text-gray-900 flex-1 pr-2">
-                                  {item.name}
-                                </h4>
-                                <div class="text-right">
-                                  <span class="text-2xl font-bold price-highlight">
-                                    ${item.base_price}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Description */}
-                              {item.description && (
-                                <p class="text-gray-600 text-sm line-clamp-3">
-                                  {item.description}
-                                </p>
-                              )}
-
-                              {/* Tags and Features */}
-                              <div class="flex flex-wrap gap-2 mb-4">
-                                {item.is_spicy && (
-                                  <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                    🌶️ Picante
-                                  </span>
-                                )}
-                                {item.is_vegan && (
-                                  <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                    🌱 Vegano
-                                  </span>
-                                )}
-                                {item.is_vegetarian && !item.is_vegan && (
-                                  <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                    🥬 Vegetariano
-                                  </span>
-                                )}
-                                {item.is_gluten_free && (
-                                  <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center">
-                                    🌾 Sin Gluten
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Additional Info */}
-                              {(item.calories || item.preparation_time) && (
-                                <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
-                                  {item.calories && (
-                                    <span class="flex items-center">
-                                      🔥 {item.calories} cal
-                                    </span>
-                                  )}
-                                  {item.preparation_time && (
-                                    <span class="flex items-center">
-                                      ⏱️ {item.preparation_time} min
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Ingredients */}
-                              {item.ingredients && (
-                                <div class="mt-3 pt-3 border-t border-gray-100">
-                                  <p class="text-xs text-gray-500">
-                                    <strong>Ingredientes:</strong>{" "}
-                                    {item.ingredients}
-                                  </p>
-                                </div>
-                              )}
-
-                              {/* Allergens Warning */}
-                              {item.allergens && (
-                                <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                                  <p class="text-yellow-800">
-                                    <strong>⚠️ Alérgenos:</strong>{" "}
-                                    {item.allergens}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                  </div>
-                  <div class="grid gap-6">
-                    {restaurant.type === 'cafeteria' && category.menu_items &&
-                      category.menu_items
-                        .filter((item) => item.is_active)
-                        .sort((a, b) => a.display_order - b.display_order)
-                        .map((item, itemIdx) => (
-                          <div class="mb-2 flex justify-between">
-                            <div>
-                              <h3 class="text-xl font-semibold text-black mb-1">
-                                {item.name}
-                              </h3>
-                              {item.description && (
-                                <p class="text-sm text-[#3b2314]/70 mb-1">
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
-                            {item.base_price && (
-                              <p class="font-medium">${item.base_price}</p>
-                            )}
-                          </div>
-                        ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )
-    }
-  </div>
-  <div class="max-w-4xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-      <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">
-        📍 Información del Restaurante
-      </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	<div class="min-h-screen bg-[#FCFCFC] text-[#1A1A1A]">
+		<div class="max-w-2xl mx-auto px-6 py-20">
+			{/* Header (Mantengo tu estructura de revista) */}
+			<header class="mb-24 flex flex-col items-center">
+				<div class="relative mb-8">
+					<img
+						src={place.image}
+						alt={place.name}
+						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
+					/>
+				</div>
+				<h1
+					class="text-5xl text-center font-light tracking-tighter serif italic mb-2 text-balance"
+				>
+					{place.name}
+				</h1>
+				<p
+					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-pretty text-center"
+				>
+					{
+						place?.content?.semantic_data?.description ||
+							place?.description ||
+							place.name
+					}
+				</p>
         {
-          restaurant.address && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg
-                class="w-5 h-5 mr-3 text-amber-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">
-                  Dirección
-                </div>
-                <div class="text-sm text-gray-900">{restaurant.address}</div>
-              </div>
-            </div>
-          )
-        }
+					address && (
+						<div class="space-y-1">
+							<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold text-center">
+								Ubicación
+							</p>
+							<a
+								href={googleMapsUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-center text-lg text-stone-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 group"
+							>
+								{address}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="size-3 opacity-50 group-hover:opacity-100 transition-opacity"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+									/>
+								</svg>
+							</a>
+						</div>
+					)
+				}
+				{
+					place.content?.semantic_data && (
+						<div class="w-full mx-auto max-w-lg space-y-4 text-center mb-8">
+							{place.content.semantic_data.price_range && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Precios
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.price_range}
+									</p>
+								</div>
+							)}
 
-        {
-          restaurant.hours && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg
-                class="w-5 h-5 mr-3 text-yellow-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">
-                  Horarios
-                </div>
-                <div class="text-sm text-gray-900">{restaurant.hours}</div>
-              </div>
-            </div>
-          )
-        }
+							{place.content.semantic_data.parking && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Estacionamiento
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.parking}
+									</p>
+								</div>
+							)}
 
-        {
-          restaurant.priceRange && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg
-                class="w-5 h-5 mr-3 text-amber-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                />
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">
-                  Precios
-                </div>
-                <div class="text-sm text-gray-900">{restaurant.priceRange}</div>
-              </div>
-            </div>
-          )
-        }
+							{place.content.semantic_data.hours && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Horarios
+									</p>
+									<p class="text-sm text-stone-600 whitespace-pre-line">
+										{place.content.semantic_data.hours}
+									</p>
+								</div>
+							)}
 
-        {
-          restaurant.type && (
-            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-              <svg
-                class="w-5 h-5 mr-3 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                />
-              </svg>
-              <div>
-                <div class="text-xs text-gray-500 uppercase font-semibold">
-                  Tipo
-                </div>
-                <div class="text-sm text-gray-900">{restaurant.type}</div>
-              </div>
-            </div>
-          )
-        }
-      </div>
-    </div>
+							{place.content.semantic_data.phone && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Teléfono
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.phone}
+									</p>
+								</div>
+							)}
 
-    <!-- Secondary CTA Section -->
-    <div
-      class="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center text-white mb-8"
-    >
-      <h3 class="text-2xl font-bold mb-4">💬 ¿Ya visitaste este lugar?</h3>
-      <p class="text-blue-100 mb-6">
-        Ayuda a otros visitantes compartiendo tu experiencia. Tu opinión cuenta
-        mucho para la comunidad.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <button
-          onclick="document.querySelector('.review-form-section')?.scrollIntoView({behavior: 'smooth'})"
-          class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-        >
-          📝 Calificar ahora
-        </button>
-        <a
-          href="/contact"
-          class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-        >
-          📞 Contactar restaurante
-        </a>
-      </div>
-    </div>
-  </div>
+							{place.content.semantic_data.payment_options &&
+								place.content.semantic_data.payment_options.length > 0 && (
+									<div class="space-y-1">
+										<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+											Métodos de Pago
+										</p>
+										<p class="text-sm text-stone-600">
+											{place.content.semantic_data.payment_options.join(", ")}
+										</p>
+									</div>
+								)}
+						</div>
+					)
+				}
+
+				<div class="h-[1px] w-12 bg-stone-200"></div>
+			</header>
+
+			{/* Menú con Acordeón Nativo y Lógica de Apertura */}
+			<div class="space-y-8">
+				{
+					(() => {
+						let sectionCounter = 0;
+						return blocks.map((block) => {
+							if (block.type === "section") {
+								const isOpen = sectionCounter < 2;
+								sectionCounter++;
+
+								return (
+									<details class="group border-b border-stone-100 pb-4" open={isOpen}>
+										<summary class="flex justify-between items-center cursor-pointer list-none sticky top-0 bg-[#FCFCFC]/95 backdrop-blur-md z-10 py-6 outline-none">
+											<h2 class="text-xl uppercase tracking-[0.3em] font-black text-stone-800 transition-all group-open:text-red-900">
+												{block.data.title}
+											</h2>
+											<div class="text-black transition-transform duration-300 group-open:rotate-180">
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-5 w-5"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M19 9l-7 7-7-7"
+													/>
+												</svg>
+											</div>
+										</summary>
+
+										<div class="space-y-12 pt-8 animate-in fade-in slide-in-from-top-2 duration-500 overflow-hidden">
+                      
+											{block.data.description && (
+												<p class="text-stone-400 text-sm font-light italic mb-8 border-l-2 border-red-50 px-4">
+													{block.data.description}
+												</p>
+											)}
+
+											{block.data.items?.map((item) => (
+												<div class="space-y-4">
+													<div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item">
+														<div class="order-2 sm:order-1">
+															<div class="flex justify-between items-baseline mb-1">
+																<h3 class="text-lg font-medium tracking-tight group-hover/item:text-red-900 transition-colors">
+																	{item.name}
+																</h3>
+																<span class="text-sm font-light text-stone-400 ml-4">
+																	{view_settings.show_prices &&
+																		item.price > 0 &&
+																		`$${item.price}`}
+																</span>
+															</div>
+															{item.description && (
+																<p class="text-stone-400 text-sm font-light leading-relaxed">
+																	{item.description}
+																</p>
+															)}
+														</div>
+
+													{item.image && item.image.trim() !== "" && (
+															<div class="order-1 sm:order-2 mb-4 sm:mb-0 overflow-hidden rounded-lg">
+																<img
+																	src={item.image}
+																	alt={item.name}
+																	class="w-full sm:w-24 h-48 sm:h-24 object-cover saturate-[0.8] group-hover/item:saturate-100 transition-all duration-500"
+																/>
+															</div>
+														)}
+													</div>
+
+													{item.gallery && item.gallery.length > 0 && (
+														<div class="mt-4">
+															<Gallery images={item.gallery} />
+														</div>
+													)}
+												</div>
+											))}
+										</div>
+									</details>
+								);
+							}
+
+							if (block.type === "gallery") {
+								return (
+									<div class="py-12">
+										<Gallery images={block.data.images || []} />
+									</div>
+								);
+							}
+						});
+					})()
+				}
+			</div>
+
+			<footer class="mt-32 pb-16 text-center border-t border-stone-100 pt-16">
+				<p class="text-[10px] text-stone-300 uppercase tracking-widest">
+					Potenciado por BYSMAX • {place.name}
+				</p>
+			</footer>
+		</div>
+	</div>
 </RestaurantLayout>
+
+<style>
+	@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap");
+	.serif {
+		font-family: "Playfair Display", serif;
+	}
+
+	/* Quita la flecha nativa de details en Safari/Chrome */
+	summary::-webkit-details-marker {
+		display: none;
+	}
+</style>
