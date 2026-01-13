@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Place } from '../types/app';
 
 // Obtener las variables de entorno
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -76,10 +77,10 @@ export async function getRestaurants({type}: {type: string | null}) {
 
   const { data, error } = await query
   if (error) {
-    console.error('Error fetching cafeterias:', error);
+    console.error(`Error fetching ${type}:`, error);
     return [];
   }
-  return data as Restaurant[];
+  return data as Place[];
 }
 
 // Función para obtener cafeterías destacadas
@@ -94,7 +95,7 @@ export async function getCafeteriasDestacadas() {
     return [];
   }
   
-  return data as Restaurant[];
+  return data as Place[];
 }
 
 // Función para obtener opiniones de una cafetería
@@ -121,5 +122,5 @@ export async function getRestaurantByName({ name }: { name: string }) {
     console.error('Error fetching cafeterias:', error);
     return [];
   }
-  return data as Restaurant[];
+  return data as Place[];
 }

@@ -16,9 +16,51 @@ export interface Place {
   specialties?: string[];
   highlight?: boolean;
   phone?: string;
-  destacado?: boolean;
+  featured: boolean;
 
-  content?: SemanticData;
+  content?: Content;
+}
+
+export interface Content {
+  semantic_data?: SemanticData;
+  blocks?: Block[];
+  view_settings?: {
+    layout: 'grid' | 'list';
+    show_prices: boolean;
+  };
+}
+
+export interface Block {
+  id: string;
+  type: 'section' | 'gallery' | 'image';
+  data: SectionData | GalleryData | ImageData;
+}
+
+export interface SectionData {
+  title: string;
+  description?: string;
+  image?: string;
+  items: ItemData[];
+}
+
+export interface ItemData {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  features?: string[];
+  gallery?: { src: string; alt?: string; title?: string }[];
+}
+
+export interface GalleryData {
+  images: { src: string; alt?: string; title?: string }[];
+}
+
+export interface ImageData {
+  src: string;
+  alt?: string;
+  caption?: string;
 }
 
 export interface SemanticData {

@@ -9,7 +9,7 @@ import { getRestaurants } from "../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
 import type { Place } from "../../types/app";
 
-const motelesData = await getRestaurants({ type: 'motel' });
+const motelesData: Place[] = await getRestaurants({ type: 'motel' });
 
 const motelesList: Place[] = motelesData.map((motel) => ({
   id: motel.id,
@@ -20,24 +20,18 @@ const motelesList: Place[] = motelesData.map((motel) => ({
   priceRange: motel.priceRange || "$$",
   address: motel.address || "",
   hours: motel.hours || "24 horas",
-  amenities: motel.services || [],
+  amenities: motel.amenities || [],
   image: motel.image,
   menu: motel.menu,
   distance: motel.distance,
   closed: motel.closed,
   openingTime: motel.openingTime,
   specialties: [],
-  highlight: motel.featured,
+  featured: motel.featured,
   phone: undefined,
   destacado: motel.featured
 }));
 
-
-
-// Usar moteles de Supabase, o fallback si no hay datos
-const finalMotelesList = motelesList;
-
-// Obtener parámetros de URL para SEO dinámico
 const url = new URL(Astro.request.url);
 const zona = url.searchParams.get('zona') || undefined;
 const tipo = url.searchParams.get('tipo') || undefined;
@@ -176,7 +170,7 @@ const schemaEnrichment = {
   canonical={seoData.canonical}
   ogUrl={seoData.ogUrl}
 ><!-- Motel Business Structured Data -->
-  <MotelBusinessSchema moteles={finalMotelesList} />
+  <MotelBusinessSchema moteles={motelesList} />
   
   <!-- Breadcrumb Structured Data -->
   <MotelBreadcrumbSchema zona={zona} tipo={tipo} />
@@ -243,7 +237,12 @@ const schemaEnrichment = {
     
           <!-- Grid de moteles con diseño creativo -->
           <div id="moteles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {finalMotelesList.sort((a,b) => a.featured - b.featured ? 1 : -1).sort((a, b) => b.rating - a.rating).map((motel) => (
+            {motelesList.sort((a, b) => {
+              if (a.featured !== b.featured) {
+                  return a.featured ? -1 : 1; 
+              }
+              return b.rating - a.rating;
+            }).sort((a,b) => a.featured < b.featured ? 1 : -1).map((motel) => (
               <div 
                 class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border ${motel.highlight ? 'border-pink-500/50 bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
                 data-rating={motel.rating}
@@ -381,7 +380,7 @@ const schemaEnrichment = {
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles Destacados</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {finalMotelesList.filter(motel => motel.highlight === true).map(motel => (
+              {motelesList.filter(motel => motel.highlight === true).map(motel => (
                 <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row border border-pink-500/20">
                   <div class="md:w-2/5 relative">
                     <img

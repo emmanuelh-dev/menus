@@ -8,13 +8,13 @@ import type { Place } from "../types/app";
 
 const path = Astro.url.pathname;
 
-function hasAmenity(amenities?: string[], amenity: string): boolean {
+function hasAmenity(amenity: string, amenities?: string[]): boolean {
   if (!amenities) return false;
   return amenities.some(a => a.toLowerCase().includes(amenity.toLowerCase()));
 }
 
 function generateSEOTitle(place: Place, year: number = new Date().getFullYear()): string {
-  const jacuzzi = hasAmenity(place.amenities, "Jacuzzi") ? " con Jacuzzi" : "";
+  const jacuzzi = hasAmenity("Jacuzzi", place.amenities) ? " con Jacuzzi" : "";
   const price = place.priceRange ? ` desde ${place.priceRange}` : "";
   const city = "Monterrey";
   

@@ -100,7 +100,7 @@ interface GalleryData {
 }
 
 
-export default function ContentEditor({ placeId, initialContent }: { placeId: number; initialContent: any }) {
+export default function ContentEditor({ placeId, initialContent, placeType = 'restaurant' }: { placeId: number; initialContent: any; placeType?: 'restaurant' | 'motel' }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialContent?.blocks) {
       const hasOldStructure = initialContent.blocks.some((block: any) => block.type === 'item');
@@ -282,17 +282,17 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
             contents: [{
               parts: [
                 {
-                  text: `Analiza esta imagen de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
+                  text: `Analiza esta imagen de menu de ${placeType === 'motel' ? 'MOTEL' : 'RESTAURANTE'} y extrae TODA la informacion en formato JSON con esta estructura exacta:
 {
   "semantic_data": {
-    "description": "descripcion breve del restaurante basada en el menu (1-2 lineas)",
+    "description": "descripcion breve del lugar basada en el menu (1-2 lineas)",
     "address": "direccion completa si aparece",
     "phone": "telefono si aparece",
     "price_range": "rango de precios aproximado (ej: MXN100-300, más de MXN500)",
     "hours": "horarios si aparecen",
     "parking": "informacion sobre estacionamiento si aparece",
-    "payment_options": [usa EXACTAMENTE estos valores: "Efectivo", "Tarjetas de crédito", "AMEX", "Visa", "Mastercard", "Transferencia", "Vales"],
-    "additional_features": [usa EXACTAMENTE estos valores: "WiFi", "Terraza", "Bar", "Estacionamiento valet", "Música en vivo", "Pet friendly", "Reservaciones", "Delivery", "Para llevar", "Aire acondicionado", "TV", "Acceso para silla de ruedas"]
+    "payment_options": ["Efectivo", "Tarjetas de crédito", "AMEX", "Visa", "Mastercard", "Transferencia", "Vales"],
+    "additional_features": ["WiFi", "Terraza", "Bar", "Estacionamiento valet", "Música en vivo", "Pet friendly", "Reservaciones", "Delivery", "Para llevar", "Aire acondicionado", "TV", "Acceso para silla de ruedas"]
   },
   "sections": [
     {
@@ -300,23 +300,31 @@ export default function ContentEditor({ placeId, initialContent }: { placeId: nu
       "description": "descripcion opcional",
       "items": [
         {
-          "name": "nombre del platillo",
+          "name": "nombre del ${placeType === 'motel' ? 'tipo de habitación' : 'platillo'}",
           "price": 150.00,
-          "description": "descripcion del platillo"
+          "description": "descripcion del ${placeType === 'motel' ? 'tipo de habitación' : 'platillo'}",
+          "features": [${placeType === 'motel' ? '"Jacuzzi", "Smart TV", "Tina", "Cochera techada", "Espejo en techo"' : '"Picante", "Vegetariano", "Sin gluten", "Especialidad de la casa"'}]
         }
       ]
     }
   ]
 }
 
-IMPORTANTE: 
-- GENERA una descripcion del lugar basada en el tipo de comida y ambiente que percibes
-- Extrae TODOS los platillos y precios que veas
-- Extrae datos del restaurante (direccion, telefono, horarios, estacionamiento)
-- Para payment_options y additional_features usa EXACTAMENTE los valores listados arriba
-- Si no ves algun dato, omite ese campo del JSON
+IMPORTANTE - OPCIONES DE PAGO:
+- SIEMPRE incluye "Efectivo" y "Tarjetas de crédito" (es el estándar en México)
+- Si ves logos de tarjetas, agrega: "Visa", "Mastercard", "AMEX"
+- Si no ves info de pago, usa: ["Efectivo", "Tarjetas de crédito"]
+
+IMPORTANTE - CARACTERÍSTICAS DEL LUGAR:
+${placeType === 'motel' ? '- Para MOTELES: "Aire acondicionado", "Estacionamiento" (siempre), "WiFi" si es moderno\n- Si es lugar premium: agrega "TV por cable", "Room service"' : '- Para RESTAURANTES: "Aire acondicionado", "WiFi" si es moderno, "Reservaciones" si es formal\n- Si ves terraza/exterior: agrega "Terraza"\n- Si aplica: "Delivery", "Para llevar"'}
+
+IMPORTANTE - FEATURES DE ITEMS:
+${placeType === 'motel' ? '- Para MOTELES: extrae features ESPECÍFICAS de cada tipo de habitación:\n  * "Jacuzzi", "Smart TV", "Tina de hidromasaje", "Cochera techada", "Espejo en techo", "Cama king size"\n  * Si TODAS las habitaciones tienen cochera básica, NO la pongas en features\n  * Solo pon features que sean ESPECIALES o diferentes entre habitaciones' : '- Para RESTAURANTES: características del platillo:\n  * "Picante" (si es picoso), "Vegetariano", "Vegano", "Sin gluten"\n  * "Especialidad de la casa", "Platillo nuevo", "Recomendado por el chef"\n  * NO pongas features generales que todos los platillos tienen'}
+
+OTRAS REGLAS:
+- Extrae TODOS los ${placeType === 'motel' ? 'tipos de habitaciones' : 'platillos'} y precios
 - Si no hay precio, usa 0
-- Agrupa platillos por secciones logicas
+- Agrupa por secciones logicas
 - Responde SOLO con el JSON, sin texto adicional`
                 },
                 {
@@ -417,17 +425,17 @@ IMPORTANTE:
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `Analiza este texto de menu de restaurante y extrae TODA la informacion en formato JSON con esta estructura exacta:
+                text: `Analiza este texto de menu de ${placeType === 'motel' ? 'MOTEL' : 'RESTAURANTE'} y extrae TODA la informacion en formato JSON con esta estructura exacta:
 {
   "semantic_data": {
-    "description": "descripcion breve del restaurante basada en el menu y contexto (1-2 lineas)",
+    "description": "descripcion breve del lugar basada en el menu (1-2 lineas)",
     "address": "direccion completa si aparece",
     "phone": "telefono si aparece",
     "price_range": "rango de precios aproximado (ej: MXN100-300, más de MXN500)",
     "hours": "horarios si aparecen",
-    "parking": "informacion sobre estacionamiento si aparece (ej: Servicio de estacionamiento, Estacionamiento en calle, Sin estacionamiento)",
-    "payment_options": [usa EXACTAMENTE estos valores: "Efectivo", "Tarjetas de crédito", "AMEX", "Visa", "Mastercard", "Transferencia", "Vales"],
-    "additional_features": [usa EXACTAMENTE estos valores: "WiFi", "Terraza", "Bar", "Estacionamiento valet", "Música en vivo", "Pet friendly", "Reservaciones", "Delivery", "Para llevar", "Aire acondicionado", "TV", "Acceso para silla de ruedas"]
+    "parking": "informacion sobre estacionamiento si aparece (ej: Servicio de estacionamiento, Estacionamiento en calle)",
+    "payment_options": ["Efectivo", "Tarjetas de crédito", "AMEX", "Visa", "Mastercard", "Transferencia", "Vales"],
+    "additional_features": ["WiFi", "Terraza", "Bar", "Estacionamiento valet", "Música en vivo", "Pet friendly", "Reservaciones", "Delivery", "Para llevar", "Aire acondicionado", "TV", "Acceso para silla de ruedas"]
   },
   "sections": [
     {
@@ -435,24 +443,34 @@ IMPORTANTE:
       "description": "descripcion opcional",
       "items": [
         {
-          "name": "nombre del platillo",
+          "name": "nombre del ${placeType === 'motel' ? 'tipo de habitación' : 'platillo'}",
           "price": 150.00,
-          "description": "descripcion del platillo"
+          "description": "descripcion del ${placeType === 'motel' ? 'tipo de habitación' : 'platillo'}",
+          "features": [${placeType === 'motel' ? '"Jacuzzi", "Smart TV", "Tina", "Cochera techada"' : '"Picante", "Vegetariano", "Sin gluten"'}]
         }
       ]
     }
   ]
 }
 
-IMPORTANTE: 
-- GENERA una descripcion del lugar basada en el tipo de comida, estilo y ambiente que percibes del menu
-- Extrae TODOS los platillos y precios que veas
-- Extrae datos del restaurante (direccion, telefono, horarios, estacionamiento)
-- Para payment_options y additional_features usa EXACTAMENTE los valores listados arriba
-- Si no ves algun dato, omite ese campo del JSON
-- Para estacionamiento se MUY especifico: "Servicio de estacionamiento", "Estacionamiento en calle", "Sin estacionamiento", etc
+IMPORTANTE - OPCIONES DE PAGO:
+- SIEMPRE incluye "Efectivo" y "Tarjetas de crédito" (es el estándar en México)
+- Si mencionan tarjetas específicas, agrega: "Visa", "Mastercard", "AMEX"
+- Si mencionan transferencias/vales, agrégalos
+- Si no ves info de pago, usa: ["Efectivo", "Tarjetas de crédito"]
+
+IMPORTANTE - CARACTERÍSTICAS DEL LUGAR:
+${placeType === 'motel' ? '- Para MOTELES: "Aire acondicionado", "Estacionamiento" (siempre), "WiFi", "TV por cable"\n- Lee el contexto para inferir: "Room service", "Recepción 24h"' : '- Para RESTAURANTES: "Aire acondicionado", "WiFi", "Reservaciones" si es formal\n- Si mencionan: "Para llevar", "Delivery", "Terraza"'}
+- Lee el contexto del texto para inferir características aunque no las mencionen explícitamente
+
+IMPORTANTE - FEATURES DE ITEMS:
+${placeType === 'motel' ? '- Para MOTELES: extrae features ESPECÍFICAS de cada tipo de habitación:\n  * "Jacuzzi", "Smart TV", "Tina de hidromasaje", "Cochera techada", "Espejo en techo"\n  * Si dice "Todas incluyen cochera" → NO pongas "Cochera" en features\n  * Solo features ESPECIALES que diferencian habitaciones' : '- Para RESTAURANTES: características especiales del platillo:\n  * "Picante", "Vegetariano", "Vegano", "Sin gluten"\n  * "Especialidad de la casa", "Recomendado", "Platillo nuevo"'}
+
+OTRAS REGLAS:
+- GENERA una descripcion del lugar si no viene en el texto
+- Extrae TODOS los ${placeType === 'motel' ? 'tipos de habitaciones' : 'platillos'} y precios
 - Si no hay precio, usa 0
-- Agrupa platillos por secciones logicas
+- Agrupa por secciones logicas
 - Responde SOLO con el JSON, sin texto adicional
 
 TEXTO DEL MENU:
@@ -590,7 +608,7 @@ ${text}`
   function renderBlock(block: Block, index: number) {
     switch (block.type) {
       case 'section':
-        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} />;
       case 'gallery':
         return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
       case 'image':
@@ -955,7 +973,6 @@ ${text}`
                 type="file"
                 accept="image/*"
                 onChange={handleAIImageUpload}
-                style={{ display: 'none' }}
               />
 
               <button
@@ -1157,7 +1174,7 @@ function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string
   );
 }
 
-function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: SectionData) => void }) {
+function SectionBlock({ data, onChange, placeType = 'restaurant' }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel' }) {
   const addItem = () => {
     const newItem: ItemData = {
       id: `item-${Date.now()}-${Math.random()}`,
@@ -1278,7 +1295,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                 />
 
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS (ej: Jacuzzi, Clima):</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">{placeType === 'motel' ? 'CARACTERÍSTICAS DE LA HABITACIÓN (ej: Jacuzzi, Smart TV, Tina):' : 'CARACTERÍSTICAS DEL PLATILLO (ej: Picante, Vegetariano):'}</label>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {item.features?.map((feature, fIdx) => (
                       <span key={fIdx} className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
@@ -1295,7 +1312,7 @@ function SectionBlock({ data, onChange }: { data: SectionData; onChange: (data: 
                   </div>
                   <input
                     type="text"
-                    placeholder="Agregar característica (Enter para añadir)"
+                    placeholder={placeType === 'motel' ? 'Agregar característica de habitación (Enter)' : 'Agregar característica del platillo (Enter)'}
                     className="w-full text-sm p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.currentTarget.value.trim()) {
