@@ -3,9 +3,8 @@ import { FaStar, FaRegStar, FaWhatsapp, FaCamera, FaReply } from "react-icons/fa
 import { supabase } from "../lib/supabase";
 import { ManualUploader } from "./ManualUploader";
 
-export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
-  const [restaurant, setRestaurant] = useState(null);
-  const [reviews, setReviews] = useState([]);
+export default function ReviewForm({ restaurantName, id, initialReviews = [], isAdmin = false }) {
+  const [reviews, setReviews] = useState(initialReviews);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [authorName, setAuthorName] = useState("");
@@ -15,39 +14,25 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
   const [replyText, setReplyText] = useState({});
   const [viewerImage, setViewerImage] = useState(null);
 
-  const menu = useMemo(() => {
-    const p = path || (typeof window !== 'undefined' ? window.location.pathname : "");
-    return p.split('/').filter(Boolean).pop() || "default";
-  }, [path]);
+  console.log(id)
 
-  const loadReviews = useCallback(async (id) => {
+  const loadReviews = useCallback(async () => {
+    if (!id) return;
     const { data } = await supabase
-      .from("review")
+      .from("review_moteles")
       .select("*")
-      .eq("restaurant_id", id)
+      .eq("motel_id", id)
       .order("created_at", { ascending: false });
     if (data) setReviews(data);
-  }, []);
-
-  const findOrCreatePlace = useCallback(async () => {
-    let { data, error } = await supabase.from("places").select("*").eq("short_name", menu).single();
-    if (error && error.code === 'PGRST116') {
-      const { data: newData } = await supabase.from("places")
-        .insert([{ name: restaurantName || menu, short_name: menu, content: { blocks: [], view_settings: {} } }])
-        .select().single();
-      data = newData;
-    }
-    if (data) {
-      setRestaurant(data);
-      loadReviews(data.id);
-    }
-  }, [menu, restaurantName, loadReviews]);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!id) return;
+    
     setIsSubmitting(true);
     const payload = {
-      restaurant_id: restaurant.id,
+      motel_id: id,
       rate: rating,
       comment: comment.trim(),
       content: {
@@ -57,11 +42,11 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
       },
       status: 'approved'
     };
-    const { error } = await supabase.from("review").insert([payload]);
+    const { error } = await supabase.from("review_moteles").insert([payload]);
     if (!error) {
       alert("Reseña publicada.");
       setRating(0); setComment(""); setImages([]);
-      loadReviews(restaurant.id);
+      loadReviews();
     }
     setIsSubmitting(false);
   };
@@ -79,19 +64,17 @@ export default function ReviewForm({ restaurantName, path, isAdmin = false }) {
     };
 
     const { error } = await supabase
-      .from("review")
+      .from("review_moteles")
       .update({ content: updatedContent })
       .eq("id", reviewId);
 
     if (!error) {
       setReplyText({ ...replyText, [reviewId]: "" });
-      loadReviews(restaurant.id);
+      loadReviews();
     }
   };
 
-  useEffect(() => { findOrCreatePlace(); }, [findOrCreatePlace]);
-
-  if (!restaurant) return <div className="p-10 text-center animate-pulse text-xs tracking-widest">CARGANDO...</div>;
+  if (!id) return null;
 
   return (
     <div className="space-y-12 max-w-4xl mx-auto">

@@ -288,7 +288,11 @@ if (schemaEnrichment.suitableForDiet) {
           class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
         >
           <div>
-            <ReviewForm client:only path={path} restaurantName={title} />
+            {
+                   place?.id && (
+
+                     <ReviewForm client:only id={place.id} restaurantName={title} />
+)            }
           </div>
         </div>
       )

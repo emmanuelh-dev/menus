@@ -104,26 +104,24 @@ let reviewStats = {
   reviewCount: 0,
 };
 
-try {
-  const { data: motelData } = await supabase
-    .from("moteles")
-    .select("id")
-    .eq("slug", path)
-    .single();
+let initialReviews = [];
 
-  if (motelData) {
+try {
+    
     const { data: reviewsData } = await supabase
-      .from("review_moteles")
-      .select("rate")
-      .eq("motel_id", motelData.id);
+      .from("reviews")
+      .select("*")
+      .eq("place_id", place?.id)
+      .order("created_at", { ascending: false });
 
     if (reviewsData && reviewsData.length > 0) {
+
+      initialReviews = reviewsData as any;
+
       const totalRating = reviewsData.reduce((sum, review) => sum + review.rate, 0);
       reviewStats.ratingValue = Number((totalRating / reviewsData.length).toFixed(1));
       reviewStats.reviewCount = reviewsData.length;
-    }
-  }
-} catch (error) {
+     }} catch (error) {
   console.error("Error fetching motel reviews:", error);
 }
 
@@ -280,27 +278,31 @@ if (reviewStats.reviewCount > 0) {
         y.parentNode.insertBefore(t, y);
       })(window, document, "clarity", "script", "s1a8gh6len");
     </script>
+
     <!-- <script 
     async 
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
     crossorigin="anonymous"
    /> -->
+
   </head>
   
   <body class="motel-typography">
     <MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
     <slot />
+
     {
-      path.includes("/moteles") && (
+     place?.id && (
         <div
           class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
         >
           <div>
-            <ReviewForm client:only path={path} restaurantName={place?.name || title} />
+            <ReviewForm client:only id={place.id} restaurantName={place?.name || title} initialReviews={initialReviews} />
           </div>
         </div>
       )
     }
+
     <ScrollTopAndComment client:only />
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
