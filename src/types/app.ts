@@ -17,7 +17,7 @@ export interface Place {
   highlight?: boolean;
   phone?: string;
   featured: boolean;
-
+  type: string;
   content?: Content;
 }
 
