@@ -36,6 +36,7 @@
  */
 import { useState, useRef } from 'react';
 import { ManualUploader } from '../ManualUploader';
+import type { SemanticData } from '../../types/app';
 
 type BlockType = 'section' | 'gallery' | 'image';
 
@@ -98,24 +99,6 @@ interface GalleryData {
   images: { src: string; alt?: string; title?: string }[];
 }
 
-interface SemanticData {
-  description?: string;
-  areas?: string[];
-  address?: string;
-  price_range?: string;
-  ambiance?: string;
-  hours?: string;
-  website?: string;
-  payment_options?: string[];
-  dress_code?: string;
-  phone?: string;
-  cuisine_type?: string;
-  zone?: string;
-  cross_street?: string;
-  parking?: string;
-  variety?: string;
-  additional_features?: string[];
-}
 
 export default function ContentEditor({ placeId, initialContent }: { placeId: number; initialContent: any }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {

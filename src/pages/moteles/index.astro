@@ -165,7 +165,6 @@ const schemaEnrichment = {
   },
 };
 
-console.log("Final moteles list:", finalMotelesList);
 ---
 
 <MotelLayout 
@@ -173,7 +172,8 @@ console.log("Final moteles list:", finalMotelesList);
   description={seoData.description}
   schemaEnrichment={schemaEnrichment}
   backgroundColor="bg-gradient-to-r from-[#4a5568] to-[#553c7b]"
-  textWhite={true}  canonical={seoData.canonical}
+  textWhite={true}
+  canonical={seoData.canonical}
   ogUrl={seoData.ogUrl}
 ><!-- Motel Business Structured Data -->
   <MotelBusinessSchema moteles={finalMotelesList} />
@@ -243,7 +243,7 @@ console.log("Final moteles list:", finalMotelesList);
     
           <!-- Grid de moteles con diseño creativo -->
           <div id="moteles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {finalMotelesList.sort((a, b) => b.rating - a.rating).map((motel) => (
+            {finalMotelesList.sort((a,b) => a.featured - b.featured ? 1 : -1).sort((a, b) => b.rating - a.rating).map((motel) => (
               <div 
                 class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border ${motel.highlight ? 'border-pink-500/50 bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
                 data-rating={motel.rating}

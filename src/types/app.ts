@@ -17,4 +17,25 @@ export interface Place {
   highlight?: boolean;
   phone?: string;
   destacado?: boolean;
+
+  content?: SemanticData;
+}
+
+export interface SemanticData {
+  description?: string;
+  areas?: string[];
+  address?: string;
+  price_range?: string;
+  ambiance?: string;
+  hours?: string;
+  website?: string;
+  payment_options?: string[];
+  dress_code?: string;
+  phone?: string;
+  cuisine_type?: string;
+  zone?: string;
+  cross_street?: string;
+  parking?: string;
+  variety?: string;
+  additional_features?: string[];
 }

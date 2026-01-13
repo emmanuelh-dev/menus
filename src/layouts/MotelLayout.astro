@@ -4,8 +4,32 @@ import MotelHeader from "../components/MotelHeader.astro";
 import ReviewForm from "../components/ReviewForm";
 import ScrollTopAndComment from "../components/ScrollTopAndComment";
 import { supabase } from "../lib/supabase";
+import type { Place } from "../types/app";
 
 const path = Astro.url.pathname;
+
+function hasAmenity(amenities?: string[], amenity: string): boolean {
+  if (!amenities) return false;
+  return amenities.some(a => a.toLowerCase().includes(amenity.toLowerCase()));
+}
+
+function generateSEOTitle(place: Place, year: number = new Date().getFullYear()): string {
+  const jacuzzi = hasAmenity(place.amenities, "Jacuzzi") ? " con Jacuzzi" : "";
+  const price = place.priceRange ? ` desde ${place.priceRange}` : "";
+  const city = "Monterrey";
+  
+  return `${place.name}${jacuzzi} en ${city}${price} | Opiniones y Precios ${year}`;
+}
+
+function generateSEODescription(place: Place, description?: string): string {
+  const city = "Monterrey";
+  const baseDesc = description || `${place.name} ofrece habitaciones cómodas y privadas`;
+  const reviews = place.reviewCount > 0 
+    ? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas` : ""}` 
+    : "";
+  
+  return `${baseDesc}. Encuentra precios, fotos de las habitaciones, ubicación en ${city}${reviews}. ¡Abierto ahora!`;
+}
 
 interface Address {
   streetAddress?: string;
@@ -22,8 +46,9 @@ interface OpeningHoursSpecification {
 }
 
 export interface Props {
-  title: string;
-  description: string;
+  place?: Place;
+  title?: string;
+  description?: string;
   image?: string;
   type?: "LodgingBusiness" | "Motel" | "Hotel";
   textWhite?: boolean;
@@ -53,6 +78,7 @@ export interface Props {
 }
 
 const {
+  place,
   title,
   description,
   image,
@@ -64,6 +90,14 @@ const {
   canonical,
   ogUrl,
 } = Astro.props;
+
+const seoTitle = place 
+  ? generateSEOTitle(place)
+  : title;
+
+const seoDescription = place
+  ? generateSEODescription(place, description)
+  : description;
 
 let reviewStats = {
   ratingValue: 0,
@@ -97,8 +131,8 @@ try {
 const schema: any = {
   "@context": "https://schema.org",
   "@type": type,
-  name: title,
-  description: description,
+  name: place?.name || title,
+  description: seoDescription,
   url: canonical || Astro.url.toString(),
 };
 
@@ -187,22 +221,22 @@ if (reviewStats.reviewCount > 0) {
       href={favicon ? favicon : "/favicon.ico"}
     />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>{seoTitle}</title>
+    <meta name="description" content={seoDescription} />
     <link rel="canonical" href={canonical || Astro.url} />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={ogUrl || Astro.url} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={seoTitle} />
+    <meta property="og:description" content={seoDescription} />
     {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={ogUrl || Astro.url} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
+    <meta property="twitter:title" content={seoTitle} />
+    <meta property="twitter:description" content={seoDescription} />
     {
       image && (
         <meta property="twitter:image" content={new URL(image, Astro.url)} />
@@ -262,7 +296,7 @@ if (reviewStats.reviewCount > 0) {
           class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
         >
           <div>
-            <ReviewForm client:only path={path} restaurantName={title} />
+            <ReviewForm client:only path={path} restaurantName={place?.name || title} />
           </div>
         </div>
       )

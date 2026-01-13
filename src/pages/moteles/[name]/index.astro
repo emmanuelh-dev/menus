@@ -26,8 +26,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 ---
 
 <MotelLayout
-	description={place.description}
-	title={`${place.name} - ${place.address}`}
+  place={place}
 	image={place.image ? place.image : "/placeholder.svg"}
 	backgroundColor="bg-[#0A0A0A]"
 >
