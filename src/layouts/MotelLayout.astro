@@ -149,10 +149,20 @@ if (schemaEnrichment.address) {
     "@type": "PostalAddress",
     ...schemaEnrichment.address,
   };
+} else if (place?.content?.semantic_data?.address) {
+  schema.address = {
+    "@type": "PostalAddress",
+    streetAddress: place.content.semantic_data.address,
+    addressLocality: "Monterrey",
+    addressRegion: "Nuevo León",
+    addressCountry: "MX",
+  };
 }
 
 if (schemaEnrichment.telephone) {
   schema.telephone = schemaEnrichment.telephone;
+} else if (place?.content?.semantic_data?.phone) {
+  schema.telephone = place.content.semantic_data.phone;
 }
 
 if (schemaEnrichment.email) {
