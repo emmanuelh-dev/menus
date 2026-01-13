@@ -86,6 +86,8 @@ let reviewStats = {
   reviewCount: 0,
 };
 
+let initialReviews = [];
+
 try {
   const { data: restaurantData } = await supabase
     .from("places")
@@ -94,22 +96,34 @@ try {
     .single();
 
   if (restaurantData) {
-    const { data: reviewsData } = await supabase
-      .from("review")
-      .select("rate")
-      .eq("restaurant_id", restaurantData.id);
+    const [reviewsResponse, statsResponse] = await Promise.all([
+      supabase
+        .from("review")
+        .select("*")
+        .eq("restaurant_id", restaurantData.id)
+        .order("created_at", { ascending: false })
+        .limit(10),
+      
+      supabase
+        .from("review")
+        .select("rate")
+        .eq("restaurant_id", restaurantData.id)
+    ]);
 
-    if (reviewsData && reviewsData.length > 0) {
-      // Calculamos el promedio de calificaciones
-      const totalRating = reviewsData.reduce(
+    if (reviewsResponse.data) {
+      initialReviews = reviewsResponse.data as any;
+    }
+
+    if (statsResponse.data && statsResponse.data.length > 0) {
+      const totalRating = statsResponse.data.reduce(
         (sum, review) => sum + review.rate,
         0
       );
-      const averageRating = totalRating / reviewsData.length;
+      const averageRating = totalRating / statsResponse.data.length;
 
       reviewStats = {
         ratingValue: parseFloat(averageRating.toFixed(1)),
-        reviewCount: reviewsData.length,
+        reviewCount: statsResponse.data.length,
       };
     }
   }
@@ -158,6 +172,23 @@ if (reviewStats.reviewCount > 0) {
     bestRating: 5,
     worstRating: 1,
   };
+
+  // Agregar reviews individuales para rich snippets
+  schema.review = initialReviews.slice(0, 10).map((review: any) => ({
+    "@type": "Review",
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: review.rate,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    author: {
+      "@type": "Person",
+      name: review.name || "Usuario Anónimo",
+    },
+    reviewBody: review.comments,
+    datePublished: review.created_at,
+  }));
 } else if (schemaEnrichment.aggregateRating) {
   schema.aggregateRating = {
     "@type": "AggregateRating",

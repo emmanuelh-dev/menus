@@ -107,21 +107,30 @@ let reviewStats = {
 let initialReviews = [];
 
 try {
-    
-    const { data: reviewsData } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("place_id", place?.id)
-      .order("created_at", { ascending: false });
+    const [reviewsResponse, statsResponse] = await Promise.all([
+      supabase
+        .from("reviews")
+        .select("*")
+        .eq("place_id", place?.id)
+        .order("created_at", { ascending: false })
+        .limit(10),
+      
+      supabase
+        .from("reviews")
+        .select("rate")
+        .eq("place_id", place?.id)
+    ]);
 
-    if (reviewsData && reviewsData.length > 0) {
+    if (reviewsResponse.data) {
+      initialReviews = reviewsResponse.data as any;
+    }
 
-      initialReviews = reviewsData as any;
-
-      const totalRating = reviewsData.reduce((sum, review) => sum + review.rate, 0);
-      reviewStats.ratingValue = Number((totalRating / reviewsData.length).toFixed(1));
-      reviewStats.reviewCount = reviewsData.length;
-     }} catch (error) {
+    if (statsResponse.data && statsResponse.data.length > 0) {
+      const totalRating = statsResponse.data.reduce((sum, review) => sum + review.rate, 0);
+      reviewStats.ratingValue = Number((totalRating / statsResponse.data.length).toFixed(1));
+      reviewStats.reviewCount = statsResponse.data.length;
+    }
+} catch (error) {
   console.error("Error fetching motel reviews:", error);
 }
 
@@ -201,6 +210,23 @@ if (reviewStats.reviewCount > 0) {
     bestRating: 5,
     worstRating: 1,
   };
+
+  // Agregar reviews individuales para rich snippets
+  schema.review = initialReviews.slice(0, 10).map((review: any) => ({
+    "@type": "Review",
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: review.rate,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    author: {
+      "@type": "Person",
+      name: review.name || "Usuario Anónimo",
+    },
+    reviewBody: review.comments,
+    datePublished: review.created_at,
+  }));
 } else if (schemaEnrichment.aggregateRating) {
   schema.aggregateRating = {
     "@type": "AggregateRating",
