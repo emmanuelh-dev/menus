@@ -15,18 +15,11 @@ type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
 type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
 
-// Add filter options with type safety
 const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"];
 const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet"];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-
-
 const restaurants = await getRestaurants({type: null})
-
-const restaurantWithImages = restaurants.filter((restaurant) => {
-    return restaurant.image !== null
-});
 ---
 
 <RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">
@@ -36,7 +29,6 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
                 Los restaurantes que usan nuestros menús.
             </h2>
 
-            <!-- Filtros -->
             <div class="mb-8 flex flex-wrap gap-4 justify-center">
                 <select 
                     id="industry-filter" 
@@ -58,11 +50,9 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
             </div>
 
             <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-                {restaurantWithImages.map((restaurant) => (
+                {restaurants.map((restaurant) => (
                     <div 
                         class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
-                        data-industry={restaurant.type}
-                        data-type={restaurant.type}
                     >
                         <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
                             {restaurant.short_name ? (
@@ -86,8 +76,6 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
                         </h2>
                         <p class="text-gray-600">{}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
-                            <span class="text-sm bg-gray-100 px-2 py-1 rounded">{restaurant.type}</span>
                         </div>
                         {restaurant.short_name && <a href={'/menus/' + restaurant.short_name} class="group mt-4 block">
                             <span class="flex items-center justify-between">
@@ -179,7 +167,6 @@ const restaurantWithImages = restaurants.filter((restaurant) => {
         }
     }
 
-    // Initialize the filter when the DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
         try {
             new RestaurantFilter();
