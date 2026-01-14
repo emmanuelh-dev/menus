@@ -245,7 +245,7 @@ const schemaEnrichment = {
               return b.rating - a.rating;
             }).sort((a,b) => a.featured < b.featured ? 1 : -1).map((motel) => (
               <div 
-                class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border ${motel.highlight ? 'border-pink-500/50 bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
+                class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${motel.highlight ? '  bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
                 data-rating={motel.rating}
                 data-price-range={motel.priceRange}
                 data-has-amenities={motel.amenities.length > 3 ? "true" : "false"}
@@ -343,6 +343,7 @@ const schemaEnrichment = {
                     {motel.short_name ? (
                       <a 
                         href={`/moteles/${motel.short_name}`}
+                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >
                         Ver Habitaciones
@@ -351,6 +352,7 @@ const schemaEnrichment = {
                     ) : motel.menu ? (
                       <a 
                         href={motel.menu} 
+                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="inline-block w-full text-center py-2 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
                       >
                         Ver Información
@@ -358,6 +360,7 @@ const schemaEnrichment = {
                     ) : motel.phone ? (
                       <a 
                         href={`tel:${motel.phone}`}
+                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >
                         <Phone className="mr-2 w-4 h-4" />
