@@ -12,7 +12,6 @@ import type { Place } from "../../../../../types/app";
 
 const motelesData: Place[] = await getRestaurants({ type: 'motel' });
 const states = await getStates();
-console.log(states)
 const motelesList: Place[] = motelesData.map((motel) => ({
   id: motel.id,
   name: motel.name,
@@ -339,7 +338,16 @@ const schemaEnrichment = {
                         <p class="text-pink-300 text-sm">⭐ <strong>Destacado:</strong> Excelente opción recomendada por nuestros usuarios.</p>
                       )}
                     </div>
-                    
+                    {motel.short_name && (
+                      <a 
+                        href={`/moteles/${motel.short_name}`}
+                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
+                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                      >
+                        Ver Habitaciones
+                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    )}
                     {/* Mostrar teléfono si existe */}
                     {motel.phone && (
                       <div class="flex items-center mt-3">

@@ -65,7 +65,7 @@ export interface Restaurant {
 }
 
 // Función para obtener todas las cafeterías
-export async function getRestaurants({type}: {type: string | null}) {
+export async function getRestaurants({type, state_id}: {type: string | null, state_id?: number}) {
 
   let query = supabase
     .from('places')
@@ -73,6 +73,10 @@ export async function getRestaurants({type}: {type: string | null}) {
 
   if (type){
     query = query.eq('type', type);
+  }
+
+  if (state_id) {
+    query = query.eq('state_id', state_id);
   }
 
   const { data, error } = await query

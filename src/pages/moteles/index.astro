@@ -312,7 +312,7 @@ const schemaEnrichment = {
                       <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
                       <span class="text-sm text-gray-300">{motel.priceRange}</span>
                     </div>
-                    
+               
                     {/* Mostrar especialidades si existen */}
                     {motel.specialties && motel.specialties.length > 0 && (
                       <div class="flex flex-wrap gap-2 mb-4">
@@ -323,7 +323,7 @@ const schemaEnrichment = {
                         ))}
                       </div>
                     )}
-                    
+                     
                     {/* Tip personalizado según el motel */}
                     <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-3 mb-4">
                       {motel.name === "Motel Love" && (
@@ -339,7 +339,16 @@ const schemaEnrichment = {
                         <p class="text-pink-300 text-sm">⭐ <strong>Destacado:</strong> Excelente opción recomendada por nuestros usuarios.</p>
                       )}
                     </div>
-                    
+                    {motel.short_name && (
+                      <a 
+                        href={`/moteles/${motel.short_name}`}
+                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
+                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                      >
+                        Ver Habitaciones
+                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    )}
                     {/* Mostrar teléfono si existe */}
                     {motel.phone && (
                       <div class="flex items-center mt-3">
@@ -501,9 +510,9 @@ const schemaEnrichment = {
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles por Estado</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {states.map(state =>(
+              {states.slice(0, 6).map(state =>(
                 <Card 
-                  href={`/moteles?estado=${state.slug}`}
+                  href={`/moteles/estados/${state.slug}`}
                   title={state.name}
                   bgColor="bg-[#2A2A2A]"
                   textColor="text-pink-300"
@@ -513,6 +522,17 @@ const schemaEnrichment = {
                 />
               ))}
             </div>
+            
+            {states.length > 6 && (
+              <div class="text-center mt-8">
+                <a 
+                  href="/moteles/estados"
+                  class="inline-block px-8 py-3 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
+                >
+                  Ver todos los estados
+                </a>
+              </div>
+            )}
           </div>
 
           <!-- Guía de precios y consejos -->
