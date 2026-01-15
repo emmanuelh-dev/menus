@@ -83,6 +83,18 @@ export async function getRestaurants({type}: {type: string | null}) {
   return data as Place[];
 }
 
+export async function getStates(){
+  const { data, error } = await supabase
+    .from('states')
+    .select('*')
+  
+  if (error) {
+    console.error('Error fetching states:', error);
+    return [];
+  }
+  
+  return data;
+}
 // Función para obtener cafeterías destacadas
 export async function getCafeteriasDestacadas() {
   const { data, error } = await supabase
