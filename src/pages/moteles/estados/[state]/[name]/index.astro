@@ -1,673 +1,261 @@
 ---
 export const prerender = false;
+const { name } = Astro.params;
 
-import { Image } from "astro:assets";
+import RestaurantLayout from "../../../../../layouts/RestaurantLayout.astro";
+import Gallery from "../../../../../components/Gallery.astro";
+import WhatsappButton from "../../../../../components/WhatsappButton";
+import CopyClabe from "../../../../../components/CopyClabe";
+import { getRestaurantByName, supabase } from "../../../../../lib/supabase";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
-import MotelBusinessSchema from "../../../../../components/MotelBusinessSchema.astro";
-import MotelBreadcrumbSchema from "../../../../../components/MotelBreadcrumbSchema.astro";
-import Card from "../../../../../components/Card.astro";
-import { getRestaurants, getStates } from "../../../../../lib/supabase";
-import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
-import type { Place } from "../../../../../types/app";
 
-const motelesData: Place[] = await getRestaurants({ type: 'motel' });
-const states = await getStates();
-const motelesList: Place[] = motelesData.map((motel) => ({
-  id: motel.id,
-  name: motel.name,
-  short_name: motel.short_name,
-  rating: motel.rating || 4.0,
-  reviewCount: motel.reviewCount || 0,
-  priceRange: motel.priceRange || "$$",
-  address: motel.address || "",
-  hours: motel.hours || "24 horas",
-  amenities: motel.amenities || [],
-  image: motel.image,
-  menu: motel.menu,
-  distance: motel.distance,
-  closed: motel.closed,
-  openingTime: motel.openingTime,
-  specialties: [],
-  featured: motel.featured,
-  phone: undefined,
-  type: motel.type,
-  destacado: motel.featured
-}));
+if (!name) {
+	throw new Error("No se ha especificado el nombre del restaurante");
+}
+const { data: place } = await supabase
+	.from("places")
+	.select("*")
+	.eq("short_name", name)
+	.single();
 
-const url = new URL(Astro.request.url);
-const zona = url.searchParams.get('zona') || undefined;
-const tipo = url.searchParams.get('tipo') || undefined;
+const { blocks = [], view_settings = {} } = place.content || {};
 
-const getDynamicSEO = () => {
-  const baseTitle = "Mejores Moteles en Monterrey 2026";
-  const baseDescription = "Guía completa de moteles en Monterrey";
-  const baseKeywords = ["moteles monterrey", "motel monterrey"];
-  const baseUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : Astro.url.toString();
-
-  // SEO por zona específica
-  if (zona) {
-    switch (zona.toLowerCase()) {
-      case 'centro':
-        return {
-          title: `Moteles en Centro de Monterrey 2026 | Hotel Los Angeles y Más`,
-          description: `Mejores moteles en el centro de Monterrey. Hotel Los Angeles, opciones económicas y ubicación céntrica. Guía completa con precios.`,
-          keywords: [...baseKeywords, "moteles en el centro de monterrey", "motel en monterrey centro", "moteles centro monterrey", "hotel los angeles monterrey"],
-          heading: "Moteles en Centro de Monterrey",
-          subheading: "Los mejores moteles en el corazón de la ciudad",
-          canonical: `${baseUrl}?zona=centro`,
-          ogUrl: `${baseUrl}?zona=centro`
-        };
-      
-      case 'universidad':
-        return {
-          title: `Moteles cerca de Universidad Monterrey 2026 | Motel Love Recomendado`,
-          description: `Moteles cerca de Universidad en Monterrey. Motel Love (favorito del autor), opciones premium y ubicación conveniente. Precios y horarios.`,
-          keywords: [...baseKeywords, "motel cerca universidad monterrey", "motel love monterrey", "moteles universidad"],
-          heading: "Moteles cerca de Universidad",
-          subheading: "Opciones premium cerca de la zona universitaria",
-          canonical: `${baseUrl}?zona=universidad`,
-          ogUrl: `${baseUrl}?zona=universidad`
-        };
-        
-      case 'cumbres':
-        return {
-          title: `Moteles en Cumbres Monterrey 2026 | Hacienda Cumbres y Más`,
-          description: `Moteles en zona Cumbres, Monterrey. Motel Hacienda Cumbres, opciones de lujo y privacidad. Guía con precios actualizados.`,
-          keywords: [...baseKeywords, "moteles cumbres monterrey", "motel hacienda cumbres", "moteles zona cumbres"],
-          heading: "Moteles en Cumbres",
-          subheading: "Opciones premium en la zona más exclusiva",
-          canonical: `${baseUrl}?zona=cumbres`,
-          ogUrl: `${baseUrl}?zona=cumbres`
-        };
-    }
-  }
-
-  // SEO por tipo de motel
-  if (tipo) {
-    switch (tipo.toLowerCase()) {
-      case 'baratos':
-        return {
-          title: `Moteles Baratos en Monterrey 2026 | Desde $300 por 4 Horas`,
-          description: `Moteles baratos en Monterrey con los mejores precios. Hotel White, Grand Motel y más opciones económicas. Guía de precios 2026.`,
-          keywords: [...baseKeywords, "moteles baratos en monterrey", "motel barato monterrey", "moteles economicos monterrey", "moteles precio bajo"],
-          heading: "Moteles Baratos en Monterrey",
-          subheading: "Las mejores opciones económicas sin sacrificar calidad",
-          canonical: `${baseUrl}?tipo=baratos`,
-          ogUrl: `${baseUrl}?tipo=baratos`
-        };
-      
-      case 'jacuzzi':
-        return {
-          title: `Moteles con Jacuzzi en Monterrey 2026 | Marbella, Canarias y Más`,
-          description: `Moteles con jacuzzi en Monterrey. Motel Marbella, Canarias y opciones de lujo con jacuzzi privado. Precios y ubicaciones.`,
-          keywords: [...baseKeywords, "motel con jacuzzi monterrey", "moteles con jacuzzi en monterrey", "motel jacuzzi privado", "moteles lujo jacuzzi"],
-          heading: "Moteles con Jacuzzi en Monterrey",
-          subheading: "Experiencia de lujo con jacuzzi privado",
-          canonical: `${baseUrl}?tipo=jacuzzi`,
-          ogUrl: `${baseUrl}?tipo=jacuzzi`
-        };
-        
-      case '12-horas':
-        return {
-          title: `Moteles de 12 Horas en Monterrey 2026 | Hotel White y Más`,
-          description: `Moteles con estancia de 12 horas en Monterrey. Hotel White y opciones para escapadas largas. Precios especiales para 12 horas.`,
-          keywords: [...baseKeywords, "motel 12 horas monterrey", "motel de 12 horas en monterrey", "estancia larga motel"],
-          heading: "Moteles de 12 Horas",
-          subheading: "Escapadas largas con los mejores precios",
-          canonical: `${baseUrl}?tipo=12-horas`,
-          ogUrl: `${baseUrl}?tipo=12-horas`
-        };
-    }
-  }
-
-  // SEO por defecto optimizado
-  return {
-    title: baseTitle + " | Motel Love, Kyoto y Más",
-    description: baseDescription + ". Encuentra moteles baratos, con jacuzzi y los mejores de la ciudad. Motel Love (recomendado), Kyoto Suites, Marbella y más. Precios, ubicaciones y recomendaciones actualizadas.",
-    keywords: [
-      ...baseKeywords,
-      "moteles baratos en monterrey",
-      "motel con jacuzzi monterrey", 
-      "mejores moteles en monterrey",
-      "moteles con jacuzzi en monterrey",
-      "motel en monterrey centro",
-      "moteles en el centro de monterrey",
-      "moteles mty",
-      "moteles en mty",
-      "mejores moteles monterrey",
-      "motel barato monterrey",
-      "motel de 12 horas en monterrey",
-      "kyoto motel mty",
-      "kyoto suites monterrey",
-      "grand motel monterrey",
-      "marbella motel monterrey",
-      "motel love monterrey"
-    ],
-    heading: "Mejores Moteles en Monterrey 2026",
-    subheading: "Encuentra el lugar perfecto para tu escapada romántica en la ciudad",
-    canonical: baseUrl,
-    ogUrl: baseUrl
-  };
-};
-
-const seoData = getDynamicSEO();
-
-// Configuración para Schema.org
-const schemaEnrichment = {
-  address: {
-    addressLocality: "Monterrey",
-    addressRegion: "Nuevo León", 
-    addressCountry: "MX",
-  },
-};
-
+const address = place.content?.semantic_data?.address || place.address || "";
+const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
+const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
 
-<MotelLayout 
-  title={seoData.title}
-  description={seoData.description}
-  schemaEnrichment={schemaEnrichment}
-  backgroundColor="bg-gradient-to-r from-[#4a5568] to-[#553c7b]"
-  textWhite={true}
-  canonical={seoData.canonical}
-  ogUrl={seoData.ogUrl}
-><!-- Motel Business Structured Data -->
-  <MotelBusinessSchema moteles={motelesList} />
-  
-  <!-- Breadcrumb Structured Data -->
-  <MotelBreadcrumbSchema zona={zona} tipo={tipo} />
+<MotelLayout
+  place={place}
+	image={place.image ? place.image : "/placeholder.svg"}
+	backgroundColor="bg-[#0A0A0A]"
+>
+	<div
+		class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white"
+	>
+		<div class="max-w-3xl mx-auto px-6 py-24">
+			{/* Header Sensual y Nocturno */}
+			<header class="mb-24 flex flex-col items-center">
+				<div class="relative mb-8">
+					<img
+						src={place.image}
+						alt={place.name}
+						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
+					/>
+				</div>
+				<h1
+					class="text-5xl text-center font-light tracking-tighter serif italic mb-2 text-balance"
+				>
+					{place.name}
+				</h1>
+				<p
+					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-balance text-center"
+				>
+					{
+						place?.content?.semantic_data?.description ||
+							place?.description ||
+							place.name
+					}
+				</p>
+				{
+					address && (
+						<div class="space-y-1">
+							<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold text-center">
+								Ubicación
+							</p>
+							<a
+								href={googleMapsUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-center text-lg text-stone-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 group"
+                >
+								{address}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="size-3 opacity-50 group-hover:opacity-100 transition-opacity"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+									/>
+								</svg>
+							</a>
+						</div>
+					)
+				}
+				{
+					place.content?.semantic_data && (
+						<div class="w-full mx-auto max-w-lg space-y-4 text-center mb-8">
+							{place.content.semantic_data.price_range && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Precios
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.price_range}
+									</p>
+								</div>
+							)}
 
-<main>
-    <section class="relative overflow-hidden">
-        <!-- Background Image with Overlay -->
-        <div class="absolute inset-0 bg-cover bg-center bg-gradient-to-r from-[#4a5568] to-[#553c7b]"></div>
-          <!-- Content -->
-        <div class="relative z-10 max-w-6xl mx-auto px-4 py-24 md:py-32 text-center">
-            <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">💕 Romance & Privacidad</span>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">{seoData.heading}</h1>
-            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">{seoData.subheading}</p>
-            <p class="text-lg text-white/80 max-w-2xl mx-auto">Guía completa de moteles en Monterrey con ubicaciones verificadas, horarios actualizados y recomendaciones personales. Incluye opciones desde $300 hasta moteles de lujo.</p>
-        </div>
+							{place.content.semantic_data.parking && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Estacionamiento
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.parking}
+									</p>
+								</div>
+							)}
 
-    </section>
+							{place.content.semantic_data.hours && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Horarios
+									</p>
+									<p class="text-sm text-stone-600 whitespace-pre-line">
+										{place.content.semantic_data.hours}
+									</p>
+								</div>
+							)}
 
-    <section class="min-h-screen bg-black text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <!-- Filtros interactivos -->
-          <div class="mb-12 space-y-4">
-            <!-- Filtros principales -->
-            <div class="flex flex-wrap justify-center gap-4">
-              <button id="filter-all" class="filter-btn px-6 py-2 bg-pink-500 text-white rounded-full font-serif hover:bg-pink-400 transition-colors" data-filter="all">Todos</button>
-              <button id="filter-premium" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="premium">Premium</button>
-              <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="rated">Mejor calificados</button>
-              <button id="filter-amenities" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="amenities">Con amenidades</button>
-            </div>
-            
-            <!-- Filtros por tipo/características -->
-            <div class="flex flex-wrap justify-center gap-3 text-sm">
-              <Card 
-                href="?tipo=baratos"
-                title="💰 Moteles Baratos"
-                bgColor="bg-green-900/30"
-                textColor="text-green-400"
-                borderColor="border-green-500/30"
-                hoverBgColor="hover:bg-green-500"
-              />
-              <Card 
-                href="?tipo=jacuzzi"
-                title="🛁 Con Jacuzzi"
-                bgColor="bg-blue-900/30"
-                textColor="text-blue-400"
-                borderColor="border-blue-500/30"
-                hoverBgColor="hover:bg-blue-500"
-              />
-              <Card 
-                href="?tipo=12-horas"
-                title="⏰ 12 Horas"
-                bgColor="bg-purple-900/30"
-                textColor="text-purple-400"
-                borderColor="border-purple-500/30"
-                hoverBgColor="hover:bg-purple-500"
-              />
-              <Card 
-                href="?zona=centro"
-                title="🏛️ Centro"
-                bgColor="bg-orange-900/30"
-                textColor="text-orange-400"
-                borderColor="border-orange-500/30"
-                hoverBgColor="hover:bg-orange-500"
-              />
-              <Card 
-                href="?zona=universidad"
-                title="🎓 Universidad"
-                bgColor="bg-yellow-900/30"
-                textColor="text-yellow-400"
-                borderColor="border-yellow-500/30"
-                hoverBgColor="hover:bg-yellow-500"
-              />
-              <Card 
-                href="?zona=cumbres"
-                title="🏔️ Cumbres"
-                bgColor="bg-indigo-900/30"
-                textColor="text-indigo-400"
-                borderColor="border-indigo-500/30"
-                hoverBgColor="hover:bg-indigo-500"
-              />
-            </div>
-          </div>
+							{place.content.semantic_data.phone && (
+								<div class="space-y-1">
+									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+										Teléfono
+									</p>
+									<p class="text-sm text-stone-600">
+										{place.content.semantic_data.phone}
+									</p>
+								</div>
+							)}
 
-          <!-- Recomendación personal del autor -->
-          <div class="mb-12 bg-gradient-to-r from-pink-900/50 to-purple-900/50 rounded-xl p-6 border border-pink-500/20">
-            <div class="flex items-start gap-4">
-              <div class="flex-shrink-0">
-                <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center">
-                  <span class="text-white font-bold text-lg">👤</span>
-                </div>
-              </div>
-              <div>
-                <h3 class="text-xl font-bold text-pink-300 mb-2">Recomendación Personal del Autor</h3>
-                <p class="text-gray-300 mb-3">
-                  Mi favorito personal es el <strong class="text-pink-300">Motel Love</strong>, que está cerca de Universidad. 
-                  Es tan bueno que a veces hay mucha fila, así que hay que llegar con tiempo. 
-                  La experiencia vale totalmente la pena: excelentes instalaciones, privacidad garantizada y un servicio de primera.
-                </p>
-                <div class="flex items-center gap-2 text-sm text-pink-400">
-                  <Star className="w-4 h-4 fill-current" />
-                  <span>Recomendación especial del equipo</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-20 mb-16">
-            <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles Destacados</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {motelesList.filter(motel => motel.featured === true).map(motel => (
-                <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
-                  <div class="md:w-2/5 relative">
-                    <img
-                      src={motel.image || '/motel.png'} 
-                      alt={motel.name}
-                      width={400}
-                      height={500}
-                      class="w-full h-full object-cover"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
-                    <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
-                      <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
-                        <Star className="w-4 h-4 text-pink-400 inline mr-1" />
-                        <span class="text-sm font-medium text-white">{motel.rating} ({motel.reviewCount})</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="md:w-3/5 p-6">
-                    <h3 class="font-serif text-2xl font-bold text-pink-400 mb-2">{motel.name}</h3>
-                    <p class="text-gray-300 mb-4">{motel.address}</p>
-                    <div class="flex items-center mb-2">
-                      <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                      <span class="text-sm text-gray-300">{motel.address}</span>
-                    </div>
-                    <div class="flex items-center mb-4">
-                      <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                      <span class="text-sm text-gray-300">{motel.priceRange}</span>
-                    </div>
-                    
-                    {/* Mostrar especialidades si existen */}
-                    {motel.specialties && motel.specialties.length > 0 && (
-                      <div class="flex flex-wrap gap-2 mb-4">
-                        {motel.specialties.map(specialty => (
-                          <span class="text-xs bg-pink-900/30 text-pink-300 px-2 py-1 rounded-full border border-pink-500/30">
-                            {specialty}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Tip personalizado según el motel */}
-                    <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-3 mb-4">
-                      {motel.name === "Motel Love" && (
-                        <p class="text-pink-300 text-sm">💡 <strong>Tip:</strong> Llega con tiempo, especialmente los fines de semana, ya que suele haber fila por su alta demanda.</p>
-                      )}
-                      {motel.name === "Motel Marbella" && (
-                        <p class="text-pink-300 text-sm">🛁 <strong>Tip:</strong> Perfecto para ocasiones especiales con jacuzzi privado y amenidades de lujo.</p>
-                      )}
-                      {motel.name === "Motel Niu" && (
-                        <p class="text-pink-300 text-sm">✨ <strong>Tip:</strong> Destacado por su limpieza excepcional y excelente servicio al cliente.</p>
-                      )}
-                      {!["Motel Love", "Motel Marbella", "Motel Niu"].includes(motel.name) && (
-                        <p class="text-pink-300 text-sm">⭐ <strong>Destacado:</strong> Excelente opción recomendada por nuestros usuarios.</p>
-                      )}
-                    </div>
-                    {motel.short_name && (
-                      <a 
-                        href={`/moteles/${motel.short_name}`}
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
-                      >
-                        Ver Habitaciones
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </a>
-                    )}
-                    {/* Mostrar teléfono si existe */}
-                    {motel.phone && (
-                      <div class="flex items-center mt-3">
-                        <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                        <a href={`tel:${motel.phone}`} class="text-sm text-pink-400 hover:text-pink-300 transition-colors">
-                          {motel.phone}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <!-- Grid de moteles con diseño creativo -->
-          <div id="moteles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {motelesList.sort((a, b) => {
-              if (a.featured !== b.featured) {
-                  return a.featured ? -1 : 1; 
-              }
-              return b.rating - a.rating;
-            }).sort((a,b) => a.featured < b.featured ? 1 : -1).map((motel) => (
-              <div 
-                class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${motel.highlight ? '  bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
-                data-rating={motel.rating}
-                data-price-range={motel.priceRange}
-                data-has-amenities={motel.amenities.length > 3 ? "true" : "false"}
-              >
-                <!-- Imagen con overlay -->
-                <div class="relative h-48 overflow-hidden">
-                  <img
-                    src={motel.image || '/motel.png'} 
-                    alt={motel.name}
-                    width={500}
-                    height={300}
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
-                  
-                  <!-- Calificación y precio -->
-                  <div class="absolute bottom-3 left-3 flex items-center space-x-2">
-                    <div class="flex items-center bg-black/90 px-2 py-1 rounded-full">
-                      <Star className="w-4 h-4 text-pink-400 mr-1" />
-                      <span class="text-sm font-medium text-white">{motel.rating}</span>
-                      <span class="text-xs text-gray-400 ml-1">({motel.reviewCount})</span>
-                    </div>
-                    <div class="bg-black/90 px-2 py-1 rounded-full">
-                      <span class="text-sm font-medium text-white">{motel.priceRange}</span>
-                    </div>
-                  </div>
-    
-                  <!-- Destacado -->
-                  {motel.highlight && (
-                    <div class="absolute top-3 left-3 bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-semibold animate-pulse">
-                      ⭐ Recomendado
-                    </div>
-                  )}
-                </div>
-    
-                <!-- Contenido de la tarjeta -->
-                <div class="p-5">
-                  <h3 class="font-serif text-xl font-bold text-pink-400 mb-2 group-hover:text-pink-300 transition-colors">
-                    {motel.name}
-                  </h3>
-    
-                  <!-- Estado (24 horas) -->
-                  <div class="flex items-center mb-3">
-                    <Clock className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-green-400">Abierto 24 horas</span>
-                  </div>                  <!-- Dirección -->
-                  <div class="flex items-start mb-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
-                    <div class="flex flex-col">
-                      <span class="text-sm text-gray-300">{motel.address}</span>
-                    </div>
-                  </div>
+							{place.content.semantic_data.payment_options &&
+								place.content.semantic_data.payment_options.length > 0 && (
+									<div class="space-y-1">
+										<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
+											Métodos de Pago
+										</p>
+										<p class="text-sm text-stone-600">
+											{place.content.semantic_data.payment_options.join(", ")}
+										</p>
+									</div>
+								)}
+						</div>
+					)
+				}
 
-                  <!-- Teléfono -->
-                  {motel.phone && (
-                    <div class="flex items-center mb-3">
-                      <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                      <a href={`tel:${motel.phone}`} class="text-sm text-pink-400 hover:text-pink-300 transition-colors">
-                        {motel.phone}
-                      </a>
-                    </div>
-                  )}
-    
-                  <!-- Especialidades -->
-                  <div class="flex flex-wrap gap-2 mt-3 mb-3">
-                    {motel.specialties && motel.specialties.map((specialty) => (
-                      <span class="text-xs bg-[#2A2A2A] text-pink-400 px-2 py-1 rounded-full">{specialty}</span>
-                    ))}
-                  </div>
-    
-                  <!-- Amenidades disponibles con iconos -->
-                  <div class="grid grid-cols-2 gap-2 mt-4">
-                    {motel.amenities && motel.amenities.slice(0, 6).map((amenity) => (
-                      <div class="flex items-center text-xs text-gray-300">
-                        {amenity.toLowerCase().includes('wifi') && <Wifi className="w-3 h-3 mr-1 text-blue-400" />}
-                        {amenity.toLowerCase().includes('estacionamiento') && <Car className="w-3 h-3 mr-1 text-green-400" />}
-                        {amenity.toLowerCase().includes('aire') && <Snowflake className="w-3 h-3 mr-1 text-cyan-400" />}
-                        {amenity.toLowerCase().includes('alberca') && <Waves className="w-3 h-3 mr-1 text-blue-400" />}
-                        {amenity.toLowerCase().includes('restaurante') && <Utensils className="w-3 h-3 mr-1 text-orange-400" />}
-                        {amenity.toLowerCase().includes('bar') && <Martini className="w-3 h-3 mr-1 text-purple-400" />}
-                        <span class="truncate">{amenity}</span>
-                      </div>
-                    ))}
-                  </div>
-    
-                  <!-- Información adicional -->
-                  {motel.distance && (
-                    <div class="mt-3 p-2 bg-[#2A2A2A] rounded-lg">
-                      <p class="text-xs text-yellow-400">ℹ️ {motel.distance}</p>
-                    </div>
-                  )}
-    
-                  <!-- Botón de acción -->
-                  <div class="mt-5">
-                    {motel.short_name ? (
-                      <a 
-                        href={`/moteles/${motel.short_name}`}
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
-                      >
-                        Ver Habitaciones
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </a>
-                    ) : motel.menu ? (
-                      <a 
-                        href={motel.menu} 
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="inline-block w-full text-center py-2 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
-                      >
-                        Ver Información
-                      </a>
-                    ) : motel.phone ? (
-                      <a 
-                        href={`tel:${motel.phone}`}
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
-                      >
-                        <Phone className="mr-2 w-4 h-4" />
-                        Llamar ahora
-                      </a>
-                    ) : (
-                      <button 
-                        class="w-full py-2 bg-[#2A2A2A] text-pink-400 rounded-lg font-serif hover:bg-[#3A3A3A] transition-colors"
-                      >
-                        Más Información
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-    
-          <div class="mt-20 mb-16">
-            <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles por Estado</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {states.map(state =>(
-                <Card 
-                  href={`/moteles?estado=${state.slug}`}
-                  title={state.name}
-                  bgColor="bg-[#2A2A2A]"
-                  textColor="text-pink-300"
-                  borderColor="border-pink-500/20"
-                  hoverBgColor="hover:bg-pink-900/30"
-                  className="text-center font-serif"
-                />
-              ))}
-            </div>
-          </div>
+				<div class="h-[1px] w-12 bg-stone-200"></div>
+			</header>
 
-          <!-- Guía de precios y consejos -->
-          <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-pink-500/20">
-            <h2 class="text-2xl md:text-3xl font-serif font-bold text-pink-400 mb-6 text-center">Guía de Precios y Consejos</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 class="text-xl font-semibold text-pink-300 mb-4">💰 Rangos de Precios</h3>
-                <ul class="space-y-2 text-gray-300">
-                  <li><span class="text-green-400">$</span> - $300-450 por 4 horas</li>
-                  <li><span class="text-yellow-400">$$</span> - $450-600 por 4 horas</li>
-                  <li><span class="text-orange-400">$$$</span> - $600-800 por sesión</li>
-                  <li><span class="text-red-400">$$$$</span> - $800+ por sesión premium</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 class="text-xl font-semibold text-pink-300 mb-4">💡 Consejos Útiles</h3>
-                <ul class="space-y-2 text-gray-300 text-sm">
-                  <li>• Los fines de semana suele haber más demanda</li>
-                  <li>• Algunos moteles permiten reservaciones entre semana</li>
-                  <li>• Verifica las amenidades antes de llegar</li>
-                  <li>• Los precios pueden variar según la temporada</li>
-                  <li>• Lleva efectivo, no todos aceptan tarjeta</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+			{/* Suites y Servicios */}
+			<div class="space-y-32">
+				{
+					blocks.map((block) => {
+						if (block.type === "section") {
+							return (
+								<section class="relative">
+									<div class="sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 py-6 mb-16">
+										<h2 class="text-3xl font-light serif italic text-white tracking-tight">
+											{block.data.title}
+										</h2>
+									</div>
 
-          <!-- FAQ Section para SEO -->
-          <div class="mt-16 bg-[#1E1E1E] rounded-xl p-8 shadow-md border border-pink-500/20">
-            <h2 class="text-3xl font-serif font-bold text-pink-400 mb-8 text-center">Preguntas Frecuentes sobre Moteles en Monterrey</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
-                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Cuáles son los mejores moteles en Monterrey?</h3>
-                <p class="text-gray-300">Los mejores moteles incluyen Motel Love (cerca de Universidad), Kyoto Suites Monterrey con cocheras privadas, y Motel Marbella por sus amenidades de lujo. También destacan ATM Motel y Motel Señorial.</p>
-              </div>
+									<div class="space-y-20">
+										{block.data.image && (
+											<div class="overflow-hidden rounded-sm group">
+												<img
+													src={block.data.image}
+													alt={block.data.title}
+													class="w-full h-80 object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
+												/>
+											</div>
+										)}
 
-              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
-                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Dónde encontrar moteles baratos en Monterrey?</h3>
-                <p class="text-gray-300">Para moteles económicos recomendamos Hotel White (desde $300 por 12 horas), Grand Motel en zona Treviño, y Super Motel en Rangel Frías. Todos ofrecen excelente relación calidad-precio.</p>
-              </div>
+										<div class="grid gap-y-16">
+											{block.data.items?.map((item) => (
+												<div class="space-y-8">
+													<div class="group flex flex-col md:flex-row gap-8 items-center md:items-start transition-colors duration-500">
+														<div class="w-full">
+															<div class="flex justify-between items-baseline mb-3">
+																<h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
+																	{item.name}
+																</h3>
+																<div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block" />
+																<span class="text-xl font-light text-stone-500">
+																	{view_settings.show_prices &&
+																		`$${item.price}`}
+																</span>
+															</div>
+															<p class="text-stone-500 text-sm font-light leading-relaxed mb-4 text-balance">
+																{item.description}
+															</p>
+															{item.features && item.features.length > 0 && (
+																<div class="flex flex-wrap gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
+																	{item.features.map((feature, idx) => (
+																		<>
+																			<span>{feature}</span>
+																			{idx < item.features.length - 1 && (
+																				<span>•</span>
+																			)}
+																		</>
+																	))}
+																</div>
+															)}
+														</div>
 
-              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
-                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Qué moteles tienen jacuzzi en Monterrey?</h3>
-                <p class="text-gray-300">Motel Marbella, Motel Canarias y varios moteles premium ofrecen jacuzzi privado. Los precios van desde $600-800 por sesión, perfectos para una experiencia romántica especial.</p>
-              </div>
+														{item.image && item.image.trim() !== "" && (
+															<div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
+																<img
+																	src={item.image}
+																	alt={item.name}
+																	class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
+																/>
+															</div>
+														)}
+													</div>
 
-              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
-                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Cuáles son los moteles en el centro de Monterrey?</h3>
-                <p class="text-gray-300">En el centro destacan Hotel Los Angeles (Centro Histórico) y opciones cerca de la zona céntrica. También hay buenas opciones en Barrio Antiguo y zonas aledañas al centro.</p>
-              </div>
+													{item.gallery && item.gallery.length > 0 && (
+														<Gallery
+															images={item.gallery}
+															buttonClasses="bg-white/5 text-white border border-white/10 px-6 py-2 rounded-sm hover:bg-white/10 transition-all uppercase text-[9px] tracking-widest"
+														/>
+													)}
+												</div>
+											))}
+										</div>
+									</div>
+								</section>
+							);
+						}
 
-              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
-                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Cómo son los precios de moteles en Monterrey?</h3>
-                <p class="text-gray-300">Los precios van desde $300-450 por 4 horas (económicos), $450-600 (estándar), $600-800 (premium) hasta $800+ para opciones de lujo. Los fines de semana pueden tener ligeros incrementos.</p>
-              </div>
+						if (block.type === "gallery") {
+							return (
+								<div class="py-20 border-y border-white/5">
+									<p class="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-12">
+										Instalaciones
+									</p>
+									<Gallery
+										images={block.data.images || []}
+										buttonClasses="bg-white/5 text-white border border-white/10 px-8 py-3 rounded-sm hover:bg-white/10 transition-all uppercase text-[10px] tracking-widest"
+									/>
+								</div>
+							);
+						}
+					})
+				}
+			</div>
 
-              <div class="bg-[#2A2A2A] rounded-lg p-6 shadow-sm">
-                <h3 class="text-xl font-serif font-bold text-pink-300 mb-3">¿Qué motel recomienda el autor?</h3>
-                <p class="text-gray-300">El favorito personal es Motel Love cerca de Universidad. Aunque a veces hay fila por su popularidad, ofrece excelentes instalaciones, privacidad garantizada y un servicio de primera calidad.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sección de registro de motel -->
-          <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-pink-500/20">
-            <h2 class="text-2xl md:text-3xl font-serif font-bold text-pink-400 mb-4 text-center">¿Tienes un motel?</h2>
-            <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">Registra tu motel en nuestra plataforma y muestra tus servicios a miles de personas que buscan el lugar perfecto para su escapada romántica.</p>
-            <div class="text-center">
-              <a 
-                href="/contact" 
-                class="inline-block px-8 py-3 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
-              >
-                Registrar mi Motel
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-</main>
+			<footer class="mt-40 pb-20 text-center">
+				<p class="text-[10px] text-stone-600 uppercase tracking-[0.5em]">
+					Privacy Guaranteed • {place.name} • 2026
+				</p>
+			</footer>
+		</div>
+	</div>
 </MotelLayout>
-
-<script>
-// Funcionalidad de filtros
-document.addEventListener('DOMContentLoaded', function() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  const motelCards = document.querySelectorAll('.motel-card');
-
-  filterButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const filter = this.getAttribute('data-filter');
-      
-      // Actualizar botones activos
-      filterButtons.forEach(btn => {
-        btn.classList.remove('bg-pink-500', 'text-white');
-        btn.classList.add('bg-[#1E1E1E]', 'text-gray-300');
-      });
-      
-      this.classList.remove('bg-[#1E1E1E]', 'text-gray-300');
-      this.classList.add('bg-pink-500', 'text-white');
-
-      // Filtrar tarjetas
-      motelCards.forEach(card => {
-        let shouldShow = true;
-
-        if (filter === 'premium') {
-          const priceRange = card.getAttribute('data-price-range');
-          shouldShow = priceRange === '$$$$' || priceRange === '$$$';
-        } else if (filter === 'rated') {
-          const ratingAttr = card.getAttribute('data-rating');
-          const rating = ratingAttr ? parseFloat(ratingAttr) : 0;
-          shouldShow = rating >= 4.3;
-        } else if (filter === 'amenities') {
-          const hasAmenities = card.getAttribute('data-has-amenities') === 'true';
-          shouldShow = hasAmenities;
-        }
-
-        if (shouldShow) {
-          (card as HTMLElement).style.display = 'block';
-          (card as HTMLElement).style.opacity = '1';
-        } else {
-          (card as HTMLElement).style.display = 'none';
-          (card as HTMLElement).style.opacity = '0';
-        }
-      });
-    });
-  });
-});
-</script>
-
-<style>
-  .motel-card {
-    transition: all 0.3s ease;
-  }
-  
-  .motel-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .filter-btn {
-    transition: all 0.3s ease;
-  }
-
-  .font-serif {
-    font-family: "Playfair Display", serif;
-  }
-</style>

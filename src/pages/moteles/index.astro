@@ -12,7 +12,6 @@ import type { Place } from "../../types/app";
 
 const motelesData: Place[] = await getRestaurants({ type: 'motel' });
 const states = await getStates();
-console.log(states)
 const motelesList: Place[] = motelesData.map((motel) => ({
   id: motel.id,
   name: motel.name,
