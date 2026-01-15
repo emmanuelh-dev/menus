@@ -1,5 +1,11 @@
 ---
 export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, s-maxage=3600, stale-while-revalidate=3600'
+);
+
 const { name } = Astro.params;
 
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";

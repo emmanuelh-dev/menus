@@ -1,11 +1,18 @@
 ---
 export const prerender = false;
 
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, s-maxage=3600, stale-while-revalidate=3600'
+);
+
+
 import { Image } from "astro:assets";
 import MotelLayout from "../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
 import Card from "../../components/Card.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { getRestaurants, getStates } from "../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
 import type { Place } from "../../types/app";
@@ -152,6 +159,34 @@ const getDynamicSEO = () => {
 
 const seoData = getDynamicSEO();
 
+// Generar breadcrumbs dinámicos
+const getBreadcrumbs = () => {
+  const breadcrumbs = [
+    { label: 'Inicio', href: '/' },
+    { label: 'Moteles', href: '/moteles' }
+  ];
+
+  if (zona) {
+    const zonaLabels = {
+      'centro': 'Centro',
+      'universidad': 'Universidad',
+      'cumbres': 'Cumbres'
+    };
+    breadcrumbs.push({ label: zonaLabels[zona.toLowerCase()] || zona } as any);
+  } else if (tipo) {
+    const tipoLabels = {
+      'baratos': 'Moteles Baratos',
+      'jacuzzi': 'Con Jacuzzi',
+      '12-horas': '12 Horas'
+    };
+    breadcrumbs.push({ label: tipoLabels[tipo.toLowerCase()] || tipo } as any);
+  }
+
+  return breadcrumbs;
+};
+
+const breadcrumbItems = getBreadcrumbs();
+
 // Configuración para Schema.org
 const schemaEnrichment = {
   address: {
@@ -193,6 +228,9 @@ const schemaEnrichment = {
 
     <section class="min-h-screen bg-black text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <Breadcrumbs items={breadcrumbItems} />
+          
           <!-- Filtros interactivos -->
           <div class="mb-12 space-y-4">
             <!-- Filtros principales -->
@@ -509,6 +547,15 @@ const schemaEnrichment = {
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles por Estado</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card 
+                  href={`/moteles/estados/nuevo-leon`}
+                  title={'Nuevo León'}
+                  bgColor="bg-[#2A2A2A]"
+                  textColor="text-pink-300"
+                  borderColor="border-pink-500/20"
+                  hoverBgColor="hover:bg-pink-900/30"
+                  className="text-center font-serif"
+                />
               {states.slice(0, 6).map(state =>(
                 <Card 
                   href={`/moteles/estados/${state.slug}`}

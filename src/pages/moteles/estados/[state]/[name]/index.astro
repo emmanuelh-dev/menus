@@ -1,12 +1,19 @@
 ---
 export const prerender = false;
-const { name } = Astro.params;
+
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, s-maxage=3600, stale-while-revalidate=3600'
+);
+
+const { name, state } = Astro.params;
 
 import RestaurantLayout from "../../../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../../../components/Gallery.astro";
 import WhatsappButton from "../../../../../components/WhatsappButton";
 import CopyClabe from "../../../../../components/CopyClabe";
-import { getRestaurantByName, supabase } from "../../../../../lib/supabase";
+import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
+import { getRestaurantByName, supabase, getStates } from "../../../../../lib/supabase";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 
 if (!name) {
@@ -17,6 +24,9 @@ const { data: place } = await supabase
 	.select("*")
 	.eq("short_name", name)
 	.single();
+
+const states = await getStates();
+const currentState = states.find(s => s.slug === state);
 
 const { blocks = [], view_settings = {} } = place.content || {};
 
@@ -34,6 +44,18 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 		class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white"
 	>
 		<div class="max-w-3xl mx-auto px-6 py-24">
+			
+			<Breadcrumbs 
+				items={[
+					{ label: 'Inicio', href: '/' },
+					{ label: 'Moteles', href: '/moteles' },
+					{ label: 'Estados', href: '/moteles/estados' },
+					...(currentState ? [{ label: currentState.name, href: `/moteles/estados/${state}` }] : []),
+					{ label: place.name }
+				]}
+				theme="dark"
+			/>
+			
 			{/* Header Sensual y Nocturno */}
 			<header class="mb-24 flex flex-col items-center">
 				<div class="relative mb-8">

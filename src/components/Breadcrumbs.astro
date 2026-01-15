@@ -1,0 +1,43 @@
+---
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  theme?: 'light' | 'dark';
+}
+
+const { items, theme = 'dark' } = Astro.props;
+
+const textColor = theme === 'light' ? 'text-gray-700' : 'text-gray-300';
+const hoverColor = theme === 'light' ? 'hover:text-pink-600' : 'hover:text-pink-400';
+const currentColor = theme === 'light' ? 'text-pink-600' : 'text-pink-400';
+const separatorColor = theme === 'light' ? 'text-gray-400' : 'text-gray-500';
+---
+
+<nav aria-label="Breadcrumb" class="mb-6">
+  <ol class="flex items-center flex-wrap gap-2 text-sm">
+    {items.map((item, index) => (
+      <li class="flex items-center gap-2">
+        {item.href ? (
+          <a 
+            href={item.href}
+            class={`${textColor} ${hoverColor} transition-colors`}
+          >
+            {item.label}
+          </a>
+        ) : (
+          <span class={`${currentColor} font-medium`}>
+            {item.label}
+          </span>
+        )}
+        
+        {index < items.length - 1 && (
+          <span class={`${separatorColor}`} aria-hidden="true">›</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

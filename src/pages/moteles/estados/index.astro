@@ -1,8 +1,14 @@
 ---
 export const prerender = false;
 
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, s-maxage=3600, stale-while-revalidate=3600'
+);
+
 import MotelLayout from "../../../layouts/MotelLayout.astro";
 import Card from "../../../components/Card.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import { getStates } from "../../../lib/supabase";
 import { MapPin } from "lucide-react";
 
@@ -54,6 +60,14 @@ const schemaEnrichment = {
     <section class="min-h-screen bg-black text-white py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        <Breadcrumbs 
+          items={[
+            { label: 'Inicio', href: '/' },
+            { label: 'Moteles', href: '/moteles' },
+            { label: 'Estados' }
+          ]}
+        />
+        
         <div class="mb-12 text-center">
           <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-4">Selecciona tu Estado</h2>
           <p class="text-gray-300 max-w-2xl mx-auto">Encuentra moteles en tu estado con información detallada sobre ubicación, precios, amenidades y recomendaciones.</p>
@@ -80,7 +94,7 @@ const schemaEnrichment = {
               )}
               
               <div class="flex items-center text-sm text-gray-500">
-                <span>Ver moteles disponibles</span>
+                <span>Ver moteles disponibles ({state.total_places})</span>
               </div>
             </a>
           ))}

@@ -87,17 +87,23 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
   return data as Place[];
 }
 
-export async function getStates(){
+export async function getStates() {
   const { data, error } = await supabase
     .from('states')
-    .select('*')
-  
+    .select(`
+      *,
+      places:places(count)
+    `);
+
   if (error) {
-    console.error('Error fetching states:', error);
+    console.error('Error fetching states with count:', error);
     return [];
   }
-  
-  return data;
+
+  return data.map(state => ({
+    ...state,
+    total_places: state.places[0]?.count || 0
+  }));
 }
 // Función para obtener cafeterías destacadas
 export async function getCafeteriasDestacadas() {

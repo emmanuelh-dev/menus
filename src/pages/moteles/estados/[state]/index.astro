@@ -1,9 +1,15 @@
 ---
 export const prerender = false;
 
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, s-maxage=3600, stale-while-revalidate=3600'
+);
+
 import MotelLayout from "../../../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../../../components/MotelBusinessSchema.astro";
 import Card from "../../../../components/Card.astro";
+import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
 import { getRestaurants, getStates } from "../../../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
 import type { Place } from "../../../../types/app";
@@ -94,6 +100,15 @@ const schemaEnrichment = {
 
     <section class="min-h-screen bg-black text-white py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <Breadcrumbs 
+          items={[
+            { label: 'Inicio', href: '/' },
+            { label: 'Moteles', href: '/moteles' },
+            { label: 'Estados', href: '/moteles/estados' },
+            { label: currentState.name }
+          ]}
+        />
         
         {motelesList.length > 0 ? (
           <>
