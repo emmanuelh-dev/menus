@@ -47,8 +47,8 @@ export interface ItemData {
   id: string;
   name: string;
   price: number;
-  description: string;
-  image: string;
+  description?: string;
+  image?: string;     
   features?: string[];
   gallery?: { src: string; alt?: string; title?: string }[];
 }

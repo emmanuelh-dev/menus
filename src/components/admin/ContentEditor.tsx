@@ -274,7 +274,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       const base64Image = (reader.result as string).split(',')[1];
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${import.meta.env.PUBLIC_GEMINI_API_KEY}`,
+        `ttps://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${import.meta.env.PUBLIC_GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
