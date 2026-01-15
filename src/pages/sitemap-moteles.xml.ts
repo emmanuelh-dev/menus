@@ -1,14 +1,22 @@
-import { getStates } from '../lib/supabase';
+import { getStates, getRestaurants } from '../lib/supabase';
 
 export async function GET() {
   const baseUrl = 'https://menus.bysmax.com';
   
   const states = await getStates();
+  const moteles = await getRestaurants({ type: 'motel' });
   
-  const motelUrls = [
+  const motelUrls: string[] = [
     '/moteles',
     '/moteles/estados',
-    ...states.map(state => `/moteles/estados/${state.slug}`)
+    ...states.map(state => `/moteles/estados/${state.slug}`),
+    ...moteles
+      .filter(motel => motel.short_name && motel.state_id)
+      .map(motel => {
+        const state = states.find(s => s.id === motel.state_id);
+        return state ? `/moteles/estados/${state.slug}/${motel.short_name}` : null;
+      })
+      .filter((url): url is string => url !== null)
   ];
   
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -18,7 +26,7 @@ export async function GET() {
     <loc>${baseUrl}${url}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>${url === '/moteles' ? '1.0' : url === '/moteles/estados' ? '0.9' : '0.8'}</priority>
+    <priority>${url === '/moteles' ? '1.0' : url === '/moteles/estados' ? '0.9' : url.split('/').length === 4 ? '0.8' : '0.7'}</priority>
   </url>`).join('')}
 </urlset>`;
 

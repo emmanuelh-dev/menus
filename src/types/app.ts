@@ -18,6 +18,7 @@ export interface Place {
   phone?: string;
   featured: boolean;
   type: string;
+  state_id?: number;
   content?: Content;
 }
 
