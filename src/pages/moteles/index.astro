@@ -378,6 +378,7 @@ const schemaEnrichment = {
                     </div>
                     {motel.short_name && (
                       <a 
+                        data-astro-prefetch="hover"
                         href={`/moteles/${motel.short_name}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
@@ -506,6 +507,7 @@ const schemaEnrichment = {
                   <div class="mt-5">
                     {motel.short_name ? (
                       <a 
+                        data-astro-prefetch="hover"
                         href={`/moteles/${motel.short_name}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"

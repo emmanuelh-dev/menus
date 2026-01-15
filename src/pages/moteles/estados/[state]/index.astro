@@ -51,14 +51,16 @@ const motelesList: Place[] = motelesData.map((motel) => ({
 }));
 
 const seoData = {
-  title: `Moteles en ${currentState.name} 2026 | Guía Completa con Precios y Ubicaciones`,
-  description: `Encuentra los mejores moteles en ${currentState.name}. Guía completa con precios actualizados, ubicaciones, amenidades y recomendaciones. Opciones desde económicas hasta premium.`,
+  title: `Moteles en ${currentState.name} 2026 | Con Jacuzzi, Precios y Ubicaciones Exactas`,
+  description: `Encuentra ${motelesList.length} moteles en ${currentState.name} con jacuzzi, precios verificados, ubicaciones exactas y amenidades. Opciones desde económicas hasta premium. Abiertos 24 horas.`,
   keywords: [
     `moteles ${currentState.name.toLowerCase()}`,
     `motel ${currentState.name.toLowerCase()}`,
-    `mejores moteles ${currentState.name.toLowerCase()}`,
+    `moteles con jacuzzi ${currentState.name.toLowerCase()}`,
     `moteles baratos ${currentState.name.toLowerCase()}`,
-    `motel con jacuzzi ${currentState.name.toLowerCase()}`
+    `mejores moteles ${currentState.name.toLowerCase()}`,
+    `motel ${currentState.name.toLowerCase()} precios`,
+    `moteles ${currentState.name.toLowerCase()} 24 horas`
   ],
   heading: `Moteles en ${currentState.name}`,
   subheading: `Encuentra el lugar perfecto en ${currentState.name}`
@@ -258,6 +260,7 @@ const schemaEnrichment = {
                     <div class="mt-5">
                       {motel.short_name ? (
                         <a 
+                          data-astro-prefetch="hover"
                           href={`/moteles/estados/${currentState.slug}/${motel.short_name}`}
                           class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                         >
@@ -305,6 +308,64 @@ const schemaEnrichment = {
             >
               Ver otros estados
             </a>
+          </div>
+        )}
+
+        {motelesList.length > 0 && (
+          <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-pink-500/20">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold text-pink-400 mb-6 text-center">Búsquedas Populares en {currentState.name}</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-3xl">🛁</span>
+                </div>
+                <h3 class="text-lg font-semibold text-pink-300 mb-2">Con Jacuzzi</h3>
+                <p class="text-gray-400 text-sm">Habitaciones con jacuzzi privado</p>
+              </div>
+              
+              <div class="text-center">
+                <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-3xl">💰</span>
+                </div>
+                <h3 class="text-lg font-semibold text-pink-300 mb-2">Precios por Hora</h3>
+                <p class="text-gray-400 text-sm">Desde $200 por hora</p>
+              </div>
+              
+              <div class="text-center">
+                <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-3xl">🕐</span>
+                </div>
+                <h3 class="text-lg font-semibold text-pink-300 mb-2">12 Horas</h3>
+                <p class="text-gray-400 text-sm">Paquetes especiales fin de semana</p>
+              </div>
+
+              <div class="text-center">
+                <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-3xl">🚗</span>
+                </div>
+                <h3 class="text-lg font-semibold text-pink-300 mb-2">Cochera Cerrada</h3>
+                <p class="text-gray-400 text-sm">Privacidad y seguridad garantizada</p>
+              </div>
+            </div>
+
+            <div class="bg-black/30 rounded-lg p-6 border border-pink-500/10">
+              <h3 class="text-xl font-serif font-bold text-pink-300 mb-4 text-center">Términos Populares</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+                <ul class="space-y-2">
+                  <li>✓ Moteles con jacuzzi en {currentState.name}</li>
+                  <li>✓ Moteles baratos {currentState.name}</li>
+                  <li>✓ Motel {currentState.name} precios 2026</li>
+                  <li>✓ Moteles 24 horas {currentState.name}</li>
+                </ul>
+                <ul class="space-y-2">
+                  <li>✓ Mejores moteles {currentState.name}</li>
+                  <li>✓ Motel 12 horas {currentState.name}</li>
+                  <li>✓ Moteles con cochera {currentState.name}</li>
+                  <li>✓ Motel centro {currentState.name}</li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
 
