@@ -164,6 +164,17 @@ const schemaEnrichment = {
                             </a>
                           </div>
                         )}
+                                     {motel.short_name && (
+                      <a 
+                        data-astro-prefetch="hover"
+                        href={`/moteles/${motel.short_name}`}
+                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
+                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                      >
+                        Ver Habitaciones
+                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    )}
                       </div>
                     </div>
                   ))}
