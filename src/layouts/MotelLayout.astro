@@ -14,8 +14,10 @@ function hasAmenity(amenity: string, amenities?: string[]): boolean {
 }
 
 function generateSEOTitle(place: Place, year: number = new Date().getFullYear()): string {
+  const semantic_data = place.content?.semantic_data || {};
+
   const jacuzzi = hasAmenity("Jacuzzi", place.amenities) ? " con Jacuzzi" : "";
-  const price = place.priceRange ? ` desde ${place.priceRange}` : "";
+  const price = semantic_data.price_range ? ` desde ${semantic_data.price_range}` : "";
   const city = "Monterrey";
   
   return `${place.name}${jacuzzi} en ${city}${price} | Opiniones y Precios ${year}`;
