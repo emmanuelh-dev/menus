@@ -63,7 +63,7 @@ const { data: reviews } = await supabase
     <div class="lg:col-span-2">
       <div class="bg-white rounded-3xl lg:p-6 shadow-sm border border-gray-100">
         {/* Aquí vive tu componente React que manipula el JSONB */}
-        <ContentEditor client:load placeId={place.id} initialContent={place.content} placeType={place.type} />
+        <ContentEditor client:load placeId={place.id} initialContent={place.content} placeType={place.type} placeData={place} />
       </div>
     </div>
 

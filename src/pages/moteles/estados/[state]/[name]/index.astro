@@ -16,6 +16,7 @@ import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
 import { getRestaurantByName, supabase, getStates } from "../../../../../lib/supabase";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 import QuickFeed from "../../../../../components/QuickFeed";
+import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
 
 if (!name) {
 	throw new Error("No se ha especificado el nombre del restaurante");
@@ -28,12 +29,6 @@ const { data: place } = await supabase
 
 const states = await getStates();
 const currentState = states.find(s => s.slug === state);
-
-const { blocks = [], view_settings = {} } = place.content || {};
-
-const address = place.content?.semantic_data?.address || place.address || "";
-const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
-const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
 
 <MotelLayout
@@ -44,7 +39,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 	<div
 		class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white"
 	>
-		<div class="max-w-3xl mx-auto px-6 py-24">
+		<div class="max-w-3xl mx-auto px-6 py-24 pb-0">
 			
 			<Breadcrumbs 
 				items={[
@@ -56,284 +51,10 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 				]}
 				theme="dark"
 			/>
-			
-			{/* Header Sensual y Nocturno */}
-			<header class="mb-24 flex flex-col items-center">
-				<div class="relative mb-8">
-					<img
-						src={place.image}
-						alt={place.name}
-						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
-					/>
-				</div>
-				<h1
-					class="text-5xl text-center font-light tracking-tighter serif italic mb-2 text-balance"
-				>
-					{place.name}
-				</h1>
-				<p
-					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-balance text-center"
-				>
-					{
-						place?.content?.semantic_data?.description ||
-							place?.description ||
-							place.name
-					}
-				</p>
-				{
-					address && (
-						<div class="space-y-1">
-							<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold text-center">
-								Ubicación
-							</p>
-							<a
-								href={googleMapsUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="text-center text-lg text-stone-600 hover:text-red-700 transition-colors inline-flex items-center gap-2 group"
-                >
-								{address}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="size-3 opacity-50 group-hover:opacity-100 transition-opacity"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-									/>
-								</svg>
-							</a>
-						</div>
-					)
-				}
-				{
-					place.content?.semantic_data && (
-						<div class="w-full mx-auto max-w-lg space-y-4 text-center mb-8">
-							{place.content.semantic_data.price_range && (
-								<div class="space-y-1">
-									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-										Precios
-									</p>
-									<p class="text-sm text-stone-600">
-										{place.content.semantic_data.price_range}
-									</p>
-								</div>
-							)}
-
-							{place.content.semantic_data.parking && (
-								<div class="space-y-1">
-									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-										Estacionamiento
-									</p>
-									<p class="text-sm text-stone-600">
-										{place.content.semantic_data.parking}
-									</p>
-								</div>
-							)}
-
-							{place.content.semantic_data.hours && (
-								<div class="space-y-1">
-									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-										Horarios
-									</p>
-									<p class="text-sm text-stone-600 whitespace-pre-line">
-										{place.content.semantic_data.hours}
-									</p>
-								</div>
-							)}
-
-							{place.content.semantic_data.phone && (
-								<div class="space-y-1">
-									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-										Teléfono
-									</p>
-									<div class="flex flex-col gap-1">
-										{place.content.semantic_data.phone.split(/[,/|y]/).map((p: string) => {
-											const cleanPhone = p.trim().replace(/\D/g, '');
-											if (!cleanPhone) return null;
-											return (
-												<a 
-													href={`tel:${cleanPhone}`}
-													class="text-sm text-stone-600 hover:text-red-700 transition-colors"
-												>
-													{p.trim()}
-												</a>
-											);
-										})}
-									</div>
-								</div>
-							)}
-
-							{place.content.semantic_data.whatsapp && (
-								<div class="space-y-1">
-									<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-										WhatsApp
-									</p>
-									<div class="flex flex-col gap-2 italic">
-										{place.content.semantic_data.whatsapp.split(/[,/|y]/).map((w: string) => {
-											const cleanWA = w.trim().replace(/\D/g, '');
-											if (!cleanWA) return null;
-											return (
-												<a 
-													href={`https://wa.me/${cleanWA}?text=${encodeURIComponent(`Hola, me interesa obtener información sobre ${place.name}`)}`}
-													target="_blank"
-													rel="noopener noreferrer"
-													class="text-sm text-stone-600 hover:text-green-600 transition-colors flex items-center justify-center gap-2"
-												>
-													<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="currentColor" viewBox="0 0 24 24">
-														<path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-													</svg>
-													WhatsApp {w.trim()}
-												</a>
-											);
-										})}
-									</div>
-								</div>
-							)}
-
-							{place.content.semantic_data.reservation_url && (
-								<div class="py-4">
-									<a 
-										href={place.content.semantic_data.reservation_url}
-										target="_blank"
-										rel="noopener noreferrer"
-										class="inline-block bg-red-700 text-white px-8 py-3 rounded-full text-sm font-bold tracking-widest hover:bg-black transition-colors"
-									>
-										RESERVAR AHORA
-									</a>
-								</div>
-							)}
-
-							{place.content.semantic_data.payment_options &&
-								place.content.semantic_data.payment_options.length > 0 && (
-									<div class="space-y-1">
-										<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold">
-											Métodos de Pago
-										</p>
-										<p class="text-sm text-stone-600">
-											{place.content.semantic_data.payment_options.join(", ")}
-										</p>
-									</div>
-								)}
-						</div>
-					)
-				}
-
-				<div class="h-[1px] w-12 bg-stone-200"></div>
-			</header>
-
-			{/* Suites y Servicios */}
-			<div class="space-y-32">
-				{
-					blocks.map((block) => {
-						if (block.type === "section") {
-							return (
-								<section class="relative">
-									<div class="sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 py-6 mb-16">
-										<h2 class="text-3xl font-light serif italic text-white tracking-tight">
-											{block.data.title}
-										</h2>
-									</div>
-
-									<div class="space-y-20">
-										{block.data.image && (
-											<div class="overflow-hidden rounded-sm group">
-												<img
-													src={block.data.image}
-													alt={block.data.title}
-													class="w-full h-80 object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
-												/>
-											</div>
-										)}
-
-										<div class="grid gap-y-16">
-											{block.data.items?.map((item) => (
-												<div class="space-y-8">
-													<div class="group flex flex-col md:flex-row gap-8 items-center md:items-start transition-colors duration-500">
-														<div class="w-full">
-															<div class="flex justify-between items-baseline mb-3">
-																<h3 class="text-2xl font-light text-white group-hover:text-red-700 transition-colors">
-																	{item.name}
-																</h3>
-																<div class="h-[1px] flex-1 mx-4 bg-white/5 hidden md:block" />
-																<span class="text-xl font-light text-stone-500">
-																	{view_settings.show_prices &&
-																		`$${item.price}`}
-																</span>
-															</div>
-															<p class="text-stone-500 text-sm font-light leading-relaxed mb-4 text-balance">
-																{item.description}
-															</p>
-															{item.features && item.features.length > 0 && (
-																<div class="flex flex-wrap gap-3 text-[9px] uppercase tracking-widest text-stone-600 font-bold">
-																	{item.features.map((feature, idx) => (
-																		<>
-																			<span>{feature}</span>
-																			{idx < item.features.length - 1 && (
-																				<span>•</span>
-																			)}
-																		</>
-																	))}
-																</div>
-															)}
-														</div>
-
-														{item.image && item.image.trim() !== "" && (
-															<div class="w-full md:w-48 aspect-video md:aspect-square overflow-hidden rounded-sm order-1 md:order-2 shadow-2xl">
-																<img
-																	src={item.image}
-																	alt={item.name}
-																	class="w-full h-full object-cover brightness-75 group-hover:brightness-110 transition-all duration-700"
-																/>
-															</div>
-														)}
-													</div>
-
-													{item.gallery && item.gallery.length > 0 && (
-														<Gallery
-															images={item.gallery}
-                              altPrefix={`${place.name} - ${item.name}`}
-															buttonClasses="bg-white/5 text-white border border-white/10 px-6 py-2 rounded-sm hover:bg-white/10 transition-all uppercase text-[9px] tracking-widest"
-														/>
-													)}
-												</div>
-											))}
-										</div>
-									</div>
-								</section>
-							);
-						}
-
-						if (block.type === "gallery") {
-							return (
-								<div class="py-20 border-y border-white/5">
-									<p class="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-12">
-										Instalaciones
-									</p>
-									<Gallery
-										images={block.data.images || []}
-                    altPrefix={`${place.name} Instalaciones`}
-										buttonClasses="bg-white/5 text-white border border-white/10 px-8 py-3 rounded-sm hover:bg-white/10 transition-all uppercase text-[10px] tracking-widest"
-									/>
-								</div>
-							);
-						}
-					})
-				}
-			</div>
-
-			<footer class="mt-40 pb-20 text-center">
-				<p class="text-[10px] text-stone-600 uppercase tracking-[0.5em]">
-					Privacy Guaranteed • {place.name} • 2026
-				</p>
-			</footer>
 		</div>
+
+		<MotelPageRenderer place={place} />
 	</div>
 
-	<!-- <QuickFeed placeId={place.id} client:load /> -->
+	<QuickFeed placeId={place.id} client:load />
 </MotelLayout>

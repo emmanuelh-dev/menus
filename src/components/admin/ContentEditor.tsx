@@ -37,6 +37,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
+import MotelPageRenderer from '../MotelPageRenderer';
 
 type BlockType = 'section' | 'gallery' | 'image';
 
@@ -100,7 +101,7 @@ interface GalleryData {
 }
 
 
-export default function ContentEditor({ placeId, initialContent, placeType = 'restaurant' }: { placeId: number; initialContent: any; placeType?: 'restaurant' | 'motel' }) {
+export default function ContentEditor({ placeId, initialContent, placeType = 'restaurant', placeData }: { placeId: number; initialContent: any; placeType?: 'restaurant' | 'motel'; placeData?: any }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialContent?.blocks) {
       const hasOldStructure = initialContent.blocks.some((block: any) => block.type === 'item');
@@ -272,15 +273,21 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     return sectionItems.some(item => normalizeTitle(item.name) === normalizedName);
   };
 
-  const analyzeMenuWithAI = async (input: { file?: File, text?: string }) => {
+  const analyzeMenuWithAI = async (input: { files?: File[], text?: string }) => {
     setAiProcessing(true);
     try {
-      let base64Image: string | undefined = undefined;
-      if (input.file) {
-        const reader = new FileReader();
-        reader.readAsDataURL(input.file);
-        await new Promise((resolve) => { reader.onloadend = resolve; });
-        base64Image = (reader.result as string).split(',')[1];
+      const base64Images: string[] = [];
+      
+      if (input.files) {
+        for (const file of input.files) {
+          const reader = new FileReader();
+          const promise = new Promise<string>((resolve) => {
+            reader.onloadend = () => resolve(reader.result as string);
+          });
+          reader.readAsDataURL(file);
+          const result = await promise;
+          base64Images.push(result);
+        }
       }
 
       const response = await fetch('/api/ai/update-content', {
@@ -288,8 +295,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           placeId,
-          image: base64Image,
-          instruction: input.text || (base64Image ? 'Analiza la imagen y extrae el contenido.' : undefined),
+          images: base64Images.length > 0 ? base64Images : undefined,
+          instruction: input.text || (base64Images.length > 0 ? 'Analiza las imágenes y extrae el contenido.' : undefined),
           currentContent: { blocks, semantic_data: semanticData }
         })
       });
@@ -305,15 +312,15 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       } else {
         throw new Error(result.error || 'Error al procesar con IA');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error IA:', err);
-      alert('Error al procesar con IA');
+      alert(err.message || 'Error al procesar con IA');
     } finally {
       setAiProcessing(false);
     }
   };
 
-  const analyzeMenuImage = (file: File) => analyzeMenuWithAI({ file });
+  const analyzeMenuImages = (files: File[]) => analyzeMenuWithAI({ files });
   const analyzeMenuText = (text: string) => analyzeMenuWithAI({ text });
 
   const analyzeMenuJSON = (jsonText: string) => {
@@ -326,10 +333,10 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     }
   };
 
-  const handleAIImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      analyzeMenuImage(file);
+  const handleAIImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      analyzeMenuImages(Array.from(files));
     }
   };
 
@@ -782,8 +789,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
-                onChange={handleAIImageUpload}
+                accept="image/*,application/pdf"
+                multiple
+                onChange={handleAIImagesUpload}
               />
 
               <button
@@ -794,13 +802,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 {aiProcessing ? (
                   <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
-                    <p className="font-bold text-purple-700">Analizando imagen...</p>
+                    <p className="font-bold text-purple-700">Analizando archivos...</p>
+                    <p className="text-xs text-purple-500 mt-1 italic">Detectando platillos y fotos para galería</p>
                   </div>
                 ) : (
                   <div className="text-center">
                     <span className="text-4xl block mb-2">📸</span>
-                    <p className="font-bold text-purple-700">Click para subir imagen del menu</p>
-                    <p className="text-xs text-gray-500 mt-1">JPG, PNG o WEBP</p>
+                    <p className="font-bold text-purple-700">Click para subir fotos o PDFs</p>
+                    <p className="text-xs text-gray-500 mt-1 italic">Puedes seleccionar varios archivos a la vez</p>
                   </div>
                 )}
               </button>
@@ -972,20 +981,31 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       </div>
     </>
   ) : (
-    <div className="mx-4 sm:mx-0 p-8 border-4 border-dashed border-gray-200 rounded-3xl text-center">
-      <div className="max-w-md mx-auto">
-        <div className="text-6xl mb-6">👁️</div>
-        <h2 className="text-2xl font-black uppercase mb-4">Modo Previa</h2>
-        <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-          Aquí podrás ver cómo se ve tu menú antes de publicarlo. Estamos trabajando en una vista exacta. Por ahora, los cambios que guardes se verán reflejados en la página pública.
-        </p>
-        <button 
-          onClick={() => setActiveTab('editor')}
-          className="bg-black text-white px-8 py-3 rounded-full font-bold"
-        >
-          Volver al Editor
-        </button>
+    <div className="mx-4 sm:mx-0 overflow-hidden rounded-3xl border shadow-2xl bg-[#0A0A0A]">
+      <div className="bg-gray-800 p-2 flex items-center justify-between px-6 border-b border-white/10">
+        <div className="flex gap-1.5">
+          <div className="w-3 h-3 rounded-full bg-red-400" />
+          <div className="w-3 h-3 rounded-full bg-yellow-400" />
+          <div className="w-3 h-3 rounded-full bg-green-400" />
+        </div>
+        <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Vista Previa en Vivo</div>
+        <div className="w-12" />
       </div>
+      {placeType === 'motel' ? (
+        <MotelPageRenderer 
+          place={{ 
+            ...placeData, 
+            content: { blocks, semantic_data: semanticData, view_settings: { layout: 'grid', show_prices: true } } 
+          }} 
+          isPreview={true} 
+        />
+      ) : (
+        <div className="p-20 text-center bg-gray-50">
+          <div className="text-6xl mb-6">👁️</div>
+          <h2 className="text-2xl font-black uppercase mb-4">Vista Previa</h2>
+          <p className="text-gray-500 text-sm">Próximamente disponible para Restaurantes. Use el editor para realizar cambios.</p>
+        </div>
+      )}
     </div>
   )}
 </div>

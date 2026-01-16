@@ -11,80 +11,66 @@ export interface GeminiResponse {
 export const SYSTEM_PROMPT = (placeType: 'motel' | 'restaurant', currentContent?: any) => `
 Eres un experto en gestión de contenido y curador de datos para ${placeType === 'motel' ? 'MOTELES' : 'RESTAURANTES'}. 
 
-TU MISIÓN: Actualizar la información del lugar basándote en nuevas entradas, manteniendo la consistencia y evitando cambios destructivos o malintencionados.
+TU MISIÓN: Generar el ESTADO FINAL del contenido del lugar. No envíes solo cambios, envía cómo debe quedar el objeto completo tras aplicar las instrucciones o analizar las imágenes.
 
-${currentContent ? `CONTENIDO ACTUAL (Úsalo como base):
-${JSON.stringify(currentContent, null, 2)}` : 'No hay contenido previo, genera uno nuevo basado en la entrada.'}
+${currentContent ? `CONTENIDO ACTUAL (Úsalo como base obligatoria):
+${JSON.stringify(currentContent)}` : 'No hay contenido previo, genera uno nuevo basado en la entrada.'}
 
-REGLAS CRÍTICAS DE SEGURIDAD Y CALIDAD:
-1. CONSERVACIÓN: Si la entrada es ambigua o parece spam, mantén el contenido actual.
-2. VALIDACIÓN: No permitas descripciones ofensivas, números de teléfono falsos o cambios que degraden la calidad del menú.
-3. FUSIÓN Y NORMALIZACIÓN INTELIGENTE: 
-   - Si se sube una imagen, añade los nuevos platillos/habitaciones pero NO borres los existentes a menos que la imagen sea claramente una actualización completa del menú.
-   - Si la instrucción es "normalizar", "mejorar" o "redactar" descripciones: Usa el nombre del item, sus features y el contexto del lugar para generar descripciones atractivas, elegantes y consistentes (ej: "Disfruta de nuestra Suite con Jacuzzi, ideal para momentos especiales..."). No inventes servicios que no estén listados, solo dales mejor redacción.
-   - DETALLE DE HABITACIONES: Si el texto indica duraciones (ej: 6hrs, 12hrs) o distribuciones por piso, INCLUYE esa información obligatoriamente en la descripción del item de forma organizada.
-   - DATOS DEL LUGAR: Si hay varios números o redes sociales, concaténalos en los campos correspondientes.
-   - Si la instrucción pide "simplificar", hazlo con elegancia sin perder la información clave (precios, features).
-4. NORMALIZACIÓN DE ATRIBUTOS (SEO): Es vital para los filtros de búsqueda. Mapea términos similares a estos ESTÁNDARES:
-   - "Jacuzzi" (no usar Tina de hidromasaje, Bañera, etc.)
-   - "Alberca" (no usar Piscina)
-   - "Smart TV" (no usar Pantalla o Televisor)
-   - "Cochera techada" (no usar Garage o Estacionamiento privado)
-   - "Sillón Tantra" (no usar Sillón del amor)
-   - "Tubo de pole dance" (no usar Tubo o Pole)
-   - "Cama King Size" (no usar Cama grande)
-   - "Aire Acondicionado" o "Clima"
-   - "Efectivo", "Visa", "Mastercard", "American Express" (para payment_options)
-5. PRECIOS: Los precios deben ser numéricos. Si no hay, usa 0.
-6. MOTELES (CRÍTICO): Las "features" son vitales. Siempre incluye Jacuzzi, Cochera, TV, WiFi, etc., en la lista de features de cada habitación si el usuario lo menciona o si la imagen lo muestra.
+REGLAS DE ORO (CRÍTICAS):
+1. CONSERVACIÓN ABSOLUTA Y LIMPIEZA: El "CONTENIDO ACTUAL" es tu base SAGRADA para lo único. NUNCA elimines habitaciones o platillos únicos. Sin embargo, DEBES ELIMINAR items que estén duplicados (mismo nombre o contenido idéntico). Si el usuario dice "fix it" o "mejorar", mantén todos los items originales pero limpia las duplicidades para dejar un catálogo único y profesional.
+2. PRESERVACIÓN DE IMÁGENES: Para CUALQUIER imagen que YA exista en el contenido actual, DEBES usar el marcador "[URL_DE_IMAGEN]" en el campo \`image\`. Para galerías usa \`{"url": "[URL]"}\`. NO inventes URLs.
+3. IDs: Mantén los \`id\` de los bloques y de los items (\`id\`) exactamente igual a como vienen en el "CONTENIDO ACTUAL". Esto es crítico para no perder fotos.
+4. FUSIÓN: Si la entrada tiene información nueva, agrégala. Si no menciona algo que ya existe, MANTENLO igual. NO asumas que lo omitido ya no existe.
+5. SEMANTIC DATA: La información de contacto (Teléfono, Dirección, WhatsApp) va SOLO en \`semantic_data\`. NUNCA en bloques de texto.
 
-REGLAS DE FORMATO JSON (Responde solo con esto):
+REGLAS DE FORMATO JSON (Responde solo con este objeto COMPLETO):
 {
   "semantic_data": {
-    "description": "Una o dos líneas",
+    "description": "Redacción elegante y vendedora",
     "address": "Dirección completa",
-    "phone": "Teléfono",
-    "whatsapp": "Número de WhatsApp (sólo números, ej: 528112345678)",
-    "reservation_url": "URL de reservaciones si existe",
-    "price_range": "Ej: MXN100-300",
-    "hours": "Horarios",
-    "parking": "Info estacionamiento",
+    "phone": "Teléfonos (pueden ser varios separados por coma)",
+    "whatsapp": "Solo números con lada, ej: 528112345678",
+    "reservation_url": "URL si aplica",
+    "price_range": "Ej: MXN450 - MXN1500",
+    "hours": "Horarios detallados",
+    "parking": "Info de estacionamiento",
     "payment_options": ["Efectivo", "Visa", "Mastercard"],
-    "additional_features": ["Jacuzzi", "Smart TV", "Cochera techada"]
+    "additional_features": ["WiFi", "Clima", "Estacionamiento"],
+    "new_gallery_images": []
   },
-  "sections": [
+  "blocks": [
     {
-      "title": "Nombre sección",
-      "description": "Opcional",
-      "items": [
-        {
-          "name": "Nombre item",
-          "price": 0,
-          "description": "Descripción",
-          "features": ["Jacuzzi", "Smart TV"]
-        }
-      ]
+      "id": "mantener_id_si_existe_o_generar_nuevo",
+      "type": "section",
+      "data": {
+        "title": "Nombre de la sección (ej: Habitaciones)",
+        "items": [
+          {
+            "id": "mantener_id_si_existe",
+            "name": "Nombre item",
+            "price": 150.00,
+            "description": "Descripción detallada y elegante",
+            "features": ["Jacuzzi", "Smart TV"],
+            "image": "[URL_DE_IMAGEN] o vacío"
+          }
+        ]
+      }
     }
   ]
 }
 
 INSTRUCCIONES ESPECÍFICAS:
-1. Si se proporciona una imagen, extrae toda la información (items, precios, secciones).
-2. Si hay contenido actual y una instrucción de texto, MODIFICA el contenido actual siguiendo la instrucción (ej: "simplifica", "añade X a todos").
-3. Para MOTELES:
-   - Items son "tipos de habitación".
-   - Features comunes: "Jacuzzi", "Smart TV", "Cochera techada", "Espejo en techo", "Cama King Size".
-4. Para RESTAURANTES:
-   - Items son "platillos".
-   - Features comunes: "Picante", "Vegetariano", "Especialidad".
+1. MOTELES: Los items son tipos de habitación. Asegura que cada uno tenga sus features (Jacuzzi, Vapor, etc.).
+2. RESTAURANTES: Los items son platillos con descripción y precio.
+3. Si el usuario pega texto de una página web, ignora avisos legales, publicidad o menús de navegación del sitio original. Solo extrae la esencia del lugar.
 
-SIEMPRE responde ÚNICAMENTE con el objeto JSON. Sin explicaciones ni Markdown.
+SIEMPRE responde ÚNICAMENTE con un objeto JSON estrictamente válido. NO uses bloques de código con triple backtick. Empieza directamente con { y termina con }. Si no puedes procesar algo, devuelve el JSON actual sin cambios.
 `;
 
 export async function callGemini(
   placeType: 'motel' | 'restaurant',
   instruction: string,
-  base64Image?: string,
+  images?: string[], // Soportar múltiples imágenes
   currentContent?: any
 ): Promise<GeminiResponse | null> {
   const prompt = SYSTEM_PROMPT(placeType, currentContent);
@@ -98,13 +84,23 @@ export async function callGemini(
     }
   ];
 
-  if (base64Image) {
-    contents[0].parts.push({
-      inline_data: {
-        mime_type: "image/jpeg", // Asumimos jpeg por simplicidad o lo detectamos
-        data: base64Image
-      }
-    } as any);
+  if (images && images.length > 0) {
+    images.forEach(base64Image => {
+      // Si el string ya tiene el prefijo de data:, lo limpiamos
+      const cleanData = base64Image.includes('base64,') 
+        ? base64Image.split('base64,')[1] 
+        : base64Image;
+
+      // Detectar si es PDF o Imagen (simplificado)
+      const isPdf = base64Image.startsWith('data:application/pdf');
+
+      contents[0].parts.push({
+        inline_data: {
+          mime_type: isPdf ? "application/pdf" : "image/jpeg",
+          data: cleanData
+        }
+      } as any);
+    });
   }
 
   try {
@@ -113,18 +109,58 @@ export async function callGemini(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents })
+        body: JSON.stringify({ contents }),
+        signal: AbortSignal.timeout(60000) // 60 segundos de timeout
       }
     );
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API Error:', errorText);
+      return null;
+    }
+
     const result = await response.json();
+    
+    // LOG DE SEGURIDAD PARA DEBUG
+    console.log('--- GEMINI RAW RESPONSE START ---');
+    console.log(JSON.stringify(result, null, 2).substring(0, 1000));
+    console.log('--- GEMINI RAW RESPONSE END ---');
+
+    if (result.error) {
+      console.error('Gemini API Error Object:', result.error);
+      return null;
+    }
+
     const textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!textResponse) return null;
+    if (!textResponse) {
+      console.warn('Gemini Success but No Text in Candidates. Finish Reason:', result.candidates?.[0]?.finishReason);
+      return null;
+    }
 
-    // Limpiar posible markdown si Gemini se equivoca
-    const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
+    // Limpiar posible markdown y extraer solo el objeto JSON { ... }
+    try {
+      let cleanJson = textResponse;
+      
+      // Si hay bloques de código markdown, extraer el contenido
+      const jsonBlockMatch = textResponse.match(/```json\n?([\s\S]*?)\n?```/) || textResponse.match(/```\n?([\s\S]*?)\n?```/);
+      if (jsonBlockMatch) {
+        cleanJson = jsonBlockMatch[1];
+      } else {
+        // Buscar el primer { y el último } para aislar el JSON si no hay bloques de código
+        const start = textResponse.indexOf('{');
+        const end = textResponse.lastIndexOf('}');
+        if (start !== -1 && end !== -1 && end > start) {
+          cleanJson = textResponse.substring(start, end + 1);
+        }
+      }
+
+      return JSON.parse(cleanJson.trim());
+    } catch (err) {
+      console.error('Error parsing Gemini JSON:', err, 'Raw response:', textResponse);
+      return null;
+    }
   } catch (err) {
     console.error('Error callGemini:', err);
     return null;
