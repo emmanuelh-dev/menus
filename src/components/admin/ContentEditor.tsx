@@ -675,7 +675,12 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <div>
               <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS ADICIONALES:</label>
               <div className="flex flex-wrap gap-2 mb-3">
-                {['WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 'Aire acondicionado', 'TV', 'Acceso para silla de ruedas'].map((feature) => {
+                {[
+                  'WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 
+                  'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 
+                  'Aire acondicionado', 'Smart TV', 'Acceso para silla de ruedas',
+                  'Jacuzzi', 'Alberca', 'Cochera techada', 'Sillón Tantra', 'Tubo de pole dance', 'Cama King Size', 'Sauna', 'Vapor'
+                ].map((feature) => {
                   const isSelected = semanticData.additional_features?.includes(feature);
                   return (
                     <button

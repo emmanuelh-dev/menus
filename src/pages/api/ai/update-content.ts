@@ -51,12 +51,24 @@ export const POST: APIRoute = async ({ request }) => {
     // 3. Procesar y fusionar la respuesta (Lógica similar a ContentEditor.tsx)
     const newContent = { ...currentContent };
     
-    // Fusionar semantic_data
+    // Fusionar semantic_data con cautela en arrays
     if (aiResponse.semantic_data) {
-      newContent.semantic_data = {
-        ...newContent.semantic_data,
-        ...aiResponse.semantic_data
-      };
+      const mergedSemantic = { ...newContent.semantic_data };
+      
+      Object.keys(aiResponse.semantic_data).forEach(key => {
+        const newValue = aiResponse.semantic_data[key];
+        const oldValue = mergedSemantic[key];
+        
+        if (Array.isArray(newValue) && Array.isArray(oldValue)) {
+          // Fusionar arrays sin duplicados (payment_options, additional_features, etc)
+          mergedSemantic[key] = [...new Set([...oldValue, ...newValue])];
+        } else if (newValue !== undefined && newValue !== null && newValue !== '') {
+          // Reemplazar valores simples si no son vacíos
+          mergedSemantic[key] = newValue;
+        }
+      });
+
+      newContent.semantic_data = mergedSemantic;
     }
 
     // Procesar secciones a bloques

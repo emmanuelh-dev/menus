@@ -1,6 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import { FaEye } from 'react-icons/fa';
+import { getStates } from '../../lib/supabase';
+
+interface State {
+  id: number;
+  name: string;
+}
 
 interface Restaurant {
   id: number;
@@ -14,14 +20,15 @@ interface Restaurant {
   type?: string;
   short_name?: string;
   content?: any;
+  state_id?: number | null;
 }
 
 export default function PlaceManager({ initialRestaurants }: { initialRestaurants: Restaurant[] }) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants);
+  const [states, setStates] = useState<State[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -32,7 +39,16 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     type: 'restaurant',
     short_name: '',
     image: '',
+    state_id: null as number | null,
   });
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      const data = await getStates();
+      setStates(data);
+    };
+    fetchStates();
+  }, []);
 
   const openModal = (restaurant?: Restaurant) => {
     if (restaurant) {
@@ -47,10 +63,11 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         type: restaurant.type || 'restaurant',
         short_name: restaurant.short_name || '',
         image: restaurant.image || '',
+        state_id: restaurant.state_id || null,
       });
     } else {
       setEditingId(null);
-      setFormData({ name: '', address: '', rating: 4.0, priceRange: '$$', hours: '', featured: false, type: 'restaurant', short_name: '', image: '' });
+      setFormData({ name: '', address: '', rating: 4.0, priceRange: '$$', hours: '', featured: false, type: 'restaurant', short_name: '', image: '', state_id: null });
     }
     setIsModalOpen(true);
   };
@@ -103,6 +120,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         type: 'restaurant',
         short_name: '',
         image: '',
+        state_id: null,
       });
     } catch (err) {
       console.error(err);
@@ -155,7 +173,19 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
             <input name="name" placeholder="Nombre" value={formData.name} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
             <input name="address" placeholder="Dirección" value={formData.address} onChange={handleInputChange} required className="w-full border-b-2 py-2 outline-none focus:border-black" />
-
+            <select 
+              name="state_id" 
+              value={formData.state_id || ''} 
+              onChange={handleInputChange} 
+              className="border-b-2 py-2 outline-none focus:border-black w-full"
+            >
+              <option value="" disabled>Selecciona un estado</option>
+              {states.map((state) => (
+                <option key={state.id} value={state.id}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
             <div className="grid grid-cols-2 gap-4">
               <select
                 name="type"

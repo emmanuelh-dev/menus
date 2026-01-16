@@ -25,8 +25,17 @@ REGLAS CRÍTICAS DE SEGURIDAD Y CALIDAD:
    - DETALLE DE HABITACIONES: Si el texto indica duraciones (ej: 6hrs, 12hrs) o distribuciones por piso, INCLUYE esa información obligatoriamente en la descripción del item de forma organizada.
    - DATOS DEL LUGAR: Si hay varios números o redes sociales, concaténalos en los campos correspondientes.
    - Si la instrucción pide "simplificar", hazlo con elegancia sin perder la información clave (precios, features).
-4. PRECIOS: Los precios deben ser numéricos. Si no hay, usa 0.
-5. FEATURES: Mantén las etiquetas estándar del sistema (Jacuzzi, WiFi, Clima, etc.).
+4. NORMALIZACIÓN DE ATRIBUTOS (SEO): Es vital para los filtros de búsqueda. Mapea términos similares a estos ESTÁNDARES:
+   - "Jacuzzi" (no usar Tina de hidromasaje, Bañera, etc.)
+   - "Alberca" (no usar Piscina)
+   - "Smart TV" (no usar Pantalla o Televisor)
+   - "Cochera techada" (no usar Garage o Estacionamiento privado)
+   - "Sillón Tantra" (no usar Sillón del amor)
+   - "Tubo de pole dance" (no usar Tubo o Pole)
+   - "Cama King Size" (no usar Cama grande)
+   - "Aire Acondicionado" o "Clima"
+   - "Efectivo", "Visa", "Mastercard", "American Express" (para payment_options)
+5. PRECIOS: Los precios deben ser numéricos. Si no hay, usa 0.
 6. MOTELES (CRÍTICO): Las "features" son vitales. Siempre incluye Jacuzzi, Cochera, TV, WiFi, etc., en la lista de features de cada habitación si el usuario lo menciona o si la imagen lo muestra.
 
 REGLAS DE FORMATO JSON (Responde solo con esto):
@@ -41,7 +50,7 @@ REGLAS DE FORMATO JSON (Responde solo con esto):
     "hours": "Horarios",
     "parking": "Info estacionamiento",
     "payment_options": ["Efectivo", "Visa", "Mastercard"],
-    "additional_features": ["WiFi", "Terraza", "Aire acondicionado"]
+    "additional_features": ["Jacuzzi", "Smart TV", "Cochera techada"]
   },
   "sections": [
     {
@@ -52,7 +61,7 @@ REGLAS DE FORMATO JSON (Responde solo con esto):
           "name": "Nombre item",
           "price": 0,
           "description": "Descripción",
-          "features": ["Feature 1", "Feature 2"]
+          "features": ["Jacuzzi", "Smart TV"]
         }
       ]
     }
