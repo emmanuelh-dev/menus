@@ -5,18 +5,22 @@ export async function GET() {
   
   const states = await getStates();
   
+  const motelUrls: string[] = [
+    '/moteles',
+    '/moteles/estados',
+    ...states.map(state => `/moteles/estados/${state.slug}`)
+  ];
+  
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap>
-    <loc>${baseUrl}/sitemap-moteles-main.xml</loc>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${motelUrls.map(url => `
+  <url>
+    <loc>${baseUrl}${url}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-  </sitemap>
-  ${states.map(state => `
-  <sitemap>
-    <loc>${baseUrl}/sitemap-moteles-${state.slug}.xml</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-  </sitemap>`).join('')}
-</sitemapindex>`;
+    <changefreq>weekly</changefreq>
+    <priority>${url === '/moteles' ? '1.0' : url === '/moteles/estados' ? '0.9' : '0.8'}</priority>
+  </url>`).join('')}
+</urlset>`;
 
   return new Response(sitemap, {
     headers: {
