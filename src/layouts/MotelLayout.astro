@@ -171,6 +171,29 @@ if (schemaEnrichment.email) {
 
 if (schemaEnrichment.priceRange) {
   schema.priceRange = schemaEnrichment.priceRange;
+} else if (place?.content?.semantic_data?.price_range) {
+  schema.priceRange = place.content.semantic_data.price_range;
+}
+
+// Agregar habitaciones como productos si existen secciones
+if (place?.content?.sections) {
+  schema.containsPlace = place.content.sections.flatMap((section: any) => 
+    section.items.map((item: any) => ({
+      "@type": "Accommodation",
+      "name": item.name,
+      "description": item.description,
+      "offers": {
+        "@type": "Offer",
+        "price": item.price,
+        "priceCurrency": "MXN"
+      },
+      "amenityFeature": item.features?.map((f: string) => ({
+        "@type": "LocationFeatureSpecification",
+        "name": f,
+        "value": true
+      }))
+    }))
+  );
 }
 
 if (schemaEnrichment.checkinTime) {

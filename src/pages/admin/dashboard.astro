@@ -6,6 +6,7 @@ import { isAuthenticated } from "../../middleware/auth";
 import { createAuthenticatedClient } from "../../lib/supabase";
 import MenuManager from "../../components/admin/MenuManager";
 import PlaceManager from "../../components/admin/PlaceManager";
+import HistoryManager from "../../components/admin/HistoryManager";
 
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
@@ -64,6 +65,18 @@ const { data: recentComments } = await supabase
 	.order("created_at", { ascending: false })
 	.limit(10);
 
+// Obtener historial de cambios reciente
+const { data: history } = await supabase
+	.from("place_content_history")
+	.select(`
+		*,
+		places (
+			name
+		)
+	`)
+	.order("created_at", { ascending: false })
+	.limit(10);
+
   console.log(recentComments)
 ---
 
@@ -72,6 +85,9 @@ const { data: recentComments } = await supabase
 	
 	<PlaceManager client:load initialRestaurants={restaurants || []} />
 	
+	<div class="mt-8">
+		<HistoryManager client:load initialHistory={history || []} />
+	</div>
 	
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
 		<div class="bg-white rounded-lg shadow p-6">

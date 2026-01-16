@@ -75,6 +75,8 @@ export interface SemanticData {
   payment_options?: string[];
   dress_code?: string;
   phone?: string;
+  whatsapp?: string;
+  reservation_url?: string;
   cuisine_type?: string;
   zone?: string;
   cross_street?: string;
