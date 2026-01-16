@@ -34,7 +34,7 @@
  * - image: string
  * - features?: string[] // ["Jacuzzi", "Clima", "Smart TV"] para moteles
  */
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 
@@ -150,7 +150,18 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [aiProcessing, setAiProcessing] = useState(false);
   const [aiInputMode, setAiInputMode] = useState<'image' | 'text' | 'json'>('image');
   const [textInput, setTextInput] = useState('');
+  const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
+  const [showMobileNav, setShowMobileNav] = useState(false);
+  const [forceCollapse, setForceCollapse] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const scrollToBlock = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setShowMobileNav(false);
+    }
+  };
 
   const addBlock = (type: BlockType, afterIndex?: number) => {
     const newBlock: Block = {
@@ -605,10 +616,10 @@ ${text}`
     }
   };
 
-  function renderBlock(block: Block, index: number) {
+  function renderBlock(block: Block, index: number, forceCollapse: boolean) {
     switch (block.type) {
       case 'section':
-        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} />;
+        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} />;
       case 'gallery':
         return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
       case 'image':
@@ -619,27 +630,86 @@ ${text}`
   }
 
   return (
-    <div className="space-y-6 pb-20">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 bg-white/90 backdrop-blur-md z-10 py-4 px-4 sm:px-0 border-b border-gray-100">
-        <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tighter">Editor de Contenido</h1>
+    <div className="space-y-6 pb-32">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 bg-white/90 backdrop-blur-md z-30 py-4 px-4 sm:px-0 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="flex bg-gray-100 p-1 rounded-full items-center gap-1">
+            <button 
+              onClick={() => setActiveTab('editor')}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase transition-all ${activeTab === 'editor' ? 'bg-black text-white shadow-sm' : 'text-gray-500'}`}
+            >
+              Diseño
+            </button>
+            <button 
+              onClick={() => setActiveTab('preview')}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase transition-all ${activeTab === 'preview' ? 'bg-black text-white shadow-sm' : 'text-gray-500'}`}
+            >
+              Previa
+            </button>
+            <div className="w-px h-4 bg-gray-300 mx-1" />
+            <button 
+              onClick={() => setForceCollapse(!forceCollapse)}
+              className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-gray-600 hover:bg-white/50 transition-all"
+              title={forceCollapse ? 'Expandir Todo' : 'Colapsar Todo'}
+            >
+              {forceCollapse ? '📂 Abrir' : '📁 Cerrar'}
+            </button>
+          </div>
+        </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <button
             onClick={() => setShowAIChat(!showAIChat)}
-            className="flex-1 sm:flex-none bg-purple-600 text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-purple-700 transition-all"
+            className="flex-1 sm:flex-none bg-purple-600 text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-purple-700 transition-all text-sm"
           >
-            IA
+            IA ✨
           </button>
           <button
             onClick={saveChanges}
             disabled={isSaving}
-            className="flex-1 sm:flex-none bg-black text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-gray-800 disabled:opacity-50 transition-all"
+            className="flex-1 sm:flex-none bg-black text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-gray-800 disabled:opacity-50 transition-all text-sm"
           >
-            {isSaving ? 'Guardando...' : 'Publicar'}
+            {isSaving ? '...' : 'Publicar'}
           </button>
         </div>
       </header>
 
-      <div className="mx-4 sm:mx-0">
+      {/* Floating Quick Nav for Mobile */}
+      <div className="fixed bottom-6 right-6 z-40 sm:hidden">
+        <button
+          onClick={() => setShowMobileNav(!showMobileNav)}
+          className="w-14 h-14 bg-black text-white rounded-full shadow-2xl flex items-center justify-center text-xl"
+        >
+          {showMobileNav ? '✕' : '☰'}
+        </button>
+        
+        {showMobileNav && (
+          <div className="absolute bottom-16 right-0 w-64 max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto p-4 animate-in slide-in-from-bottom-5">
+            <h3 className="text-xs font-black uppercase text-gray-400 mb-3 px-2">Saltar a sección:</h3>
+            <div className="space-y-1">
+              <button
+                onClick={() => { setShowSemanticData(true); setShowMobileNav(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-sm font-bold flex items-center gap-2"
+              >
+                <span>🏢</span> Datos del Lugar
+              </button>
+              {blocks.map((block, idx) => (
+                <button
+                  key={block.id}
+                  onClick={() => scrollToBlock(block.id)}
+                  className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-sm font-bold flex items-center gap-2"
+                >
+                  <span>{block.type === 'section' ? '📋' : block.type === 'gallery' ? '🎨' : '🖼️'}</span>
+                  <span className="truncate">{block.data.title || block.data.caption || `${block.type} ${idx + 1}`}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {activeTab === 'editor' ? (
+        <>
+          <div className="mx-4 sm:mx-0">
         <button
           onClick={() => setShowSemanticData(!showSemanticData)}
           className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-colors"
@@ -1052,7 +1122,7 @@ ${text}`
 
       <div className="space-y-4 lg:px-4 sm:px-0">
         {blocks.map((block, index) => (
-          <div key={block.id} className="relative">
+          <div key={block.id} id={block.id} className="relative scroll-mt-24">
             {index === 0 && (
               <>
                 <div className="flex justify-center my-4">
@@ -1105,7 +1175,7 @@ ${text}`
               >✕</button>
             </div>
 
-            {renderBlock(block, index)}
+            {renderBlock(block, index, forceCollapse)}
 
             <div className="flex justify-center my-4">
               <button
@@ -1136,18 +1206,19 @@ ${text}`
         ))}
 
         {blocks.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-400 mb-4">No hay bloques. Comienza agregando uno.</p>
+          <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
+            <div className="mb-4 text-4xl">📭</div>
+            <p className="text-gray-500 font-bold uppercase text-xs mb-6">El menú está vacío. Comienza agregando contenido.</p>
             <button
               onClick={() => setShowBlockMenu(true)}
-              className="bg-black text-white px-6 py-3 rounded-full font-bold hover:bg-gray-800"
+              className="bg-black text-white px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-gray-800 shadow-xl transition-all"
             >
               + Agregar Primer Bloque
             </button>
 
             {showBlockMenu === true && (
-              <div className="mt-6 max-w-md mx-auto p-6 bg-white border rounded-xl shadow-lg">
-                <p className="text-xs font-bold text-gray-500 mb-4">¿QUÉ QUIERES AGREGAR?</p>
+              <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-2xl animate-in zoom-in-95">
+                <p className="text-xs font-black text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
                 <div className="grid grid-cols-3 gap-3">
                   <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section')} />
                   <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image')} />
@@ -1158,8 +1229,26 @@ ${text}`
           </div>
         )}
       </div>
+    </>
+  ) : (
+    <div className="mx-4 sm:mx-0 p-8 border-4 border-dashed border-gray-200 rounded-3xl text-center">
+      <div className="max-w-md mx-auto">
+        <div className="text-6xl mb-6">👁️</div>
+        <h2 className="text-2xl font-black uppercase mb-4">Modo Previa</h2>
+        <p className="text-gray-500 text-sm mb-8 leading-relaxed">
+          Aquí podrás ver cómo se ve tu menú antes de publicarlo. Estamos trabajando en una vista exacta. Por ahora, los cambios que guardes se verán reflejados en la página pública.
+        </p>
+        <button 
+          onClick={() => setActiveTab('editor')}
+          className="bg-black text-white px-8 py-3 rounded-full font-bold"
+        >
+          Volver al Editor
+        </button>
+      </div>
     </div>
-  );
+  )}
+</div>
+);
 }
 
 function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
@@ -1174,7 +1263,15 @@ function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string
   );
 }
 
-function SectionBlock({ data, onChange, placeType = 'restaurant' }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel' }) {
+function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean }) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    if (forceCollapse !== undefined) {
+      setIsCollapsed(forceCollapse);
+    }
+  }, [forceCollapse]);
+
   const addItem = () => {
     const newItem: ItemData = {
       id: `item-${Date.now()}-${Math.random()}`,
@@ -1185,6 +1282,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant' }: { data: Sect
       features: []
     };
     onChange({ ...data, items: [...data.items, newItem] });
+    setIsCollapsed(false);
   };
 
   const updateItem = (itemIndex: number, itemData: Partial<ItemData>) => {
@@ -1207,51 +1305,75 @@ function SectionBlock({ data, onChange, placeType = 'restaurant' }: { data: Sect
   };
 
   return (
-    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 sm:p-6 rounded-xl border-2 border-purple-200">
+    <div className={`bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 transition-all ${isCollapsed ? 'p-3' : 'p-4 sm:p-6'}`}>
       <div className="space-y-4">
-        <input
-          value={data.title}
-          onChange={(e) => onChange({ ...data, title: e.target.value })}
-          placeholder="Título de la Sección"
-          className="w-full text-xl sm:text-2xl font-black uppercase bg-transparent border-b-2 border-purple-300 pb-2 outline-none focus:border-purple-600"
-        />
-
-        <textarea
-          value={data.description || ''}
-          onChange={(e) => onChange({ ...data, description: e.target.value })}
-          placeholder="Descripción (opcional)"
-          rows={2}
-          className="w-full text-sm bg-white/50 p-3 rounded-lg border border-purple-200 outline-none focus:border-purple-600"
-        />
-
-        <div>
-          <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN DE FONDO (opcional):</label>
-          <ManualUploader
-            currentImage={data.image}
-            onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
-            onImageRemove={() => onChange({ ...data, image: '' })}
-            onUploadStart={() => console.log('Subiendo imagen de sección...')}
-            onUploadError={() => console.error('Error al subir imagen')}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-purple-600 font-bold border border-purple-100 hover:bg-purple-50 transition-colors"
+          >
+            {isCollapsed ? '+' : '−'}
+          </button>
+          
+          <input
+            value={data.title}
+            onChange={(e) => onChange({ ...data, title: e.target.value })}
+            placeholder="Título de la Sección"
+            className={`w-full font-black uppercase bg-transparent outline-none focus:border-purple-600 transition-all ${
+              isCollapsed ? 'text-sm' : 'text-xl sm:text-2xl border-b-2 border-purple-300 pb-2'
+            }`}
           />
+
+          {isCollapsed && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black bg-purple-200 text-purple-700 px-2 py-1 rounded-full whitespace-nowrap">
+                {data.items.length} ITEMS
+              </span>
+              {data.image && <span className="text-xs">🖼️</span>}
+            </div>
+          )}
         </div>
 
-        <div className="mt-6 space-y-3">
-          <div className="flex justify-between items-center">
-            <h4 className="text-sm font-bold text-purple-700 uppercase">Items de esta sección:</h4>
-            <button
-              onClick={addItem}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors"
-            >
-              + Item
-            </button>
-          </div>
+        {!isCollapsed && (
+          <div className="animate-in fade-in slide-in-from-top-1 duration-200 space-y-4">
+            <textarea
+              value={data.description || ''}
+              onChange={(e) => onChange({ ...data, description: e.target.value })}
+              placeholder="Descripción (opcional)"
+              rows={2}
+              className="w-full text-sm bg-white/50 p-3 rounded-lg border border-purple-200 outline-none focus:border-purple-600"
+            />
 
-          {data.items.length === 0 && (
-            <p className="text-center text-gray-400 text-sm py-4">No hay items. Agrega uno.</p>
-          )}
+            <div>
+              <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Imagen de fondo:</label>
+              <ManualUploader
+                currentImage={data.image}
+                onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
+                onImageRemove={() => onChange({ ...data, image: '' })}
+                onUploadStart={() => console.log('Subiendo imagen de sección...')}
+                onUploadError={() => console.error('Error al subir imagen')}
+              />
+            </div>
 
-          {data.items.map((item, itemIndex) => (
-            <div key={item.id} className="bg-white p-4 rounded-lg border border-purple-100">
+            <div className="mt-6 space-y-3">
+              <div className="flex justify-between items-center border-t border-purple-100 pt-4">
+                <h4 className="text-xs font-black text-purple-800 uppercase tracking-widest">Contenido de la sección</h4>
+                <button
+                  onClick={addItem}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-full text-xs font-black transition-all shadow-sm hover:shadow-md"
+                >
+                  + AGREGAR ITEM
+                </button>
+              </div>
+
+              {data.items.length === 0 && (
+                <div className="text-center py-10 bg-white/30 rounded-xl border-2 border-dashed border-purple-200">
+                  <p className="text-purple-400 text-xs font-bold uppercase">No hay items en esta sección</p>
+                </div>
+              )}
+
+              {data.items.map((item, itemIndex) => (
+                <div key={item.id} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
               <div className="flex justify-end gap-2 mb-3">
                 <button
                   onClick={() => moveItem(itemIndex, 'up')}
@@ -1375,8 +1497,10 @@ function SectionBlock({ data, onChange, placeType = 'restaurant' }: { data: Sect
           ))}
         </div>
       </div>
-    </div>
-  );
+    )}
+  </div>
+</div>
+);
 }
 
 function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: GalleryData) => void }) {
