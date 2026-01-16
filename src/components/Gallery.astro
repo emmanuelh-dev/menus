@@ -5,7 +5,7 @@ import ImageModal from './ImageModal.astro';
 // Quitamos ImageMetadata para que acepte tanto assets locales como URLs de Cloudinary (strings)
 interface ImageData {
   src: any; 
-  alt: string;
+  alt?: string;
   title?: string;
 }
 
@@ -13,9 +13,10 @@ interface Props {
   images: ImageData[];
   buttonClasses?: string;
   modalId?: string;
+  altPrefix?: string;
 }
 
-const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
+const { images, buttonClasses, modalId = 'galleryModal', altPrefix = 'Imagen' } = Astro.props;
 ---
 
 <div>
@@ -36,7 +37,7 @@ const { images, buttonClasses, modalId = 'galleryModal' } = Astro.props;
           >
             <img
               src={image.src?.src || image.src}
-              alt={image.alt}
+              alt={image.alt || `${altPrefix} Galería ${String(index + 1).padStart(2, '0')}`}
               class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
               loading="lazy"
             />
