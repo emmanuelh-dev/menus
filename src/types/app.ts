@@ -1,3 +1,7 @@
+export const formater = {
+  'motel': 'moteles',
+  'restaurant': 'menus',
+}
 export interface Place {
   id?: number;
   name: string;

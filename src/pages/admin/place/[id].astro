@@ -5,7 +5,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../../middleware/auth";
 import { createAuthenticatedClient } from "../../../lib/supabase";
 import ContentEditor from "../../../components/admin/ContentEditor";
-
+import { formater } from "../../../types/app";
 const { id } = Astro.params;
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
@@ -50,7 +50,7 @@ const { data: reviews } = await supabase
     
     <div class="flex gap-3">
       <a 
-        href={`/menus/${place.short_name}`} 
+        href={`/${formater[place.type] || place.type}/${place.short_name}`} 
         target="_blank" 
         class="bg-gray-100 px-4 py-2 rounded-lg text-sm font-bold"
       >
