@@ -16,36 +16,16 @@ import type { SupabasePlace } from "../../../../types/app";
 
 const { state } = Astro.params;
 
-const [states, allRatings] = await Promise.all([
-  getStates(),
-  getAllPlaceRatings()
-]);
-
+const states = await getStates();
 const currentState = states.find(s => s.slug === state);
 
 if (!currentState) {
   return Astro.redirect('/moteles/estados');
 }
 
-const motelesData: SupabasePlace[] = await getRestaurants({ 
+const motelesList = await getRestaurants({ 
   type: 'motel',
   state_id: currentState.id 
-});
-
-const motelesList: SupabasePlace[] = motelesData.map((motel) => {
-  const stats = allRatings[motel.id];
-  
-  return {
-    ...motel,
-    rating: stats?.rating || motel.rating || 4.0,
-    reviewCount: stats?.count || motel.reviewCount || 0,
-    priceRange: motel.priceRange || "$$",
-    address: motel.address || "",
-    hours: motel.hours || "24 horas",
-    amenities: motel.amenities || [],
-    specialties: [],
-    destacado: motel.featured
-  };
 });
 
 const seoData = {

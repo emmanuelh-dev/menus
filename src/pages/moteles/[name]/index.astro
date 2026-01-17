@@ -21,11 +21,12 @@ import MotelPageRenderer from "../../../components/MotelPageRenderer";
 if (!name) {
 	throw new Error("No se ha especificado el nombre del restaurante");
 }
-const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", name)
-	.single();
+const restaurantData = await getRestaurantByName({ name });
+const place = restaurantData[0];
+
+if (!place) {
+	throw new Error("No se ha encontrado el restaurante");
+}
 
 const states = await getStates();
 const currentState = states.find(s => s.slug === state);

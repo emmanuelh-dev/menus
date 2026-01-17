@@ -18,39 +18,10 @@ import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Sno
 import type { SupabasePlace } from "../../types/app";
 
 
-const [motelesData, states, allRatings] = await Promise.all([
+const [motelesList, states] = await Promise.all([
   getRestaurants({ type: 'motel' }),
-  getStates(),
-  getAllPlaceRatings()
+  getStates()
 ]);
-
-const motelesList: SupabasePlace[] = motelesData.map((motel) => {
-  const stats = allRatings[motel.id];
-  const stateObj = states.find(s => s.id === motel.state_id);
-  
-  return {
-    id: motel.id,
-    name: motel.name,
-    short_name: motel.short_name,
-    state_slug: stateObj?.slug || 'nuevo-leon',
-    rating: stats?.rating || motel.rating || 4.0,
-    reviewCount: stats?.count || motel.reviewCount || 0,
-    priceRange: motel.priceRange || "$$",
-    address: motel.address || "",
-    hours: motel.hours || "24 horas",
-    amenities: motel.amenities || [],
-    image: motel.image,
-    menu: motel.menu,
-    distance: motel.distance,
-    closed: motel.closed,
-    openingTime: motel.openingTime,
-    specialties: [],
-    featured: motel.featured,
-    phone: undefined,
-    type: motel.type,
-    destacado: motel.featured
-  };
-});
 
 const url = new URL(Astro.request.url);
 const zona = url.searchParams.get('zona') || undefined;

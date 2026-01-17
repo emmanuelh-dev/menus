@@ -69,7 +69,7 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
 
   let query = supabase
     .from('places')
-    .select('*')
+    .select('*, states(slug)')
 
   if (type){
     query = query.eq('type', type);
@@ -84,7 +84,51 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
     console.error(`Error fetching ${type}:`, error);
     return [];
   }
-  return data as SupabasePlace[];
+
+  // Si no hay lugares, retornamos vacío pronto
+  if (!data || data.length === 0) return [];
+
+  // Obtenemos los ratings para los lugares encontrados en una sola consulta
+  const placeIds = data.map(p => p.id);
+  const { data: reviewsData } = await supabase
+    .from('reviews')
+    .select('place_id, rate')
+    .in('place_id', placeIds);
+
+  const statsMap: Record<number, { rating: number, count: number }> = {};
+  if (reviewsData) {
+    reviewsData.forEach((rev: any) => {
+      if (!statsMap[rev.place_id]) {
+        statsMap[rev.place_id] = { sum: 0, count: 0 } as any;
+      }
+      const s = statsMap[rev.place_id] as any;
+      s.sum += rev.rate;
+      s.count += 1;
+    });
+    Object.keys(statsMap).forEach((id: any) => {
+      const s = statsMap[id] as any;
+      statsMap[id] = {
+        rating: Number((s.sum / s.count).toFixed(1)),
+        count: s.count
+      };
+    });
+  }
+
+  return (data as any[]).map(place => {
+    const stats = statsMap[place.id];
+    return {
+      ...place,
+      state_slug: place.states?.slug || 'nuevo-leon',
+      rating: stats?.rating || place.rating || 4.0,
+      reviewCount: stats?.count || place.reviewCount || 0,
+      priceRange: place.priceRange || "$$",
+      address: place.address || "",
+      hours: place.hours || "24 horas",
+      amenities: place.amenities || [],
+      specialties: place.specialties || [],
+      destacado: place.featured
+    } as SupabasePlace;
+  });
 }
 
 /**
@@ -194,11 +238,29 @@ export async function getOpinionesCafeteria(cafeteriaId: number) {
 export async function getRestaurantByName({ name }: { name: string }) {
   const { data, error } = await supabase
     .from('places')
-    .select('*')
-    .eq('short_name', name)
+    .select('*, states(slug)')
+    .eq('short_name', name);
+    
   if (error) {
-    console.error('Error fetching cafeterias:', error);
+    console.error('Error fetching restaurant:', error);
     return [];
   }
-  return data as SupabasePlace[];
+
+  if (!data || data.length === 0) return [];
+
+  const place = data[0];
+  const stats = await getPlaceRating(place.id);
+
+  return [{
+    ...place,
+    state_slug: place.states?.slug || 'nuevo-leon',
+    rating: stats?.rating || place.rating || 4.0,
+    reviewCount: stats?.count || place.reviewCount || 0,
+    priceRange: place.priceRange || "$$",
+    address: place.address || "",
+    hours: place.hours || "24 horas",
+    amenities: place.amenities || [],
+    specialties: place.specialties || [],
+    destacado: place.featured
+  }] as SupabasePlace[];
 }

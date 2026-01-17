@@ -8,362 +8,370 @@ import type { Place } from "../types/app";
 const path = Astro.url.pathname;
 
 function hasAmenity(amenity: string, amenities?: string[]): boolean {
-  if (!amenities) return false;
-  return amenities.some(a => a.toLowerCase().includes(amenity.toLowerCase()));
+	if (!amenities) return false;
+	return amenities.some((a) => a.toLowerCase().includes(amenity.toLowerCase()));
 }
 
-function generateSEOTitle(place: Place, year: number = new Date().getFullYear()): string {
-  const semantic_data = place.content?.semantic_data || {};
+function generateSEOTitle(
+	place: Place,
+	year: number = new Date().getFullYear(),
+): string {
+	const semantic_data = place.content?.semantic_data || {};
 
-  const jacuzzi = hasAmenity("Jacuzzi", place.amenities) ? " con Jacuzzi" : "";
-  const price = semantic_data.price_range ? ` desde ${semantic_data.price_range}` : "";
-  const city = "Monterrey";
-  
-  return `${place.name}${jacuzzi} en ${city}${price} | Opiniones y Precios ${year}`;
+	const jacuzzi = hasAmenity("Jacuzzi", place.amenities) ? " con Jacuzzi" : "";
+	const price = semantic_data.price_range
+		? ` desde ${semantic_data.price_range}`
+		: "";
+	const city = "Monterrey";
+
+	return `${place.name}${jacuzzi} en ${city}${price} | Opiniones y Precios ${year}`;
 }
 
 function generateSEODescription(place: Place, description?: string): string {
-  const city = "Monterrey";
-  const baseDesc = description || `${place.name} ofrece habitaciones cómodas y privadas`;
-  const reviews = place.reviewCount > 0 
-    ? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas` : ""}` 
-    : "";
-  
-  return `${baseDesc}. Encuentra precios, fotos de las habitaciones, ubicación en ${city}${reviews}. ¡Abierto ahora!`;
+	const city = "Monterrey";
+	const baseDesc =
+		description || `${place.name} ofrece habitaciones cómodas y privadas`;
+	const reviews =
+		place.reviewCount > 0
+			? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas` : ""}`
+			: "";
+
+	return `${baseDesc}. Encuentra precios, fotos de las habitaciones, ubicación en ${city}${reviews}. ¡Abierto ahora!`;
 }
 
 interface Address {
-  streetAddress?: string;
-  addressLocality?: string;
-  postalCode?: string;
-  addressCountry?: string;
+	streetAddress?: string;
+	addressLocality?: string;
+	postalCode?: string;
+	addressCountry?: string;
 }
 
 interface OpeningHoursSpecification {
-  "@type": "OpeningHoursSpecification";
-  dayOfWeek: string[];
-  opens: string;
-  closes: string;
+	"@type": "OpeningHoursSpecification";
+	dayOfWeek: string[];
+	opens: string;
+	closes: string;
 }
 
 export interface Props {
-  place?: Place;
-  title?: string;
-  description?: string;
-  image?: string;
-  type?: "LodgingBusiness" | "Motel" | "Hotel";
-  textWhite?: boolean;
-  backgroundColor?: string;
-  favicon?: string;
-  canonical?: string;
-  ogUrl?: string;
+	place?: Place;
+	title?: string;
+	description?: string;
+	image?: string;
+	type?: "LodgingBusiness" | "Motel" | "Hotel";
+	textWhite?: boolean;
+	backgroundColor?: string;
+	favicon?: string;
+	canonical?: string;
+	ogUrl?: string;
 
-  schemaEnrichment?: {
-    address?: Address;
-    telephone?: string;
-    email?: string;
-    priceRange?: string;
-    checkinTime?: string;
-    checkoutTime?: string;
-    openingHours?: string | OpeningHoursSpecification[];
-    paymentAccepted?: string[];
-    currenciesAccepted?: string[];
-    aggregateRating?: {
-      ratingValue: number;
-      reviewCount: number;
-    };
-    amenityFeature?: string[];
-    numberOfRooms?: number;
-    petsAllowed?: boolean;
-  };
+	schemaEnrichment?: {
+		address?: Address;
+		telephone?: string;
+		email?: string;
+		priceRange?: string;
+		checkinTime?: string;
+		checkoutTime?: string;
+		openingHours?: string | OpeningHoursSpecification[];
+		paymentAccepted?: string[];
+		currenciesAccepted?: string[];
+		aggregateRating?: {
+			ratingValue: number;
+			reviewCount: number;
+		};
+		amenityFeature?: string[];
+		numberOfRooms?: number;
+		petsAllowed?: boolean;
+	};
 }
 
 const {
-  place,
-  title,
-  description,
-  image,
-  favicon,
-  type = "LodgingBusiness",
-  textWhite = false,
-  backgroundColor = "bg-white",
-  schemaEnrichment = {},
-  canonical,
-  ogUrl,
+	place,
+	title,
+	description,
+	image,
+	favicon,
+	type = "LodgingBusiness",
+	textWhite = false,
+	backgroundColor = "bg-white",
+	schemaEnrichment = {},
+	canonical,
+	ogUrl,
 } = Astro.props;
 
-const seoTitle = place 
-  ? generateSEOTitle(place)
-  : title;
+const seoTitle = place ? generateSEOTitle(place) : title;
 
 const seoDescription = place
-  ? generateSEODescription(place, description)
-  : description;
+	? generateSEODescription(place, description)
+	: description;
 
 let reviewStats = {
-  ratingValue: 0,
-  reviewCount: 0,
+	ratingValue: 0,
+	reviewCount: 0,
 };
 
 let initialReviews = [];
 
 try {
-    const [reviewsResponse, statsResponse] = await Promise.all([
-      supabase
-        .from("reviews")
-        .select("*")
-        .eq("place_id", place?.id)
-        .order("created_at", { ascending: false })
-        .limit(10),
-      
-      supabase
-        .from("reviews")
-        .select("rate")
-        .eq("place_id", place?.id)
-    ]);
+	const [reviewsResponse, statsResponse] = await Promise.all([
+		supabase
+			.from("reviews")
+			.select("*")
+			.eq("place_id", place?.id)
+			.order("created_at", { ascending: false })
+			.limit(10),
 
-    if (reviewsResponse.data) {
-      initialReviews = reviewsResponse.data as any;
-    }
+		supabase.from("reviews").select("rate").eq("place_id", place?.id),
+	]);
 
-    if (statsResponse.data && statsResponse.data.length > 0) {
-      const totalRating = statsResponse.data.reduce((sum, review) => sum + review.rate, 0);
-      reviewStats.ratingValue = Number((totalRating / statsResponse.data.length).toFixed(1));
-      reviewStats.reviewCount = statsResponse.data.length;
-    }
+	if (reviewsResponse.data) {
+		initialReviews = reviewsResponse.data as any;
+	}
+
+	if (statsResponse.data && statsResponse.data.length > 0) {
+		const totalRating = statsResponse.data.reduce(
+			(sum, review) => sum + review.rate,
+			0,
+		);
+		reviewStats.ratingValue = Number(
+			(totalRating / statsResponse.data.length).toFixed(1),
+		);
+		reviewStats.reviewCount = statsResponse.data.length;
+	}
 } catch (error) {
-  console.error("Error fetching motel reviews:", error);
+	console.error("Error fetching motel reviews:", error);
 }
 
 // Schema.org structured data para moteles
 const schema: any = {
-  "@context": "https://schema.org",
-  "@type": type,
-  name: place?.name || title,
-  description: seoDescription,
-  url: canonical || Astro.url.toString(),
+	"@context": "https://schema.org",
+	"@type": type,
+	name: place?.name || title,
+	description: seoDescription,
+	url: canonical || Astro.url.toString(),
 };
 
 // Enriquecimiento del schema con datos específicos
 if (schemaEnrichment.address) {
-  schema.address = {
-    "@type": "PostalAddress",
-    ...schemaEnrichment.address,
-  };
+	schema.address = {
+		"@type": "PostalAddress",
+		...schemaEnrichment.address,
+	};
 } else if (place?.content?.semantic_data?.address) {
-  schema.address = {
-    "@type": "PostalAddress",
-    streetAddress: place.content.semantic_data.address,
-    addressLocality: "Monterrey",
-    addressRegion: "Nuevo León",
-    addressCountry: "MX",
-  };
+	schema.address = {
+		"@type": "PostalAddress",
+		streetAddress: place.content.semantic_data.address,
+		addressLocality: "Monterrey",
+		addressRegion: "Nuevo León",
+		addressCountry: "MX",
+	};
 }
 
 if (schemaEnrichment.telephone) {
-  schema.telephone = schemaEnrichment.telephone;
+	schema.telephone = schemaEnrichment.telephone;
 } else if (place?.content?.semantic_data?.phone) {
-  schema.telephone = place.content.semantic_data.phone;
+	schema.telephone = place.content.semantic_data.phone;
 }
 
 if (schemaEnrichment.email) {
-  schema.email = schemaEnrichment.email;
+	schema.email = schemaEnrichment.email;
 }
 
 if (schemaEnrichment.priceRange) {
-  schema.priceRange = schemaEnrichment.priceRange;
+	schema.priceRange = schemaEnrichment.priceRange;
 } else if (place?.content?.semantic_data?.price_range) {
-  schema.priceRange = place.content.semantic_data.price_range;
+	schema.priceRange = place.content.semantic_data.price_range;
 }
 
 // Agregar habitaciones como productos si existen secciones
 if (place?.content?.sections) {
-  schema.containsPlace = place.content.sections.flatMap((section: any) => 
-    section.items.map((item: any) => ({
-      "@type": "Accommodation",
-      "name": item.name,
-      "description": item.description,
-      "offers": {
-        "@type": "Offer",
-        "price": item.price,
-        "priceCurrency": "MXN"
-      },
-      "amenityFeature": item.features?.map((f: string) => ({
-        "@type": "LocationFeatureSpecification",
-        "name": f,
-        "value": true
-      }))
-    }))
-  );
+	schema.containsPlace = place.content.sections.flatMap((section: any) =>
+		section.items.map((item: any) => ({
+			"@type": "Accommodation",
+			name: item.name,
+			description: item.description,
+			offers: {
+				"@type": "Offer",
+				price: item.price,
+				priceCurrency: "MXN",
+			},
+			amenityFeature: item.features?.map((f: string) => ({
+				"@type": "LocationFeatureSpecification",
+				name: f,
+				value: true,
+			})),
+		})),
+	);
 }
 
 if (schemaEnrichment.checkinTime) {
-  schema.checkinTime = schemaEnrichment.checkinTime;
+	schema.checkinTime = schemaEnrichment.checkinTime;
 }
 
 if (schemaEnrichment.checkoutTime) {
-  schema.checkoutTime = schemaEnrichment.checkoutTime;
+	schema.checkoutTime = schemaEnrichment.checkoutTime;
 }
 
 if (schemaEnrichment.openingHours) {
-  if (typeof schemaEnrichment.openingHours === "string") {
-    schema.openingHours = schemaEnrichment.openingHours;
-  } else {
-    schema.openingHoursSpecification = schemaEnrichment.openingHours;
-  }
+	if (typeof schemaEnrichment.openingHours === "string") {
+		schema.openingHours = schemaEnrichment.openingHours;
+	} else {
+		schema.openingHoursSpecification = schemaEnrichment.openingHours;
+	}
 }
 
 if (schemaEnrichment.paymentAccepted) {
-  schema.paymentAccepted = schemaEnrichment.paymentAccepted;
+	schema.paymentAccepted = schemaEnrichment.paymentAccepted;
 }
 
 if (schemaEnrichment.currenciesAccepted) {
-  schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
+	schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
 }
 
 if (schemaEnrichment.amenityFeature) {
-  schema.amenityFeature = schemaEnrichment.amenityFeature.map(amenity => ({
-    "@type": "LocationFeatureSpecification",
-    name: amenity
-  }));
+	schema.amenityFeature = schemaEnrichment.amenityFeature.map((amenity) => ({
+		"@type": "LocationFeatureSpecification",
+		name: amenity,
+	}));
 }
 
 if (schemaEnrichment.numberOfRooms) {
-  schema.numberOfRooms = schemaEnrichment.numberOfRooms;
+	schema.numberOfRooms = schemaEnrichment.numberOfRooms;
 }
 
 if (schemaEnrichment.petsAllowed !== undefined) {
-  schema.petsAllowed = schemaEnrichment.petsAllowed;
+	schema.petsAllowed = schemaEnrichment.petsAllowed;
 }
 
 if (reviewStats.reviewCount > 0) {
-  schema.aggregateRating = {
-    "@type": "AggregateRating",
-    ratingValue: reviewStats.ratingValue,
-    reviewCount: reviewStats.reviewCount,
-    bestRating: 5,
-    worstRating: 1,
-  };
+	schema.aggregateRating = {
+		"@type": "AggregateRating",
+		ratingValue: reviewStats.ratingValue,
+		reviewCount: reviewStats.reviewCount,
+		bestRating: 5,
+		worstRating: 1,
+	};
 
-  // Agregar reviews individuales para rich snippets
-  schema.review = initialReviews.slice(0, 10).map((review: any) => ({
-    "@type": "Review",
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: review.rate,
-      bestRating: 5,
-      worstRating: 1,
-    },
-    author: {
-      "@type": "Person",
-      name: review.name || "Usuario Anónimo",
-    },
-    reviewBody: review.comments,
-    datePublished: review.created_at,
-  }));
+	// Agregar reviews individuales para rich snippets
+	schema.review = initialReviews.slice(0, 10).map((review: any) => ({
+		"@type": "Review",
+		reviewRating: {
+			"@type": "Rating",
+			ratingValue: review.rate,
+			bestRating: 5,
+			worstRating: 1,
+		},
+		author: {
+			"@type": "Person",
+			name: review.name || "Usuario Anónimo",
+		},
+		reviewBody: review.comments,
+		datePublished: review.created_at,
+	}));
 } else if (schemaEnrichment.aggregateRating) {
-  schema.aggregateRating = {
-    "@type": "AggregateRating",
-    ...schemaEnrichment.aggregateRating,
-  };
+	schema.aggregateRating = {
+		"@type": "AggregateRating",
+		...schemaEnrichment.aggregateRating,
+	};
 }
 ---
 
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href={favicon ? favicon : "/favicon.ico"}
-    />
-    <meta name="generator" content={Astro.generator} />
-    <title>{seoTitle}</title>
-    <meta name="description" content={seoDescription} />
-    <link rel="canonical" href={canonical || Astro.url} />
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href={favicon ? favicon : "/favicon.ico"}
+		/>
+		<meta name="generator" content={Astro.generator} />
+		<title>{seoTitle}</title>
+		<meta name="description" content={seoDescription} />
+		<link rel="canonical" href={canonical || Astro.url} />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={ogUrl || Astro.url} />
-    <meta property="og:title" content={seoTitle} />
-    <meta property="og:description" content={seoDescription} />
-    {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={ogUrl || Astro.url} />
+		<meta property="og:title" content={seoTitle} />
+		<meta property="og:description" content={seoDescription} />
+		{image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={ogUrl || Astro.url} />
-    <meta property="twitter:title" content={seoTitle} />
-    <meta property="twitter:description" content={seoDescription} />
-    {
-      image && (
-        <meta property="twitter:image" content={new URL(image, Astro.url)} />
-      )
-    }
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={ogUrl || Astro.url} />
+		<meta property="twitter:title" content={seoTitle} />
+		<meta property="twitter:description" content={seoDescription} />
+		{
+			image && (
+				<meta property="twitter:image" content={new URL(image, Astro.url)} />
+			)
+		}
 
-    <!-- Schema.org for Google -->
-    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+		<!-- Schema.org for Google -->
+		<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-    <!-- Google Fonts for elegant feel -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+		<!-- Google Fonts for elegant feel -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+			rel="stylesheet"
+		/>
 
-    <script
-      src="https://analytics.ahrefs.com/analytics.js"
-      data-key="tBLkU3Ea6HxUBHJiGObWig"
-      async></script>
-    <script
-      defer
-      src="https://cloud.umami.is/script.js"
-      data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
-    <script type="text/javascript">
-      (function (c, l, a, r, i, t, y) {
-        c[a] =
-          c[a] ||
-          function () {
-            (c[a].q = c[a].q || []).push(arguments);
-          };
-        t = l.createElement(r);
-        t.async = 1;
-        t.src = "https://www.clarity.ms/tag/" + i;
-        y = l.getElementsByTagName(r)[0];
-        y.parentNode.insertBefore(t, y);
-      })(window, document, "clarity", "script", "s1a8gh6len");
-    </script>
+		<script
+			src="https://analytics.ahrefs.com/analytics.js"
+			data-key="tBLkU3Ea6HxUBHJiGObWig"
+			async></script>
+		<script
+			defer
+			src="https://cloud.umami.is/script.js"
+			data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
+		<script type="text/javascript">
+			(function (c, l, a, r, i, t, y) {
+				c[a] =
+					c[a] ||
+					function () {
+						(c[a].q = c[a].q || []).push(arguments);
+					};
+				t = l.createElement(r);
+				t.async = 1;
+				t.src = "https://www.clarity.ms/tag/" + i;
+				y = l.getElementsByTagName(r)[0];
+				y.parentNode.insertBefore(t, y);
+			})(window, document, "clarity", "script", "s1a8gh6len");
+		</script>
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
-    crossorigin="anonymous"></script>
+		<script
+			async
+			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
+			crossorigin="anonymous"></script>
+	</head>
 
-  </head>
-  
-  <body class="motel-typography">
-    <MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
-    <slot />
+	<body class="motel-typography">
+		<MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
+		<slot />
 
-    <ScrollTopAndComment client:only />
-    <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
+		<ScrollTopAndComment client:only />
+		<Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
-    <style>
-      .motel-typography {
-        font-family: "Inter", system-ui, sans-serif;
-      }
-      
-      .font-serif {
-        font-family: "Playfair Display", serif;
-      }
+		<style>
+			.motel-typography {
+				font-family: "Inter", system-ui, sans-serif;
+			}
 
-      body {
-        background-color: #000;
-        color: #fff;
-      }
-    </style>
-  </body>
+			.font-serif {
+				font-family: "Playfair Display", serif;
+			}
+
+			body {
+				background-color: #000;
+				color: #fff;
+			}
+		</style>
+	</body>
 </html>

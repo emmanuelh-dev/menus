@@ -9,6 +9,7 @@ Astro.response.headers.set(
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight } from "lucide-react";
 import { getRestaurants } from "../../lib/supabase";
+import { formater } from "../../types/app";
 
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
@@ -72,7 +73,7 @@ const restaurants = await getRestaurants({type: null})
                             )}
                         </div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            <a href={'/menus/'+ restaurant.short_name}>{restaurant.name}</a>
+                            <a href={`/${formater[restaurant.type] || restaurant.type}/${restaurant.short_name}`}>{restaurant.name}</a>
                         </h2>
                         <p class="text-gray-600">{}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
