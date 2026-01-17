@@ -10,45 +10,43 @@ import MotelLayout from "../../../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../../../components/MotelBusinessSchema.astro";
 import Card from "../../../../components/Card.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
-import { getRestaurants, getStates } from "../../../../lib/supabase";
+import { getRestaurants, getStates, getAllPlaceRatings } from "../../../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
-import type { Place } from "../../../../types/app";
+import type { SupabasePlace } from "../../../../types/app";
 
 const { state } = Astro.params;
 
-const states = await getStates();
+const [states, allRatings] = await Promise.all([
+  getStates(),
+  getAllPlaceRatings()
+]);
+
 const currentState = states.find(s => s.slug === state);
 
 if (!currentState) {
   return Astro.redirect('/moteles/estados');
 }
 
-const motelesData: Place[] = await getRestaurants({ 
+const motelesData: SupabasePlace[] = await getRestaurants({ 
   type: 'motel',
   state_id: currentState.id 
 });
 
-const motelesList: Place[] = motelesData.map((motel) => ({
-  id: motel.id,
-  name: motel.name,
-  short_name: motel.short_name,
-  rating: motel.rating || 4.0,
-  reviewCount: motel.reviewCount || 0,
-  priceRange: motel.priceRange || "$$",
-  address: motel.address || "",
-  hours: motel.hours || "24 horas",
-  amenities: motel.amenities || [],
-  image: motel.image,
-  menu: motel.menu,
-  distance: motel.distance,
-  closed: motel.closed,
-  openingTime: motel.openingTime,
-  specialties: [],
-  featured: motel.featured,
-  phone: undefined,
-  type: motel.type,
-  destacado: motel.featured
-}));
+const motelesList: SupabasePlace[] = motelesData.map((motel) => {
+  const stats = allRatings[motel.id];
+  
+  return {
+    ...motel,
+    rating: stats?.rating || motel.rating || 4.0,
+    reviewCount: stats?.count || motel.reviewCount || 0,
+    priceRange: motel.priceRange || "$$",
+    address: motel.address || "",
+    hours: motel.hours || "24 horas",
+    amenities: motel.amenities || [],
+    specialties: [],
+    destacado: motel.featured
+  };
+});
 
 const seoData = {
   title: `Moteles en ${currentState.name} 2026 | Con Jacuzzi, Precios y Ubicaciones Exactas`,
@@ -167,7 +165,7 @@ const schemaEnrichment = {
                                      {motel.short_name && (
                       <a 
                         data-astro-prefetch="hover"
-                        href={`/moteles/${motel.short_name}`}
+                        href={`/moteles/estados/${state}/${motel.short_name}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >

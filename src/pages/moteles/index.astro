@@ -13,33 +13,44 @@ import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
 import Card from "../../components/Card.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import { getRestaurants, getStates } from "../../lib/supabase";
+import { getRestaurants, getStates, getAllPlaceRatings } from "../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
-import type { Place } from "../../types/app";
+import type { SupabasePlace } from "../../types/app";
 
-const motelesData: Place[] = await getRestaurants({ type: 'motel' });
-const states = await getStates();
-const motelesList: Place[] = motelesData.map((motel) => ({
-  id: motel.id,
-  name: motel.name,
-  short_name: motel.short_name,
-  rating: motel.rating || 4.0,
-  reviewCount: motel.reviewCount || 0,
-  priceRange: motel.priceRange || "$$",
-  address: motel.address || "",
-  hours: motel.hours || "24 horas",
-  amenities: motel.amenities || [],
-  image: motel.image,
-  menu: motel.menu,
-  distance: motel.distance,
-  closed: motel.closed,
-  openingTime: motel.openingTime,
-  specialties: [],
-  featured: motel.featured,
-  phone: undefined,
-  type: motel.type,
-  destacado: motel.featured
-}));
+
+const [motelesData, states, allRatings] = await Promise.all([
+  getRestaurants({ type: 'motel' }),
+  getStates(),
+  getAllPlaceRatings()
+]);
+
+const motelesList: SupabasePlace[] = motelesData.map((motel) => {
+  const stats = allRatings[motel.id];
+  const stateObj = states.find(s => s.id === motel.state_id);
+  
+  return {
+    id: motel.id,
+    name: motel.name,
+    short_name: motel.short_name,
+    state_slug: stateObj?.slug || 'nuevo-leon',
+    rating: stats?.rating || motel.rating || 4.0,
+    reviewCount: stats?.count || motel.reviewCount || 0,
+    priceRange: motel.priceRange || "$$",
+    address: motel.address || "",
+    hours: motel.hours || "24 horas",
+    amenities: motel.amenities || [],
+    image: motel.image,
+    menu: motel.menu,
+    distance: motel.distance,
+    closed: motel.closed,
+    openingTime: motel.openingTime,
+    specialties: [],
+    featured: motel.featured,
+    phone: undefined,
+    type: motel.type,
+    destacado: motel.featured
+  };
+});
 
 const url = new URL(Astro.request.url);
 const zona = url.searchParams.get('zona') || undefined;
@@ -379,7 +390,7 @@ const schemaEnrichment = {
                     {motel.short_name && (
                       <a 
                         data-astro-prefetch="hover"
-                        href={`/moteles/${motel.short_name}`}
+                        href={`/moteles/estados/${motel.state_slug}/${motel.short_name}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >
@@ -451,7 +462,16 @@ const schemaEnrichment = {
                   <h3 class="font-serif text-xl font-bold text-pink-400 mb-2 group-hover:text-pink-300 transition-colors">
                     {motel.name}
                   </h3>
-    
+                      <!-- Rating Real-Time -->
+                  <div class="flex items-center gap-2 mb-3">
+                    <div class="flex items-center bg-amber-500 text-black px-1.5 py-0.5 rounded text-xs font-bold">
+                      <Star className="w-3 h-3 mr-1 fill-current" />
+                      {motel.rating}
+                    </div>
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                      {motel.reviewCount} REVOLUCIONES
+                    </span>
+                  </div>
                   <!-- Estado (24 horas) -->
                   <div class="flex items-center mb-3">
                     <Clock className="w-4 h-4 text-gray-400 mr-2" />
@@ -508,7 +528,7 @@ const schemaEnrichment = {
                     {motel.short_name ? (
                       <a 
                         data-astro-prefetch="hover"
-                        href={`/moteles/${motel.short_name}`}
+                        href={`/moteles/estados/${motel.state_slug}/${motel.short_name}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
                         class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >

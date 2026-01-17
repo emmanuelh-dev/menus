@@ -36,36 +36,24 @@ if (userError || !user) {
 	return Astro.redirect("/admin/login");
 }
 
-// Obtener restaurantes del usuario
-const { data: restaurants, error: restaurantsError } = await supabase
+const { data: places, error: placesError } = await supabase
 	.from("places")
 	.select("*")
 	.eq("user_id", user?.id)
 	.order("created_at", { ascending: false });
 
-// Obtener menús con información del restaurante
-const { data: menus, error } = await supabase
-	.from("menus")
-	.select(
-		`
-    *,
-    restaurants (
-      id,
-      name
-    )
-  `
-	)
-	.eq("user_id", user?.id)
-	.order("created_at", { ascending: false });
-  
-
 const { data: recentComments } = await supabase
-	.from("review")
-	.select('*')
+	.from("reviews")
+	.select(`
+		*,
+		places (
+			name
+		)
+	`)
+  .in('place_id', (places || []).map(p => p.id))
 	.order("created_at", { ascending: false })
-	.limit(10);
+	.limit(20);
 
-// Obtener historial de cambios reciente
 const { data: history } = await supabase
 	.from("place_content_history")
 	.select(`
@@ -83,7 +71,7 @@ const { data: history } = await supabase
 <AdminLayout title="Dashboard | Panel de Administrador">
 	<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 	
-	<PlaceManager client:load initialRestaurants={restaurants || []} />
+	<PlaceManager  initialRestaurants={places || []} client:load/>
 	
 	<div class="mt-8">
 		<HistoryManager client:load initialHistory={history || []} />
@@ -104,9 +92,7 @@ const { data: history } = await supabase
 								<div class="flex items-center space-x-4">
 									<div class="flex-1 min-w-0">
 										<p class="text-sm font-medium text-gray-900 truncate">
-											{comment.restaurants?.name ||
-												comment.restaurant ||
-												"Restaurante no especificado"}
+											{comment.places?.name || "Lugar no especificado"}
 										</p>
 										<p class="text-sm text-gray-500 truncate">
 											{comment.comment}
@@ -120,7 +106,7 @@ const { data: history } = await supabase
 						))}
 					</ul>
 				) : (
-					<p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
+					<p class="text-gray-500 text-sm">No hay comentarios recientes.</p>
 				)
 			}
 		</div>

@@ -13,26 +13,37 @@ import Gallery from "../../../../../components/Gallery.astro";
 import WhatsappButton from "../../../../../components/WhatsappButton";
 import CopyClabe from "../../../../../components/CopyClabe";
 import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
-import { getRestaurantByName, supabase, getStates } from "../../../../../lib/supabase";
+import { getRestaurantByName, supabase, getStates, getPlaceRating } from "../../../../../lib/supabase";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 import QuickFeed from "../../../../../components/QuickFeed";
 import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
+import { isAuthenticated } from "../../../../../middleware/auth";
 
 if (!name) {
 	throw new Error("No se ha especificado el nombre del restaurante");
 }
+
+const isAdmin = await isAuthenticated(Astro.request, Astro.cookies);
+
 const { data: place } = await supabase
 	.from("places")
 	.select("*")
 	.eq("short_name", name)
 	.single();
 
+if (!place) {
+  return Astro.redirect('/404');
+}
+
+const stats = await getPlaceRating(place.id);
+const placeWithStats = { ...place, ...stats };
+
 const states = await getStates();
 const currentState = states.find(s => s.slug === state);
 ---
 
 <MotelLayout
-  place={place}
+  place={placeWithStats}
 	image={place.image ? place.image : "/placeholder.svg"}
 	backgroundColor="bg-[#0A0A0A]"
 >
@@ -53,7 +64,7 @@ const currentState = states.find(s => s.slug === state);
 			/>
 		</div>
 
-		<MotelPageRenderer place={place} />
+		<MotelPageRenderer place={placeWithStats} isAdmin={isAdmin} />
 	</div>
 
 	<!-- <QuickFeed placeId={place.id} client:load /> -->

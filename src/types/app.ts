@@ -3,7 +3,6 @@ export const formater = {
   'restaurant': 'menus',
 }
 export interface Place {
-  id?: number;
   name: string;
   short_name?: string;
   rating: number;
@@ -23,7 +22,12 @@ export interface Place {
   featured: boolean;
   type: string;
   state_id?: number;
+  state_slug?: string;
   content?: Content;
+}
+
+export interface SupabasePlace extends Place {
+  id: number;
 }
 
 export interface Content {

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Place } from '../types/app';
+import type { SupabasePlace } from '../types/app';
 
 // Obtener las variables de entorno
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -84,7 +84,63 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
     console.error(`Error fetching ${type}:`, error);
     return [];
   }
-  return data as Place[];
+  return data as SupabasePlace[];
+}
+
+/**
+ * Obtiene el promedio de calificación y conteo de reseñas para todos los lugares
+ */
+export async function getAllPlaceRatings() {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('place_id, rate');
+
+  if (error) {
+    console.error('Error fetching all ratings:', error);
+    return {};
+  }
+
+  const stats: Record<number, { rating: number, count: number }> = {};
+  
+  data.forEach((rev: any) => {
+    if (!stats[rev.place_id]) {
+      stats[rev.place_id] = { sum: 0, count: 0 } as any;
+    }
+    const s = stats[rev.place_id] as any;
+    s.sum += rev.rate;
+    s.count += 1;
+  });
+
+  const finalStats: Record<number, { rating: number, count: number }> = {};
+  Object.keys(stats).forEach((id: any) => {
+    const s = stats[id] as any;
+    finalStats[id] = {
+      rating: Number((s.sum / s.count).toFixed(1)),
+      count: s.count
+    };
+  });
+
+  return finalStats;
+}
+
+/**
+ * Obtiene el promedio de calificación y conteo de reseñas para un lugar específico
+ */
+export async function getPlaceRating(placeId: number) {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('rate')
+    .eq('place_id', placeId);
+
+  if (error || !data || data.length === 0) {
+    return { rating: 0, count: 0 };
+  }
+
+  const sum = data.reduce((acc, rev) => acc + (rev.rate || 0), 0);
+  const count = data.length;
+  const rating = Number((sum / count).toFixed(1));
+
+  return { rating, count };
 }
 
 export async function getStates() {
@@ -117,7 +173,7 @@ export async function getCafeteriasDestacadas() {
     return [];
   }
   
-  return data as Place[];
+  return data as SupabasePlace[];
 }
 
 // Función para obtener opiniones de una cafetería
@@ -132,7 +188,7 @@ export async function getOpinionesCafeteria(cafeteriaId: number) {
     return [];
   }
   
-  return data;
+  return data as SupabasePlace[];
 }
 
 export async function getRestaurantByName({ name }: { name: string }) {
@@ -144,5 +200,5 @@ export async function getRestaurantByName({ name }: { name: string }) {
     console.error('Error fetching cafeterias:', error);
     return [];
   }
-  return data as Place[];
+  return data as SupabasePlace[];
 }

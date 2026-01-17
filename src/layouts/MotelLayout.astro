@@ -1,7 +1,6 @@
 ---
 import Footer from "../components/Footer.astro";
 import MotelHeader from "../components/MotelHeader.astro";
-import ReviewForm from "../components/ReviewForm";
 import ScrollTopAndComment from "../components/ScrollTopAndComment";
 import { supabase } from "../lib/supabase";
 import type { Place } from "../types/app";
@@ -340,29 +339,14 @@ if (reviewStats.reviewCount > 0) {
       })(window, document, "clarity", "script", "s1a8gh6len");
     </script>
 
-    <!-- <script 
-    async 
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
-    crossorigin="anonymous"
-   /> -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
+    crossorigin="anonymous"></script>
 
   </head>
   
   <body class="motel-typography">
     <MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
     <slot />
-
-    {
-     place?.id && (
-        <div
-          class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
-        >
-          <div>
-            <ReviewForm client:only id={place.id} restaurantName={place?.name || title} initialReviews={initialReviews} />
-          </div>
-        </div>
-      )
-    }
 
     <ScrollTopAndComment client:only />
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
