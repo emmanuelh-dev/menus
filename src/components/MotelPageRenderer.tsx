@@ -181,7 +181,7 @@ export default function MotelPageRenderer({ place, isPreview = false, isAdmin = 
           </div>
         </div>
 
-    <ins className="adsbygoogle block"
+    <ins className="adsbygoogle block h-48"
 
 data-ad-client="ca-pub-3646138644530578"
     data-ad-slot="7426120296"
