@@ -20,7 +20,7 @@ const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"]
 const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet"];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const restaurants = await getRestaurants({type: null})
+const restaurants = (await getRestaurants({type: null})).sort((a, b) => (b.rating || 0) - (a.rating || 0));
 ---
 
 <RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">
@@ -51,13 +51,18 @@ const restaurants = await getRestaurants({type: null})
             </div>
 
             <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-                {restaurants.map((restaurant) => (
+                {restaurants.map((restaurant) => {
+                    const restaurantUrl = restaurant.type === 'motel' 
+                        ? `/moteles/estados/${restaurant.state_slug}/${restaurant.short_name}`
+                        : `/menus/${restaurant.short_name}`;
+                    
+                    return (
                     <div 
                         class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
                     >
                         <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
                             {restaurant.short_name ? (
-                                <a href={'/menus/' + restaurant.short_name}>
+                                <a href={restaurantUrl}>
                                     <img
                                         src={restaurant.image}
                                         alt={restaurant.name}
@@ -73,12 +78,16 @@ const restaurants = await getRestaurants({type: null})
                             )}
                         </div>
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            <a href={`/${formater[restaurant.type] || restaurant.type}/${restaurant.short_name}`}>{restaurant.name}</a>
+                            <a href={restaurantUrl}>{restaurant.name}</a>
                         </h2>
-                        <p class="text-gray-600">{}</p>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-amber-500 text-sm font-bold">★ {restaurant.rating}</span>
+                            <span class="text-gray-400 text-xs text-uppercase">({restaurant.reviewCount} reseñas)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm">{restaurant.address}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
                         </div>
-                        {restaurant.short_name && <a href={'/menus/' + restaurant.short_name} class="group mt-4 block">
+                        {restaurant.short_name && <a href={restaurantUrl} class="group mt-4 block">
                             <span class="flex items-center justify-between">
                                 Leer la historia completa
                                 <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
@@ -87,7 +96,7 @@ const restaurants = await getRestaurants({type: null})
                             </span>
                         </a>}
                     </div>
-                ))}
+                )})}
            
             </div>
         </div>
