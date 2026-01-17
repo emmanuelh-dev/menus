@@ -181,8 +181,13 @@ export default function MotelPageRenderer({ place, isPreview = false, isAdmin = 
           </div>
         </div>
 
-        <div className="h-[1px] w-full bg-white/5 mt-16"></div>
-      </header>
+    <ins className="adsbygoogle block"
+
+data-ad-client="ca-pub-3646138644530578"
+    data-ad-slot="7426120296"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>
+          </header>
 
       {/* Suites y Servicios */}
       <div className="space-y-24">
