@@ -188,6 +188,26 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     }
   };
 
+  const getAllExistingImages = (): string[] => {
+    const images = new Set<string>();
+    
+    blocks.forEach(block => {
+      if (block.type === 'section') {
+        if (block.data.image) images.add(block.data.image);
+        block.data.items?.forEach((item: ItemData) => {
+          if (item.image) images.add(item.image);
+          item.gallery?.forEach(img => images.add(img.src));
+        });
+      } else if (block.type === 'gallery') {
+        block.data.images?.forEach((img: any) => images.add(img.src));
+      } else if (block.type === 'image') {
+        if (block.data.src) images.add(block.data.src);
+      }
+    });
+    
+    return Array.from(images).filter(Boolean);
+  };
+
   const addBlock = (type: BlockType, afterIndex?: number) => {
     const newBlock: Block = {
       id: `block-${Date.now()}-${Math.random()}`,
@@ -421,13 +441,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   };
 
   function renderBlock(block: Block, index: number, forceCollapse: boolean) {
+    const existingImages = getAllExistingImages();
     switch (block.type) {
       case 'section':
-        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} />;
+        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} />;
       case 'gallery':
-        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
       case 'image':
-        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
+        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
       default:
         return null;
     }
@@ -1145,8 +1166,49 @@ function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string
   );
 }
 
-function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean }) {
+function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: string[]; onSelect: (url: string) => void; onClose: () => void }) {
+  if (existingImages.length === 0) {
+    return (
+      <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl border-2 border-gray-200 shadow-2xl p-6 text-center z-50">
+        <div className="text-4xl mb-2">📭</div>
+        <p className="text-sm text-gray-500">No hay imágenes disponibles todavía</p>
+        <button onClick={onClose} className="mt-3 text-xs text-gray-400 hover:text-gray-600">Cerrar</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl border-2 border-gray-200 shadow-2xl p-4 z-50 max-h-96 overflow-y-auto">
+      <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
+        <span className="text-xs font-black uppercase text-gray-600">Selecciona una imagen</span>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold">✕</button>
+      </div>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {existingImages.map((url, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              onSelect(url);
+              onClose();
+            }}
+            className="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-all group"
+          >
+            <img src={url} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+              <span className="opacity-0 group-hover:opacity-100 text-white text-2xl">✓</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse, existingImages }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean; existingImages?: string[] }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [showImageSelector, setShowImageSelector] = useState(false);
+  const [showItemImageSelector, setShowItemImageSelector] = useState<{[key: number]: boolean}>({});
+  const [showItemGallerySelector, setShowItemGallerySelector] = useState<{[key: number]: boolean}>({});
 
   useEffect(() => {
     if (forceCollapse !== undefined) {
@@ -1226,15 +1288,34 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse 
               className="w-full text-sm bg-white/50 p-3 rounded-lg border border-purple-200 outline-none focus:border-purple-600"
             />
 
-            <div>
+            <div className="relative">
               <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Imagen de fondo:</label>
-              <ManualUploader
-                currentImage={data.image}
-                onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
-                onImageRemove={() => onChange({ ...data, image: '' })}
-                onUploadStart={() => console.log('Subiendo imagen de sección...')}
-                onUploadError={() => console.error('Error al subir imagen')}
-              />
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <ManualUploader
+                    currentImage={data.image}
+                    onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
+                    onImageRemove={() => onChange({ ...data, image: '' })}
+                    onUploadStart={() => console.log('Subiendo imagen de sección...')}
+                    onUploadError={() => console.error('Error al subir imagen')}
+                  />
+                </div>
+                {existingImages && existingImages.length > 0 && (
+                  <button
+                    onClick={() => setShowImageSelector(!showImageSelector)}
+                    className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm font-bold whitespace-nowrap"
+                  >
+                    📚 Existentes
+                  </button>
+                )}
+              </div>
+              {showImageSelector && existingImages && (
+                <ImageSelector
+                  existingImages={existingImages}
+                  onSelect={(url) => onChange({ ...data, image: url })}
+                  onClose={() => setShowImageSelector(false)}
+                />
+              )}
             </div>
 
             <div className="mt-6 space-y-3">
@@ -1331,28 +1412,73 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse 
 
                 <div className="w-full">
                   <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN PRINCIPAL:</label>
-                  <ManualUploader
-                    currentImage={item.image}
-                    onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
-                    onImageRemove={() => updateItem(itemIndex, { image: '' })}
-                    onUploadStart={() => console.log('Subiendo imagen del item...')}
-                    onUploadError={() => console.error('Error al subir imagen')}
-                  />
+                  <div className="relative">
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <ManualUploader
+                          currentImage={item.image}
+                          onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
+                          onImageRemove={() => updateItem(itemIndex, { image: '' })}
+                          onUploadStart={() => console.log('Subiendo imagen del item...')}
+                          onUploadError={() => console.error('Error al subir imagen')}
+                        />
+                      </div>
+                      {existingImages && existingImages.length > 0 && (
+                        <button
+                          onClick={() => setShowItemImageSelector({...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex]})}
+                          className="px-3 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-xs font-bold whitespace-nowrap"
+                        >
+                          📚 Existentes
+                        </button>
+                      )}
+                    </div>
+                    {showItemImageSelector[itemIndex] && existingImages && (
+                      <ImageSelector
+                        existingImages={existingImages}
+                        onSelect={(url) => updateItem(itemIndex, { image: url })}
+                        onClose={() => setShowItemImageSelector({...showItemImageSelector, [itemIndex]: false})}
+                      />
+                    )}
+                  </div>
                 </div>
 
                 <div className="w-full">
                   <label className="text-xs font-bold text-gray-600 mb-2 block">GALERÍA DEL ITEM (opcional):</label>
-                  <ManualUploader
-                    currentImage=""
-                    multiple={true}
-                    onFilesUploaded={(urls) => {
-                      const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
-                      const currentGallery = item.gallery || [];
-                      updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
-                    }}
-                    onUploadStart={() => console.log('Subiendo galería...')}
-                    onUploadError={() => console.error('Error al subir galería')}
-                  />
+                  <div className="space-y-2">
+                    <ManualUploader
+                      currentImage=""
+                      multiple={true}
+                      onFilesUploaded={(urls) => {
+                        const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
+                        const currentGallery = item.gallery || [];
+                        updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
+                      }}
+                      onUploadStart={() => console.log('Subiendo galería...')}
+                      onUploadError={() => console.error('Error al subir galería')}
+                    />
+                    
+                    {existingImages && existingImages.length > 0 && (
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowItemGallerySelector({...showItemGallerySelector, [itemIndex]: !showItemGallerySelector[itemIndex]})}
+                          className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-xs font-bold border border-purple-200"
+                        >
+                          📚 Agregar desde existentes
+                        </button>
+                        {showItemGallerySelector[itemIndex] && (
+                          <ImageSelector
+                            existingImages={existingImages}
+                            onSelect={(url) => {
+                              const newGalleryItem = { src: url, alt: item.name, title: '' };
+                              const currentGallery = item.gallery || [];
+                              updateItem(itemIndex, { gallery: [...currentGallery, newGalleryItem] });
+                            }}
+                            onClose={() => setShowItemGallerySelector({...showItemGallerySelector, [itemIndex]: false})}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
                   
                   {item.gallery && item.gallery.length > 0 && (
                     <div className="mt-3 grid grid-cols-4 gap-2">
@@ -1385,7 +1511,9 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse 
 );
 }
 
-function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: GalleryData) => void }) {
+function GalleryBlock({ data, onChange, existingImages }: { data: GalleryData; onChange: (data: GalleryData) => void; existingImages?: string[] }) {
+  const [showImageSelector, setShowImageSelector] = useState(false);
+  
   const addImageToGallery = (urls: string[]) => {
     const newImages = urls.map(url => ({ src: url, alt: '', title: '' }));
     onChange({
@@ -1427,6 +1555,26 @@ function GalleryBlock({ data, onChange }: { data: GalleryData; onChange: (data: 
           />
         </div>
       </div>
+      
+      <div className="mt-4 flex gap-2">
+        {existingImages && existingImages.length > 0 && (
+          <div className="relative flex-1">
+            <button
+              onClick={() => setShowImageSelector(!showImageSelector)}
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-bold"
+            >
+              📚 Agregar desde existentes
+            </button>
+            {showImageSelector && (
+              <ImageSelector
+                existingImages={existingImages}
+                onSelect={(url) => addImageToGallery([url])}
+                onClose={() => setShowImageSelector(false)}
+              />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1437,7 +1585,9 @@ interface ImageData {
   caption?: string;
 }
 
-function ImageBlock({ data, onChange }: { data: ImageData; onChange: (data: ImageData) => void }) {
+function ImageBlock({ data, onChange, existingImages }: { data: ImageData; onChange: (data: ImageData) => void; existingImages?: string[] }) {
+  const [showImageSelector, setShowImageSelector] = useState(false);
+  
   return (
     <div className="bg-blue-50 p-4 sm:p-6 rounded-xl border-2 border-blue-200">
       <div className="space-y-4">
@@ -1455,12 +1605,33 @@ function ImageBlock({ data, onChange }: { data: ImageData; onChange: (data: Imag
           </div>
         )}
 
-        <ManualUploader
-          currentImage={data.src}
-          onFilesUploaded={(url) => onChange({ ...data, src: url[0] })}
-          onUploadStart={() => console.log('Subiendo imagen...')}
-          onUploadError={() => console.error('Error al subir imagen')}
-        />
+        <div className="relative">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <ManualUploader
+                currentImage={data.src}
+                onFilesUploaded={(url) => onChange({ ...data, src: url[0] })}
+                onUploadStart={() => console.log('Subiendo imagen...')}
+                onUploadError={() => console.error('Error al subir imagen')}
+              />
+            </div>
+            {existingImages && existingImages.length > 0 && (
+              <button
+                onClick={() => setShowImageSelector(!showImageSelector)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-bold whitespace-nowrap"
+              >
+                📚 Existentes
+              </button>
+            )}
+          </div>
+          {showImageSelector && existingImages && (
+            <ImageSelector
+              existingImages={existingImages}
+              onSelect={(url) => onChange({ ...data, src: url })}
+              onClose={() => setShowImageSelector(false)}
+            />
+          )}
+        </div>
 
         <input
           value={data.alt || ''}
