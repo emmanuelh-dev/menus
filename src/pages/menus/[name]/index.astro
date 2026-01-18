@@ -12,6 +12,7 @@ const { name } = Astro.params;
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../components/Gallery.astro";
 import WhatsappButton from "../../../components/WhatsappButton";
+import { Image } from 'astro:assets';
 import { supabase } from "../../../lib/supabase";
 
 if (!name) {
@@ -59,10 +60,14 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 			{/* Header (Mantengo tu estructura de revista) */}
 			<header class="mb-24 flex flex-col items-center">
 				<div class="relative mb-8">
-					<img
+					<Image
 						src={place.image}
 						alt={place.name}
+						width={192}
+						height={192}
 						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
+						loading="eager"
+						format="webp"
 					/>
 				</div>
 				<h1
@@ -240,10 +245,14 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 
 													{item.image && item.image.trim() !== "" && (
 															<div class="order-1 sm:order-2 mb-4 sm:mb-0 overflow-hidden rounded-lg">
-																<img
+																<Image
 																	src={item.image}
 																	alt={item.name}
+																	width={96}
+																	height={96}
 																	class="w-full sm:w-24 h-48 sm:h-24 object-cover saturate-[0.8] group-hover/item:saturate-100 transition-all duration-500"
+																	loading="lazy"
+																	format="webp"
 																/>
 															</div>
 														)}

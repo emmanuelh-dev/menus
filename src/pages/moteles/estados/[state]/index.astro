@@ -12,6 +12,7 @@ import Card from "../../../../components/Card.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
 import { getRestaurants, getStates, getAllPlaceRatings } from "../../../../lib/supabase";
 import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
+import { Image } from 'astro:assets';
 import type { SupabasePlace } from "../../../../types/app";
 
 const { state } = Astro.params;
@@ -108,13 +109,27 @@ const schemaEnrichment = {
                   {motelesList.filter(motel => motel.featured === true).map(motel => (
                     <div class="bg-[#1E1E1E] rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row">
                       <div class="md:w-2/5 relative">
-                        <img
-                          src={motel.image || '/motel.png'} 
-                          alt={motel.name}
-                          width={400}
-                          height={500}
-                          class="w-full h-full object-cover"
-                        />
+                        {motel.image ? (
+                          <Image
+                            src={motel.image}
+                            alt={motel.name}
+                            width={400}
+                            height={500}
+                            class="w-full h-full object-cover"
+                            loading="eager"
+                            format="webp"
+                          />
+                        ) : (
+                          <Image
+                            src="/motel.png"
+                            alt={motel.name}
+                            width={400}
+                            height={500}
+                            class="w-full h-full object-cover"
+                            loading="eager"
+                            format="webp"
+                          />
+                        )}
                         <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
                         <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
                           <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
@@ -173,13 +188,27 @@ const schemaEnrichment = {
                   data-price-range={motel.priceRange}
                 >
                   <div class="relative h-48 overflow-hidden">
-                    <img
-                      src={motel.image || '/motel.png'} 
-                      alt={motel.name}
-                      width={500}
-                      height={300}
-                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
+                    {motel.image ? (
+                      <Image
+                        src={motel.image}
+                        alt={motel.name}
+                        width={500}
+                        height={300}
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
+                        format="webp"
+                      />
+                    ) : (
+                      <Image
+                        src="/motel.png"
+                        alt={motel.name}
+                        width={500}
+                        height={300}
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
+                        format="webp"
+                      />
+                    )}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
                     
                     <div class="absolute bottom-3 left-3 flex items-center space-x-2">
