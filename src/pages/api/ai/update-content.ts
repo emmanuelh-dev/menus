@@ -49,10 +49,25 @@ async function uploadBase64(base64String: string, originalName?: string) {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    let { placeId, instruction, image, images, currentContent: providedContent } = body;
+    let { placeId, instruction, image, images, currentContent: providedContent, preview, saveOnly } = body;
 
     if (!placeId) {
       return new Response(JSON.stringify({ error: 'placeId is required' }), { status: 400 });
+    }
+
+    if (saveOnly && providedContent) {
+      const { error: updateError } = await supabase
+        .from('places')
+        .update({ content: providedContent })
+        .eq('id', placeId);
+
+      if (updateError) throw updateError;
+      
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'Contenido guardado correctamente',
+        content: providedContent
+      }), { status: 200 });
     }
 
     // Simplificar la instrucción: eliminar saltos de línea excesivos y ruidos comunes
@@ -213,6 +228,24 @@ export const POST: APIRoute = async ({ request }) => {
       });
 
       newContent.blocks = restoredBlocks;
+    }
+
+    // Calcular estadísticas de lo detectado
+    const stats = {
+      sections: newContent.blocks?.length || 0,
+      items: newContent.blocks?.reduce((acc: number, b: any) => acc + (b.data?.items?.length || 0), 0) || 0,
+      hasAddress: !!aiResponse.semantic_data?.address,
+      hasPhone: !!aiResponse.semantic_data?.phone,
+      newImages: aiResponse.semantic_data?.new_gallery_images?.length || 0
+    };
+
+    if (preview) {
+      return new Response(JSON.stringify({ 
+        success: true, 
+        preview: true,
+        stats,
+        content: newContent
+      }), { status: 200 });
     }
 
     // 3.5. Procesar nuevas imágenes para la galería (si la IA detectó fotos nuevas en la subida)

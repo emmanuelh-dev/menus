@@ -10,6 +10,8 @@ export default function QuickFeed({ placeId }: QuickFeedProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [text, setText] = useState('');
   const [images, setImages] = useState<File[]>([]);
+  const [pendingContent, setPendingContent] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async () => {
@@ -40,24 +42,50 @@ export default function QuickFeed({ placeId }: QuickFeedProps) {
         body: JSON.stringify({
           placeId,
           images: base64Images,
-          instruction: text || (base64Images.length > 0 ? 'Analiza estas imágenes y actualiza el contenido.' : undefined)
+          instruction: text || (base64Images.length > 0 ? 'Analiza estas imágenes y actualiza el contenido.' : undefined),
+          preview: true
         })
       });
 
       const result = await response.json();
       
-      if (result.success) {
-        alert('✓ ¡Gracias! Hemos procesado la información con IA.');
-        setIsOpen(false);
-        setText('');
-        setImages([]);
-        window.location.reload();
+      if (result.success && result.preview) {
+        setPendingContent(result.content);
+        setStats(result.stats);
       } else {
         throw new Error(result.error || 'Error al procesar');
       }
     } catch (err) {
       console.error(err);
       alert('Hubo un error al procesar tu solicitud.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!pendingContent) return;
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/ai/update-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          placeId,
+          saveOnly: true,
+          currentContent: pendingContent
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert('✓ ¡Gracias! Hemos actualizado la información.');
+        setIsOpen(false);
+        setPendingContent(null);
+        window.location.reload();
+      }
+    } catch (err) {
+      alert('Error al guardar');
     } finally {
       setIsProcessing(false);
     }
@@ -101,48 +129,102 @@ export default function QuickFeed({ placeId }: QuickFeedProps) {
             </p>
 
             <div className="space-y-4">
-              <div 
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${images.length > 0 ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-white/20 hover:bg-white/5'}`}
-              >
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleFileChange}
-                  className="hidden" 
-                  accept="image/*,application/pdf"
-                  multiple
-                />
-                <svg xmlns="http://www.w3.org/2000/svg" className={`size-10 mb-2 ${images.length > 0 ? 'text-green-500' : 'text-stone-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="text-sm text-stone-500 text-center">
-                  {images.length > 0 ? `${images.length} archivos seleccionados` : 'Subir fotos o PDFs (pueden ser varios)'}
-                </span>
-                {images.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1 justify-center">
-                    {images.slice(0, 3).map((f, i) => (
-                      <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-stone-400 max-w-[100px] truncate">{f.name}</span>
-                    ))}
-                    {images.length > 3 && <span className="text-[10px] text-stone-500">+ {images.length - 3} más</span>}
+              {pendingContent ? (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 mb-6">
+                    <h3 className="text-green-400 font-bold mb-4 flex items-center gap-2">
+                      <span className="text-xl">✨</span> ¡Análisis Completo!
+                    </h3>
+                    
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="bg-black/40 p-3 rounded-lg border border-white/5">
+                        <p className="text-stone-500 text-[10px] uppercase font-black mb-1">Items</p>
+                        <p className="text-white text-xl font-bold">{stats?.items || 0}</p>
+                      </div>
+                      <div className="bg-black/40 p-3 rounded-lg border border-white/5">
+                        <p className="text-stone-500 text-[10px] uppercase font-black mb-1">Secciones</p>
+                        <p className="text-white text-xl font-bold">{stats?.sections || 0}</p>
+                      </div>
+                      {(stats?.hasAddress || stats?.hasPhone) && (
+                        <div className="col-span-2 bg-black/40 p-3 rounded-lg border border-white/5">
+                           <p className="text-stone-500 text-[10px] uppercase font-black mb-1">Detalles</p>
+                           <p className="text-stone-300 text-xs">
+                             Se detectó: {stats.hasAddress ? '📍 Dirección' : ''} {stats.hasPhone ? ' 📞 Teléfono' : ''}
+                           </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
 
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Ej: 'Simplifica las descripciones' o 'Agrega cochera a la habitación normal'..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-800 transition-all min-h-[100px]"
-              />
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setPendingContent(null)}
+                      className="flex-1 py-3 px-4 bg-white/5 text-stone-400 rounded-xl font-bold hover:bg-white/10 transition-colors"
+                    >
+                      Volver
+                    </button>
+                    <button
+                      onClick={handleConfirm}
+                      disabled={isProcessing}
+                      className="flex-[2] py-3 px-4 bg-red-800 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-xl shadow-red-950/20 flex items-center justify-center gap-2"
+                    >
+                      {isProcessing ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Guardando...
+                        </>
+                      ) : (
+                        <>Aplicar Cambios ✨</>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${images.length > 0 ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-white/20 hover:bg-white/5'}`}
+                  >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange}
+                      className="hidden" 
+                      accept="image/*,application/pdf"
+                      multiple
+                    />
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`size-10 mb-2 ${images.length > 0 ? 'text-green-500' : 'text-stone-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm text-stone-500 text-center">
+                      {images.length > 0 ? `${images.length} archivos seleccionados` : 'Subir fotos o PDFs (pueden ser varios)'}
+                    </span>
+                    {images.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1 justify-center">
+                        {images.slice(0, 3).map((f, i) => (
+                          <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-stone-400 max-w-[100px] truncate">{f.name}</span>
+                        ))}
+                        {images.length > 3 && <span className="text-[10px] text-stone-500">+ {images.length - 3} más</span>}
+                      </div>
+                    )}
+                  </div>
 
-              <button
-                onClick={handleSubmit}
-                disabled={isProcessing}
-                className="w-full bg-red-800 hover:bg-red-700 disabled:bg-stone-800 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all shadow-xl shadow-red-950/20"
-              >
-                {isProcessing ? 'Procesando con IA...' : 'Actualizar ahora'}
-              </button>
+                  <textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Ej: 'Simplifica las descripciones' o 'Agrega cochera a la habitación normal'..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-800 transition-all min-h-[100px]"
+                  />
+
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isProcessing}
+                    className="w-full bg-red-800 hover:bg-red-700 disabled:bg-stone-800 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all shadow-xl shadow-red-950/20"
+                  >
+                    {isProcessing ? 'Procesando con IA...' : 'Actualizar ahora'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

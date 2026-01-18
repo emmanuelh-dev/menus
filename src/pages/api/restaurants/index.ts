@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const { data, error } = await supabase
       .from('places')
       .insert(dataToInsert)
-      .select()
+      .select('*, states(*)')
       .single();
     
     if (error) {

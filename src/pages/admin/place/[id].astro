@@ -26,7 +26,7 @@ const supabase = await createAuthenticatedClient(
 // 1. OBTENER EL LUGAR ESPECÍFICO (Ya no buscamos 'menus')
 const { data: place, error: placeError } = await supabase
   .from("places")
-  .select("*")
+  .select("*, states(*)")
   .eq("id", id)
   .single();
 
@@ -45,12 +45,19 @@ const { data: reviews } = await supabase
   <div class="mb-8 flex items-center justify-between">
     <div>
       <a href="/admin/dashboard" class="text-sm text-gray-500 hover:underline">← Volver al Dashboard</a>
-      <h1 class="text-3xl font-black uppercase tracking-tighter mt-2">{place.name}</h1>
+      <div class="flex items-center gap-3 mt-2">
+        <h1 class="text-3xl font-black uppercase tracking-tighter">{place.name}</h1>
+        {place.states && (
+          <span class="text-xs bg-gray-100 px-2 py-1 rounded-full font-bold uppercase text-gray-500">
+            {place.states.name}
+          </span>
+        )}
+      </div>
     </div>
     
     <div class="flex gap-3">
       <a 
-        href={`/${formater[place.type] || place.type}/${place.short_name}`} 
+        href={place.type === 'motel' && place.states?.slug ? `/moteles/estados/${place.states.slug}/${place.short_name}` : `/${formater[place.type] || place.type}/${place.short_name}`} 
         target="_blank" 
         class="bg-gray-100 px-4 py-2 rounded-lg text-sm font-bold"
       >
@@ -72,6 +79,9 @@ const { data: reviews } = await supabase
         <h2 class="text-lg font-bold mb-4">Información General</h2>
         <div class="space-y-3 text-sm">
           <p><span class="text-gray-400 uppercase font-bold text-xs">Categoría:</span> {place.type}</p>
+          {place.states && (
+            <p><span class="text-gray-400 uppercase font-bold text-xs">Estado:</span> {place.states.name}</p>
+          )}
           <p><span class="text-gray-400 uppercase font-bold text-xs">Dirección:</span> {place.address}</p>
           <p><span class="text-gray-400 uppercase font-bold text-xs">Rating:</span> {place.rating} ★</p>
         </div>

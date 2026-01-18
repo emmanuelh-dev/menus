@@ -38,6 +38,28 @@ import { useState, useRef, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 import MotelPageRenderer from '../MotelPageRenderer';
+import { 
+  Plus, 
+  Trash2, 
+  GripVertical, 
+  ChevronUp, 
+  ChevronDown, 
+  Copy, 
+  Eye, 
+  Layout, 
+  Save, 
+  Upload, 
+  Image as ImageIcon, 
+  FileText, 
+  Send,
+  X,
+  Paperclip,
+  RotateCcw,
+  Sparkles,
+  Search,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
 
 type BlockType = 'section' | 'gallery' | 'image';
 
@@ -149,8 +171,10 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiProcessing, setAiProcessing] = useState(false);
-  const [aiInputMode, setAiInputMode] = useState<'image' | 'text' | 'json'>('image');
+  const [pendingAiContent, setPendingAiContent] = useState<any>(null);
+  const [aiStats, setAiStats] = useState<any>(null);
   const [textInput, setTextInput] = useState('');
+  const [aiFiles, setAiFiles] = useState<{ name: string; data: string; type: string }[]>([]);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [forceCollapse, setForceCollapse] = useState(true);
@@ -273,40 +297,36 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     return sectionItems.some(item => normalizeTitle(item.name) === normalizedName);
   };
 
-  const analyzeMenuWithAI = async (input: { files?: File[], text?: string }) => {
+  const analyzeMenuWithAI = async () => {
+    if (!textInput.trim() && aiFiles.length === 0) {
+      alert('Por favor agrega texto o imágenes para analizar');
+      return;
+    }
+
     setAiProcessing(true);
     try {
-      const base64Images: string[] = [];
-      
-      if (input.files) {
-        for (const file of input.files) {
-          const reader = new FileReader();
-          const promise = new Promise<string>((resolve) => {
-            reader.onloadend = () => resolve(reader.result as string);
-          });
-          reader.readAsDataURL(file);
-          const result = await promise;
-          base64Images.push(result);
-        }
-      }
-
       const response = await fetch('/api/ai/update-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           placeId,
-          images: base64Images.length > 0 ? base64Images : undefined,
-          instruction: input.text || (base64Images.length > 0 ? 'Analiza las imágenes y extrae el contenido.' : undefined),
-          currentContent: { blocks, semantic_data: semanticData }
+          images: aiFiles.length > 0 ? aiFiles.map(f => f.data) : undefined,
+          instruction: textInput.trim() || undefined,
+          currentContent: { blocks, semantic_data: semanticData },
+          preview: true
         })
       });
 
       const result = await response.json();
       
-      if (result.success) {
+      if (result.success && result.preview) {
+        setPendingAiContent(result.content);
+        setAiStats(result.stats);
+      } else if (result.success) {
         setBlocks(result.content.blocks);
         setSemanticData(result.content.semantic_data);
         setShowAIChat(false);
+        setAiFiles([]);
         setTextInput('');
         alert('✓ Contenido actualizado con IA');
       } else {
@@ -320,23 +340,83 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     }
   };
 
-  const analyzeMenuImages = (files: File[]) => analyzeMenuWithAI({ files });
-  const analyzeMenuText = (text: string) => analyzeMenuWithAI({ text });
-
-  const analyzeMenuJSON = (jsonText: string) => {
-    try {
-      const parsed = JSON.parse(jsonText);
-      // ... lógica de importación JSON manual simplificada si se requiere
-      alert('Importación manual de JSON no disponible, use el análisis de texto o imagen.');
-    } catch (err) {
-      alert('Error al analizar JSON');
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const base64 = event.target?.result as string;
+            setAiFiles(prev => [...prev, {
+              name: `pasted-image-${Date.now()}.png`,
+              data: base64,
+              type: file.type
+            }]);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
     }
   };
 
-  const handleAIImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAIImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      analyzeMenuImages(Array.from(files));
+    if (!files) return;
+
+    for (const file of Array.from(files)) {
+      const reader = new FileReader();
+      const promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+      });
+      reader.readAsDataURL(file);
+      const data = await promise;
+      
+      setAiFiles(prev => [...prev, {
+        name: file.name,
+        data: data,
+        type: file.type
+      }]);
+    }
+  };
+
+  const removeAiFile = (index: number) => {
+    setAiFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const confirmAiChanges = async () => {
+    if (!pendingAiContent) return;
+    
+    setAiProcessing(true);
+    try {
+      const response = await fetch('/api/ai/update-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          placeId,
+          saveOnly: true,
+          currentContent: pendingAiContent
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setBlocks(result.content.blocks);
+        setSemanticData(result.content.semantic_data);
+        setPendingAiContent(null);
+        setAiStats(null);
+        setShowAIChat(false);
+        setAiFiles([]);
+        setTextInput('');
+        alert('✓ Cambios aplicados correctamente');
+      } else {
+        throw new Error(result.error || 'Error al guardar cambios');
+      }
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setAiProcessing(false);
     }
   };
 
@@ -739,134 +819,175 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       </div>
 
       {showAIChat && (
-        <div className="mx-4 sm:mx-0 p-6 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl border-2 border-purple-300 shadow-lg">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-lg font-black uppercase mb-1">Asistente IA</h2>
-              <p className="text-sm text-gray-600">Detecta automaticamente secciones existentes y agrega solo lo que falta</p>
+        <div className="mx-4 sm:mx-0 p-6 bg-gray-50 rounded-2xl border-2 border-purple-200 shadow-xl overflow-hidden">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black uppercase tracking-tight leading-none">Asistente IA</h2>
+                <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Sube fotos, pega texto o arrastra archivos</p>
+              </div>
             </div>
             <button
               onClick={() => setShowAIChat(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >✕</button>
-          </div>
-
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setAiInputMode('image')}
-              className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
-                aiInputMode === 'image'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-purple-600 border border-purple-300'
-              }`}
+              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
             >
-              📸 Imagen
-            </button>
-            <button
-              onClick={() => setAiInputMode('text')}
-              className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
-                aiInputMode === 'text'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-purple-600 border border-purple-300'
-              }`}
-            >
-              📝 Texto
-            </button>
-            <button
-              onClick={() => setAiInputMode('json')}
-              className={`flex-1 py-2 px-4 rounded-lg font-bold transition-colors ${
-                aiInputMode === 'json'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-purple-600 border border-purple-300'
-              }`}
-            >
-              🔗 JSON
+              <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
-          {aiInputMode === 'image' && (
-            <>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*,application/pdf"
-                multiple
-                onChange={handleAIImagesUpload}
-              />
+          {!pendingAiContent ? (
+            <div className="bg-white rounded-xl border-2 border-gray-100 shadow-sm overflow-hidden focus-within:border-purple-400 transition-all">
+              {/* Archivos adjuntos */}
+              {aiFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border-b border-gray-100">
+                  {aiFiles.map((file, idx) => (
+                    <div key={idx} className="group relative">
+                      <img 
+                        src={file.data} 
+                        alt={file.name} 
+                        className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        onClick={() => removeAiFile(idx)}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={aiProcessing}
-                className="w-full bg-white border-2 border-dashed border-purple-400 rounded-lg p-8 hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {aiProcessing ? (
-                  <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
-                    <p className="font-bold text-purple-700">Analizando archivos...</p>
-                    <p className="text-xs text-purple-500 mt-1 italic">Detectando platillos y fotos para galería</p>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <span className="text-4xl block mb-2">📸</span>
-                    <p className="font-bold text-purple-700">Click para subir fotos o PDFs</p>
-                    <p className="text-xs text-gray-500 mt-1 italic">Puedes seleccionar varios archivos a la vez</p>
-                  </div>
-                )}
-              </button>
-            </>
-          )}
-
-          {aiInputMode === 'text' && (
-            <div className="space-y-3">
               <textarea
+                className="w-full p-4 text-sm resize-none outline-none min-h-[140px] focus:ring-0"
+                placeholder="Escribe instrucciones (ej: 'agrega estos platillos'), pega una imagen del menú directamente aquí, o arrastra archivos..."
+                onPaste={handlePaste}
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Pega aqui el contenido del menu completo&#10;&#10;Ejemplo:&#10;ENTRADAS&#10;Guacamole - $120&#10;Queso fundido con chorizo - $150&#10;&#10;PLATOS FUERTES&#10;Tacos al pastor (3 piezas) - $90&#10;..."
-                rows={12}
                 disabled={aiProcessing}
-                className="w-full p-4 rounded-lg border-2 border-purple-300 outline-none focus:border-purple-600 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    analyzeMenuWithAI();
+                  }
+                }}
               />
-              <button
-                onClick={() => textInput.trim() && analyzeMenuText(textInput)}
-                disabled={aiProcessing || !textInput.trim()}
-                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {aiProcessing ? (
-                  <span className="flex items-center justify-center">
-                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Analizando texto...
-                  </span>
-                ) : (
-                  '🤖 Analizar con IA'
-                )}
-              </button>
-            </div>
-          )}
 
-          {aiInputMode === 'json' && (
-            <div className="space-y-3">
-              <div className="bg-purple-50 p-3 rounded-lg text-xs text-gray-700 mb-3">
-                <p className="font-bold mb-1">Formato esperado:</p>
-                <code className="block bg-white p-2 rounded text-[10px] overflow-x-auto">
-                  [{'{'}"nombre": "CATEGORIA", "subcategorias": [{'{'}"nombre": "SUBCATEGORIA", "platillos": [{'{'}"nombre": "...", "precio": 120, "descripcion": "...", "imagenUrl": "https://..."{'}'}]{'}'}]{'}'}]
-                </code>
+              <div className="flex items-center justify-between p-3 bg-gray-50 border-t border-gray-100">
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={aiProcessing}
+                    className="p-2 hover:bg-white text-gray-600 rounded-lg transition-colors flex items-center gap-1.5 border border-transparent hover:border-gray-200"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase">Adjuntar</span>
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleAIImagesUpload}
+                    accept="image/*,application/pdf"
+                  />
+                </div>
+
+                <button
+                  onClick={analyzeMenuWithAI}
+                  disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
+                  className="bg-purple-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-100 active:scale-95"
+                >
+                  {aiProcessing ? (
+                    <>
+                      <RotateCcw className="w-4 h-4 animate-spin" />
+                      Analizando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Analizar con IA
+                    </>
+                  )}
+                </button>
               </div>
-              <textarea
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Pega aquí tu JSON con el menú completo incluyendo imágenes..."
-                rows={12}
-                className="w-full p-4 rounded-lg border-2 border-purple-300 outline-none focus:border-purple-600 resize-none font-mono text-xs"
-              />
-              <button
-                onClick={() => textInput.trim() && analyzeMenuJSON(textInput)}
-                disabled={!textInput.trim()}
-                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                📥 Importar JSON con imágenes
-              </button>
+            </div>
+          ) : (
+            <div className="p-6 bg-white rounded-2xl border-2 border-green-500 shadow-2xl animate-in fade-in zoom-in duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black uppercase text-green-900 leading-none">Análisis Completado</h3>
+                  <p className="text-xs text-green-600 font-bold uppercase mt-1">Revisa los cambios detectados</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                  <p className="text-[10px] text-green-600 uppercase font-black mb-1">Secciones</p>
+                  <p className="text-3xl font-black text-green-900">{aiStats?.sections || 0}</p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                  <p className="text-[10px] text-green-600 uppercase font-black mb-1">Productos</p>
+                  <p className="text-3xl font-black text-green-900">{aiStats?.items || 0}</p>
+                </div>
+                {aiStats?.newImages > 0 && (
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 col-span-2 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-blue-600 uppercase font-black">Galería</p>
+                      <p className="text-lg font-black text-blue-900">+{aiStats.newImages} fotos detectadas</p>
+                    </div>
+                    <ImageIcon className="w-8 h-8 text-blue-200" />
+                  </div>
+                )}
+                {(aiStats?.hasAddress || aiStats?.hasPhone) && (
+                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 col-span-2">
+                    <p className="text-[10px] text-amber-600 uppercase font-black mb-1">Contacto Renovado</p>
+                    <div className="flex gap-2">
+                      {aiStats.hasAddress && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📍 Dirección</span>}
+                      {aiStats.hasPhone && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📞 Teléfono</span>}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setPendingAiContent(null);
+                    setAiStats(null);
+                  }}
+                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-500 rounded-xl font-bold hover:bg-gray-200 transition-colors uppercase text-xs"
+                >
+                  Descartar
+                </button>
+                <button
+                  onClick={confirmAiChanges}
+                  disabled={aiProcessing}
+                  className="flex-[2] py-3 px-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center justify-center gap-2 uppercase text-xs tracking-wider"
+                >
+                  {aiProcessing ? (
+                    <>
+                      <RotateCcw className="w-4 h-4 animate-spin" />
+                      Aplicando...
+                    </>
+                  ) : (
+                    <>Aplicar Cambios ✨</>
+                  )}
+                </button>
+              </div>
             </div>
           )}
+          
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> CMD + Enter para enviar</span>
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Arrastra fotos o archivos</span>
+          </div>
         </div>
       )}
 

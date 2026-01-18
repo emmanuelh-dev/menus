@@ -75,7 +75,7 @@ export default function MotelPageRenderer({ place, isPreview = false, isAdmin = 
       <div className={`${isPreview ? 'p-4' : 'max-w-3xl mx-auto p-4 pt-0'}`}>
         {/* Header Estilo App Moderna */}
       <header className="mb-16">
-        <div className="relative mb-10 group cursor-pointer overflow-hidden rounded-[2.5rem] shadow-2xl">
+        <div className="relative mb-10 overflow-hidden rounded-[2.5rem] shadow-2xl">
           <img
             src={place.image || "/placeholder.svg"}
             alt={place.name}

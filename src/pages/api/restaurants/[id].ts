@@ -110,7 +110,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       .from('places')
       .update(dataToUpdate)
       .eq('id', id)
-      .select()
+      .select('*, states(*)')
       .single();
     
     if (error) {

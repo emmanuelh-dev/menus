@@ -1,6 +1,9 @@
 export const prerender = false;
 
 const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY || import.meta.env.PUBLIC_GEMINI_API_KEY;
+const IS_DEVELOP = import.meta.env.DEVELOP === 'true';
+const OLLAMA_HOST = 'http://localhost:11434';
+const OLLAMA_MODEL = 'deepseek-coder:1.3b';
 
 export interface GeminiResponse {
   semantic_data?: any;
@@ -67,12 +70,62 @@ INSTRUCCIONES ESPECÍFICAS:
 SIEMPRE responde ÚNICAMENTE con un objeto JSON estrictamente válido. NO uses bloques de código con triple backtick. Empieza directamente con { y termina con }. Si no puedes procesar algo, devuelve el JSON actual sin cambios.
 `;
 
+async function callOllama(
+  placeType: 'motel' | 'restaurant',
+  instruction: string,
+  images?: string[],
+  currentContent?: any
+): Promise<GeminiResponse | null> {
+  const prompt = SYSTEM_PROMPT(placeType, currentContent) + `\n\nINSTRUCCIÓN DEL USUARIO: ${instruction}`;
+  
+  const cleanImages = images?.map(img => {
+    return img.includes('base64,') ? img.split('base64,')[1] : img;
+  }) || [];
+
+  try {
+    const response = await fetch(`${OLLAMA_HOST}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        prompt: prompt,
+        images: cleanImages,
+        stream: false,
+        format: 'json'
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Ollama Error:', errorText);
+      return null;
+    }
+
+    const result = await response.json();
+    const textResponse = result.response;
+
+    if (!textResponse) return null;
+
+    return JSON.parse(textResponse.trim());
+  } catch (err) {
+    console.error('Error callOllama:', err);
+    return null;
+  }
+}
+
 export async function callGemini(
   placeType: 'motel' | 'restaurant',
   instruction: string,
-  images?: string[], // Soportar múltiples imágenes
+  images?: string[],
   currentContent?: any
 ): Promise<GeminiResponse | null> {
+  // Redirigir a Ollama si estamos en modo desarrollo
+  if (IS_DEVELOP) {
+    console.log('🤖 USANDO OLLAMA (Local) - Modo Desarrollo Activo');
+    return callOllama(placeType, instruction, images, currentContent);
+  }
+
+  console.log('☁️ USANDO GEMINI (Google Cloud) - Modo Producción Activo');
   const prompt = SYSTEM_PROMPT(placeType, currentContent);
   
   const contents = [

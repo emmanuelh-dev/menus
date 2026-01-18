@@ -22,6 +22,11 @@ interface Restaurant {
   short_name?: string;
   content?: any;
   state_id?: number | null;
+  states?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
 }
 
 export default function PlaceManager({ initialRestaurants }: { initialRestaurants: Restaurant[] }) {
@@ -144,11 +149,22 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
           <div key={r.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
             <img key={r.image} src={r.image || '/placeholder.svg'} alt={r.name} className="w-full h-44 object-cover" />
             <div className="p-5">
-              <h3 className="font-bold text-xl">{r.name}</h3>
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="font-bold text-xl">{r.name}</h3>
+                {r.states && (
+                  <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full font-bold uppercase text-gray-500">
+                    {r.states.name}
+                  </span>
+                )}
+              </div>
               <p className="text-gray-400 text-sm mb-4">{r.address}</p>
 
               <div className="flex gap-2">
-                <a href={`/${formater[r.type] || r.type}/${r.short_name}`} target='_blank' className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center">
+                <a 
+                  href={r.type === 'motel' && r.states?.slug ? `/moteles/estados/${r.states.slug}/${r.short_name}` : `/${formater[r.type] || r.type}/${r.short_name}`} 
+                  target='_blank' 
+                  className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center"
+                >
                   <FaEye className="inline" />
                 </a>
                 <button onClick={() => openModal(r)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
