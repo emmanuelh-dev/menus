@@ -11,9 +11,9 @@ const { name } = Astro.params;
 
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../components/Gallery.astro";
-import WhatsappButton from "../../../components/WhatsappButton";
 import { Image } from 'astro:assets';
 import { supabase } from "../../../lib/supabase";
+import CartManager from "../../../components/CartManager.tsx";
 
 if (!name) {
 	throw new Error("No se ha especificado el nombre del restaurante");
@@ -29,6 +29,8 @@ if (!place) {
 }
 
 let { blocks = [], view_settings = {} } = place.content || {};
+const enableCart = place.content?.semantic_data?.enable_cart || false;
+const whatsappNumber = place.content?.semantic_data?.whatsapp || '';
 
 // Limpieza de bloques
 blocks = blocks.map((block) => {
@@ -180,6 +182,16 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 				<div class="h-[1px] w-12 bg-stone-200"></div>
 			</header>
 
+			{enableCart && whatsappNumber && (
+				<CartManager 
+					client:load
+					placeName={place.name}
+					placeSlug={name}
+					whatsappNumber={whatsappNumber}
+					blocks={blocks}
+				/>
+			)}
+
 			{/* Menú con Acordeón Nativo y Lógica de Apertura */}
 			<div class="space-y-8">
 				{
@@ -223,7 +235,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 											)}
 
 											{block.data.items?.map((item) => (
-												<div class="space-y-4">
+												<div class="space-y-4" data-item-id={item.id}>
 													<div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item">
 														<div class="order-2 sm:order-1">
 															<div class="flex justify-between items-baseline mb-1">
@@ -240,6 +252,24 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 																<p class="text-stone-400 text-sm font-light leading-relaxed">
 																	{item.description}
 																</p>
+															)}
+															{enableCart && whatsappNumber && item.price > 0 && (
+																<div class="flex gap-2 mt-3">
+																	<button 
+																		class="cart-add-btn flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg transition-colors"
+																		data-item={JSON.stringify({ id: item.id, name: item.name, price: item.price, image: item.image })}
+																	>
+																		Agregar
+																	</button>
+																	<button 
+																		class="favorite-btn p-2 border border-stone-300 hover:border-red-500 rounded-lg transition-colors"
+																		data-item={JSON.stringify({ id: item.id, name: item.name, slug: name })}
+																	>
+																		<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+																			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+																		</svg>
+																	</button>
+																</div>
 															)}
 														</div>
 

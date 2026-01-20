@@ -11,6 +11,8 @@
  *     payment_options?: string[],
  *     dress_code?: string,
  *     phone?: string,
+ *     whatsapp?: string,
+ *     enable_cart?: boolean,
  *     cuisine_type?: string,
  *     zone?: string,
  *     cross_street?: string,
@@ -586,6 +588,19 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+              <input
+                type="checkbox"
+                id="enable_cart"
+                checked={semanticData.enable_cart || false}
+                onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
+                className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
+              />
+              <label htmlFor="enable_cart" className="text-sm font-bold text-gray-700 cursor-pointer">
+                Activar carrito de compras y pedidos por WhatsApp
+              </label>
             </div>
 
             <div>
