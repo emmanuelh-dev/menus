@@ -583,10 +583,18 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 <label className="text-xs font-bold text-gray-600 mb-2 block">WHATSAPP:</label>
                 <input
                   value={semanticData.whatsapp || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value })}
+                  onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value.replace(/\D/g, '') })}
                   placeholder="528112345678"
                   className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
                 />
+                <p className="text-xs text-gray-400 mt-1">
+                  Código de país + número sin espacios ni símbolos (ej: 528112345678)
+                </p>
+                {semanticData.whatsapp && !/^\d{10,15}$/.test(semanticData.whatsapp) && (
+                  <p className="text-xs text-red-500 mt-1 font-bold">
+                    ⚠️ Formato incorrecto. Usa solo números (10-15 dígitos)
+                  </p>
+                )}
               </div>
             </div>
 

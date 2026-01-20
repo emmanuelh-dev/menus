@@ -65,6 +65,13 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       toggleFavorite(itemData);
     };
 
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowCart(false);
+        setShowFavorites(false);
+      }
+    };
+
     document.querySelectorAll('.cart-add-btn').forEach(btn => {
       btn.addEventListener('click', handleAddToCart);
     });
@@ -73,6 +80,8 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       btn.addEventListener('click', handleToggleFavorite);
     });
 
+    document.addEventListener('keydown', handleEscape);
+
     return () => {
       document.querySelectorAll('.cart-add-btn').forEach(btn => {
         btn.removeEventListener('click', handleAddToCart);
@@ -80,6 +89,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       document.querySelectorAll('.favorite-btn').forEach(btn => {
         btn.removeEventListener('click', handleToggleFavorite);
       });
+      document.removeEventListener('keydown', handleEscape);
     };
   }, [placeSlug]);
 
@@ -157,6 +167,13 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
   const sendToWhatsApp = () => {
     if (cart.length === 0) return;
     
+    const cleanNumber = whatsappNumber.replace(/\D/g, '');
+    
+    if (!cleanNumber || cleanNumber.length < 10) {
+      alert('Error: Número de WhatsApp inválido. Por favor contacta al restaurante.');
+      return;
+    }
+    
     let message = `Hola! Me gustaría hacer un pedido de *${placeName}*:\n\n`;
     
     cart.forEach(item => {
@@ -166,7 +183,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     message += `\n*Total: $${total}*`;
     
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
@@ -202,7 +219,12 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       </div>
 
       {showFavorites && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowFavorites(false);
+          }}
+        >
           <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -238,7 +260,12 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       )}
 
       {showCart && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowCart(false);
+          }}
+        >
           <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
