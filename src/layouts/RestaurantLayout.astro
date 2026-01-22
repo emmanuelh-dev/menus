@@ -81,6 +81,22 @@ const {
   place = {},
 } = Astro.props;
 
+const currentYear = new Date().getFullYear();
+const streetAddress = schemaEnrichment.address?.streetAddress || place?.content?.semantic_data?.address || "";
+const city = schemaEnrichment.address?.addressLocality || "Monterrey";
+
+function generateSEOTitle(): string {
+  const location = streetAddress ? `${streetAddress}, ${city}` : city;
+  return `Menú de ${title} en ${location} | Precios y Opiniones ${currentYear}`;
+}
+
+function generateSEODescription(): string {
+  const reviews = reviewStats.reviewCount > 0
+    ? `. Con ${reviewStats.reviewCount} opiniones y ${reviewStats.ratingValue} estrellas`
+    : "";
+  return `Consulta el menú digital de ${title} en ${city}. ${description}${reviews}. ¡Abierto ahora con los mejores precios!`;
+}
+
 let reviewStats = {
   ratingValue: 0,
   reviewCount: 0,
@@ -131,11 +147,14 @@ try {
   console.error("Error al obtener estadísticas de reseñas:", error);
 }
 
+const seoTitle = generateSEOTitle();
+const seoDescription = generateSEODescription();
+
 const schema: any = {
   "@context": "https://schema.org",
   "@type": type,
   name: title,
-  description: description,
+  description: seoDescription,
 };
 
 if (image) {
@@ -233,18 +252,15 @@ if (schemaEnrichment.suitableForDiet) {
       href={favicon ? favicon : "/favicon.ico"}
     />
     <meta name="generator" content={Astro.generator} />
-    <title>
-      Menú - {title} - {schemaEnrichment?.address?.streetAddress} - Menu digital
-      - PDF - QR
-    </title>
-    <meta name="description" content={description} />
+    <title>{seoTitle}</title>
+    <meta name="description" content={seoDescription} />
     <link rel="canonical" href={canonical || Astro.url} />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={ogUrl || Astro.url} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={seoTitle} />
+    <meta property="og:description" content={seoDescription} />
     {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
     {place.image && (
@@ -253,8 +269,8 @@ if (schemaEnrichment.suitableForDiet) {
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={ogUrl || Astro.url} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
+    <meta property="twitter:title" content={seoTitle} />
+    <meta property="twitter:description" content={seoDescription} />
     {
       image && (
         <meta property="twitter:image" content={new URL(image, Astro.url)} />
