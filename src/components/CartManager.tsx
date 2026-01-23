@@ -56,12 +56,15 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
     setFavorites(getFavorites(placeSlug));
 
     const handleAddToCart = (e: any) => {
-      const itemData = JSON.parse(e.target.dataset.item);
+      const button = e.currentTarget;
+      const itemData = JSON.parse(button.dataset.item);
       addToCart(itemData);
+      setShowCart(true); // Abrir carrito para feedback visual
     };
 
     const handleToggleFavorite = (e: any) => {
-      const itemData = JSON.parse(e.target.dataset.item);
+      const button = e.currentTarget;
+      const itemData = JSON.parse(button.dataset.item);
       toggleFavorite(itemData);
     };
 
@@ -72,28 +75,23 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       }
     };
 
-    document.querySelectorAll('.cart-add-btn').forEach(btn => {
-      btn.addEventListener('click', handleAddToCart);
-    });
+    const addButtons = document.querySelectorAll('.cart-add-btn');
+    const favButtons = document.querySelectorAll('.favorite-btn');
 
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-      btn.addEventListener('click', handleToggleFavorite);
-    });
+    addButtons.forEach(btn => btn.addEventListener('click', handleAddToCart));
+    favButtons.forEach(btn => btn.addEventListener('click', handleToggleFavorite));
 
     document.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.querySelectorAll('.cart-add-btn').forEach(btn => {
-        btn.removeEventListener('click', handleAddToCart);
-      });
-      document.querySelectorAll('.favorite-btn').forEach(btn => {
-        btn.removeEventListener('click', handleToggleFavorite);
-      });
+      addButtons.forEach(btn => btn.removeEventListener('click', handleAddToCart));
+      favButtons.forEach(btn => btn.removeEventListener('click', handleToggleFavorite));
       document.removeEventListener('keydown', handleEscape);
     };
   }, [placeSlug]);
 
   useEffect(() => {
+    // Actualizar visual de favoritos en botones externos
     document.querySelectorAll('.favorite-btn').forEach(btn => {
       const itemData = JSON.parse((btn as HTMLElement).dataset.item || '{}');
       const isFav = favorites.some(f => f.id === itemData.id);
@@ -113,50 +111,58 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
   }, [favorites]);
 
   const addToCart = (item: { id: string; name: string; price: number; image?: string }) => {
-    const newCart = [...cart];
-    const existing = newCart.find(i => i.id === item.id);
-    
-    if (existing) {
-      existing.quantity++;
-    } else {
-      newCart.push({ ...item, quantity: 1 });
-    }
-    
-    setCart(newCart);
-    saveCart(placeSlug, newCart);
+    setCart(prevCart => {
+      const newCart = [...prevCart];
+      const existing = newCart.find(i => i.id === item.id);
+      
+      if (existing) {
+        existing.quantity++;
+      } else {
+        newCart.push({ ...item, quantity: 1 });
+      }
+      
+      saveCart(placeSlug, newCart);
+      return newCart;
+    });
   };
 
   const removeFromCart = (itemId: string) => {
-    const newCart = cart.filter(i => i.id !== itemId);
-    setCart(newCart);
-    saveCart(placeSlug, newCart);
+    setCart(prevCart => {
+      const newCart = prevCart.filter(i => i.id !== itemId);
+      saveCart(placeSlug, newCart);
+      return newCart;
+    });
   };
 
   const updateQuantity = (itemId: string, change: number) => {
-    const newCart = cart.map(item => {
-      if (item.id === itemId) {
-        const newQty = Math.max(0, item.quantity + change);
-        return newQty === 0 ? null : { ...item, quantity: newQty };
-      }
-      return item;
-    }).filter(Boolean) as CartItem[];
-    
-    setCart(newCart);
-    saveCart(placeSlug, newCart);
+    setCart(prevCart => {
+      const newCart = prevCart.map(item => {
+        if (item.id === itemId) {
+          const newQty = Math.max(0, item.quantity + change);
+          return newQty === 0 ? null : { ...item, quantity: newQty };
+        }
+        return item;
+      }).filter(Boolean) as CartItem[];
+      
+      saveCart(placeSlug, newCart);
+      return newCart;
+    });
   };
 
   const toggleFavorite = (item: { id: string; name: string; slug: string }) => {
-    const newFavorites = [...favorites];
-    const index = newFavorites.findIndex(f => f.id === item.id);
-    
-    if (index > -1) {
-      newFavorites.splice(index, 1);
-    } else {
-      newFavorites.push(item);
-    }
-    
-    setFavorites(newFavorites);
-    saveFavorites(placeSlug, newFavorites);
+    setFavorites(prevFavs => {
+      const newFavorites = [...prevFavs];
+      const index = newFavorites.findIndex(f => f.id === item.id);
+      
+      if (index > -1) {
+        newFavorites.splice(index, 1);
+      } else {
+        newFavorites.push(item);
+      }
+      
+      saveFavorites(placeSlug, newFavorites);
+      return newFavorites;
+    });
   };
 
   const clearCart = () => {
@@ -167,7 +173,12 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
   const sendToWhatsApp = () => {
     if (cart.length === 0) return;
     
-    const cleanNumber = whatsappNumber.replace(/\D/g, '');
+    let cleanNumber = whatsappNumber.replace(/\D/g, '');
+    
+    // Si tiene 10 dígitos (México) y no tiene el 52, agregarlo
+    if (cleanNumber.length === 10) {
+      cleanNumber = `52${cleanNumber}`;
+    }
     
     if (!cleanNumber || cleanNumber.length < 10) {
       alert('Error: Número de WhatsApp inválido. Por favor contacta al restaurante.');
