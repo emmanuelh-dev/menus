@@ -59,7 +59,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       const button = e.currentTarget;
       const itemData = JSON.parse(button.dataset.item);
       addToCart(itemData);
-      setShowCart(true); // Abrir carrito para feedback visual
+      // setShowCart(true); // Removido para que el modal no se abra automáticamente
     };
 
     const handleToggleFavorite = (e: any) => {
