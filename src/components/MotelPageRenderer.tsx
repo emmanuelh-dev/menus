@@ -6,6 +6,7 @@ interface MotelPageRendererProps {
   place: any;
   isPreview?: boolean;
   isAdmin?: boolean;
+  initialReviews?: any[];
 }
 
 const Icons = {
@@ -21,7 +22,12 @@ const Icons = {
   )
 };
 
-export default function MotelPageRenderer({ place, isPreview = false, isAdmin = false }: MotelPageRendererProps) {
+export default function MotelPageRenderer({ 
+  place, 
+  isPreview = false, 
+  isAdmin = false,
+  initialReviews = []
+}: MotelPageRendererProps) {
   if (!place) return null;
 
   const { blocks = [], view_settings = {} } = place.content || {};
@@ -290,6 +296,7 @@ data-ad-client="ca-pub-3646138644530578"
             id={place.id} 
             restaurantName={place.name} 
             isAdmin={isAdmin}
+            initialReviews={initialReviews}
           />
         </section>
       )}

@@ -103,27 +103,30 @@ let reviewStats = {
 };
 
 let initialReviews = [];
+let restaurantData: any = null;
 
 try {
-  const { data: restaurantData } = await supabase
+  const { data } = await supabase
     .from("places")
     .select("id")
     .eq("menu", path)
     .single();
+  
+  restaurantData = data;
 
   if (restaurantData) {
     const [reviewsResponse, statsResponse] = await Promise.all([
       supabase
-        .from("review")
+        .from("reviews")
         .select("*")
-        .eq("restaurant_id", restaurantData.id)
+        .eq("place_id", restaurantData.id)
         .order("created_at", { ascending: false })
         .limit(10),
       
       supabase
-        .from("review")
+        .from("reviews")
         .select("rate")
-        .eq("restaurant_id", restaurantData.id)
+        .eq("place_id", restaurantData.id)
     ]);
 
     if (reviewsResponse.data) {
@@ -348,15 +351,20 @@ if (schemaEnrichment.suitableForDiet) {
         >
           <div>
             {
-                   place?.id && (
+                   (place?.id || restaurantData?.id) && (
 
-                     <ReviewForm client:only id={place.id} restaurantName={title} />
+                     <ReviewForm 
+                      client:load
+                      id={place?.id || restaurantData?.id} 
+                      restaurantName={title} 
+                      initialReviews={initialReviews}
+                    />
 )            }
           </div>
         </div>
       )
     }
-    <ScrollTopAndComment client:only />
+    <ScrollTopAndComment client:load />
     <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
     <style>

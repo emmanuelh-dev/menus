@@ -36,6 +36,13 @@ if (!place) {
 }
 
 const stats = await getPlaceRating(place.id);
+const { data: initialReviews } = await supabase
+	.from("reviews")
+	.select("*")
+	.eq("place_id", place.id)
+	.order("created_at", { ascending: false })
+	.limit(10);
+
 const placeWithStats = { ...place, ...stats };
 
 const states = await getStates();
@@ -64,7 +71,12 @@ const currentState = states.find(s => s.slug === state);
 			/>
 		</div>
 
-		<MotelPageRenderer place={placeWithStats} isAdmin={isAdmin} />
+		<MotelPageRenderer 
+			place={placeWithStats} 
+			isAdmin={isAdmin} 
+			initialReviews={initialReviews || []}
+			client:load 
+		/>
     
     <ins class="adsbygoogle h-48"
      style="display:block"

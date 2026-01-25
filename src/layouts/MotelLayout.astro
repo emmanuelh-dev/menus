@@ -356,7 +356,7 @@ if (reviewStats.reviewCount > 0) {
 		<MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
 		<slot />
 
-		<ScrollTopAndComment client:only />
+		<ScrollTopAndComment client:load/>
 		<Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
 		<style>

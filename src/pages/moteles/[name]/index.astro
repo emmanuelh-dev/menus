@@ -28,6 +28,13 @@ if (!place) {
 	throw new Error("No se ha encontrado el restaurante");
 }
 
+const { data: initialReviews } = await supabase
+	.from("reviews")
+	.select("*")
+	.eq("place_id", place.id)
+	.order("created_at", { ascending: false })
+	.limit(10);
+
 const states = await getStates();
 const currentState = states.find(s => s.slug === state);
 ---
@@ -54,7 +61,11 @@ const currentState = states.find(s => s.slug === state);
 			/>
 		</div>
 
-		<MotelPageRenderer place={place} />
+		<MotelPageRenderer 
+			place={place} 
+			initialReviews={initialReviews || []}
+			client:load 
+		/>
 
 
     <ins class="adsbygoogle h-48"
