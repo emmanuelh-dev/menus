@@ -1,0 +1,190 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import {
+	MessageCircle,
+	ArrowRight,
+	TrendingUp,
+	ShieldCheck,
+	Zap,
+	Send,
+} from "lucide-react";
+
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+
+const seoData = {
+	title: "Pedidos por WhatsApp para Restaurantes - BySMax",
+	description:
+		"Recibe pedidos de comida directamente en tu WhatsApp. Sin comisiones, sin intermediarios. El sistema más simple para vender comida a domicilio.",
+	keywords:
+		"pedidos por whatsapp restaurantes, sistema pedidos whatsapp, menú digital whatsapp, comandas whatsapp, restaurante whatsapp",
+};
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<div>
+		<main class="flex-1">
+			<!-- Hero Minimalist -->
+			<section class="py-20 md:py-32 bg-white">
+				<div class="max-w-4xl mx-auto px-6 text-center">
+					<div
+						class="inline-flex items-center justify-center p-3 bg-green-100 text-green-700 rounded-full mb-8"
+					>
+						<MessageCircle className="w-8 h-8" />
+					</div>
+
+					<h1
+						class="text-4xl md:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
+					>
+						Vende Comida por <br />
+						<span class="text-[#25D366]">WhatsApp</span>
+					</h1>
+					<p
+						class="text-xl text-slate-600 mb-10 max-w-xl mx-auto leading-relaxed"
+					>
+						El sistema de pedidos más simple del mundo. Tus clientes eligen del
+						menú y tú recibes el pedido listo en un mensaje.
+					</p>
+
+					<div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+						<a
+							href="/admin/login"
+							class="inline-flex items-center px-8 py-4 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-500/20"
+						>
+							Empezar a Vender
+							<ArrowRight className="ml-2 h-5 w-5" />
+						</a>
+					</div>
+
+					<!-- Chat Simulation Minimal -->
+					<div
+						class="max-w-sm mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden transform rotate-1 hover:rotate-0 transition-transform duration-500"
+					>
+						<div class="bg-[#075E54] p-4 flex items-center gap-3">
+							<div
+								class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold"
+							>
+								R
+							</div>
+							<div class="text-left">
+								<div class="font-bold text-white text-sm">Restaurante Demo</div>
+							</div>
+						</div>
+						<div
+							class="bg-[#ECE5DD] p-4 text-left min-h-[240px] flex flex-col justify-end space-y-3"
+						>
+							<div
+								class="self-end bg-[#DCF8C6] p-3 rounded-lg shadow-sm max-w-[90%] text-sm"
+							>
+								<div class="font-bold text-green-800 text-xs mb-1">
+									Nuevo Pedido Web
+								</div>
+								<div class="space-y-1">
+									<p>🍕 1x Pizza Pepperoni</p>
+									<p>🥤 2x Refrescos</p>
+									<div class="border-t border-green-200 my-1"></div>
+									<p class="font-bold">Total: $180.00</p>
+									<p class="text-xs text-slate-500">📍 Av. Siempre Viva 123</p>
+								</div>
+								<div class="text-[10px] text-right text-slate-400 mt-1">
+									14:05
+								</div>
+							</div>
+							<div
+								class="self-start bg-white p-3 rounded-lg shadow-sm max-w-[85%] text-sm"
+							>
+								<p>¡Recibido! 👨‍🍳 Tu pedido sale en 30min.</p>
+								<div class="text-[10px] text-right text-slate-400 mt-1">
+									14:06
+								</div>
+							</div>
+						</div>
+						<div
+							class="p-3 bg-slate-50 border-t border-slate-100 flex items-center gap-2"
+						>
+							<div
+								class="flex-1 h-8 bg-white border border-slate-200 rounded-full"
+							>
+							</div>
+							<div
+								class="w-8 h-8 bg-[#075E54] rounded-full flex items-center justify-center text-white"
+							>
+								<Send className="w-4 h-4" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Benefits Icons -->
+			<section class="py-20 bg-slate-50">
+				<div class="max-w-5xl mx-auto px-6">
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+						<div class="text-center">
+							<div
+								class="w-16 h-16 bg-white text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm"
+							>
+								<TrendingUp className="w-8 h-8" />
+							</div>
+							<h3 class="font-bold text-lg mb-2 text-slate-900">
+								0% Comisiones
+							</h3>
+							<p class="text-slate-600 leading-relaxed">
+								Todo el dinero es tuyo. No pagues el 30% a las apps de delivery.
+							</p>
+						</div>
+						<div class="text-center">
+							<div
+								class="w-16 h-16 bg-white text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm"
+							>
+								<ShieldCheck className="w-8 h-8" />
+							</div>
+							<h3 class="font-bold text-lg mb-2 text-slate-900">
+								Datos Propios
+							</h3>
+							<p class="text-slate-600 leading-relaxed">
+								Tú tienes el control de tus clientes. Construye tu base de datos
+								real.
+							</p>
+						</div>
+						<div class="text-center">
+							<div
+								class="w-16 h-16 bg-white text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm"
+							>
+								<Zap className="w-8 h-8" />
+							</div>
+							<h3 class="font-bold text-lg mb-2 text-slate-900">
+								Ultra Rápido
+							</h3>
+							<p class="text-slate-600 leading-relaxed">
+								Configura en 5 minutos. Empieza a recibir pedidos hoy mismo.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Simple CTA -->
+			<section class="py-20 bg-[#111b21] text-white overflow-hidden">
+				<div class="max-w-3xl mx-auto px-6 text-center">
+					<h2 class="text-3xl font-bold mb-6">¿Listo para recibir pedidos?</h2>
+					<p class="text-lg text-slate-400 mb-10">
+						Es totalmente gratis y puedes cancelar cuando quieras.
+					</p>
+
+					<a
+						href="/admin/login"
+						class="inline-flex items-center px-8 py-4 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#20bd5a] transition-all transform hover:scale-105 shadow-lg shadow-green-500/20"
+					>
+						Crear Cuenta Gratis
+					</a>
+				</div>
+			</section>
+		</main>
+	</div>
+</DefaultLayout>

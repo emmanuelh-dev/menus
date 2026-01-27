@@ -2,8 +2,8 @@
 export const prerender = false;
 
 Astro.response.headers.set(
-  'Cache-Control', 
-  'public, s-maxage=300, stale-while-revalidate=60'
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
 );
 
 const { name, state } = Astro.params;
@@ -13,7 +13,12 @@ import Gallery from "../../../../../components/Gallery.astro";
 import WhatsappButton from "../../../../../components/WhatsappButton";
 import CopyClabe from "../../../../../components/CopyClabe";
 import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
-import { getRestaurantByName, supabase, getStates, getPlaceRating } from "../../../../../lib/supabase";
+import {
+	getRestaurantByName,
+	supabase,
+	getStates,
+	getPlaceRating,
+} from "../../../../../lib/supabase";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 import QuickFeed from "../../../../../components/QuickFeed";
 import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
@@ -27,12 +32,12 @@ const isAdmin = await isAuthenticated(Astro.request, Astro.cookies);
 
 const { data: place } = await supabase
 	.from("places")
-	.select("*")
+	.select("*, states(*)")
 	.eq("short_name", name)
 	.single();
 
 if (!place) {
-  return Astro.redirect('/404');
+	return Astro.redirect("/404");
 }
 
 const stats = await getPlaceRating(place.id);
@@ -46,47 +51,49 @@ const { data: initialReviews } = await supabase
 const placeWithStats = { ...place, ...stats };
 
 const states = await getStates();
-const currentState = states.find(s => s.slug === state);
+const currentState = states.find((s) => s.slug === state);
 ---
 
 <MotelLayout
-  place={placeWithStats}
+	place={placeWithStats}
 	image={place.image ? place.image : "/placeholder.svg"}
 	backgroundColor="bg-[#0A0A0A]"
 >
 	<div
 		class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white"
 	>
-     <div class="max-w-3xl mx-auto p-4">
-			
-			<Breadcrumbs 
+		<div class="max-w-3xl mx-auto p-4">
+			<Breadcrumbs
 				items={[
-					{ label: 'Inicio', href: '/' },
-					{ label: 'Moteles', href: '/moteles' },
-					{ label: 'Estados', href: '/moteles/estados' },
-					...(currentState ? [{ label: currentState.name, href: `/moteles/estados/${state}` }] : []),
-					{ label: place.name }
+					{ label: "Inicio", href: "/" },
+					{ label: "Moteles", href: "/moteles" },
+					{ label: "Estados", href: "/moteles/estados" },
+					...(currentState
+						? [{ label: currentState.name, href: `/moteles/estados/${state}` }]
+						: []),
+					{ label: place.name },
 				]}
 				theme="dark"
 			/>
 		</div>
 
-		<MotelPageRenderer 
-			place={placeWithStats} 
-			isAdmin={isAdmin} 
+		<MotelPageRenderer
+			place={placeWithStats}
+			isAdmin={isAdmin}
 			initialReviews={initialReviews || []}
-			client:load 
+			client:load
 		/>
-    
-    <ins class="adsbygoogle h-48"
-     style="display:block"
-     data-ad-client="ca-pub-3646138644530578"
-     data-ad-slot="5585876237"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+
+		<ins
+			class="adsbygoogle h-48"
+			style="display:block"
+			data-ad-client="ca-pub-3646138644530578"
+			data-ad-slot="5585876237"
+			data-ad-format="auto"
+			data-full-width-responsive="true"></ins>
+		<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
 	</div>
 
 	<!-- <QuickFeed placeId={place.id} client:load /> -->

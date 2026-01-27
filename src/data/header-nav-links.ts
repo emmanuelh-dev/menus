@@ -33,7 +33,9 @@ export const navCategories = [
     {
         title: "Herramientas",
         items: [
-            { name: "Generador de códigos QR", href: "https://www.bysmax.com/tools/qr-code-generator" },
+            { name: "Generador de códigos QR", href: "/generador-qr" },
+            { name: "Pedidos por whatsapp", href: "/pedidos-whatsapp" },
+            {name : "Crear menu digital", href: "/crear-menu-digital"}
         ]
     },
     {

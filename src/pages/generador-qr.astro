@@ -1,0 +1,133 @@
+---
+import QRGenerator from "../components/QRGenerator.tsx";
+import { QrCode, Check, Zap, Shield } from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+
+const seoData = {
+	title: "Generador de Código QR Gratis - BySMax",
+	description:
+		"Crea códigos QR personalizados gratis, sin registro y sin caducidad. Personaliza colores y descarga en alta calidad PNG. Ideal para menús, wifi y links.",
+	keywords:
+		"generador codigo qr gratis, crear qr gratis, qr code generator free, qr restaurante gratis",
+};
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<div>
+		<main class="flex-1 bg-slate-50">
+			<!-- Hero & Tool -->
+			<section class="py-20 md:py-24">
+				<div class="max-w-5xl mx-auto px-6 text-center">
+					<div
+						class="inline-flex items-center justify-center p-3 bg-white text-slate-900 rounded-2xl shadow-sm mb-8 border border-slate-100"
+					>
+						<QrCode className="w-6 h-6 mr-2" />
+						<span class="font-bold">Generador QR 100% Gratis</span>
+					</div>
+
+					<h1
+						class="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
+					>
+						Crea tu Código QR <br />
+						<span class="text-emerald-600">Personalizado</span>
+					</h1>
+					<p
+						class="text-lg text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed"
+					>
+						Sin registro, sin límites de escaneos y sin caducidad. Introduce tu
+						enlace, personaliza el estilo y descarga.
+					</p>
+
+					<!-- React Component Wrapper -->
+					<div class="max-w-4xl mx-auto mb-20 text-left">
+						<QRGenerator client:load />
+					</div>
+
+					<!-- Features -->
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+						<div
+							class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+						>
+							<div
+								class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4"
+							>
+								<Zap className="w-5 h-5" />
+							</div>
+							<h3 class="font-bold text-slate-900 mb-2">Para Siempre</h3>
+							<p class="text-slate-500 text-sm">
+								Tu código QR nunca caduca. Úsalo todo el tiempo que quieras
+								totalmente gratis.
+							</p>
+						</div>
+						<div
+							class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+						>
+							<div
+								class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-4"
+							>
+								<Shield className="w-5 h-5" />
+							</div>
+							<h3 class="font-bold text-slate-900 mb-2">Alta Calidad</h3>
+							<p class="text-slate-500 text-sm">
+								Descarga en formato PNG de alta resolución, ideal para imprimir
+								en menús o tarjetas.
+							</p>
+						</div>
+						<div
+							class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+						>
+							<div
+								class="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-4"
+							>
+								<Check className="w-5 h-5" />
+							</div>
+							<h3 class="font-bold text-slate-900 mb-2">Personalizable</h3>
+							<p class="text-slate-500 text-sm">
+								Elige los colores que coincidan con tu marca para darle un toque
+								profesional.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- SEO Content -->
+			<section class="py-20 bg-white border-t border-slate-100">
+				<div class="max-w-3xl mx-auto px-6">
+					<h2 class="text-2xl font-bold text-slate-900 mb-6">
+						¿Qué es un código QR?
+					</h2>
+					<div class="prose prose-slate max-w-none text-slate-600">
+						<p class="mb-4">
+							Un código QR (Quick Response) es un tipo de código de barras
+							bidimensional que puede ser escaneado fácilmente usando la cámara
+							de la mayoría de los teléfonos inteligentes modernos.
+						</p>
+						<p class="mb-4">
+							Esta herramienta gratuita de BySMax te permite generar códigos QR
+							estáticos para:
+						</p>
+						<ul class="list-disc pl-5 space-y-2 mb-6">
+							<li>Menús digitales de restaurantes</li>
+							<li>Enlaces a sitios web y redes sociales</li>
+							<li>Conexiones a redes WiFi</li>
+							<li>Tarjetas de presentación digitales (vCard)</li>
+						</ul>
+						<p>
+							¿Necesitas un menú digital completo? <a
+								href="/crear-menu-digital"
+								class="text-emerald-600 font-bold hover:underline"
+								>Crea tu menú digital gratis aquí</a
+							>.
+						</p>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+</DefaultLayout>

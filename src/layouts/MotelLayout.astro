@@ -22,13 +22,13 @@ function generateSEOTitle(
 	const price = semantic_data.price_range
 		? ` desde ${semantic_data.price_range}`
 		: "";
-	const city = "Monterrey";
+	const city = place.states?.name || "Monterrey";
 
 	return `${place.name}${jacuzzi} en ${city}${price} | Opiniones y Precios ${year}`;
 }
 
 function generateSEODescription(place: Place, description?: string): string {
-	const city = "Monterrey";
+	const city = place.states?.name || "Monterrey";
 	const baseDesc =
 		description || `${place.name} ofrece habitaciones cómodas y privadas`;
 	const reviews =
@@ -161,8 +161,8 @@ if (schemaEnrichment.address) {
 	schema.address = {
 		"@type": "PostalAddress",
 		streetAddress: place.content.semantic_data.address,
-		addressLocality: "Monterrey",
-		addressRegion: "Nuevo León",
+		addressLocality: place.states?.name || "Monterrey",
+		addressRegion: place.states?.name || "Nuevo León",
 		addressCountry: "MX",
 	};
 }
@@ -356,7 +356,7 @@ if (reviewStats.reviewCount > 0) {
 		<MotelHeader textWhite={textWhite} backgroundColor={backgroundColor} />
 		<slot />
 
-		<ScrollTopAndComment client:load/>
+		<ScrollTopAndComment client:load />
 		<Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
 		<style>

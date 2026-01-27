@@ -23,6 +23,11 @@ export interface Place {
   type: string;
   state_id?: number;
   state_slug?: string;
+  states?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
   content?: Content;
 }
 
