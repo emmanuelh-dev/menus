@@ -7,6 +7,7 @@ interface CartItem {
   price: number;
   quantity: number;
   image?: string;
+  notes?: string;
 }
 
 interface Favorite {
@@ -26,7 +27,7 @@ const getCartKey = (slug: string) => `cart_${slug}`;
 const getFavoritesKey = (slug: string) => `favorites_${slug}`;
 
 function getCart(slug: string): CartItem[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === "undefined") return [];
   const stored = localStorage.getItem(getCartKey(slug));
   return stored ? JSON.parse(stored) : [];
 }
@@ -36,7 +37,7 @@ function saveCart(slug: string, cart: CartItem[]) {
 }
 
 function getFavorites(slug: string): Favorite[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === "undefined") return [];
   const stored = localStorage.getItem(getFavoritesKey(slug));
   return stored ? JSON.parse(stored) : [];
 }
@@ -45,7 +46,12 @@ function saveFavorites(slug: string, favorites: Favorite[]) {
   localStorage.setItem(getFavoritesKey(slug), JSON.stringify(favorites));
 }
 
-export default function CartManager({ placeName, placeSlug, whatsappNumber, blocks }: CartManagerProps) {
+export default function CartManager({
+  placeName,
+  placeSlug,
+  whatsappNumber,
+  blocks,
+}: CartManagerProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -69,97 +75,123 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
     };
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setShowCart(false);
         setShowFavorites(false);
       }
     };
 
-    const addButtons = document.querySelectorAll('.cart-add-btn');
-    const favButtons = document.querySelectorAll('.favorite-btn');
+    const addButtons = document.querySelectorAll(".cart-add-btn");
+    const favButtons = document.querySelectorAll(".favorite-btn");
 
-    addButtons.forEach(btn => btn.addEventListener('click', handleAddToCart));
-    favButtons.forEach(btn => btn.addEventListener('click', handleToggleFavorite));
+    addButtons.forEach((btn) => btn.addEventListener("click", handleAddToCart));
+    favButtons.forEach((btn) =>
+      btn.addEventListener("click", handleToggleFavorite),
+    );
 
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      addButtons.forEach(btn => btn.removeEventListener('click', handleAddToCart));
-      favButtons.forEach(btn => btn.removeEventListener('click', handleToggleFavorite));
-      document.removeEventListener('keydown', handleEscape);
+      addButtons.forEach((btn) =>
+        btn.removeEventListener("click", handleAddToCart),
+      );
+      favButtons.forEach((btn) =>
+        btn.removeEventListener("click", handleToggleFavorite),
+      );
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [placeSlug]);
 
   useEffect(() => {
     // Actualizar visual de favoritos en botones externos
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-      const itemData = JSON.parse((btn as HTMLElement).dataset.item || '{}');
-      const isFav = favorites.some(f => f.id === itemData.id);
-      const svg = btn.querySelector('svg');
+    document.querySelectorAll(".favorite-btn").forEach((btn) => {
+      const itemData = JSON.parse((btn as HTMLElement).dataset.item || "{}");
+      const isFav = favorites.some((f) => f.id === itemData.id);
+      const svg = btn.querySelector("svg");
       if (svg) {
         if (isFav) {
-          svg.setAttribute('fill', 'currentColor');
-          svg.classList.add('text-red-500');
-          svg.classList.remove('text-stone-400');
+          svg.setAttribute("fill", "currentColor");
+          svg.classList.add("text-red-500");
+          svg.classList.remove("text-stone-400");
         } else {
-          svg.setAttribute('fill', 'none');
-          svg.classList.remove('text-red-500');
-          svg.classList.add('text-stone-400');
+          svg.setAttribute("fill", "none");
+          svg.classList.remove("text-red-500");
+          svg.classList.add("text-stone-400");
         }
       }
     });
   }, [favorites]);
 
-  const addToCart = (item: { id: string; name: string; price: number; image?: string }) => {
-    setCart(prevCart => {
+  const addToCart = (item: {
+    id: string;
+    name: string;
+    price: number;
+    image?: string;
+  }) => {
+    setCart((prevCart) => {
       const newCart = [...prevCart];
-      const existing = newCart.find(i => i.id === item.id);
-      
+      const existing = newCart.find((i) => i.id === item.id);
+
       if (existing) {
         existing.quantity++;
       } else {
-        newCart.push({ ...item, quantity: 1 });
+        newCart.push({ ...item, quantity: 1, notes: "" });
       }
-      
+
       saveCart(placeSlug, newCart);
       return newCart;
     });
   };
 
   const removeFromCart = (itemId: string) => {
-    setCart(prevCart => {
-      const newCart = prevCart.filter(i => i.id !== itemId);
+    setCart((prevCart) => {
+      const newCart = prevCart.filter((i) => i.id !== itemId);
       saveCart(placeSlug, newCart);
       return newCart;
     });
   };
 
   const updateQuantity = (itemId: string, change: number) => {
-    setCart(prevCart => {
-      const newCart = prevCart.map(item => {
+    setCart((prevCart) => {
+      const newCart = prevCart
+        .map((item) => {
+          if (item.id === itemId) {
+            const newQty = Math.max(0, item.quantity + change);
+            return newQty === 0 ? null : { ...item, quantity: newQty };
+          }
+          return item;
+        })
+        .filter(Boolean) as CartItem[];
+
+      saveCart(placeSlug, newCart);
+      return newCart;
+    });
+  };
+
+  const updateNotes = (itemId: string, notes: string) => {
+    setCart((prevCart) => {
+      const newCart = prevCart.map((item) => {
         if (item.id === itemId) {
-          const newQty = Math.max(0, item.quantity + change);
-          return newQty === 0 ? null : { ...item, quantity: newQty };
+          return { ...item, notes };
         }
         return item;
-      }).filter(Boolean) as CartItem[];
-      
+      });
       saveCart(placeSlug, newCart);
       return newCart;
     });
   };
 
   const toggleFavorite = (item: { id: string; name: string; slug: string }) => {
-    setFavorites(prevFavs => {
+    setFavorites((prevFavs) => {
       const newFavorites = [...prevFavs];
-      const index = newFavorites.findIndex(f => f.id === item.id);
-      
+      const index = newFavorites.findIndex((f) => f.id === item.id);
+
       if (index > -1) {
         newFavorites.splice(index, 1);
       } else {
         newFavorites.push(item);
       }
-      
+
       saveFavorites(placeSlug, newFavorites);
       return newFavorites;
     });
@@ -172,34 +204,45 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
 
   const sendToWhatsApp = () => {
     if (cart.length === 0) return;
-    
-    let cleanNumber = whatsappNumber.replace(/\D/g, '');
-    
+
+    let cleanNumber = whatsappNumber.replace(/\D/g, "");
+
     // Si tiene 10 dígitos (México) y no tiene el 52, agregarlo
     if (cleanNumber.length === 10) {
       cleanNumber = `52${cleanNumber}`;
     }
-    
+
     if (!cleanNumber || cleanNumber.length < 10) {
-      alert('Error: Número de WhatsApp inválido. Por favor contacta al restaurante.');
+      alert(
+        "Error: Número de WhatsApp inválido. Por favor contacta al restaurante.",
+      );
       return;
     }
-    
+
     let message = `Hola! Me gustaría hacer un pedido de *${placeName}*:\n\n`;
-    
-    cart.forEach(item => {
+
+    cart.forEach((item) => {
       message += `• ${item.quantity}x ${item.name} - $${item.price * item.quantity}\n`;
+      if (item.notes) {
+        message += `  _Nota: ${item.notes}_\n`;
+      }
     });
-    
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const total = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
     message += `\n*Total: $${total}*`;
-    
+
     const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   return (
     <>
@@ -215,7 +258,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
             </span>
           </button>
         )}
-        
+
         <button
           onClick={() => setShowCart(!showCart)}
           className="relative bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105"
@@ -230,7 +273,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       </div>
 
       {showFavorites && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowFavorites(false);
@@ -246,14 +289,19 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
                 <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-6">
               {favorites.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">No tienes favoritos</p>
+                <p className="text-center text-gray-400 py-8">
+                  No tienes favoritos
+                </p>
               ) : (
                 <div className="space-y-3">
-                  {favorites.map(fav => (
-                    <div key={fav.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {favorites.map((fav) => (
+                    <div
+                      key={fav.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
                       <span className="font-medium">{fav.name}</span>
                       <button
                         onClick={() => toggleFavorite(fav)}
@@ -271,7 +319,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
       )}
 
       {showCart && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowCart(false);
@@ -287,49 +335,69 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
                 <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-6">
               {cart.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">Tu carrito está vacío</p>
+                <p className="text-center text-gray-400 py-8">
+                  Tu carrito está vacío
+                </p>
               ) : (
-                <div className="space-y-4">
-                  {cart.map(item => (
-                    <div key={item.id} className="flex gap-4 items-start">
-                      {item.image && (
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium truncate">{item.name}</h3>
-                        <p className="text-sm text-gray-500">${item.price}</p>
-                        <div className="flex items-center gap-3 mt-2">
+                <div className="space-y-6">
+                  {cart.map((item) => (
+                    <div key={item.id} className="space-y-3">
+                      <div className="flex gap-4 items-start">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-16 h-16 object-cover rounded-lg"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium truncate">{item.name}</h3>
+                          <p className="text-sm text-gray-500">${item.price}</p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, -1)}
+                              className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                            >
+                              -
+                            </button>
+                            <span className="font-medium w-8 text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(item.id, 1)}
+                              className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">
+                            ${item.price * item.quantity}
+                          </p>
                           <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-red-500 hover:text-red-600 mt-2"
                           >
-                            -
-                          </button>
-                          <span className="font-medium w-8 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
-                          >
-                            +
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">${item.price * item.quantity}</p>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hover:text-red-600 mt-2"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Instrucciones especiales (ej: sin cebolla)"
+                          value={item.notes}
+                          onChange={(e) =>
+                            updateNotes(item.id, e.target.value)
+                          }
+                          className="w-full text-xs bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 outline-none focus:border-red-200 focus:bg-white transition-all"
+                        />
                       </div>
+                      <div className="h-px bg-gray-50 w-full" />
                     </div>
                   ))}
                 </div>
@@ -342,7 +410,7 @@ export default function CartManager({ placeName, placeSlug, whatsappNumber, bloc
                   <span>Total</span>
                   <span>${totalPrice}</span>
                 </div>
-                
+
                 <div className="flex gap-3">
                   <button
                     onClick={clearCart}

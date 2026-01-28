@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 
 interface ManualUploaderProps {
-  onFilesUploaded: (urls: string[]) => void 
+  onFilesUploaded: (urls: string[]) => void
   onUploadStart?: () => void
   onUploadError?: () => void
   onImageRemove?: () => void
@@ -28,8 +28,71 @@ export function ManualUploader({
     return url.includes('/upload/') ? url.replace('/upload/', `/upload/${params}/`) : url
   }
 
+  const compressImage = (file: File): Promise<Blob | File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const maxDimension = 1080;
+        const fileSizeThreshold = 200 * 1024; // 200KB
+
+        // Si la imagen ya es pequeña en dimensiones y peso, no le hacemos nada
+        if (img.width <= maxDimension && img.height <= maxDimension && file.size <= fileSizeThreshold) {
+          resolve(file);
+          return;
+        }
+
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const isPng = file.type === 'image/png';
+        const type = isPng ? 'image/png' : 'image/jpeg';
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              // Convert blob back to file to maintain filename
+              const compressedFile = new File([blob], file.name, {
+                type: type,
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          },
+          type,
+          isPng ? undefined : 0.9,
+        );
+      };
+      img.onerror = () => resolve(file);
+    });
+  };
+
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    // Convertimos FileList a Array para poder usar .map()
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
@@ -37,19 +100,21 @@ export function ManualUploader({
     onUploadStart?.()
 
     try {
-      // Ejecutamos todas las subidas en paralelo
       const uploadPromises = files.map(async (file) => {
+        // Compress image before upload
+        const processedFile = file.type.startsWith('image/') ? await compressImage(file) : file;
+
         const formData = new FormData()
-        formData.append('file', file)
+        formData.append('file', processedFile)
         formData.append('upload_preset', uploadPreset)
 
         const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
           method: 'POST',
           body: formData,
         })
-        
+
         if (!response.ok) throw new Error('Upload failed')
-        
+
         const data = await response.json()
         return optimizeImageUrl(data.secure_url)
       })
@@ -80,7 +145,7 @@ export function ManualUploader({
           )}
         </div>
       )}
-      
+
       <div className="rounded-xl border-2 border-dashed border-gray-200 p-4 hover:border-black transition-colors">
         <input
           type="file"
