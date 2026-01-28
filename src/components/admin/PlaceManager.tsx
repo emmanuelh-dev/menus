@@ -217,7 +217,9 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
               <div className="flex gap-2">
                 <a
-                  href={r.type === 'motel' && r.states?.slug ? `/moteles/estados/${r.states.slug}/${r.short_name}` : `/${formater[r.type] || r.type}/${r.short_name}`}
+                  href={r.type === 'motel' && r.states?.slug
+                    ? `/moteles/estados/${r.states.slug}/${r.short_name}`
+                    : `/${(r.type === 'cafe' || r.type === 'restaurant') ? 'menus' : (formater[r.type as keyof typeof formater] || r.type)}/${r.short_name}`}
                   target='_blank'
                   className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center"
                 >
