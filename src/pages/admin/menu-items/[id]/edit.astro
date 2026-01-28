@@ -56,6 +56,19 @@ try {
         restaurant_name: itemData.restaurants?.name
     };
 
+    // VERIFICAR PROPIEDAD O ADMIN
+    const { data: { user } } = await supabase.auth.getUser();
+    const isAdmin = [
+        "emmanuelh.dev@gmail.com",
+        "admin@bysmax.com",
+        "e805177@gmail.com",
+    ].includes(user?.email || "");
+
+    // @ts-ignore
+    if (item.user_id !== user?.id && !isAdmin) {
+        return Astro.redirect("/admin/dashboard");
+    }
+
     // Obtener categorías del mismo restaurante
     const { data: categoriesData, error: categoriesError } = await supabase
         .from('menu_categories')

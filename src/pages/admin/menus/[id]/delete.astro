@@ -57,11 +57,20 @@ try {
         .eq('id', id)
         .single();
     
-    if (menuError || !menuData) {
-        throw new Error('Menú no encontrado');
-    }
-    
     menu = menuData;
+
+    // VERIFICAR PROPIEDAD O ADMIN
+    const { data: { user } } = await supabase.auth.getUser();
+    const isAdmin = [
+        "emmanuelh.dev@gmail.com",
+        "admin@bysmax.com",
+        "e805177@gmail.com",
+    ].includes(user?.email || "");
+
+    // @ts-ignore
+    if (menu.user_id !== user?.id && !isAdmin) {
+        return Astro.redirect("/admin/dashboard");
+    }
 
     // Contar categorías asociadas
     const { data: categoryData, error: categoryError } = await supabase

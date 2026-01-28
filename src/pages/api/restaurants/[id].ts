@@ -2,6 +2,12 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { createAuthenticatedClient } from '../../../lib/supabase';
 
+const ADMIN_EMAILS = [
+  "emmanuelh.dev@gmail.com",
+  "admin@bysmax.com",
+  "e805177@gmail.com",
+];
+
 export const GET: APIRoute = async ({ params, cookies }) => {
   // Verificar autenticación
   const accessToken = cookies.get('sb-access-token')?.value;
@@ -23,8 +29,17 @@ export const GET: APIRoute = async ({ params, cookies }) => {
   }
 
   try {
-    // Crear cliente de Supabase con autenticación
     const supabase = await createAuthenticatedClient(accessToken, refreshToken);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'No autorizado' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
     
     // Obtener el restaurante por ID
     const { data, error } = await supabase
@@ -33,18 +48,18 @@ export const GET: APIRoute = async ({ params, cookies }) => {
       .eq('id', id)
       .single();
     
-    if (error) {
-      console.error('Error al obtener restaurante:', error);
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    if (!data) {
+    if (error || !data) {
       return new Response(
         JSON.stringify({ error: 'Restaurante no encontrado' }),
         { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verificar propiedad o admin
+    if (data.user_id !== user.id && !isAdmin) {
+      return new Response(
+        JSON.stringify({ error: 'No tienes permisos para ver este establecimiento' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
       );
     }
     
@@ -82,13 +97,43 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
   }
 
   try {
-    // Crear cliente de Supabase con autenticación
     const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'No autorizado' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+
+    // Verificar que el restaurante pertenezca al usuario (o sea admin)
+    const { data: existingPlace } = await supabase
+      .from('places')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+
+    if (!existingPlace) {
+      return new Response(
+        JSON.stringify({ error: 'Restaurante no encontrado' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (existingPlace.user_id !== user.id && !isAdmin) {
+      return new Response(
+        JSON.stringify({ error: 'No tienes permiso para editar este establecimiento' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Obtener datos del cuerpo de la solicitud
     const restaurantData = await request.json();
     
-    // Validar datos mínimos requeridos solo si no es una actualización de content únicamente
+    // Validar datos mínimos requeridos
     const isContentOnlyUpdate = Object.keys(restaurantData).length === 1 && 'content' in restaurantData;
     
     if (!isContentOnlyUpdate && (!restaurantData.name || !restaurantData.address)) {
@@ -98,7 +143,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
     
-    // Mapear type a type para la base de datos
+    // Mapear type
     const { type, ...rest } = restaurantData;
     const dataToUpdate = {
       ...rest,
@@ -114,7 +159,6 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       .single();
     
     if (error) {
-      console.error('Error al actualizar restaurante:', error);
       return new Response(
         JSON.stringify({ error: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -155,9 +199,39 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
   }
 
   try {
-    // Crear cliente de Supabase con autenticación
     const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'No autorizado' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+
+    // Verificar propiedad o admin
+    const { data: existingPlace } = await supabase
+      .from('places')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+
+    if (!existingPlace) {
+      return new Response(
+        JSON.stringify({ error: 'Restaurante no encontrado' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (existingPlace.user_id !== user.id && !isAdmin) {
+      return new Response(
+        JSON.stringify({ error: 'No tienes permiso para eliminar este establecimiento' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Eliminar de la base de datos
     const { error } = await supabase
       .from('places')
@@ -165,7 +239,6 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
       .eq('id', id);
     
     if (error) {
-      console.error('Error al eliminar restaurante:', error);
       return new Response(
         JSON.stringify({ error: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }

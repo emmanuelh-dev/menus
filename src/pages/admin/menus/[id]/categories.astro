@@ -2,77 +2,99 @@
 export const prerender = false;
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../../../middleware/auth";
-import { createAuthenticatedClient, createSupabaseClient } from "../../../../lib/supabase";
+import {
+	createAuthenticatedClient,
+	createSupabaseClient,
+} from "../../../../lib/supabase";
 import CategoryManager from "../../../../components/admin/CategoryManager.tsx";
 
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
 if (!isAuth) {
-  return Astro.redirect("/admin/login");
+	return Astro.redirect("/admin/login");
 }
 
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
 if (!accessTokenCookie || !refreshTokenCookie) {
-  return Astro.redirect("/admin/login");
+	return Astro.redirect("/admin/login");
 }
 
 const supabase = await createAuthenticatedClient(
-  accessTokenCookie.value,
-  refreshTokenCookie.value
+	accessTokenCookie.value,
+	refreshTokenCookie.value,
 );
 
 const menuId = Astro.params.id;
 
 // Obtener información del menú
 const { data: menu } = await supabase
-  .from("menus")
-  .select(`
+	.from("menus")
+	.select(
+		`
     *,
     restaurants (
       id,
       name
     )
-  `)
-  .eq("id", menuId)
-  .single();
+  `,
+	)
+	.eq("id", menuId)
+	.single();
 
 if (!menu) {
-  return Astro.redirect("/admin/menus");
+	return Astro.redirect("/admin/menus");
+}
+
+// VERIFICAR PROPIEDAD O ADMIN
+const {
+	data: { user },
+} = await supabase.auth.getUser();
+const isAdmin = [
+	"emmanuelh.dev@gmail.com",
+	"admin@bysmax.com",
+	"e805177@gmail.com",
+].includes(user?.email || "");
+
+// @ts-ignore
+if (menu.user_id !== user?.id && !isAdmin) {
+	return Astro.redirect("/admin/dashboard");
 }
 
 // Obtener categorías del restaurante
 const { data: categories } = await supabase
-  .from("menu_categories")
-  .select(`
+	.from("menu_categories")
+	.select(
+		`
     *,
     parent:menu_categories!parent_id (
       id,
       name
     )
-  `)
-  .eq("restaurant_id", menu.restaurant_id)
-  .order("display_order");
+  `,
+	)
+	.eq("restaurant_id", menu.restaurant_id)
+	.order("display_order");
 ---
 
 <AdminLayout title={`Categorías - ${menu.name}`}>
-  <div class="max-w-6xl mx-auto">
-    <div class="flex items-center mb-6">
-      <a href="/admin/menus" class="text-black -600 hover:text-black -800 mr-4">
-        ← Volver a Menús
-      </a>
-      <div>
-        <h1 class="text-2xl font-bold">Categorías del Menú</h1>
-        <p class="text-gray-600">{menu.name} - {menu.restaurants?.name}</p>
-      </div>
-    </div>
+	<div class="max-w-6xl mx-auto">
+		<div class="flex items-center mb-6">
+			<a href="/admin/menus" class="text-black -600 hover:text-black -800 mr-4">
+				← Volver a Menús
+			</a>
+			<div>
+				<h1 class="text-2xl font-bold">Categorías del Menú</h1>
+				<p class="text-gray-600">{menu.name} - {menu.restaurants?.name}</p>
+			</div>
+		</div>
 
-    <CategoryManager 
-      client:load
-      restaurantId={menu.restaurant_id}
-      menuId={menuId as string}
-      initialCategories={categories || []}
-    />
-  </div>
+		<CategoryManager
+			client:load
+			restaurantId={menu.restaurant_id}
+			menuId={menuId as string}
+			initialCategories={categories || []}
+		/>
+	</div>
 </AdminLayout>
