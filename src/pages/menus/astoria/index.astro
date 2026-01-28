@@ -1,23 +1,23 @@
 ---
-import RestaurantLayout from '../../../layouts/RestaurantLayout.astro';
-import { wines } from './wines';
-import { ArrowLeft } from 'lucide-react';
+import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import { wines } from "./wines";
+import { ArrowLeft } from "lucide-react";
 
 const restaurantData = {
-  name: 'Astoria La Bodega',
-  address: 'Av. de la Constitución, 100, Madrid',
-  phone: '+34 600 00 00 00',
-  email: 'astoria@example.com',
-  website: 'https://menus.bysmax.com/menus/astoria',
-}
+	name: "Astoria La Bodega",
+	address: "Av. de la Constitución, 100, Madrid",
+	phone: "+34 600 00 00 00",
+	email: "astoria@example.com",
+	website: "https://menus.bysmax.com/menus/astoria",
+};
 
 const WineItem = ({ wine }) => {
-  return `
+	return `
     <div class="mb-8 flex justify-between items-start last:mb-0">
       <div class="flex-1">
         <h3 class="font-medium">${wine.name}</h3>
         <p class="text-gray-400 text-sm">
-          ${wine.producer ? `${wine.producer},` : ''} ${wine.region} ${wine.year}
+          ${wine.producer ? `${wine.producer},` : ""} ${wine.region} ${wine.year}
         </p>
       </div>
       <div class="ml-4 whitespace-nowrap">
@@ -25,21 +25,21 @@ const WineItem = ({ wine }) => {
       </div>
     </div>
   `;
-}
+};
 
 const WineSection = ({ title, wines }) => {
-  return `
+	return `
     <div class="mb-16 last:mb-0">
       <h2 class="text-2xl font-serif mb-8">${title}</h2>
       <div>
-        ${wines.map(wine => WineItem({ wine })).join('')}
+        ${wines.map((wine) => WineItem({ wine })).join("")}
       </div>
     </div>
   `;
-}
+};
 
 const WineBottle = () => {
-  return `
+	return `
     <div class="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none select-none block">
       <svg
         viewBox="0 0 200 800"
@@ -53,34 +53,60 @@ const WineBottle = () => {
       </svg>
     </div>
   `;
-}
+};
 ---
+
 <RestaurantLayout
-title={restaurantData.name}
-description={restaurantData.name}
-textWhite={true}
-backgroundColor="bg-black"
+	place={restaurantData}
+	title={restaurantData.name}
+	description={restaurantData.name}
+	textWhite={true}
+	backgroundColor="bg-black"
 >
-  <div class="min-h-screen bg-black text-white p-6 md:p-12">
-    <main class="max-w-2xl mx-auto">
-     <Fragment set:html={WineBottle()} />
-     <div class="max-w-4xl mx-auto relative">
-       <header class="mb-16 text-center">
-         <h1 class="text-4xl md:text-5xl font-serif mb-2">ASTORIA</h1>
-         <p class="text-xl tracking-widest">LA BODEGA</p>
-       </header>
- 
-       <div class="max-w-xl mx-auto ">
-         <Fragment set:html={WineSection({ title: "VINOS BLANCOS", wines: wines.blancos })} />
-         <Fragment set:html={WineSection({ title: "VINOS TINTOS", wines: wines.tintos })} />
-         <Fragment set:html={WineSection({ title: "ESPUMOSOS", wines: wines.espumosos })} />
-         <Fragment set:html={WineSection({ title: "ROSADOS", wines: wines.rosados })} />
-         <Fragment set:html={WineSection({ title: "VINOS DE POSTRE", wines: wines.postres })} />
-       </div>
-       <div class="text-center mt-16">
-         <a href="/" >Obtener una demo <ArrowLeft className="inline-block h-4 w-4" /></a>
-       </div>
-     </div>
-    </main>
-   </div>
+	<div class="min-h-screen bg-black text-white p-6 md:p-12">
+		<main class="max-w-2xl mx-auto">
+			<Fragment set:html={WineBottle()} />
+			<div class="max-w-4xl mx-auto relative">
+				<header class="mb-16 text-center">
+					<h1 class="text-4xl md:text-5xl font-serif mb-2">ASTORIA</h1>
+					<p class="text-xl tracking-widest">LA BODEGA</p>
+				</header>
+
+				<div class="max-w-xl mx-auto">
+					<Fragment
+						set:html={WineSection({
+							title: "VINOS BLANCOS",
+							wines: wines.blancos,
+						})}
+					/>
+					<Fragment
+						set:html={WineSection({
+							title: "VINOS TINTOS",
+							wines: wines.tintos,
+						})}
+					/>
+					<Fragment
+						set:html={WineSection({
+							title: "ESPUMOSOS",
+							wines: wines.espumosos,
+						})}
+					/>
+					<Fragment
+						set:html={WineSection({ title: "ROSADOS", wines: wines.rosados })}
+					/>
+					<Fragment
+						set:html={WineSection({
+							title: "VINOS DE POSTRE",
+							wines: wines.postres,
+						})}
+					/>
+				</div>
+				<div class="text-center mt-16">
+					<a href="/"
+						>Obtener una demo <ArrowLeft className="inline-block h-4 w-4" /></a
+					>
+				</div>
+			</div>
+		</main>
+	</div>
 </RestaurantLayout>
