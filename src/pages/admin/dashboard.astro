@@ -42,10 +42,8 @@ const isAdmin = [
 	"e805177@gmail.com",
 ].includes(user.email || "");
 
-const { data: places, error: placesError } = await supabase
-	.from("places")
-	.select(
-		`
+const query = supabase.from("places").select(
+	`
 		*,
 		states (
 			id,
@@ -53,24 +51,33 @@ const { data: places, error: placesError } = await supabase
 			slug
 		)
 	`,
-	)
-	.eq("user_id", user?.id)
-	.order("created_at", { ascending: false });
+);
 
-const { data: recentComments } = await supabase
-	.from("reviews")
-	.select(
-		`
+if (!isAdmin) {
+	query.eq("user_id", user?.id);
+}
+
+const { data: places, error: placesError } = await query.order("created_at", {
+	ascending: false,
+});
+
+const commentsQuery = supabase.from("reviews").select(
+	`
 		*,
 		places (
 			name
 		)
 	`,
-	)
-	.in(
+);
+
+if (!isAdmin) {
+	commentsQuery.in(
 		"place_id",
 		(places || []).map((p) => p.id),
-	)
+	);
+}
+
+const { data: recentComments } = await commentsQuery
 	.order("created_at", { ascending: false })
 	.limit(20);
 

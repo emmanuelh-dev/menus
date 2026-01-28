@@ -93,7 +93,12 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 					</p>
 					{
 						address && (
-							<div class="flex items-center justify-center gap-2 text-white/80 text-sm md:text-base">
+							<a
+								href={googleMapsUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="flex items-center justify-center gap-2 text-white/80 text-sm md:text-base hover:text-white transition-colors"
+							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									class="w-4 h-4"
@@ -114,8 +119,10 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 										d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
 									/>
 								</svg>
-								<span>{address}</span>
-							</div>
+								<span class="underline decoration-white/20 underline-offset-4">
+									{address}
+								</span>
+							</a>
 						)
 					}
 				</div>
