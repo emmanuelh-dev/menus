@@ -1,189 +1,364 @@
 ---
 export const prerender = false;
 
-import { supabase, createSupabaseClient, createAuthenticatedClient } from "../../lib/supabase";
+import {
+	supabase,
+	createSupabaseClient,
+	createAuthenticatedClient,
+} from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
+import {
+	UserPlus,
+	Mail,
+	Lock,
+	User,
+	ArrowRight,
+	Utensils,
+	CheckCircle2,
+} from "lucide-react";
 
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
 if (accessTokenCookie && refreshTokenCookie) {
-  try {
-    const supabaseWithAuth = await createAuthenticatedClient(
-      accessTokenCookie.value,
-      refreshTokenCookie.value
-    );
-    const { data } = await supabaseWithAuth.auth.getUser();
-    if (data?.user) {
-      return Astro.redirect("/admin/dashboard");
-    }
-  } catch (error) {
-    console.error("Token validation error:", error);
-  }
+	try {
+		const supabaseWithAuth = await createAuthenticatedClient(
+			accessTokenCookie.value,
+			refreshTokenCookie.value,
+		);
+		const { data } = await supabaseWithAuth.auth.getUser();
+		if (data?.user) {
+			return Astro.redirect("/admin/dashboard");
+		}
+	} catch (error) {
+		console.error("Token validation error:", error);
+	}
 }
 ---
 
-<RestaurantLayout title="Crear Cuenta" description="Crear una nueva cuenta">
-  <div class="h-screen flex items-center justify-center w-screen -mt-20">
-    <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-      <h1 class="text-2xl font-bold text-center mb-2">
-        Crear Cuenta
-      </h1>
-      <p class="text-center text-gray-600 mb-6">
-        Administra tus menús digitales
-      </p>
+<RestaurantLayout title="Crear Cuenta" description="Tu éxito comienza aquí">
+	<div
+		class="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden py-12"
+	>
+		<!-- Decorative elements -->
+		<div
+			class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full -mr-48 -mt-48"
+		>
+		</div>
+		<div
+			class="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 blur-[120px] rounded-full -ml-48 -mb-48"
+		>
+		</div>
 
-      <div
-        id="error-message"
-        class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4"
-        role="alert"
-      >
-      </div>
+		<div
+			class="max-w-4xl w-full px-6 relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+		>
+			<div class="hidden lg:block space-y-8">
+				<div
+					class="inline-flex items-center justify-center p-3 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20 mb-6"
+				>
+					<Utensils className="h-8 w-8 text-white" />
+				</div>
+				<h1
+					class="text-5xl font-black text-slate-900 tracking-tighter leading-tight"
+				>
+					El futuro <br />
+					<span class="text-emerald-500">comienza hoy.</span>
+				</h1>
+				<p class="text-xl text-slate-600 leading-relaxed font-medium">
+					Únete a miles de restaurantes que ya están digitalizando su éxito.
+				</p>
 
-      <div
-        id="success-message"
-        class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4"
-        role="alert"
-      >
-      </div>
+				<div class="space-y-4">
+					<div class="flex items-center gap-3 text-slate-700">
+						<CheckCircle2 className="h-5 w-5 text-emerald-500" />
+						<span class="font-bold">Menú Digital en 10 min</span>
+					</div>
+					<div class="flex items-center gap-3 text-slate-700">
+						<CheckCircle2 className="h-5 w-5 text-emerald-500" />
+						<span class="font-bold">Sin Comisiones por Venta</span>
+					</div>
+					<div class="flex items-center gap-3 text-slate-700">
+						<CheckCircle2 className="h-5 w-5 text-emerald-500" />
+						<span class="font-bold">Soporte 24/7 Gratis</span>
+					</div>
+				</div>
+			</div>
 
-      <form id="register-form" class="space-y-4">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
-            Correo electrónico
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black -500 focus:border-black -500"
-          />
-        </div>
+			<div
+				class="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 p-10 border border-slate-100"
+			>
+				<div class="lg:hidden text-center mb-8">
+					<h1 class="text-3xl font-black text-slate-900 tracking-tighter">
+						Crear Cuenta
+					</h1>
+					<p class="text-slate-500 font-medium italic mt-1">
+						"Tu éxito comienza aquí"
+					</p>
+				</div>
 
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            minlength="6"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black -500 focus:border-black -500"
-          />
-          <p class="mt-1 text-xs text-gray-500">Mínimo 6 caracteres</p>
-        </div>
+				<div
+					id="error-message"
+					class="hidden bg-red-50 border border-red-100 text-red-600 text-sm p-4 rounded-xl mb-6 text-center"
+					role="alert"
+				>
+				</div>
 
-        <div>
-          <label for="confirm-password" class="block text-sm font-medium text-gray-700">
-            Confirmar Contraseña
-          </label>
-          <input
-            type="password"
-            id="confirm-password"
-            name="confirm-password"
-            required
-            minlength="6"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black -500 focus:border-black -500"
-          />
-        </div>
+				<div
+					id="success-message"
+					class="hidden bg-emerald-50 border border-emerald-100 text-emerald-600 text-sm p-4 rounded-xl mb-6 text-center"
+					role="alert"
+				>
+				</div>
 
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700">
-            Nombre completo (opcional)
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black -500 focus:border-black -500"
-          />
-        </div>
+				<form id="register-form" class="space-y-4">
+					<div class="space-y-1">
+						<label
+							for="email"
+							class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1"
+						>
+							Correo Electrónico
+						</label>
+						<div class="relative group">
+							<div
+								class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+							>
+								<Mail className="h-4 w-4" />
+							</div>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								required
+								placeholder="tu@correo.com"
+								class="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all outline-none text-slate-900 font-medium"
+							/>
+						</div>
+					</div>
 
-        <button
-          type="submit"
-          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black -600 hover:bg-black -700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Crear cuenta
-        </button>
-      </form>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div class="space-y-1">
+							<label
+								for="password"
+								class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1"
+							>
+								Contraseña
+							</label>
+							<div class="relative group">
+								<div
+									class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+								>
+									<Lock className="h-4 w-4" />
+								</div>
+								<input
+									type="password"
+									id="password"
+									name="password"
+									required
+									minlength="6"
+									placeholder="••••••"
+									class="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all outline-none text-slate-900 font-medium"
+								/>
+							</div>
+						</div>
 
-      <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
-          ¿Ya tienes cuenta?
-          <a href="/admin/login" class="font-medium text-black -600 hover:text-black -500">
-            Iniciar sesión
-          </a>
-        </p>
-      </div>
-    </div>
-  </div>
+						<div class="space-y-1">
+							<label
+								for="confirm-password"
+								class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1"
+							>
+								Confirmar
+							</label>
+							<div class="relative group">
+								<div
+									class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+								>
+									<Lock className="h-4 w-4" />
+								</div>
+								<input
+									type="password"
+									id="confirm-password"
+									name="confirm-password"
+									required
+									minlength="6"
+									placeholder="••••••"
+									class="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all outline-none text-slate-900 font-medium"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div class="space-y-1">
+						<label
+							for="name"
+							class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1"
+						>
+							Tu Nombre (Opcional)
+						</label>
+						<div class="relative group">
+							<div
+								class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+							>
+								<User className="h-4 w-4" />
+							</div>
+							<input
+								type="text"
+								id="name"
+								name="name"
+								placeholder="Juan Pérez"
+								class="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all outline-none text-slate-900 font-medium"
+							/>
+						</div>
+					</div>
+
+					<div class="space-y-1">
+						<label
+							for="whatsapp"
+							class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1"
+						>
+							WhatsApp / Teléfono
+						</label>
+						<div class="relative group">
+							<div
+								class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="h-4 w-4"
+									><path
+										d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+									></path></svg
+								>
+							</div>
+							<input
+								type="tel"
+								id="whatsapp"
+								name="whatsapp"
+								required
+								placeholder="+52 ..."
+								class="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all outline-none text-slate-900 font-medium"
+							/>
+						</div>
+					</div>
+
+					<button
+						type="submit"
+						class="w-full flex justify-center items-center py-4 px-6 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all duration-300 shadow-xl shadow-slate-900/20 group active:scale-[0.98] mt-4"
+					>
+						Crear Mi Cuenta
+						<ArrowRight
+							className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform"
+						/>
+					</button>
+				</form>
+
+				<div class="mt-8 text-center">
+					<p class="text-slate-500 font-medium">
+						¿Ya tienes cuenta?
+						<a
+							href="/admin/login"
+							class="text-emerald-600 font-bold hover:text-emerald-700 ml-1 underline underline-offset-4 decoration-emerald-500/30 hover:decoration-emerald-500 transition-all"
+						>
+							Inicia sesión
+						</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
 </RestaurantLayout>
 
 <script>
-  const form = document.getElementById("register-form") as HTMLFormElement;
-  const errorMessage = document.getElementById("error-message");
-  const successMessage = document.getElementById("success-message");
+	const form = document.getElementById("register-form") as HTMLFormElement;
+	const errorMessage = document.getElementById("error-message");
+	const successMessage = document.getElementById("success-message");
 
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+	form?.addEventListener("submit", async (e) => {
+		e.preventDefault();
 
-    const formData = new FormData(form);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirm-password") as string;
-    const name = formData.get("name") as string;
+		const formData = new FormData(form);
+		const email = formData.get("email") as string;
+		const password = formData.get("password") as string;
+		const confirmPassword = formData.get("confirm-password") as string;
+		const name = formData.get("name") as string;
+		const whatsapp = formData.get("whatsapp") as string;
 
-    if (password !== confirmPassword) {
-      errorMessage!.textContent = "Las contraseñas no coinciden";
-      errorMessage!.classList.remove("hidden");
-      successMessage!.classList.add("hidden");
-      return;
-    }
+		if (password !== confirmPassword) {
+			errorMessage!.textContent = "Las contraseñas no coinciden";
+			errorMessage!.classList.remove("hidden");
+			successMessage!.classList.add("hidden");
+			return;
+		}
 
-    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-    submitButton.disabled = true;
-    submitButton.textContent = "Creando cuenta...";
+		const submitButton = form.querySelector(
+			'button[type="submit"]',
+		) as HTMLButtonElement;
+		submitButton.disabled = true;
+		submitButton.textContent = "Creando cuenta...";
 
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          email, 
-          password,
-          name 
-        }),
-      });
+		try {
+			const response = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email,
+					password,
+					name,
+					whatsapp,
+				}),
+			});
 
-      const data = await response.json();
+			const data = await response.json();
+			const loginUrl = "/admin/login";
 
-      if (response.ok) {
-        successMessage!.textContent = "Cuenta creada exitosamente. Redirigiendo...";
-        successMessage!.classList.remove("hidden");
-        errorMessage!.classList.add("hidden");
-        
-        setTimeout(() => {
-          window.location.href = "/admin/dashboard";
-        }, 1500);
-      } else {
-        errorMessage!.textContent = data.error || "Error al crear la cuenta";
-        errorMessage!.classList.remove("hidden");
-        successMessage!.classList.add("hidden");
-        submitButton.disabled = false;
-        submitButton.textContent = "Crear cuenta";
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      errorMessage!.textContent = "Error de conexión. Intenta de nuevo.";
-      errorMessage!.classList.remove("hidden");
-      successMessage!.classList.add("hidden");
-      submitButton.disabled = false;
-      submitButton.textContent = "Crear cuenta";
-    }
-  });
+			if (response.ok) {
+				if (data.session) {
+					successMessage!.textContent =
+						"¡Cuenta creada exitosamente! Redirigiendo...";
+					successMessage!.classList.remove("hidden");
+					errorMessage!.classList.add("hidden");
+
+					setTimeout(() => {
+						window.location.href = "/admin/dashboard";
+					}, 1500);
+				} else {
+					// Caso donde Supabase requiere verificación de correo
+					successMessage!.innerHTML = `
+						<div class="flex flex-col gap-2">
+							<p class="font-bold text-lg">¡Casi listo! ✨</p>
+							<p>Hemos enviado un enlace de confirmación a <strong>${email}</strong>.</p>
+							<p class="text-xs opacity-80">Por favor, confirma tu correo para poder iniciar sesión.</p>
+							<a href="${loginUrl}" class="mt-2 text-emerald-700 underline font-bold">Ir al Login</a>
+						</div>
+					`;
+					successMessage!.classList.remove("hidden");
+					errorMessage!.classList.add("hidden");
+					submitButton.classList.add("hidden");
+				}
+			} else {
+				errorMessage!.textContent = data.error || "Error al crear la cuenta";
+				errorMessage!.classList.remove("hidden");
+				successMessage!.classList.add("hidden");
+				submitButton.disabled = false;
+				submitButton.textContent = "Crear cuenta";
+			}
+		} catch (error) {
+			console.error("Error:", error);
+			errorMessage!.textContent = "Error de conexión. Intenta de nuevo.";
+			errorMessage!.classList.remove("hidden");
+			successMessage!.classList.add("hidden");
+			submitButton.disabled = false;
+			submitButton.textContent = "Crear cuenta";
+		}
+	});
 </script>

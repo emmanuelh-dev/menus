@@ -1,0 +1,54 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { isAuthenticated } from "../../middleware/auth";
+import { createAuthenticatedClient } from "../../lib/supabase";
+import AdminUserList from "../../components/admin/AdminUserList";
+
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) {
+	return Astro.redirect("/admin/login");
+}
+
+const accessTokenCookie = Astro.cookies.get("sb-access-token");
+const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
+
+if (!accessTokenCookie || !refreshTokenCookie) {
+	return Astro.redirect("/admin/login");
+}
+
+const supabase = await createAuthenticatedClient(
+	accessTokenCookie.value,
+	refreshTokenCookie.value,
+);
+
+const {
+	data: { user },
+} = await supabase.auth.getUser();
+
+// Solo permitir a emails específicos
+const isAdmin =
+	user?.email === "emmanuelh.dev@gmail.com" ||
+	user?.email === "admin@bysmax.com";
+
+if (!isAdmin) {
+	return Astro.redirect("/admin/dashboard");
+}
+---
+
+<AdminLayout title="Usuarios Registrados | Administrador">
+	<div class="px-8 py-10">
+		<div class="mb-10">
+			<h1 class="text-3xl font-black text-slate-900 tracking-tighter">
+				Usuarios Registrados
+			</h1>
+			<p class="text-slate-500">
+				Lista completa de dueños de restaurantes y sus datos de contacto.
+			</p>
+		</div>
+
+		<AdminUserList client:load />
+	</div>
+</AdminLayout>

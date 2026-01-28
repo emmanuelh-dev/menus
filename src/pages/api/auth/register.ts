@@ -5,7 +5,7 @@ import { supabase } from "../../../lib/supabase";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const { email, password, name } = await request.json();
+    const { email, password, name, whatsapp } = await request.json();
 
     if (!email || !password) {
       return new Response(
@@ -27,6 +27,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       options: {
         data: {
           name: name || null,
+          whatsapp: whatsapp || null,
         },
       },
     });

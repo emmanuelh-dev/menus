@@ -8,16 +8,19 @@ import {
 	ShieldCheck,
 	Zap,
 	Send,
+	ShoppingCart,
+	Smartphone,
+	CheckCircle,
 } from "lucide-react";
 
 import DefaultLayout from "../layouts/DefaultLayout.astro";
 
 const seoData = {
-	title: "Pedidos por WhatsApp para Restaurantes - BySMax",
+	title: "Pedidos por WhatsApp para Restaurantes - Vende Sin Comisiones",
 	description:
-		"Recibe pedidos de comida directamente en tu WhatsApp. Sin comisiones, sin intermediarios. El sistema más simple para vender comida a domicilio.",
+		"Digitaliza tus pedidos por WhatsApp. Tus clientes eligen del menú y te envían el pedido organizado al chat. Sin comisiones por venta.",
 	keywords:
-		"pedidos por whatsapp restaurantes, sistema pedidos whatsapp, menú digital whatsapp, comandas whatsapp, restaurante whatsapp",
+		"pedidos whatsapp restaurante, carta digital whatsapp, vender por whatsapp gratis, sistema pedidos whatsapp",
 };
 ---
 
@@ -39,16 +42,16 @@ const seoData = {
 					</div>
 
 					<h1
-						class="text-4xl md:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
+						class="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.9]"
 					>
-						Vende Comida por <br />
-						<span class="text-[#25D366]">WhatsApp</span>
+						Vende por WhatsApp <br />
+						<span class="text-green-500">sin comisiones.</span>
 					</h1>
 					<p
-						class="text-xl text-slate-600 mb-10 max-w-xl mx-auto leading-relaxed"
+						class="text-xl text-slate-600 mb-10 max-w-xl mx-auto leading-relaxed font-medium"
 					>
-						El sistema de pedidos más simple del mundo. Tus clientes eligen del
-						menú y tú recibes el pedido listo en un mensaje.
+						Deja que tus clientes armen su pedido en tu menú digital y lo envíen
+						directo a tu chat. Organizado, rápido y 100% tuyo.
 					</p>
 
 					<div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -121,7 +124,106 @@ const seoData = {
 				</div>
 			</section>
 
-			<!-- Benefits Icons -->
+			<!-- Workflow Explanation -->
+			<section class="py-24 bg-white">
+				<div class="max-w-6xl mx-auto px-6">
+					<div class="text-center mb-20">
+						<h2
+							class="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tighter"
+						>
+							Adiós al desorden en el chat
+						</h2>
+						<p class="text-slate-500 text-lg">
+							Tus clientes aman la rapidez, tú amarás la organización.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+						<div class="space-y-12">
+							<div class="flex gap-6">
+								<div
+									class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center shrink-0 border border-green-100"
+								>
+									<Smartphone className="w-7 h-7" />
+								</div>
+								<div>
+									<h4 class="font-bold text-xl mb-2">Catálogo Interactivo</h4>
+									<p class="text-slate-500 leading-relaxed">
+										Tus clientes navegan por tu menú, ven fotos y precios sin
+										salir del navegador.
+									</p>
+								</div>
+							</div>
+							<div class="flex gap-6">
+								<div
+									class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100"
+								>
+									<ShoppingCart className="w-7 h-7" />
+								</div>
+								<div>
+									<h4 class="font-bold text-xl mb-2">Carrito Inteligente</h4>
+									<p class="text-slate-500 leading-relaxed">
+										Pueden sumar extras (queso, tocino, etc.) y ver el total en
+										tiempo real.
+									</p>
+								</div>
+							</div>
+							<div class="flex gap-6">
+								<div
+									class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-100"
+								>
+									<Zap className="w-7 h-7" />
+								</div>
+								<div>
+									<h4 class="font-bold text-xl mb-2">Envío en 1 Click</h4>
+									<p class="text-slate-500 leading-relaxed">
+										Al finalizar, el pedido llega a tu WhatsApp con todos los
+										detalles listos para preparar.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="bg-slate-50 rounded-[40px] p-8 border border-slate-100">
+							<!-- Simulated Order Result -->
+							<div
+								class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100"
+							>
+								<div
+									class="bg-green-600 p-4 text-white flex items-center gap-3"
+								>
+									<div class="w-10 h-10 bg-white/20 rounded-full"></div>
+									<div>
+										<p class="text-xs opacity-80">Cliente (WhatsApp)</p>
+										<p class="font-bold">Nuevo Pedido Recibido</p>
+									</div>
+								</div>
+								<div class="p-6 font-mono text-sm space-y-2">
+									<p class="text-green-600 font-bold mb-4">
+										🛒 DETALLE DEL PEDIDO
+									</p>
+									<p>-------------------------</p>
+									<p>1x Burger Doble Queso (+$2.00)</p>
+									<p>1x Papas Grandes</p>
+									<p>1x Coca Cola 600ml</p>
+									<p>-------------------------</p>
+									<p class="font-bold">TOTAL: $18.50</p>
+									<p class="mt-4 text-slate-400">Dir: Calle Falsa 123</p>
+									<div class="mt-6 flex justify-end">
+										<div
+											class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold"
+										>
+											Listo para preparar
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Benefits List Refined -->
 			<section class="py-20 bg-slate-50">
 				<div class="max-w-5xl mx-auto px-6">
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-10">

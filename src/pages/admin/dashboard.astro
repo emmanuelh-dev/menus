@@ -11,7 +11,7 @@ import HistoryManager from "../../components/admin/HistoryManager";
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
 if (!isAuth) {
-  return Astro.redirect("/admin/login");
+	return Astro.redirect("/admin/login");
 }
 
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
@@ -23,7 +23,7 @@ if (!accessTokenCookie || !refreshTokenCookie) {
 
 const supabase = await createAuthenticatedClient(
 	accessTokenCookie.value,
-	refreshTokenCookie.value
+	refreshTokenCookie.value,
 );
 
 const {
@@ -36,113 +36,133 @@ if (userError || !user) {
 	return Astro.redirect("/admin/login");
 }
 
+const isAdmin = [
+	"emmanuelh.dev@gmail.com",
+	"admin@bysmax.com",
+	"e805177@gmail.com",
+].includes(user.email || "");
+
 const { data: places, error: placesError } = await supabase
 	.from("places")
-	.select(`
+	.select(
+		`
 		*,
 		states (
 			id,
 			name,
 			slug
 		)
-	`)
+	`,
+	)
 	.eq("user_id", user?.id)
 	.order("created_at", { ascending: false });
 
 const { data: recentComments } = await supabase
 	.from("reviews")
-	.select(`
+	.select(
+		`
 		*,
 		places (
 			name
 		)
-	`)
-  .in('place_id', (places || []).map(p => p.id))
+	`,
+	)
+	.in(
+		"place_id",
+		(places || []).map((p) => p.id),
+	)
 	.order("created_at", { ascending: false })
 	.limit(20);
 
-const { data: history } = await supabase
-	.from("place_content_history")
-	.select(`
-		*,
-		places (
-			name
+// Only fetch history if admin
+let history: any[] = [];
+if (isAdmin) {
+	const { data: historyData } = await supabase
+		.from("place_content_history")
+		.select(
+			`
+			*,
+			places (
+				name
+			)
+		`,
 		)
-	`)
-	.order("created_at", { ascending: false })
-	.limit(10);
-
-  console.log(recentComments)
+		.order("created_at", { ascending: false })
+		.limit(10);
+	history = historyData || [];
+}
 ---
 
 <AdminLayout title="Dashboard | Panel de Administrador">
-	<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
-	
-	<PlaceManager  initialRestaurants={places || []} client:load/>
-	
-	<div class="mt-8">
-		<HistoryManager client:load initialHistory={history || []} />
-	</div>
-	
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-		<div class="bg-white rounded-lg shadow p-6">
-			<h2 class="text-lg font-medium text-gray-900 mb-4">
-				Comentarios Recientes
-			</h2>
+	<div class="flex flex-col gap-6 pb-20">
+		<header
+			class="flex flex-col md:flex-row md:items-end justify-between gap-4"
+		>
+			<div class="flex flex-col gap-1">
+				<h1
+					class="text-3xl font-black uppercase tracking-tighter text-slate-900"
+				>
+					Panel
+				</h1>
+				<p class="text-slate-500 font-medium text-sm">
+					Bienvenido, {user.user_metadata?.name || "Administrador"}.
+				</p>
+			</div>
+			<div id="place-manager-trigger">
+				<PlaceManager initialRestaurants={places || []} client:load />
+			</div>
+		</header>
 
-			{
-				recentComments && recentComments.length > 0 ? (
-					<ul class="divide-y divide-gray-200">
-						{recentComments.map((comment) => (
-							<li class="py-3">
-								{" "}
-								<div class="flex items-center space-x-4">
-									<div class="flex-1 min-w-0">
-										<p class="text-sm font-medium text-gray-900 truncate">
-											{comment.places?.name || "Lugar no especificado"}
-										</p>
-										<p class="text-sm text-gray-500 truncate">
-											{comment.comment}
-										</p>
-									</div>
-									<span class="text-xs text-gray-500">
-										{new Date(comment.created_at).toLocaleDateString()}
-									</span>
-								</div>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p class="text-gray-500 text-sm">No hay comentarios recientes.</p>
-				)
-			}
-		</div>
-		<!-- <div class="bg-white rounded-lg shadow p-6">
-			<h2 class="text-lg font-medium text-gray-900 mb-4">Mensajes Recientes</h2>
+		{
+			places && places.length === 0 ? (
+				<div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center">
+					<div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+						<span class="text-2xl">✨</span>
+					</div>
+					<h2 class="text-2xl font-black uppercase tracking-tighter text-slate-900 mb-2">
+						Comienza creando tu primer lugar
+					</h2>
+					<p class="text-slate-500 font-medium max-w-sm mx-auto mb-8">
+						Registra tu establecimiento y sube tu menú para empezar a recibir
+						pedidos por WhatsApp.
+					</p>
+					{/* The PlaceManager above already provides the button, but we can add a visual hint here if needed */}
+				</div>
+			) : (
+				<div class="space-y-12">
+					{isAdmin && (
+						<div>
+							<HistoryManager client:load initialHistory={history || []} />
+						</div>
+					)}
 
-			{
-				recentContacts && recentContacts.length > 0 ? (
-					<ul class="divide-y divide-gray-200">
-						{recentContacts.map((contact) => (
-							<li class="py-3">
-								<div class="flex items-center space-x-4">
-									<div class="flex-1 min-w-0">
-										<p class="text-sm font-medium text-gray-900 truncate">
-											{contact.email}
+					{recentComments && recentComments.length > 0 && (
+						<div class="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm max-w-2xl">
+							<h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+								<span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+								Actividad Reciente
+							</h2>
+							<ul class="space-y-4">
+								{recentComments.slice(0, 5).map((comment) => (
+									<li class="flex flex-col gap-1">
+										<div class="flex items-center justify-between text-[10px] font-black uppercase tracking-tight">
+											<span class="text-emerald-600">
+												{comment.places?.name}
+											</span>
+											<span class="text-slate-300">
+												{new Date(comment.created_at).toLocaleDateString()}
+											</span>
+										</div>
+										<p class="text-sm font-medium text-slate-700 leading-snug">
+											"{comment.comment}"
 										</p>
-										<p class="text-sm text-gray-500">{contact.message}</p>
-									</div>
-									<span class="text-xs text-gray-500">
-										{new Date(contact.created_at).toLocaleDateString()}
-									</span>
-								</div>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p class="text-gray-500 text-sm">No hay mensajes de contacto.</p>
-				)
-			}
-		</div> -->
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
+				</div>
+			)
+		}
 	</div>
 </AdminLayout>

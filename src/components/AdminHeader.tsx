@@ -4,6 +4,7 @@ function AdminHeader() {
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
@@ -14,7 +15,20 @@ function AdminHeader() {
       setIsOpen(!isMobileWidth);
     };
 
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me'); // I'll create this API
+        const data = await response.json();
+        if (data.user) {
+          setUserEmail(data.user.email);
+        }
+      } catch (e) {
+        console.error("Error fetching user", e);
+      }
+    };
+
     checkIfMobile();
+    fetchUser();
     window.addEventListener('resize', checkIfMobile);
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
@@ -80,6 +94,19 @@ function AdminHeader() {
               Dashboard
             </a>
 
+            <a
+              href="/admin/profile"
+              className={`${isActive('/admin/profile')
+                ? 'bg-gray-100 text-gray-900 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
+            >
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Mi Perfil
+            </a>
+
             {/*
               <a 
                 href="/admin/restaurants" 
@@ -96,23 +123,6 @@ function AdminHeader() {
               </a>
             */}
 
-            <div className="pt-4 pb-2">
-              <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">
-                Menús
-              </div>
-              <a
-                href="/admin/menus"
-                className={`${isActive('/admin/menus')
-                  ? 'bg-gray-100 text-gray-900 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
-              >
-                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-                Administrar
-              </a>
-            </div>
 
             <a
               href="/admin/contacts"
@@ -126,6 +136,27 @@ function AdminHeader() {
               </svg>
               Contactos
             </a>
+
+            {(userEmail === 'emmanuelh.dev@gmail.com' || userEmail === 'admin@bysmax.com' || userEmail === 'e805177@gmail.com'
+            ) && (
+                <div className="pt-4 pb-2">
+                  <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">
+                    Administrador
+                  </div>
+                  <a
+                    href="/admin/users"
+                    className={`${isActive('/admin/users')
+                      ? 'bg-gray-100 text-gray-900 font-medium'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
+                  >
+                    <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    Usuarios Registrados
+                  </a>
+                </div>
+              )}
           </nav>
 
           <div className="p-3 border-t border-gray-100 flex flex-col gap-4">
@@ -152,8 +183,8 @@ function AdminHeader() {
               ¿Algun problema?
             </a>
             <div className="px-8 text-center text-gray-500 text-xs">
-          &copy; {new Date().getFullYear()} Menús BysMax.
-        </div>
+              &copy; {new Date().getFullYear()} Menús BysMax.
+            </div>
           </div>
         </div>
       </aside>
