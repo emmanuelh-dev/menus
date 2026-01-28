@@ -18,8 +18,8 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
 
   const handleSubmit = async (files?: File[]) => {
     const filesToUpload = files || images;
-    if (filesToUpload.length === 0) {
-      alert('Por favor selecciona al menos una foto.');
+    if (filesToUpload.length === 0 && text.trim() === '') {
+      alert('Por favor selecciona al menos una foto o escribe qué cambió.');
       return;
     }
 
