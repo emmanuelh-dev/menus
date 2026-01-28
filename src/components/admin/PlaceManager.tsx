@@ -237,9 +237,9 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-xl rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white w-full max-w-xl max-h-[90vh] rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col">
             {/* Steps Header */}
-            <div className="bg-white px-8 py-5 border-b border-slate-100 flex items-center justify-between">
+            <div className="bg-white px-8 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-6">
                 <div className={`flex items-center gap-2 ${step === 1 ? 'text-black' : 'text-slate-400'}`}>
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${step === 1 ? 'bg-black text-white' : 'bg-slate-100'}`}>1</span>
@@ -256,7 +256,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
               </button>
             </div>
 
-            <div className="p-8">
+            <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
               {step === 1 ? (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-1">
