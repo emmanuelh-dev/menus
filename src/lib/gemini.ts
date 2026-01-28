@@ -28,6 +28,8 @@ REGLAS DE ORO (CRÍTICAS):
 3. IDs: Mantén los \`id\` de los bloques y de los items exactamente igual.
 4. FUSIÓN: Si la entrada tiene información nueva, agrégala.
 5. SEMANTIC DATA: La información de contacto va SOLO en \`semantic_data\`.
+6. RESILIENCIA: Si la instrucción es vaga, contradictoria o malformada, PRIORIZA mantener el contenido original intacto. No inventes datos que no se te proporcionaron explícitamente.
+7. ACTUALIZACIONES PRECISAS: Si el usuario dice algo como "habitacion X ahora cuesta Y", busca ese item exacto y actualiza solo ese valor.
 
 REGLAS DE FORMATO JSON:
 {
