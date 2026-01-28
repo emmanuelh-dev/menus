@@ -1,11 +1,13 @@
 
 import React, { useState, useRef } from 'react';
+import { Sparkles, Upload, CheckCircle2, X, Camera, Info } from 'lucide-react';
 
 interface QuickFeedProps {
   placeId: number;
+  isInline?: boolean;
 }
 
-export default function QuickFeed({ placeId }: QuickFeedProps) {
+export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [text, setText] = useState('');
@@ -14,17 +16,18 @@ export default function QuickFeed({ placeId }: QuickFeedProps) {
   const [stats, setStats] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async () => {
-    if (!text && images.length === 0) {
-      alert('Por favor agrega al menos una foto o una instrucción.');
+  const handleSubmit = async (files?: File[]) => {
+    const filesToUpload = files || images;
+    if (filesToUpload.length === 0) {
+      alert('Por favor selecciona al menos una foto.');
       return;
     }
 
     setIsProcessing(true);
     try {
       const base64Images: string[] = [];
-      
-      for (const file of images) {
+
+      for (const file of filesToUpload) {
         const reader = new FileReader();
         const promise = new Promise<string>((resolve) => {
           reader.onloadend = () => {
@@ -42,22 +45,23 @@ export default function QuickFeed({ placeId }: QuickFeedProps) {
         body: JSON.stringify({
           placeId,
           images: base64Images,
-          instruction: text || (base64Images.length > 0 ? 'Analiza estas imágenes y actualiza el contenido.' : undefined),
+          instruction: text || 'Analiza estas fotos de precios o habitaciones y actualiza la información correspondiente. Si es una foto de una habitación específica, asígnala como su imagen principal.',
           preview: true
         })
       });
 
       const result = await response.json();
-      
+
       if (result.success && result.preview) {
         setPendingContent(result.content);
         setStats(result.stats);
+        if (isInline && !isOpen) setIsOpen(true);
       } else {
         throw new Error(result.error || 'Error al procesar');
       }
     } catch (err) {
       console.error(err);
-      alert('Hubo un error al procesar tu solicitud.');
+      alert('Hubo un error al procesar las imágenes con IA.');
     } finally {
       setIsProcessing(false);
     }
@@ -79,153 +83,236 @@ export default function QuickFeed({ placeId }: QuickFeedProps) {
 
       const result = await response.json();
       if (result.success) {
-        alert('✓ ¡Gracias! Hemos actualizado la información.');
         setIsOpen(false);
         setPendingContent(null);
+        alert('✓ ¡Gracias! Tu aporte ayuda a toda la comunidad. La información ha sido actualizada.');
         window.location.reload();
       }
     } catch (err) {
-      alert('Error al guardar');
+      alert('Error al guardar los cambios.');
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setImages(Array.from(e.target.files));
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      setImages(selectedFiles);
+      if (isInline) {
+        handleSubmit(selectedFiles);
+      }
     }
   };
 
+  if (isInline) {
+    return (
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-10 mb-20 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+          <Sparkles size={120} />
+        </div>
+
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-800 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">
+              <Info size={12} className="text-zinc-500" />
+              Keep it fresh
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-4 italic serif">
+              Ayúdanos a mantener <br />esta información actualizada
+            </h2>
+            <p className="text-zinc-400 font-medium text-sm max-w-md leading-relaxed">
+              ¿Ves precios diferentes o nuevas habitaciones? Escríbenos o sube una foto y nuestra IA se encargará del resto.
+            </p>
+          </div>
+
+          <div className="w-full md:w-80 space-y-3">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="¿Qué cambió? (opcional)"
+              className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-xs focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[80px] resize-none"
+            />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/*"
+              multiple
+            />
+            <button
+              onClick={() => {
+                if (images.length > 0 || text.trim() !== '') {
+                  handleSubmit();
+                } else {
+                  fileInputRef.current?.click();
+                }
+              }}
+              disabled={isProcessing}
+              className="w-full bg-white text-black px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-3 active:scale-95"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  {images.length > 0 ? <CheckCircle2 size={16} /> : <Camera size={16} />}
+                  {images.length > 0 ? `${images.length} Fotos - Actualizar` : text.trim() !== '' ? 'Actualizar con texto' : 'Subir Foto / Actualizar'}
+                </>
+              )}
+            </button>
+            {images.length > 0 && (
+              <button
+                onClick={() => setImages([])}
+                className="w-full py-1 text-[9px] font-black uppercase tracking-tighter text-zinc-600 hover:text-red-500 transition-colors"
+              >
+                Limpiar fotos
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Preview Modal for Inline */}
+        {isOpen && pendingContent && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+            <div className="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+              <div className="p-8 md:p-10">
+                <div className="flex items-center gap-4 mb-6 text-emerald-500">
+                  <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-black uppercase tracking-tight text-xl text-white">¡Detección Exitosa!</h3>
+                    <p className="text-emerald-500/80 text-xs font-bold uppercase tracking-wider">La IA ha procesado tus fotos</p>
+                  </div>
+                </div>
+
+                <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 mb-8">
+                  <p className="text-zinc-400 text-sm font-medium leading-relaxed mb-4">
+                    Hemos detectado cambios en <span className="text-white font-bold">{stats?.items || 0} elementos</span> y <span className="text-white font-bold">{stats?.sections || 0} secciones</span>.
+                  </p>
+                  <div className="flex gap-2">
+                    {stats?.hasAddress && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300">📍 UBICACIÓN</span>}
+                    {stats?.hasPhone && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300">📞 TELÉFONO</span>}
+                    {stats?.newImages > 0 && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300">🖼️ {stats.newImages} FOTOS</span>}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleConfirm}
+                    disabled={isProcessing}
+                    className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? 'Guardando...' : 'Confirmar y Actualizar ✨'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      setPendingContent(null);
+                      setText('');
+                      setImages([]);
+                    }}
+                    className="w-full py-2 text-zinc-500 font-bold uppercase text-[10px] tracking-tight hover:text-zinc-300 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Floating Button Version (Optional, keep it for other views if needed)
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-[1000] bg-[#1A1A1A] text-white p-4 rounded-full shadow-2xl border border-white/10 hover:scale-110 transition-transform flex items-center gap-2 group ring-1 ring-white/5"
-        title="Mejorar esta página con IA"
+        className="fixed bottom-6 right-6 z-[100] bg-white text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 group border border-zinc-200"
+        title="Mejorar info con IA"
       >
-        <div className="relative">
-          <svg xmlns="http://www.w3.org/2000/svg" className="size-6 text-red-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
-          </svg>
-        </div>
-        <span className="hidden sm:inline font-medium text-sm tracking-tight">Alimentar IA</span>
+        <Sparkles size={20} className="text-zinc-800" />
+        <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest">Alimentar IA</span>
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm px-6">
-          <div className="bg-[#1A1A1A] border border-white/10 w-full max-w-md p-6 rounded-2xl shadow-2xl text-stone-300">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-light serif italic text-white">Mejorar información</h2>
-              <button onClick={() => setIsOpen(false)} className="text-stone-500 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm px-6">
+          {/* ... Same modal as before or similar ... */}
+          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md p-8 rounded-[32px] shadow-2xl text-zinc-300 relative">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setPendingContent(null);
+                setText('');
+                setImages([]);
+              }}
+              className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-6">
+              <Camera size={24} className="text-white" />
             </div>
 
-            <p className="text-sm text-stone-400 mb-6">
-              Sube fotos del menú, lugar o archivos PDF. Nuestra IA analizará todo para actualizar la página.
+            <h2 className="text-2xl font-black uppercase tracking-tighter text-white mb-2">Mejorar información</h2>
+            <p className="text-zinc-500 text-sm font-medium mb-8">
+              Sube fotos del menú o habitaciones, o simplemente indícanos qué cambió.
             </p>
 
-            <div className="space-y-4">
-              {pendingContent ? (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                  <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 mb-6">
-                    <h3 className="text-green-400 font-bold mb-4 flex items-center gap-2">
-                      <span className="text-xl">✨</span> ¡Análisis Completo!
-                    </h3>
-                    
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-black/40 p-3 rounded-lg border border-white/5">
-                        <p className="text-stone-500 text-[10px] uppercase font-black mb-1">Items</p>
-                        <p className="text-white text-xl font-bold">{stats?.items || 0}</p>
-                      </div>
-                      <div className="bg-black/40 p-3 rounded-lg border border-white/5">
-                        <p className="text-stone-500 text-[10px] uppercase font-black mb-1">Secciones</p>
-                        <p className="text-white text-xl font-bold">{stats?.sections || 0}</p>
-                      </div>
-                      {(stats?.hasAddress || stats?.hasPhone) && (
-                        <div className="col-span-2 bg-black/40 p-3 rounded-lg border border-white/5">
-                           <p className="text-stone-500 text-[10px] uppercase font-black mb-1">Detalles</p>
-                           <p className="text-stone-300 text-xs">
-                             Se detectó: {stats.hasAddress ? '📍 Dirección' : ''} {stats.hasPhone ? ' 📞 Teléfono' : ''}
-                           </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setPendingContent(null)}
-                      className="flex-1 py-3 px-4 bg-white/5 text-stone-400 rounded-xl font-bold hover:bg-white/10 transition-colors"
-                    >
-                      Volver
-                    </button>
-                    <button
-                      onClick={handleConfirm}
-                      disabled={isProcessing}
-                      className="flex-[2] py-3 px-4 bg-red-800 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-xl shadow-red-950/20 flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Guardando...
-                        </>
-                      ) : (
-                        <>Aplicar Cambios ✨</>
-                      )}
-                    </button>
-                  </div>
+            {pendingContent ? (
+              <div className="space-y-6">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
+                  <p className="text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">¡Análisis listo!</p>
+                  <p className="text-zinc-300 text-sm leading-relaxed font-medium">Hemos encontrado actualizaciones para {stats?.items || 0} elementos.</p>
                 </div>
-              ) : (
-                <>
-                  <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${images.length > 0 ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-white/20 hover:bg-white/5'}`}
-                  >
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      onChange={handleFileChange}
-                      className="hidden" 
-                      accept="image/*,application/pdf"
-                      multiple
-                    />
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`size-10 mb-2 ${images.length > 0 ? 'text-green-500' : 'text-stone-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-sm text-stone-500 text-center">
-                      {images.length > 0 ? `${images.length} archivos seleccionados` : 'Subir fotos o PDFs (pueden ser varios)'}
-                    </span>
-                    {images.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1 justify-center">
-                        {images.slice(0, 3).map((f, i) => (
-                          <span key={i} className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-stone-400 max-w-[100px] truncate">{f.name}</span>
-                        ))}
-                        {images.length > 3 && <span className="text-[10px] text-stone-500">+ {images.length - 3} más</span>}
-                      </div>
-                    )}
-                  </div>
-
-                  <textarea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Ej: 'Simplifica las descripciones' o 'Agrega cochera a la habitación normal'..."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-800 transition-all min-h-[100px]"
-                  />
-
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isProcessing}
-                    className="w-full bg-red-800 hover:bg-red-700 disabled:bg-stone-800 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-all shadow-xl shadow-red-950/20"
-                  >
-                    {isProcessing ? 'Procesando con IA...' : 'Actualizar ahora'}
-                  </button>
-                </>
-              )}
-            </div>
+                <button
+                  onClick={handleConfirm}
+                  disabled={isProcessing}
+                  className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-zinc-100 transition-all"
+                >
+                  {isProcessing ? 'Guardando...' : 'Aplicar Cambios ✨'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Describe los cambios aquí..."
+                  className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[100px] resize-none"
+                />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  multiple
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group"
+                >
+                  <Upload size={24} className="text-zinc-700 group-hover:text-zinc-500 mb-2" />
+                  <span className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">
+                    {images.length > 0 ? `${images.length} archivos` : 'Añadir Fotos'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleSubmit()}
+                  disabled={isProcessing || (images.length === 0 && text.trim() === '')}
+                  className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isProcessing ? 'Procesando...' : 'Analizar ahora'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
