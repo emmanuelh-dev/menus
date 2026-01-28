@@ -99,9 +99,6 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
       setImages(selectedFiles);
-      if (isInline) {
-        handleSubmit(selectedFiles);
-      }
     }
   };
 
@@ -191,13 +188,31 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                 </div>
 
                 <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 mb-8">
-                  <p className="text-zinc-400 text-sm font-medium leading-relaxed mb-4">
+                  <p className="text-zinc-400 text-xs font-medium leading-relaxed mb-4">
                     Hemos detectado cambios en <span className="text-white font-bold">{stats?.items || 0} elementos</span> y <span className="text-white font-bold">{stats?.sections || 0} secciones</span>.
                   </p>
-                  <div className="flex gap-2">
-                    {stats?.hasAddress && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300">📍 UBICACIÓN</span>}
-                    {stats?.hasPhone && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300">📞 TELÉFONO</span>}
-                    {stats?.newImages > 0 && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300">🖼️ {stats.newImages} FOTOS</span>}
+
+                  {stats?.summary && (
+                    <div className="mb-6 p-5 bg-white/5 rounded-2xl border border-white/5 max-h-48 overflow-y-auto">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-3 flex items-center gap-2">
+                        <Sparkles size={12} />
+                        Resumen de Cambios:
+                      </p>
+                      <div className="space-y-3">
+                        {stats.summary.split('\n').map((line: string, i: number) => (
+                          <div key={i} className="text-xs text-zinc-300 flex gap-3 leading-tight font-medium">
+                            <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
+                            <span>{line}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    {stats?.hasAddress && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[9px] font-bold text-zinc-300">📍 UBICACIÓN</span>}
+                    {stats?.hasPhone && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[9px] font-bold text-zinc-300">📞 TELÉFONO</span>}
+                    {stats?.newImages > 0 && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[9px] font-bold text-zinc-300">🖼️ {stats.newImages} FOTOS</span>}
                   </div>
                 </div>
 
@@ -270,7 +285,15 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
               <div className="space-y-6">
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
                   <p className="text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">¡Análisis listo!</p>
-                  <p className="text-zinc-300 text-sm leading-relaxed font-medium">Hemos encontrado actualizaciones para {stats?.items || 0} elementos.</p>
+                  <p className="text-zinc-300 text-sm leading-relaxed font-medium mb-4">Hemos encontrado actualizaciones para {stats?.items || 0} elementos.</p>
+
+                  {stats?.summary && (
+                    <div className="space-y-1.5 border-t border-emerald-500/10 pt-3">
+                      {stats.summary.split('\n').map((line: string, i: number) => (
+                        <p key={i} className="text-[10px] text-emerald-500/80 font-medium">✨ {line}</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={handleConfirm}

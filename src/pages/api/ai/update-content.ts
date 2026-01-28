@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 import { callGemini } from '../../../lib/gemini';
@@ -5,7 +7,11 @@ import { uploadToCloudinary } from '../../../lib/cloudinary';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await request.json();
+    const textBody = await request.text();
+    if (!textBody) {
+      return new Response(JSON.stringify({ error: 'Empty body' }), { status: 400 });
+    }
+    const body = JSON.parse(textBody);
     let { placeId, instruction, image, images, currentContent: providedContent, preview, saveOnly } = body;
 
     if (!placeId) {
@@ -13,6 +19,18 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (saveOnly && providedContent) {
+      // Guardar historial antes de actualizar
+      const { data: oldPlace } = await supabase.from('places').select('content').eq('id', placeId).single();
+      if (oldPlace) {
+        await supabase.from('place_content_history').insert({
+          place_id: placeId,
+          content: oldPlace.content,
+          source: 'admin_editor',
+          agent_reasoning: instruction || 'Edición manual desde el panel',
+          version_label: 'Manual'
+        });
+      }
+
       const { error: updateError } = await supabase
         .from('places')
         .update({ content: providedContent })
@@ -79,16 +97,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     const placeType = place.type || 'restaurant';
 
-    await supabase
-      .from('place_content_history')
-      .insert({
-        place_id: placeId,
-        content: currentContent,
-        source: providedContent ? 'admin_editor' : 'quick_feed_request',
-        agent_reasoning: instruction || 'Update request',
-        version_label: `Revision before: ${instruction?.substring(0, 30) || 'AI Scan'}`
-      });
-
     let aiResponse = await callGemini(
       placeType as 'motel' | 'restaurant',
       instruction || 'Analiza las imágenes y actualiza el contenido.',
@@ -152,17 +160,50 @@ export const POST: APIRoute = async ({ request }) => {
       newContent.blocks = restoredBlocks;
     }
 
-    // PROCESAR NUEVAS IMÁGENES DE GALERÍA
+    // PROCESAR TODAS LAS IMÁGENES DE CLOUDINARY (Auto-añadir a galería si no se usaron en items)
+    if (!newContent.gallery) newContent.gallery = [];
+    const usedInItems = new Set();
+    newContent.blocks?.forEach((b: any) => {
+        b.data?.items?.forEach((i: any) => { if (i.image?.includes('cloudinary.com')) usedInItems.add(i.image); });
+    });
+
+    cloudinaryUrls.forEach(url => {
+        if (!usedInItems.has(url)) {
+            const exists = newContent.gallery.some((img: any) => img.url === url);
+            if (!exists) {
+                newContent.gallery.push({
+                    url,
+                    title: 'Aporte de la comunidad',
+                    id: `img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                });
+            }
+        }
+    });
+
+    // PROCESAR IMÁGENES QUE LA IA DECIDIÓ AÑADIR ESPECÍFICAMENTE
     if (aiResponse.new_gallery_images && Array.isArray(aiResponse.new_gallery_images)) {
-        if (!newContent.gallery) newContent.gallery = [];
         aiResponse.new_gallery_images.forEach((img: any) => {
-            newContent.gallery.push({
-                url: img.url,
-                title: img.title || 'Imagen del lugar',
-                id: `img-${Date.now()}-${Math.random()}`
-            });
+            const exists = newContent.gallery.some((existing: any) => existing.url === img.url);
+            if (!exists) {
+                newContent.gallery.push({
+                    url: img.url,
+                    title: img.title || 'Imagen del lugar',
+                    id: `img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                });
+            }
         });
     }
+    
+    // GUARDAR HISTORIAL CON EL RESUMEN DE LA IA
+    await supabase
+      .from('place_content_history')
+      .insert({
+        place_id: placeId,
+        content: currentContent, // El contenido anterior para poder hacer rollback
+        source: providedContent ? 'admin_editor' : 'quick_feed_request',
+        agent_reasoning: aiResponse.change_summary || instruction || 'Update request',
+        version_label: aiResponse.change_summary?.substring(0, 50) || `Revision: ${instruction?.substring(0, 30) || 'AI Scan'}`
+      });
 
     const stats = {
       sections: newContent.blocks?.length || 0,
@@ -176,7 +217,10 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ 
         success: true, 
         preview: true,
-        stats,
+        stats: {
+          ...stats,
+          summary: aiResponse.change_summary
+        },
         content: newContent
       }), { status: 200 });
     }

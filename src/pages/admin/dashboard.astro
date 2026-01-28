@@ -95,23 +95,7 @@ if (isAdmin) {
 
 <AdminLayout title="Dashboard | Panel de Administrador">
 	<div class="flex flex-col gap-6 pb-20">
-		<header
-			class="flex flex-col md:flex-row md:items-end justify-between gap-4"
-		>
-			<div class="flex flex-col gap-1">
-				<h1
-					class="text-3xl font-black uppercase tracking-tighter text-slate-900"
-				>
-					Panel
-				</h1>
-				<p class="text-slate-500 font-medium text-sm">
-					Bienvenido, {user.user_metadata?.name || "Administrador"}.
-				</p>
-			</div>
-			<div id="place-manager-trigger">
-				<PlaceManager initialRestaurants={places || []} client:load />
-			</div>
-		</header>
+		<PlaceManager initialRestaurants={places || []} client:load />
 
 		{
 			places && places.length === 0 ? (
