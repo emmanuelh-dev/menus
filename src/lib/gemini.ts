@@ -9,6 +9,7 @@ export interface GeminiResponse {
   semantic_data?: any;
   sections?: any[];
   blocks?: any[];
+  new_gallery_images?: any[];
 }
 
 export const SYSTEM_PROMPT = (placeType: 'motel' | 'restaurant', currentContent?: any) => `
@@ -20,54 +21,52 @@ ${currentContent ? `CONTENIDO ACTUAL (Úsalo como base obligatoria):
 ${JSON.stringify(currentContent)}` : 'No hay contenido previo, genera uno nuevo basado en la entrada.'}
 
 REGLAS DE ORO (CRÍTICAS):
-1. CONSERVACIÓN ABSOLUTA Y LIMPIEZA: El "CONTENIDO ACTUAL" es tu base SAGRADA para lo único. NUNCA elimines habitaciones o platillos únicos. Sin embargo, DEBES ELIMINAR items que estén duplicados (mismo nombre o contenido idéntico). Si el usuario dice "fix it" o "mejorar", mantén todos los items originales pero limpia las duplicidades para dejar un catálogo único y profesional.
-2. PRESERVACIÓN DE IMÁGENES: Para CUALQUIER imagen que YA exista en el contenido actual, DEBES usar el marcador "[URL_DE_IMAGEN]" en el campo \`image\`. Para galerías usa \`{"url": "[URL]"}\`. NO inventes URLs.
-3. IDs: Mantén los \`id\` de los bloques y de los items (\`id\`) exactamente igual a como vienen en el "CONTENIDO ACTUAL". Esto es crítico para no perder fotos.
-4. FUSIÓN: Si la entrada tiene información nueva, agrégala. Si no menciona algo que ya existe, MANTENLO igual. NO asumas que lo omitido ya no existe.
-5. SEMANTIC DATA: La información de contacto (Teléfono, Dirección, WhatsApp) va SOLO en \`semantic_data\`. NUNCA en bloques de texto.
+1. CONSERVACIÓN ABSOLUTA Y LIMPIEZA: El "CONTENIDO ACTUAL" es tu base SAGRADA. NUNCA elimines habitaciones o platillos únicos. Sin embargo, DEBES ELIMINAR items que estén duplicados.
+2. PRESERVACIÓN DE IMÁGENES:
+   - Para imágenes que YA existen, usa "[URL_DE_IMAGEN]".
+   - Si se proporcionan nuevas imágenes y se te indica que uses sus URLs de Cloudinary, USALAS en los campos \`image\` de los nuevos items o en la galería.
+3. IDs: Mantén los \`id\` de los bloques y de los items exactamente igual.
+4. FUSIÓN: Si la entrada tiene información nueva, agrégala.
+5. SEMANTIC DATA: La información de contacto va SOLO en \`semantic_data\`.
 
-REGLAS DE FORMATO JSON (Responde solo con este objeto COMPLETO):
+REGLAS DE FORMATO JSON:
 {
   "semantic_data": {
     "description": "Redacción elegante y vendedora",
     "address": "Dirección completa",
-    "phone": "Teléfonos (pueden ser varios separados por coma)",
-    "whatsapp": "Solo números con lada, ej: 528112345678",
-    "reservation_url": "URL si aplica",
-    "price_range": "Ej: MXN450 - MXN1500",
-    "hours": "Horarios detallados",
-    "parking": "Info de estacionamiento",
-    "payment_options": ["Efectivo", "Visa", "Mastercard"],
-    "additional_features": ["WiFi", "Clima", "Estacionamiento"],
-    "new_gallery_images": []
+    "phone": "Teléfonos",
+    "whatsapp": "Solo números con lada",
+    "reservation_url": "URL",
+    "price_range": "Rango de precios",
+    "hours": "Horarios",
+    "parking": "Info parking",
+    "payment_options": ["Efectivo", "Visa"],
+    "additional_features": ["WiFi"]
   },
   "blocks": [
     {
-      "id": "mantener_id_si_existe_o_generar_nuevo",
+      "id": "mantener_id_o_generar_nuevo",
       "type": "section",
       "data": {
-        "title": "Nombre de la sección (ej: Habitaciones)",
+        "title": "Nombre sección",
         "items": [
           {
-            "id": "mantener_id_si_existe",
-            "name": "Nombre item",
-            "price": 150.00,
-            "description": "Descripción detallada y elegante",
-            "features": ["Jacuzzi", "Smart TV"],
-            "image": "[URL_DE_IMAGEN] o vacío"
+            "id": "mantener_id",
+            "name": "Nombre",
+            "price": 0,
+            "description": "Elegante",
+            "features": ["Feature"],
+            "image": "URL_O_PLACEHOLDER"
           }
         ]
       }
     }
-  ]
+  ],
+  "new_gallery_images": []
 }
 
-INSTRUCCIONES ESPECÍFICAS:
-1. MOTELES: Los items son tipos de habitación. Asegura que cada uno tenga sus features (Jacuzzi, Vapor, etc.).
-2. RESTAURANTES: Los items son platillos con descripción y precio.
-3. Si el usuario pega texto de una página web, ignora avisos legales, publicidad o menús de navegación del sitio original. Solo extrae la esencia del lugar.
-
-SIEMPRE responde ÚNICAMENTE con un objeto JSON estrictamente válido. NO uses bloques de código con triple backtick. Empieza directamente con { y termina con }. Si no puedes procesar algo, devuelve el JSON actual sin cambios.
+MUY IMPORTANTE PARA IMÁGENES:
+Si te doy una lista de "IMÁGENES NUEVAS" con sus URLs correspondientes, y detectas que una imagen corresponde a un plato o habitación específica, pon esa URL directamente en el campo "image". Si es una imagen general del lugar, agrégala al array "new_gallery_images" con un objeto { "url": "...", "title": "..." }.
 `;
 
 async function callOllama(
@@ -117,34 +116,38 @@ export async function callGemini(
   placeType: 'motel' | 'restaurant',
   instruction: string,
   images?: string[],
-  currentContent?: any
+  currentContent?: any,
+  imageUrlMapping?: string[]
 ): Promise<GeminiResponse | null> {
-  // Redirigir a Ollama si estamos en modo desarrollo
   if (IS_DEVELOP) {
-    console.log('🤖 USANDO OLLAMA (Local) - Modo Desarrollo Activo');
     return callOllama(placeType, instruction, images, currentContent);
   }
 
-  console.log('☁️ USANDO GEMINI (Google Cloud) - Modo Producción Activo');
   const prompt = SYSTEM_PROMPT(placeType, currentContent);
   
+  let finalInstruction = `INSTRUCCIÓN DEL USUARIO: ${instruction}`;
+  if (imageUrlMapping && imageUrlMapping.length > 0) {
+    finalInstruction += `\n\nIMÁGENES NUEVAS SUBIDAS (Usa estas URLs si corresponden):`;
+    imageUrlMapping.forEach((url, i) => {
+      finalInstruction += `\n- Imagen ${i+1}: ${url}`;
+    });
+  }
+
   const contents = [
     {
       parts: [
         { text: prompt },
-        { text: `INSTRUCCIÓN DEL USUARIO: ${instruction}` }
+        { text: finalInstruction }
       ]
     }
   ];
 
   if (images && images.length > 0) {
     images.forEach(base64Image => {
-      // Si el string ya tiene el prefijo de data:, lo limpiamos
       const cleanData = base64Image.includes('base64,') 
         ? base64Image.split('base64,')[1] 
         : base64Image;
 
-      // Detectar si es PDF o Imagen (simplificado)
       const isPdf = base64Image.startsWith('data:application/pdf');
 
       contents[0].parts.push({
@@ -158,12 +161,12 @@ export async function callGemini(
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents }),
-        signal: AbortSignal.timeout(60000) // 60 segundos de timeout
+        signal: AbortSignal.timeout(60000)
       }
     );
 
@@ -174,34 +177,16 @@ export async function callGemini(
     }
 
     const result = await response.json();
-    
-    // LOG DE SEGURIDAD PARA DEBUG
-    console.log('--- GEMINI RAW RESPONSE START ---');
-    console.log(JSON.stringify(result, null, 2).substring(0, 1000));
-    console.log('--- GEMINI RAW RESPONSE END ---');
-
-    if (result.error) {
-      console.error('Gemini API Error Object:', result.error);
-      return null;
-    }
-
     const textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!textResponse) {
-      console.warn('Gemini Success but No Text in Candidates. Finish Reason:', result.candidates?.[0]?.finishReason);
-      return null;
-    }
+    if (!textResponse) return null;
 
-    // Limpiar posible markdown y extraer solo el objeto JSON { ... }
     try {
       let cleanJson = textResponse;
-      
-      // Si hay bloques de código markdown, extraer el contenido
       const jsonBlockMatch = textResponse.match(/```json\n?([\s\S]*?)\n?```/) || textResponse.match(/```\n?([\s\S]*?)\n?```/);
       if (jsonBlockMatch) {
         cleanJson = jsonBlockMatch[1];
       } else {
-        // Buscar el primer { y el último } para aislar el JSON si no hay bloques de código
         const start = textResponse.indexOf('{');
         const end = textResponse.lastIndexOf('}');
         if (start !== -1 && end !== -1 && end > start) {
@@ -211,7 +196,7 @@ export async function callGemini(
 
       return JSON.parse(cleanJson.trim());
     } catch (err) {
-      console.error('Error parsing Gemini JSON:', err, 'Raw response:', textResponse);
+      console.error('Error parsing Gemini JSON:', err);
       return null;
     }
   } catch (err) {
@@ -219,3 +204,4 @@ export async function callGemini(
     return null;
   }
 }
+
