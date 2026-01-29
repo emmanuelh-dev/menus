@@ -488,7 +488,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             onClick={() => setShowAIChat(!showAIChat)}
             className="flex-1 sm:flex-none bg-purple-600 text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-purple-700 transition-all text-sm"
           >
-            IA ✨
+            IA 
           </button>
           <button
             onClick={saveChanges}
@@ -1020,7 +1020,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                       Aplicando...
                     </>
                   ) : (
-                    <>Aplicar Cambios ✨</>
+                    <>Aplicar Cambios </>
                   )}
                 </button>
               </div>

@@ -96,7 +96,7 @@ export default function HistoryManager({ initialHistory }: { initialHistory: His
                     <div className="max-w-xs md:max-w-md">
                       {item.agent_reasoning ? (
                         <div className="flex items-start gap-2">
-                          <span className="text-emerald-500 animate-pulse mt-0.5">✨</span>
+                          <span className="text-emerald-500 animate-pulse mt-0.5"></span>
                           <span className="leading-snug">{item.agent_reasoning}</span>
                         </div>
                       ) : (

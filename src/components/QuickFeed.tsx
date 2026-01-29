@@ -222,7 +222,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                     disabled={isProcessing}
                     className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition-all flex items-center justify-center gap-2"
                   >
-                    {isProcessing ? 'Guardando...' : 'Confirmar y Actualizar ✨'}
+                    {isProcessing ? 'Guardando...' : 'Confirmar y Actualizar '}
                   </button>
                   <button
                     onClick={() => {
@@ -290,7 +290,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                   {stats?.summary && (
                     <div className="space-y-1.5 border-t border-emerald-500/10 pt-3">
                       {stats.summary.split('\n').map((line: string, i: number) => (
-                        <p key={i} className="text-[10px] text-emerald-500/80 font-medium">✨ {line}</p>
+                        <p key={i} className="text-[10px] text-emerald-500/80 font-medium"> {line}</p>
                       ))}
                     </div>
                   )}
@@ -300,7 +300,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                   disabled={isProcessing}
                   className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-zinc-100 transition-all"
                 >
-                  {isProcessing ? 'Guardando...' : 'Aplicar Cambios ✨'}
+                  {isProcessing ? 'Guardando...' : 'Aplicar Cambios '}
                 </button>
               </div>
             ) : (
