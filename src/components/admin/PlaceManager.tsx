@@ -205,10 +205,12 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     <div className="p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div className="flex flex-wrap gap-4 w-full md:w-auto">
+        <span>({restaurants.length})</span>
+
           <div className="relative flex-1 min-w-[240px]">
             <input
               type="text"
-              placeholder="Buscar establecimiento..."
+              placeholder="Buscar establecimiento... "
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white border border-gray-200 px-4 py-2 rounded-xl outline-none focus:border-black transition-all text-sm"
@@ -224,8 +226,9 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
             <option value="oldest">Más Antiguos</option>
             <option value="name">Nombre (A-Z)</option>
           </select>
+       
         </div>
-
+  
         <button onClick={() => openModal()} className="w-full md:w-auto bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-slate-800 transition-colors">
           + Añadir Lugar
         </button>
