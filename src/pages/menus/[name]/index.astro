@@ -13,6 +13,7 @@ import Gallery from "../../../components/Gallery.astro";
 import { Image } from "astro:assets";
 import { supabase } from "../../../lib/supabase";
 import CartManager from "../../../components/CartManager.tsx";
+import FavoritesManager from "../../../components/FavoritesManager.tsx";
 import Carousel from "../../../components/Carousel.tsx";
 
 if (!name) {
@@ -47,6 +48,9 @@ blocks = blocks.map((block) => {
 const address = place.content?.semantic_data?.address || place.address || "";
 const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
+
+// Find first carousel block for hero
+const heroCarousel = blocks.find((block) => block.type === "carrusel");
 ---
 
 <RestaurantLayout
@@ -58,10 +62,14 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 	backgroundColor="bg-[#FCFCFC]"
 >
 	<div class="min-h-screen bg-[#FCFCFC] text-[#1A1A1A]">
-		{/* Hero Image Section */}
+		{/* Hero Section with Carousel or Image */}
 		<div class="relative h-[60vh] min-h-[400px] overflow-hidden bg-stone-900">
 			{
-				place.image?.trim() && (
+				heroCarousel && heroCarousel.data.items?.length > 0 ? (
+					<div class="absolute inset-0">
+						<Carousel client:load items={heroCarousel.data.items} />
+					</div>
+				) : place.image?.trim() ? (
 					<Image
 						src={place.image}
 						alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
@@ -71,10 +79,10 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 						loading="eager"
 						format="webp"
 					/>
-				)
+				) : null
 			}
 			<div
-				class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"
+				class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none"
 			>
 			</div>
 
@@ -293,6 +301,10 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 				)
 			}
 
+			{/* Favorites Manager - Always visible */}
+			<FavoritesManager client:load placeSlug={name} blocks={blocks} />
+
+			{/* Cart Manager - Only when enabled */}
 			{
 				enableCart && whatsappNumber && (
 					<CartManager
@@ -446,6 +458,10 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 							}
 
 							if (block.type === "carrusel") {
+								// Skip if this is the hero carousel
+								if (heroCarousel && block === heroCarousel) {
+									return null;
+								}
 								return (
 									<div class="py-8">
 										<Carousel client:load items={block.data.items || []} />

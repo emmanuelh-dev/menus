@@ -246,19 +246,7 @@ export default function CartManager({
 
   return (
     <>
-      <div className="fixed bottom-32 right-6 z-40 flex flex-col gap-2">
-        {favorites.length > 0 && (
-          <button
-            onClick={() => setShowFavorites(!showFavorites)}
-            className="relative bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105"
-          >
-            <Heart className="w-5 h-5" fill="currentColor" />
-            <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-              {favorites.length}
-            </span>
-          </button>
-        )}
-
+      <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setShowCart(!showCart)}
           className="relative bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105"
@@ -274,12 +262,12 @@ export default function CartManager({
 
       {showFavorites && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowFavorites(false);
           }}
         >
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
+          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Heart className="w-6 h-6 text-pink-500" fill="currentColor" />
@@ -297,20 +285,57 @@ export default function CartManager({
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {favorites.map((fav) => (
-                    <div
-                      key={fav.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                    >
-                      <span className="font-medium">{fav.name}</span>
-                      <button
-                        onClick={() => toggleFavorite(fav)}
-                        className="text-pink-500 hover:text-pink-600"
+                  {favorites.map((fav) => {
+                    // Find the item in blocks to get price and image
+                    let itemData: any = null;
+                    for (const block of blocks) {
+                      if (block.type === 'section' && block.data.items) {
+                        const found = block.data.items.find((item: any) => item.id === fav.id);
+                        if (found) {
+                          itemData = found;
+                          break;
+                        }
+                      }
+                    }
+
+                    return (
+                      <div
+                        key={fav.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-3"
                       >
-                        <Heart className="w-5 h-5" fill="currentColor" />
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex-1">
+                          <span className="font-medium block">{fav.name}</span>
+                          {itemData?.price && (
+                            <span className="text-sm text-gray-600">${itemData.price}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {itemData && (
+                            <button
+                              onClick={() => {
+                                addToCart({
+                                  id: fav.id,
+                                  name: fav.name,
+                                  price: itemData.price || 0,
+                                  image: itemData.image,
+                                });
+                              }}
+                              className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-semibold flex items-center gap-1.5"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              Agregar
+                            </button>
+                          )}
+                          <button
+                            onClick={() => toggleFavorite(fav)}
+                            className="text-pink-500 hover:text-pink-600"
+                          >
+                            <Heart className="w-5 h-5" fill="currentColor" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -320,12 +345,12 @@ export default function CartManager({
 
       {showCart && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowCart(false);
           }}
         >
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
+          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <ShoppingCart className="w-6 h-6 text-red-600" />

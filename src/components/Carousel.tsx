@@ -15,29 +15,29 @@ export default function Carousel({ items }: CarouselProps) {
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="relative group/carousel w-full overflow-hidden rounded-3xl shadow-xl bg-stone-100">
+    <div className="relative group/carousel w-full h-full overflow-hidden rounded-none bg-stone-100">
       <div
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide h-full"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex-none w-full snap-start relative aspect-[16/9] md:aspect-[3/1]"
+            className="flex-none w-full h-full snap-start relative"
           >
             {item.link ? (
               <a href={item.link} className="block w-full h-full">
                 <img
                   src={item.src}
                   alt={item.alt || item.caption || `Promoción ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-stone-900"
                 />
               </a>
             ) : (
               <img
                 src={item.src}
                 alt={item.alt || item.caption || `Promoción ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-stone-900"
               />
             )}
 

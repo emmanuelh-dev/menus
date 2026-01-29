@@ -96,8 +96,8 @@ const ScrollTopAndComment = () => {
         </div>
       )}
 
-      {/* Floating Buttons Group - Bottom RIGHT */}
-      <div className={`fixed bottom-6 right-6 z-[1000] flex flex-col gap-2 transition-all duration-500 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+      {/* Floating Buttons Group - Bottom LEFT */}
+      <div className={`fixed bottom-6 left-6 z-[35] flex flex-col gap-2 transition-all duration-500 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         {/* Main Review Button */}
         <button
           onClick={handleScrollToComment}
