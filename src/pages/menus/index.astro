@@ -20,7 +20,9 @@ const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"]
 const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet"];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const restaurants = (await getRestaurants({type: null})).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+const restaurants = (await getRestaurants({type: null}))
+    .filter(r => r.type !== 'motel')
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0));
 ---
 
 <RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">
@@ -52,9 +54,7 @@ const restaurants = (await getRestaurants({type: null})).sort((a, b) => (b.ratin
 
             <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
                 {restaurants.map((restaurant) => {
-                    const restaurantUrl = restaurant.type === 'motel' 
-                        ? `/moteles/estados/${restaurant.state_slug}/${restaurant.short_name}`
-                        : `/menus/${restaurant.short_name}`;
+                    const restaurantUrl = `/menus/${restaurant.short_name}`;
                     
                     return (
                     <div 
