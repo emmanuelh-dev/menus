@@ -13,7 +13,10 @@ const { title, description = "Panel de administrador" } = Astro.props;
 <html lang="es">
 	<head>
 		<BaseHead title={title} description={description} />
-		<link rel="manifest" href="/manifest.json?type=admin&v=3" />
+		<link
+			rel="manifest"
+			href={`/manifest.json?type=admin&v=4&path=${Astro.url.pathname}`}
+		/>
 	</head>
 	<body class="bg-gray-50 min-h-screen">
 		<AdminHeader client:load />

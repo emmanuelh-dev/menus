@@ -6,11 +6,12 @@ import { supabase } from "../lib/supabase";
 export const GET: APIRoute = async ({ url }) => {
 	const slug = url.searchParams.get("slug");
 	const type = url.searchParams.get("type");
+	const pathParam = url.searchParams.get("path");
 
 	// Valores base
 	let name = "Menú Digital";
 	let shortName = "Menú";
-	let startUrl = "/";
+	let startUrl = pathParam || "/";
 	let themeColor = "#ffffff";
 	let icon = "/android-chrome-512x512.png";
 
@@ -20,10 +21,7 @@ export const GET: APIRoute = async ({ url }) => {
 		startUrl = "/admin/dashboard";
 		themeColor = "#10b981";
 	} else if (slug) {
-		// LOG: Intentando buscar datos para el slug
-		console.log(`[PWA Manifest] Buscando datos para: ${slug}`);
-
-		// Hacemos una búsqueda simple en la tabla places para obtener el nombre exacto
+		// Búsqueda en la tabla places para obtener metadatos reales
 		const { data: place, error } = await supabase
 			.from("places")
 			.select("name, type, image, menu, short_name")
@@ -31,18 +29,19 @@ export const GET: APIRoute = async ({ url }) => {
 			.maybeSingle();
 
 		if (!error && place) {
-			console.log(`[PWA Manifest] Encontrado: ${place.name}`);
 			name = place.name;
 			shortName = place.name;
-			startUrl = place.menu || (place.type === "motel" ? `/moteles/${slug}` : `/menus/${slug}`);
+			
+			// Si no nos pasaron un path exacto por param, usamos la lógica de fallback
+			if (!pathParam) {
+				startUrl = place.menu || (place.type === "motel" ? `/moteles/${slug}` : `/menus/${slug}`);
+			}
 			
 			if (place.image) icon = place.image;
 			if (place.type === "motel") themeColor = "#000000";
 			else if (place.type === "cafe") themeColor = "#6f4e37";
 		} else {
-			console.error(`[PWA Manifest] No se pudo encontrar datos para el slug: ${slug}`, error);
-			// Si falla la DB, al menos intentamos que el nombre no sea genérico usando el slug formateado
-			const capitalizedSlug = slug.split('-').map(word => word.charAt(0)).join('').toUpperCase();
+			// Si falla la DB, usamos lo que tenemos del slug
 			name = `Menú ${slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ')}`;
 			shortName = name;
 		}
@@ -52,6 +51,7 @@ export const GET: APIRoute = async ({ url }) => {
 		name: name,
 		short_name: shortName.substring(0, 12),
 		start_url: startUrl,
+		scope: "/",
 		display: "standalone",
 		background_color: "#ffffff",
 		theme_color: themeColor,
