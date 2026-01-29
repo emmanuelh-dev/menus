@@ -5,8 +5,15 @@ function AdminHeader() {
   const [isMobile, setIsMobile] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     setCurrentPath(window.location.pathname);
 
     const checkIfMobile = () => {
@@ -30,8 +37,21 @@ function AdminHeader() {
     checkIfMobile();
     fetchUser();
     window.addEventListener('resize', checkIfMobile);
-    return () => window.removeEventListener('resize', checkIfMobile);
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  const handleInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -159,7 +179,18 @@ function AdminHeader() {
               )}
           </nav>
 
-          <div className="p-3 border-t border-gray-100 flex flex-col gap-4">
+          <div className="p-3 border-t border-gray-100 flex flex-col gap-2">
+            {deferredPrompt && (
+              <button
+                onClick={handleInstall}
+                className="w-full flex items-center px-3 py-2 text-sm text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors font-bold"
+              >
+                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Instalar App
+              </button>
+            )}
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors"

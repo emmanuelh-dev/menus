@@ -8,299 +8,311 @@ import { supabase } from "../lib/supabase";
 const path = Astro.url.pathname;
 
 interface Address {
-  streetAddress?: string;
-  addressLocality?: string;
-  postalCode?: string;
-  addressCountry?: string;
+	streetAddress?: string;
+	addressLocality?: string;
+	postalCode?: string;
+	addressCountry?: string;
 }
 
 interface MenuItem {
-  "@type": "MenuItem";
-  name: string;
-  description?: string;
-  price?: string;
-  image?: string;
+	"@type": "MenuItem";
+	name: string;
+	description?: string;
+	price?: string;
+	image?: string;
 }
 
 interface MenuSection {
-  "@type": "MenuSection";
-  name: string;
-  description?: string;
-  items?: MenuItem[];
+	"@type": "MenuSection";
+	name: string;
+	description?: string;
+	items?: MenuItem[];
 }
 
 interface OpeningHoursSpecification {
-  "@type": "OpeningHoursSpecification";
-  dayOfWeek: string[];
-  opens: string;
-  closes: string;
+	"@type": "OpeningHoursSpecification";
+	dayOfWeek: string[];
+	opens: string;
+	closes: string;
 }
 
 export interface Props {
-  title: string;
-  description: string;
-  image?: string;
-  type?: "Restaurant" | "Menu" | "Event";
-  textWhite?: boolean;
-  backgroundColor?: string;
-  favicon?: string;
-  canonical?: string;
-  ogUrl?: string;
-  place?: any;
-  schemaEnrichment?: {
-    address?: Address;
-    telephone?: string;
-    email?: string;
-    priceRange?: string;
-    servesCuisine?: string | string[];
-    menu?: MenuSection[];
-    openingHours?: string | OpeningHoursSpecification[];
-    acceptsReservations?: boolean;
-    paymentAccepted?: string[];
-    currenciesAccepted?: string[];
-    aggregateRating?: {
-      ratingValue: number;
-      reviewCount: number;
-    };
-    awards?: string[];
-    suitableForDiet?: string[];
-  };
+	title: string;
+	description: string;
+	image?: string;
+	type?: "Restaurant" | "Menu" | "Event";
+	textWhite?: boolean;
+	backgroundColor?: string;
+	favicon?: string;
+	canonical?: string;
+	ogUrl?: string;
+	place?: any;
+	schemaEnrichment?: {
+		address?: Address;
+		telephone?: string;
+		email?: string;
+		priceRange?: string;
+		servesCuisine?: string | string[];
+		menu?: MenuSection[];
+		openingHours?: string | OpeningHoursSpecification[];
+		acceptsReservations?: boolean;
+		paymentAccepted?: string[];
+		currenciesAccepted?: string[];
+		aggregateRating?: {
+			ratingValue: number;
+			reviewCount: number;
+		};
+		awards?: string[];
+		suitableForDiet?: string[];
+	};
 }
 
 const {
-  title,
-  description,
-  image,
-  favicon,
-  type = "Restaurant",
-  textWhite = false,
-  backgroundColor = "bg-white",
-  schemaEnrichment = {},
-  canonical,
-  ogUrl,
-  place = {},
+	title,
+	description,
+	image,
+	favicon,
+	type = "Restaurant",
+	textWhite = false,
+	backgroundColor = "bg-white",
+	schemaEnrichment = {},
+	canonical,
+	ogUrl,
+	place = {},
 } = Astro.props;
 
 const currentYear = new Date().getFullYear();
-const streetAddress = schemaEnrichment.address?.streetAddress || place?.content?.semantic_data?.address || "";
+const streetAddress =
+	schemaEnrichment.address?.streetAddress ||
+	place?.content?.semantic_data?.address ||
+	"";
 const city = schemaEnrichment.address?.addressLocality || "Monterrey";
 
 function generateSEOTitle(): string {
-  const location = streetAddress ? `${streetAddress}, ${city}` : city;
-  return `Menú Digital de ${title} en ${location} | Precios y Opiniones ${currentYear}`;
+	const location = streetAddress ? `${streetAddress}, ${city}` : city;
+	return `Menú Digital de ${title} en ${location} | Precios y Opiniones ${currentYear}`;
 }
 
 function generateSEODescription(): string {
-  const reviews = reviewStats.reviewCount > 0
-    ? `. Con ${reviewStats.reviewCount} opiniones y ${reviewStats.ratingValue} estrellas`
-    : "";
-  return `Consulta el menú digital de ${title} en ${city}. ${description}${reviews}. ¡Abierto ahora con los mejores precios!`;
+	const reviews =
+		reviewStats.reviewCount > 0
+			? `. Con ${reviewStats.reviewCount} opiniones y ${reviewStats.ratingValue} estrellas`
+			: "";
+	return `Consulta el menú digital de ${title} en ${city}. ${description}${reviews}. ¡Abierto ahora con los mejores precios!`;
 }
 
 let reviewStats = {
-  ratingValue: 0,
-  reviewCount: 0,
+	ratingValue: 0,
+	reviewCount: 0,
 };
 
 let initialReviews = [];
 let restaurantData: any = null;
 
 try {
-  const { data } = await supabase
-    .from("places")
-    .select("id")
-    .eq("menu", path)
-    .single();
-  
-  restaurantData = data;
+	const { data } = await supabase
+		.from("places")
+		.select("id")
+		.eq("menu", path)
+		.single();
 
-  if (restaurantData) {
-    const [reviewsResponse, statsResponse] = await Promise.all([
-      supabase
-        .from("reviews")
-        .select("*")
-        .eq("place_id", restaurantData.id)
-        .order("created_at", { ascending: false })
-        .limit(10),
-      
-      supabase
-        .from("reviews")
-        .select("rate")
-        .eq("place_id", restaurantData.id)
-    ]);
+	restaurantData = data;
 
-    if (reviewsResponse.data) {
-      initialReviews = reviewsResponse.data as any;
-    }
+	if (restaurantData) {
+		const [reviewsResponse, statsResponse] = await Promise.all([
+			supabase
+				.from("reviews")
+				.select("*")
+				.eq("place_id", restaurantData.id)
+				.order("created_at", { ascending: false })
+				.limit(10),
 
-    if (statsResponse.data && statsResponse.data.length > 0) {
-      const totalRating = statsResponse.data.reduce(
-        (sum, review) => sum + review.rate,
-        0
-      );
-      const averageRating = totalRating / statsResponse.data.length;
+			supabase.from("reviews").select("rate").eq("place_id", restaurantData.id),
+		]);
 
-      reviewStats = {
-        ratingValue: parseFloat(averageRating.toFixed(1)),
-        reviewCount: statsResponse.data.length,
-      };
-    }
-  }
+		if (reviewsResponse.data) {
+			initialReviews = reviewsResponse.data as any;
+		}
+
+		if (statsResponse.data && statsResponse.data.length > 0) {
+			const totalRating = statsResponse.data.reduce(
+				(sum, review) => sum + review.rate,
+				0,
+			);
+			const averageRating = totalRating / statsResponse.data.length;
+
+			reviewStats = {
+				ratingValue: parseFloat(averageRating.toFixed(1)),
+				reviewCount: statsResponse.data.length,
+			};
+		}
+	}
 } catch (error) {
-  console.error("Error al obtener estadísticas de reseñas:", error);
+	console.error("Error al obtener estadísticas de reseñas:", error);
 }
 
 const seoTitle = generateSEOTitle();
 const seoDescription = generateSEODescription();
 
 const schema: any = {
-  "@context": "https://schema.org",
-  "@type": type,
-  name: title,
-  description: seoDescription,
+	"@context": "https://schema.org",
+	"@type": type,
+	name: title,
+	description: seoDescription,
 };
 
 if (image) {
-  schema.image = new URL(image, Astro.url);
+	schema.image = new URL(image, Astro.url);
 }
 
 if (schemaEnrichment.address) {
-  schema.address = {
-    "@type": "PostalAddress",
-    ...schemaEnrichment.address,
-  };
+	schema.address = {
+		"@type": "PostalAddress",
+		...schemaEnrichment.address,
+	};
 } else if (place?.content?.semantic_data?.address) {
-  schema.address = {
-    "@type": "PostalAddress",
-    streetAddress: place.content.semantic_data.address,
-    addressLocality: "Monterrey",
-    addressRegion: "Nuevo León",
-    addressCountry: "MX",
-  };
+	schema.address = {
+		"@type": "PostalAddress",
+		streetAddress: place.content.semantic_data.address,
+		addressLocality: "Monterrey",
+		addressRegion: "Nuevo León",
+		addressCountry: "MX",
+	};
 }
 
 if (schemaEnrichment.telephone) {
-  schema.telephone = schemaEnrichment.telephone;
+	schema.telephone = schemaEnrichment.telephone;
 } else if (place?.content?.semantic_data?.phone) {
-  schema.telephone = place.content.semantic_data.phone;
+	schema.telephone = place.content.semantic_data.phone;
 }
 if (schemaEnrichment.email) schema.email = schemaEnrichment.email;
 if (schemaEnrichment.priceRange)
-  schema.priceRange = schemaEnrichment.priceRange;
+	schema.priceRange = schemaEnrichment.priceRange;
 if (schemaEnrichment.servesCuisine)
-  schema.servesCuisine = schemaEnrichment.servesCuisine;
+	schema.servesCuisine = schemaEnrichment.servesCuisine;
 if (schemaEnrichment.openingHours)
-  schema.openingHours = schemaEnrichment.openingHours;
+	schema.openingHours = schemaEnrichment.openingHours;
 if (schemaEnrichment.acceptsReservations)
-  schema.acceptsReservations = schemaEnrichment.acceptsReservations;
+	schema.acceptsReservations = schemaEnrichment.acceptsReservations;
 if (schemaEnrichment.paymentAccepted)
-  schema.paymentAccepted = schemaEnrichment.paymentAccepted;
+	schema.paymentAccepted = schemaEnrichment.paymentAccepted;
 if (schemaEnrichment.currenciesAccepted)
-  schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
+	schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
 
 if (reviewStats.reviewCount > 0) {
-  schema.aggregateRating = {
-    "@type": "AggregateRating",
-    ratingValue: reviewStats.ratingValue,
-    reviewCount: reviewStats.reviewCount,
-    bestRating: 5,
-    worstRating: 1,
-  };
+	schema.aggregateRating = {
+		"@type": "AggregateRating",
+		ratingValue: reviewStats.ratingValue,
+		reviewCount: reviewStats.reviewCount,
+		bestRating: 5,
+		worstRating: 1,
+	};
 
-  // Agregar reviews individuales para rich snippets
-  schema.review = initialReviews.slice(0, 10).map((review: any) => ({
-    "@type": "Review",
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: review.rate,
-      bestRating: 5,
-      worstRating: 1,
-    },
-    author: {
-      "@type": "Person",
-      name: review.name || "Usuario Anónimo",
-    },
-    reviewBody: review.comments,
-    datePublished: review.created_at,
-  }));
+	// Agregar reviews individuales para rich snippets
+	schema.review = initialReviews.slice(0, 10).map((review: any) => ({
+		"@type": "Review",
+		reviewRating: {
+			"@type": "Rating",
+			ratingValue: review.rate,
+			bestRating: 5,
+			worstRating: 1,
+		},
+		author: {
+			"@type": "Person",
+			name: review.name || "Usuario Anónimo",
+		},
+		reviewBody: review.comments,
+		datePublished: review.created_at,
+	}));
 } else if (schemaEnrichment.aggregateRating) {
-  schema.aggregateRating = {
-    "@type": "AggregateRating",
-    ...schemaEnrichment.aggregateRating,
-  };
+	schema.aggregateRating = {
+		"@type": "AggregateRating",
+		...schemaEnrichment.aggregateRating,
+	};
 }
 
 if (type === "Menu" && schemaEnrichment.menu) {
-  schema.hasMenuSection = schemaEnrichment.menu;
+	schema.hasMenuSection = schemaEnrichment.menu;
 }
 
 if (schemaEnrichment.awards) {
-  schema.awards = schemaEnrichment.awards;
+	schema.awards = schemaEnrichment.awards;
 }
 
 if (schemaEnrichment.suitableForDiet) {
-  schema.suitableForDiet = schemaEnrichment.suitableForDiet.map(
-    (diet) => `http://schema.org/${diet}`
-  );
+	schema.suitableForDiet = schemaEnrichment.suitableForDiet.map(
+		(diet) => `http://schema.org/${diet}`,
+	);
 }
 ---
 
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href={favicon ? favicon : "/favicon.ico"}
-    />
-    <meta name="generator" content={Astro.generator} />
-    <title>{seoTitle}</title>
-    <meta name="description" content={seoDescription} />
-    <link rel="canonical" href={canonical || Astro.url} />
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+		/>
+		{
+			place?.short_name ? (
+				<link
+					rel="manifest"
+					href={`/manifest.json?slug=${place.short_name}&type=${place.type || "restaurant"}&path=${Astro.url.pathname}`}
+				/>
+			) : (
+				<link rel="manifest" href="/site.webmanifest" />
+			)
+		}
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href={favicon ? favicon : "/favicon.ico"}
+		/>
+		<meta name="generator" content={Astro.generator} />
+		<title>{seoTitle}</title>
+		<meta name="description" content={seoDescription} />
+		<link rel="canonical" href={canonical || Astro.url} />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={ogUrl || Astro.url} />
-    <meta property="og:title" content={seoTitle} />
-    <meta property="og:description" content={seoDescription} />
-    {image && <meta property="og:image" content={new URL(image, Astro.url)} />}
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={ogUrl || Astro.url} />
+		<meta property="og:title" content={seoTitle} />
+		<meta property="og:description" content={seoDescription} />
+		{image && <meta property="og:image" content={new URL(image, Astro.url)} />}
 
-    {place.image && (
-      <meta property="og:image" content={place.image} />
-    )}
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={ogUrl || Astro.url} />
-    <meta property="twitter:title" content={seoTitle} />
-    <meta property="twitter:description" content={seoDescription} />
-    {
-      image && (
-        <meta property="twitter:image" content={new URL(image, Astro.url)} />
-      )
-    }
+		{place.image && <meta property="og:image" content={place.image} />}
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={ogUrl || Astro.url} />
+		<meta property="twitter:title" content={seoTitle} />
+		<meta property="twitter:description" content={seoDescription} />
+		{
+			image && (
+				<meta property="twitter:image" content={new URL(image, Astro.url)} />
+			)
+		}
 
-    <!-- Schema.org for Google -->
-    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+		<!-- Schema.org for Google -->
+		<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-    <!-- Google Fonts for Restaurant Feel -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
-      rel="stylesheet"
-    />
-    <!-- <script 
+		<!-- Google Fonts for Restaurant Feel -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
+			rel="stylesheet"
+		/>
+		<!-- <script 
          async 
          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
          crossorigin="anonymous"
         /> -->
 
-    <!-- <ViewTransitions />
+		<!-- <ViewTransitions />
 
         <style is:global>
             :root {
@@ -319,60 +331,57 @@ if (schemaEnrichment.suitableForDiet) {
             }
         </style> -->
 
-    <script
-      defer
-      src="https://cloud.umami.is/script.js"
-      data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
-    <script type="text/javascript">
-      (function (c, l, a, r, i, t, y) {
-        c[a] =
-          c[a] ||
-          function () {
-            (c[a].q = c[a].q || []).push(arguments);
-          };
-        t = l.createElement(r);
-        t.async = 1;
-        t.src = "https://www.clarity.ms/tag/" + i;
-        y = l.getElementsByTagName(r)[0];
-        y.parentNode.insertBefore(t, y);
-      })(window, document, "clarity", "script", "s1a8gh6len");
-    </script>
-  </head>
-  <body class="restaurant-typography">
-    <Header textWhite={textWhite} backgroundColor={backgroundColor} />
-    <slot />
-    {
-      (path.includes("/menus/") ||
-        path.includes("/cafeterias") ||
-        path.includes("/espadas") ||
-        path.includes("/moteles")) && (
-        <div
-          class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
-        >
-          <div>
-            {
-                   (place?.id || restaurantData?.id) && (
+		<script
+			defer
+			src="https://cloud.umami.is/script.js"
+			data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
+		<script type="text/javascript">
+			(function (c, l, a, r, i, t, y) {
+				c[a] =
+					c[a] ||
+					function () {
+						(c[a].q = c[a].q || []).push(arguments);
+					};
+				t = l.createElement(r);
+				t.async = 1;
+				t.src = "https://www.clarity.ms/tag/" + i;
+				y = l.getElementsByTagName(r)[0];
+				y.parentNode.insertBefore(t, y);
+			})(window, document, "clarity", "script", "s1a8gh6len");
+		</script>
+	</head>
+	<body class="restaurant-typography">
+		<Header textWhite={textWhite} backgroundColor={backgroundColor} />
+		<slot />
+		{
+			(path.includes("/menus/") ||
+				path.includes("/cafeterias") ||
+				path.includes("/espadas") ||
+				path.includes("/moteles")) && (
+				<div
+					class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
+				>
+					<div>
+						{(place?.id || restaurantData?.id) && (
+							<ReviewForm
+								client:load
+								id={place?.id || restaurantData?.id}
+								restaurantName={title}
+								initialReviews={initialReviews}
+							/>
+						)}
+					</div>
+				</div>
+			)
+		}
+		<ScrollTopAndComment client:load />
+		<Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 
-                     <ReviewForm 
-                      client:load
-                      id={place?.id || restaurantData?.id} 
-                      restaurantName={title} 
-                      initialReviews={initialReviews}
-                    />
-)            }
-          </div>
-        </div>
-      )
-    }
-    <ScrollTopAndComment client:load />
-    <Footer textWhite={textWhite} backgroundColor={backgroundColor} />
-
-    <style>
-
-      body{
-        overflow-x: hidden;
-        width: 100vw;
-      }
-    </style>
-  </body>
+		<style>
+			body {
+				overflow-x: hidden;
+				width: 100vw;
+			}
+		</style>
+	</body>
 </html>
