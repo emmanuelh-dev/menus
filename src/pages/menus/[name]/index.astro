@@ -13,6 +13,7 @@ import Gallery from "../../../components/Gallery.astro";
 import { Image } from "astro:assets";
 import { supabase } from "../../../lib/supabase";
 import CartManager from "../../../components/CartManager.tsx";
+import Carousel from "../../../components/Carousel.tsx";
 
 if (!name) {
 	throw new Error("No se ha especificado el nombre del restaurante");
@@ -440,6 +441,14 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 								return (
 									<div class="py-12">
 										<Gallery images={block.data.images || []} />
+									</div>
+								);
+							}
+
+							if (block.type === "carrusel") {
+								return (
+									<div class="py-8">
+										<Carousel client:load items={block.data.items || []} />
 									</div>
 								);
 							}

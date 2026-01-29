@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { ChangeEvent } from 'react'
+import { PiX } from 'react-icons/pi'
 
 interface ManualUploaderProps {
   onFilesUploaded: (urls: string[]) => void
@@ -138,9 +139,9 @@ export function ManualUploader({
             <button
               type="button"
               onClick={onImageRemove}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md transition-colors"
+              className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-red-100 text-red-500 rounded-full flex items-center justify-center text-xs shadow-md hover:bg-red-50 transition-colors"
             >
-              ✕
+              <PiX className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -153,7 +154,7 @@ export function ManualUploader({
           multiple={multiple}
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full text-xs text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-black file:text-white file:px-4 file:py-2 file:font-bold cursor-pointer"
+          className="block w-full text-[10px] text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-gray-100 file:text-gray-700 file:px-4 file:py-1.5 file:font-semibold cursor-pointer hover:file:bg-gray-200 transition-all"
         />
         {uploading && (
           <p className="mt-2 animate-pulse text-[10px] font-bold text-blue-600 uppercase">Subiendo ráfaga...</p>

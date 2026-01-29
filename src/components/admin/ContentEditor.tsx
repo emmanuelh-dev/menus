@@ -40,30 +40,30 @@ import { useState, useRef, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 import MotelPageRenderer from '../MotelPageRenderer';
-import { 
-  Plus, 
-  Trash2, 
-  GripVertical, 
-  ChevronUp, 
-  ChevronDown, 
-  Copy, 
-  Eye, 
-  Layout, 
-  Save, 
-  Upload, 
-  Image as ImageIcon, 
-  FileText, 
-  Send,
-  X,
-  Paperclip,
-  RotateCcw,
-  Sparkles,
-  Search,
-  CheckCircle2,
-  AlertCircle
-} from 'lucide-react';
+import {
+  PiPlus,
+  PiTrash,
+  PiDotsSixVertical,
+  PiCaretUp,
+  PiCaretDown,
+  PiCopy,
+  PiEye,
+  PiLayout,
+  PiFloppyDisk,
+  PiUpload,
+  PiImage,
+  PiFileText,
+  PiPaperPlaneTilt,
+  PiX,
+  PiPaperclip,
+  PiArrowCounterClockwise,
+  PiSparkle,
+  PiMagnifyingGlass,
+  PiCheckCircle,
+  PiWarningCircle
+} from 'react-icons/pi';
 
-type BlockType = 'section' | 'gallery' | 'image';
+type BlockType = 'section' | 'gallery' | 'image' | 'carrusel';
 
 interface Block {
   id: string;
@@ -192,7 +192,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
   const getAllExistingImages = (): string[] => {
     const images = new Set<string>();
-    
+
     blocks.forEach(block => {
       if (block.type === 'section') {
         if (block.data.image) images.add(block.data.image);
@@ -206,7 +206,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         if (block.data.src) images.add(block.data.src);
       }
     });
-    
+
     return Array.from(images).filter(Boolean);
   };
 
@@ -234,8 +234,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         return { title: 'NUEVA SECCIÓN', description: '', image: '', items: [] };
       case 'gallery':
         return { images: [] };
-      case 'image':
-        return { src: '', alt: '', caption: '' };
+      case 'carrusel':
+        return { items: [] };
       default:
         return {};
     }
@@ -340,7 +340,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       });
 
       const result = await response.json();
-      
+
       if (result.success && result.preview) {
         setPendingAiContent(result.content);
         setAiStats(result.stats);
@@ -394,7 +394,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       });
       reader.readAsDataURL(file);
       const data = await promise;
-      
+
       setAiFiles(prev => [...prev, {
         name: file.name,
         data: data,
@@ -409,7 +409,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
   const confirmAiChanges = async () => {
     if (!pendingAiContent) return;
-    
+
     setAiProcessing(true);
     try {
       const response = await fetch('/api/ai/update-content', {
@@ -449,53 +449,56 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} />;
       case 'gallery':
         return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
-      case 'image':
-        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
+      case 'carrusel':
+        return <CarruselBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
       default:
         return null;
     }
   }
 
   return (
-    <div className="space-y-6 pb-32">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 bg-white/90 backdrop-blur-md z-30 py-4 px-4 sm:px-0 border-b border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="flex bg-gray-100 p-1 rounded-full items-center gap-1">
-            <button 
+    <div className="space-y-8 pb-32 px-4 sm:px-0">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-4 bg-white/70 backdrop-blur-xl z-[60] py-4 px-6 rounded-2xl border border-white/40 shadow-xl shadow-emerald-500/10 mx-4 sm:mx-0">
+        <div className="flex items-center gap-4">
+          <div className="flex bg-gray-100/50 p-1.5 rounded-2xl items-center gap-1">
+            <button
               onClick={() => setActiveTab('editor')}
-              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase transition-all ${activeTab === 'editor' ? 'bg-black text-white shadow-sm' : 'text-gray-500'}`}
+              className={`px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'editor' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Diseño
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('preview')}
-              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase transition-all ${activeTab === 'preview' ? 'bg-black text-white shadow-sm' : 'text-gray-500'}`}
+              className={`px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'preview' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Previa
             </button>
-            <div className="w-px h-4 bg-gray-300 mx-1" />
-            <button 
+            <div className="w-px h-5 bg-gray-200 mx-2" />
+            <button
               onClick={() => setForceCollapse(!forceCollapse)}
-              className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-gray-600 hover:bg-white/50 transition-all"
+              className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-emerald-700 hover:bg-emerald-50 transition-all flex items-center gap-2"
               title={forceCollapse ? 'Expandir Todo' : 'Colapsar Todo'}
             >
-              {forceCollapse ? '📂 Abrir' : '📁 Cerrar'}
+              {forceCollapse ? <PiPlus className="w-3 h-3" /> : <PiX className="w-3 h-3" />}
+              {forceCollapse ? 'Abrir Todo' : 'Cerrar Todo'}
             </button>
           </div>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-3 w-full sm:w-auto">
           <button
             onClick={() => setShowAIChat(!showAIChat)}
-            className="flex-1 sm:flex-none bg-purple-600 text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-purple-700 transition-all text-sm"
+            className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-200 flex items-center justify-center gap-2"
           >
-            IA 
+            <PiSparkle className="w-4 h-4" />
+            Asistente IA
           </button>
           <button
             onClick={saveChanges}
             disabled={isSaving}
-            className="flex-1 sm:flex-none bg-black text-white px-6 py-3 sm:py-2 rounded-full font-bold hover:bg-gray-800 disabled:opacity-50 transition-all text-sm"
+            className="flex-1 sm:flex-none bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-2.5 rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {isSaving ? '...' : 'Publicar'}
+            {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
+            {isSaving ? 'Guardando...' : 'Publicar Menú'}
           </button>
         </div>
       </header>
@@ -504,14 +507,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       <div className="fixed bottom-6 right-6 z-40 sm:hidden">
         <button
           onClick={() => setShowMobileNav(!showMobileNav)}
-          className="w-14 h-14 bg-black text-white rounded-full shadow-2xl flex items-center justify-center text-xl"
+          className="w-14 h-14 bg-black text-white rounded-full shadow-xl flex items-center justify-center text-xl"
         >
           {showMobileNav ? '✕' : '☰'}
         </button>
-        
+
         {showMobileNav && (
-          <div className="absolute bottom-16 right-0 w-64 max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto p-4 animate-in slide-in-from-bottom-5">
-            <h3 className="text-xs font-black uppercase text-gray-400 mb-3 px-2">Saltar a sección:</h3>
+          <div className="absolute bottom-16 right-0 w-64 max-h-[70vh] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-y-auto p-4 animate-in slide-in-from-bottom-5">
+            <h3 className="text-xs font-bold uppercase text-gray-400 mb-3 px-2">Saltar a sección:</h3>
             <div className="space-y-1">
               <button
                 onClick={() => { setShowSemanticData(true); setShowMobileNav(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -537,525 +540,593 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       {activeTab === 'editor' ? (
         <>
           <div className="mx-4 sm:mx-0">
-        <button
-          onClick={() => setShowSemanticData(!showSemanticData)}
-          className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-black uppercase text-sm">Datos del Lugar</span>
-          </div>
-          <span className="text-2xl">{showSemanticData ? '−' : '+'}</span>
-        </button>
-
-        {showSemanticData && (
-          <div className="mt-3 p-6 bg-white rounded-xl border-2 border-blue-100 space-y-4">
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">DESCRIPCIÓN DEL LUGAR:</label>
-              <textarea
-                value={semanticData.description || ''}
-                onChange={(e) => setSemanticData({ ...semanticData, description: e.target.value })}
-                placeholder="Breve descripción del restaurante, su especialidad y ambiente..."
-                rows={3}
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">DIRECCIÓN:</label>
-                <input
-                  value={semanticData.address || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, address: e.target.value })}
-                  placeholder="Av. Principal #123, Colonia, Ciudad"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">TELÉFONO:</label>
-                <input
-                  value={semanticData.phone || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, phone: e.target.value })}
-                  placeholder="81 1234 5678"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">WHATSAPP:</label>
-                <input
-                  value={semanticData.whatsapp || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value.replace(/\D/g, '') })}
-                  placeholder="528112345678"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-                <p className="text-xs text-gray-400 mt-1">
-                  Código de país + número sin espacios ni símbolos (ej: 528112345678)
-                </p>
-                {semanticData.whatsapp && !/^\d{10,15}$/.test(semanticData.whatsapp) && (
-                  <p className="text-xs text-red-500 mt-1 font-bold">
-                    ⚠️ Formato incorrecto. Usa solo números (10-15 dígitos)
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-              <input
-                type="checkbox"
-                id="enable_cart"
-                checked={semanticData.enable_cart || false}
-                onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
-                className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
-              />
-              <label htmlFor="enable_cart" className="text-sm font-bold text-gray-700 cursor-pointer">
-                Activar carrito de compras y pedidos por WhatsApp
-              </label>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">URL DE RESERVACIÓN:</label>
-              <input
-                value={semanticData.reservation_url || ''}
-                onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
-                placeholder="https://reservaciones.com/..."
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">RANGO DE PRECIOS:</label>
-                <input
-                  value={semanticData.price_range || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, price_range: e.target.value })}
-                  placeholder="más de MXN500"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">TIPO DE COCINA:</label>
-                <input
-                  value={semanticData.cuisine_type || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, cuisine_type: e.target.value })}
-                  placeholder="Mexicana contemporánea"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">AMBIENTE:</label>
-                <input
-                  value={semanticData.ambiance || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, ambiance: e.target.value })}
-                  placeholder="Casual elegante"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">CÓDIGO DE VESTIMENTA:</label>
-                <input
-                  value={semanticData.dress_code || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, dress_code: e.target.value })}
-                  placeholder="Ropa formal"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">ZONA:</label>
-                <input
-                  value={semanticData.zone || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, zone: e.target.value })}
-                  placeholder="San Pedro Garza García"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-600 mb-2 block">INTERSECCIÓN:</label>
-                <input
-                  value={semanticData.cross_street || ''}
-                  onChange={(e) => setSemanticData({ ...semanticData, cross_street: e.target.value })}
-                  placeholder="Jose Vasconcelos"
-                  className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">SITIO WEB:</label>
-              <input
-                value={semanticData.website || ''}
-                onChange={(e) => setSemanticData({ ...semanticData, website: e.target.value })}
-                placeholder="https://www.ejemplo.com"
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">HORARIOS:</label>
-              <textarea
-                value={semanticData.hours || ''}
-                onChange={(e) => setSemanticData({ ...semanticData, hours: e.target.value })}
-                placeholder="Lun-Vie 13:00-23:00, Sáb-Dom 12:00-00:00"
-                rows={3}
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">ESTACIONAMIENTO:</label>
-              <input
-                value={semanticData.parking || ''}
-                onChange={(e) => setSemanticData({ ...semanticData, parking: e.target.value })}
-                placeholder="Servicio de estacionamiento"
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">VARIEDAD:</label>
-              <input
-                value={semanticData.variety || ''}
-                onChange={(e) => setSemanticData({ ...semanticData, variety: e.target.value })}
-                placeholder="Pantalla HD de 9 x 4 mts"
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">ÁREAS DEL RESTAURANTE:</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {semanticData.areas?.map((area, idx) => (
-                  <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                    {area}
-                    <button
-                      onClick={() => setSemanticData({ ...semanticData, areas: semanticData.areas?.filter((_, i) => i !== idx) })}
-                      className="hover:text-red-600"
-                    >×</button>
-                  </span>
-                ))}
-              </div>
-              <input
-                type="text"
-                placeholder="Agregar área (Enter para añadir)"
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    const newArea = e.currentTarget.value.trim();
-                    setSemanticData({ ...semanticData, areas: [...(semanticData.areas || []), newArea] });
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">OPCIONES DE PAGO:</label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].map((option) => {
-                  const isSelected = semanticData.payment_options?.includes(option);
-                  return (
-                    <button
-                      key={option}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) });
-                        } else {
-                          setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), option] });
-                        }
-                      }}
-                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
-                        isSelected
-                          ? 'bg-green-600 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {isSelected && '✓ '}{option}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {semanticData.payment_options?.filter(o => !['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].includes(o)).map((option, idx) => (
-                  <span key={idx} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                    {option}
-                    <button
-                      onClick={() => setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) })}
-                      className="hover:text-red-600"
-                    >×</button>
-                  </span>
-                ))}
-              </div>
-              <input
-                type="text"
-                placeholder="Agregar método personalizado (Enter)"
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    const newOption = e.currentTarget.value.trim();
-                    setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), newOption] });
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS ADICIONALES:</label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {[
-                  'WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 
-                  'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 
-                  'Aire acondicionado', 'Smart TV', 'Acceso para silla de ruedas',
-                  'Jacuzzi', 'Alberca', 'Cochera techada', 'Sillón Tantra', 'Tubo de pole dance', 'Cama King Size', 'Sauna', 'Vapor'
-                ].map((feature) => {
-                  const isSelected = semanticData.additional_features?.includes(feature);
-                  return (
-                    <button
-                      key={feature}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) });
-                        } else {
-                          setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), feature] });
-                        }
-                      }}
-                      className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
-                        isSelected
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {isSelected && '✓ '}{feature}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {semanticData.additional_features?.filter(f => !['WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 'Aire acondicionado', 'TV', 'Acceso para silla de ruedas'].includes(f)).map((feature, idx) => (
-                  <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                    {feature}
-                    <button
-                      onClick={() => setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) })}
-                      className="hover:text-red-600"
-                    >×</button>
-                  </span>
-                ))}
-              </div>
-              <input
-                type="text"
-                placeholder="Agregar característica personalizada (Enter)"
-                className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    const newFeature = e.currentTarget.value.trim();
-                    setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), newFeature] });
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {showAIChat && (
-        <div className="mx-4 sm:mx-0 p-6 bg-gray-50 rounded-2xl border-2 border-purple-200 shadow-xl overflow-hidden">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-black uppercase tracking-tight leading-none">Asistente IA</h2>
-                <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Sube fotos, pega texto o arrastra archivos</p>
-              </div>
-            </div>
             <button
-              onClick={() => setShowAIChat(false)}
-              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+              onClick={() => setShowSemanticData(!showSemanticData)}
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100 hover:border-emerald-200 transition-all shadow-sm group"
             >
-              <X className="w-5 h-5 text-gray-400" />
-            </button>
-          </div>
-
-          {!pendingAiContent ? (
-            <div className="bg-white rounded-xl border-2 border-gray-100 shadow-sm overflow-hidden focus-within:border-purple-400 transition-all">
-              {/* Archivos adjuntos */}
-              {aiFiles.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border-b border-gray-100">
-                  {aiFiles.map((file, idx) => (
-                    <div key={idx} className="group relative">
-                      <img 
-                        src={file.data} 
-                        alt={file.name} 
-                        className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                      />
-                      <button
-                        onClick={() => removeAiFile(idx)}
-                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
+              <div className="flex items-center gap-4">
+                <div className={`p-3 bg-white rounded-2xl shadow-sm text-emerald-600 group-hover:scale-110 transition-transform ${showSemanticData ? 'shadow-inner' : ''}`}>
+                  <PiPlus className={`w-5 h-5 transition-transform duration-300 ${showSemanticData ? 'rotate-45 text-red-500' : ''}`} />
                 </div>
-              )}
+                <div className="text-left">
+                  <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-emerald-900 block mb-1">Información General</span>
+                  <p className="text-xs text-emerald-600/70 font-medium">Dirección, horarios, contacto y redes sociales</p>
+                </div>
+              </div>
+            </button>
 
-              <textarea
-                className="w-full p-4 text-sm resize-none outline-none min-h-[140px] focus:ring-0"
-                placeholder="Escribe instrucciones (ej: 'agrega estos platillos'), pega una imagen del menú directamente aquí, o arrastra archivos..."
-                onPaste={handlePaste}
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                disabled={aiProcessing}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                    analyzeMenuWithAI();
-                  }
-                }}
-              />
-
-              <div className="flex items-center justify-between p-3 bg-gray-50 border-t border-gray-100">
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={aiProcessing}
-                    className="p-2 hover:bg-white text-gray-600 rounded-lg transition-colors flex items-center gap-1.5 border border-transparent hover:border-gray-200"
-                  >
-                    <Paperclip className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase">Adjuntar</span>
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={handleAIImagesUpload}
-                    accept="image/*,application/pdf"
+            {showSemanticData && (
+              <div className="mt-4 p-8 bg-white rounded-2xl border border-emerald-100 shadow-xl space-y-6 animate-in slide-in-from-top-2">
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">DESCRIPCIÓN DEL LUGAR:</label>
+                  <textarea
+                    value={semanticData.description || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, description: e.target.value })}
+                    placeholder="Breve descripción del restaurante, su especialidad y ambiente..."
+                    rows={3}
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
                   />
                 </div>
 
-                <button
-                  onClick={analyzeMenuWithAI}
-                  disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
-                  className="bg-purple-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-100 active:scale-95"
-                >
-                  {aiProcessing ? (
-                    <>
-                      <RotateCcw className="w-4 h-4 animate-spin" />
-                      Analizando...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Analizar con IA
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="p-6 bg-white rounded-2xl border-2 border-green-500 shadow-2xl animate-in fade-in zoom-in duration-300">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">DIRECCIÓN:</label>
+                    <input
+                      value={semanticData.address || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, address: e.target.value })}
+                      placeholder="Av. Principal #123, Colonia, Ciudad"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">TELÉFONO:</label>
+                    <input
+                      value={semanticData.phone || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, phone: e.target.value })}
+                      placeholder="81 1234 5678"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">WHATSAPP:</label>
+                    <input
+                      value={semanticData.whatsapp || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value.replace(/\D/g, '') })}
+                      placeholder="528112345678"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Código de país + número sin espacios ni símbolos (ej: 528112345678)
+                    </p>
+                    {semanticData.whatsapp && !/^\d{10,15}$/.test(semanticData.whatsapp) && (
+                      <p className="text-xs text-red-500 mt-1 font-bold">
+                        ⚠️ Formato incorrecto. Usa solo números (10-15 dígitos)
+                      </p>
+                    )}
+                  </div>
                 </div>
+
+                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+                  <input
+                    type="checkbox"
+                    id="enable_cart"
+                    checked={semanticData.enable_cart || false}
+                    onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
+                    className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="enable_cart" className="text-sm font-bold text-gray-700 cursor-pointer">
+                    Activar carrito de compras y pedidos por WhatsApp
+                  </label>
+                </div>
+
                 <div>
-                  <h3 className="text-lg font-black uppercase text-green-900 leading-none">Análisis Completado</h3>
-                  <p className="text-xs text-green-600 font-bold uppercase mt-1">Revisa los cambios detectados</p>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">URL DE RESERVACIÓN:</label>
+                  <input
+                    value={semanticData.reservation_url || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
+                    placeholder="https://reservaciones.com/..."
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">RANGO DE PRECIOS:</label>
+                    <input
+                      value={semanticData.price_range || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, price_range: e.target.value })}
+                      placeholder="más de MXN500"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">TIPO DE COCINA:</label>
+                    <input
+                      value={semanticData.cuisine_type || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, cuisine_type: e.target.value })}
+                      placeholder="Mexicana contemporánea"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">AMBIENTE:</label>
+                    <input
+                      value={semanticData.ambiance || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, ambiance: e.target.value })}
+                      placeholder="Casual elegante"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">CÓDIGO DE VESTIMENTA:</label>
+                    <input
+                      value={semanticData.dress_code || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, dress_code: e.target.value })}
+                      placeholder="Ropa formal"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">ZONA:</label>
+                    <input
+                      value={semanticData.zone || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, zone: e.target.value })}
+                      placeholder="San Pedro Garza García"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">INTERSECCIÓN:</label>
+                    <input
+                      value={semanticData.cross_street || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, cross_street: e.target.value })}
+                      placeholder="Jose Vasconcelos"
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">SITIO WEB:</label>
+                  <input
+                    value={semanticData.website || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, website: e.target.value })}
+                    placeholder="https://www.ejemplo.com"
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">HORARIOS:</label>
+                  <textarea
+                    value={semanticData.hours || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, hours: e.target.value })}
+                    placeholder="Lun-Vie 13:00-23:00, Sáb-Dom 12:00-00:00"
+                    rows={3}
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">ESTACIONAMIENTO:</label>
+                  <input
+                    value={semanticData.parking || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, parking: e.target.value })}
+                    placeholder="Servicio de estacionamiento"
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">VARIEDAD:</label>
+                  <input
+                    value={semanticData.variety || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, variety: e.target.value })}
+                    placeholder="Pantalla HD de 9 x 4 mts"
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">ÁREAS DEL RESTAURANTE:</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {semanticData.areas?.map((area, idx) => (
+                      <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                        {area}
+                        <button
+                          onClick={() => setSemanticData({ ...semanticData, areas: semanticData.areas?.filter((_, i) => i !== idx) })}
+                          className="hover:text-red-600"
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Agregar área (Enter para añadir)"
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        const newArea = e.currentTarget.value.trim();
+                        setSemanticData({ ...semanticData, areas: [...(semanticData.areas || []), newArea] });
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">OPCIONES DE PAGO:</label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].map((option) => {
+                      const isSelected = semanticData.payment_options?.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) });
+                            } else {
+                              setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), option] });
+                            }
+                          }}
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${isSelected
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                          {isSelected && '✓ '}{option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {semanticData.payment_options?.filter(o => !['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].includes(o)).map((option, idx) => (
+                      <span key={idx} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                        {option}
+                        <button
+                          onClick={() => setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) })}
+                          className="hover:text-red-600"
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Agregar método personalizado (Enter)"
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        const newOption = e.currentTarget.value.trim();
+                        setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), newOption] });
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS ADICIONALES:</label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {[
+                      'WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo',
+                      'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar',
+                      'Aire acondicionado', 'Smart TV', 'Acceso para silla de ruedas',
+                      'Jacuzzi', 'Alberca', 'Cochera techada', 'Sillón Tantra', 'Tubo de pole dance', 'Cama King Size', 'Sauna', 'Vapor'
+                    ].map((feature) => {
+                      const isSelected = semanticData.additional_features?.includes(feature);
+                      return (
+                        <button
+                          key={feature}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) });
+                            } else {
+                              setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), feature] });
+                            }
+                          }}
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${isSelected
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                          {isSelected && '✓ '}{feature}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {semanticData.additional_features?.filter(f => !['WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 'Aire acondicionado', 'TV', 'Acceso para silla de ruedas'].includes(f)).map((feature, idx) => (
+                      <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                        {feature}
+                        <button
+                          onClick={() => setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) })}
+                          className="hover:text-red-600"
+                        >×</button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Agregar característica personalizada (Enter)"
+                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        const newFeature = e.currentTarget.value.trim();
+                        setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), newFeature] });
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
                 </div>
               </div>
-              
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                  <p className="text-[10px] text-green-600 uppercase font-black mb-1">Secciones</p>
-                  <p className="text-3xl font-black text-green-900">{aiStats?.sections || 0}</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                  <p className="text-[10px] text-green-600 uppercase font-black mb-1">Productos</p>
-                  <p className="text-3xl font-black text-green-900">{aiStats?.items || 0}</p>
-                </div>
-                {aiStats?.newImages > 0 && (
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 col-span-2 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-blue-600 uppercase font-black">Galería</p>
-                      <p className="text-lg font-black text-blue-900">+{aiStats.newImages} fotos detectadas</p>
-                    </div>
-                    <ImageIcon className="w-8 h-8 text-blue-200" />
+            )}
+          </div>
+
+          {showAIChat && (
+            <div className="mx-4 sm:mx-0 p-6 bg-gray-50 rounded-2xl border-2 border-purple-200 shadow-xl overflow-hidden">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <PiSparkle className="w-5 h-5 text-white" />
                   </div>
-                )}
-                {(aiStats?.hasAddress || aiStats?.hasPhone) && (
-                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 col-span-2">
-                    <p className="text-[10px] text-amber-600 uppercase font-black mb-1">Contacto Renovado</p>
-                    <div className="flex gap-2">
-                      {aiStats.hasAddress && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📍 Dirección</span>}
-                      {aiStats.hasPhone && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📞 Teléfono</span>}
-                    </div>
+                  <div>
+                    <h2 className="text-lg font-bold uppercase tracking-tight leading-none">Asistente IA</h2>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Sube fotos, pega texto o arrastra archivos</p>
                   </div>
-                )}
+                </div>
+                <button
+                  onClick={() => setShowAIChat(false)}
+                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                >
+                  <PiX className="w-5 h-5 text-gray-400" />
+                </button>
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setPendingAiContent(null);
-                    setAiStats(null);
-                  }}
-                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-500 rounded-xl font-bold hover:bg-gray-200 transition-colors uppercase text-xs"
-                >
-                  Descartar
-                </button>
-                <button
-                  onClick={confirmAiChanges}
-                  disabled={aiProcessing}
-                  className="flex-[2] py-3 px-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center justify-center gap-2 uppercase text-xs tracking-wider"
-                >
-                  {aiProcessing ? (
-                    <>
-                      <RotateCcw className="w-4 h-4 animate-spin" />
-                      Aplicando...
-                    </>
-                  ) : (
-                    <>Aplicar Cambios </>
+              {!pendingAiContent ? (
+                <div className="bg-white rounded-xl border-2 border-gray-100 shadow-sm overflow-hidden focus-within:border-purple-400 transition-all">
+                  {/* Archivos adjuntos */}
+                  {aiFiles.length > 0 && (
+                    <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border-b border-gray-100">
+                      {aiFiles.map((file, idx) => (
+                        <div key={idx} className="group relative">
+                          <img
+                            src={file.data}
+                            alt={file.name}
+                            className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            onClick={() => removeAiFile(idx)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                          >
+                            <PiX className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   )}
-                </button>
+
+                  <textarea
+                    className="w-full p-4 text-sm resize-none outline-none min-h-[140px] focus:ring-0"
+                    placeholder="Escribe instrucciones (ej: 'agrega estos platillos'), pega una imagen del menú directamente aquí, o arrastra archivos..."
+                    onPaste={handlePaste}
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    disabled={aiProcessing}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                        analyzeMenuWithAI();
+                      }
+                    }}
+                  />
+
+                  <div className="flex items-center justify-between p-3 bg-gray-50 border-t border-gray-100">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={aiProcessing}
+                        className="p-2 hover:bg-white text-gray-600 rounded-lg transition-colors flex items-center gap-1.5 border border-transparent hover:border-gray-200"
+                      >
+                        <PiPaperclip className="w-4 h-4" />
+                        <span className="text-xs font-bold uppercase">Adjuntar</span>
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={handleAIImagesUpload}
+                        accept="image/*,application/pdf"
+                      />
+                    </div>
+
+                    <button
+                      onClick={analyzeMenuWithAI}
+                      disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
+                      className="bg-purple-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-100 active:scale-95"
+                    >
+                      {aiProcessing ? (
+                        <>
+                          <PiArrowCounterClockwise className="w-4 h-4 animate-spin" />
+                          Analizando...
+                        </>
+                      ) : (
+                        <>
+                          <PiPaperPlaneTilt className="w-4 h-4" />
+                          Analizar con IA
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6 bg-white rounded-2xl border-2 border-green-500 shadow-xl animate-in fade-in zoom-in duration-300">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <PiCheckCircle className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold uppercase text-green-900 leading-none">Análisis Completado</h3>
+                      <p className="text-xs text-green-600 font-bold uppercase mt-1">Revisa los cambios detectados</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                      <p className="text-[10px] text-green-600 uppercase font-bold mb-1">Secciones</p>
+                      <p className="text-3xl font-bold text-green-900">{aiStats?.sections || 0}</p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                      <p className="text-[10px] text-green-600 uppercase font-bold mb-1">Productos</p>
+                      <p className="text-3xl font-bold text-green-900">{aiStats?.items || 0}</p>
+                    </div>
+                    {aiStats?.newImages > 0 && (
+                      <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 col-span-2 flex items-center justify-between">
+                        <div>
+                          <p className="text-[10px] text-blue-600 uppercase font-bold">Galería</p>
+                          <p className="text-lg font-bold text-blue-900">+{aiStats.newImages} fotos detectadas</p>
+                        </div>
+                        <PiImage className="w-8 h-8 text-blue-200" />
+                      </div>
+                    )}
+                    {(aiStats?.hasAddress || aiStats?.hasPhone) && (
+                      <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 col-span-2">
+                        <p className="text-[10px] text-amber-600 uppercase font-bold mb-1">Contacto Renovado</p>
+                        <div className="flex gap-2">
+                          {aiStats.hasAddress && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📍 Dirección</span>}
+                          {aiStats.hasPhone && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📞 Teléfono</span>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setPendingAiContent(null);
+                        setAiStats(null);
+                      }}
+                      className="flex-1 py-3 px-4 bg-gray-100 text-gray-500 rounded-xl font-bold hover:bg-gray-200 transition-colors uppercase text-xs"
+                    >
+                      Descartar
+                    </button>
+                    <button
+                      onClick={confirmAiChanges}
+                      disabled={aiProcessing}
+                      className="flex-[2] py-3 px-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center justify-center gap-2 uppercase text-xs tracking-wider"
+                    >
+                      {aiProcessing ? (
+                        <>
+                          <PiArrowCounterClockwise className="w-4 h-4 animate-spin" />
+                          Aplicando...
+                        </>
+                      ) : (
+                        <>Aplicar Cambios </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
+                <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
+                <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> CMD + Enter para enviar</span>
+                <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Arrastra fotos o archivos</span>
               </div>
             </div>
           )}
-          
-          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> CMD + Enter para enviar</span>
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Arrastra fotos o archivos</span>
-          </div>
-        </div>
-      )}
 
-      <div className="space-y-4 lg:px-4 sm:px-0">
-        {blocks.map((block, index) => (
-          <div key={block.id} id={block.id} className="relative scroll-mt-24">
-            {index === 0 && (
-              <>
+          <div className="space-y-4 lg:px-4 sm:px-0">
+            {blocks.map((block, index) => (
+              <div key={block.id} id={block.id} className="relative scroll-mt-24">
+                {index === 0 && (
+                  <>
+                    <div className="flex justify-center -my-2 relative z-10">
+                      <button
+                        onClick={() => setShowBlockMenu(`before-${index}`)}
+                        className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
+                      >
+                        <PiPlus className="w-3 h-3" /> Insertar Bloque
+                      </button>
+                    </div>
+
+                    {showBlockMenu === `before-${index}` && (
+                      <div className="mb-3 p-4 bg-white border rounded-xl shadow-lg">
+                        <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index - 1)} />
+                          <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image', index - 1)} />
+                          <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index - 1)} />
+                          <BlockTypeButton icon="🎪" label="Carrusel" onClick={() => addBlock('carrusel', index - 1)} />
+                        </div>
+                        <button
+                          onClick={() => setShowBlockMenu(false)}
+                          className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                <div className="flex justify-end gap-2 mb-3 sm:absolute sm:-left-16 sm:top-0 sm:flex-col group/controls">
+                  <button
+                    onClick={() => moveBlock(index, 'up')}
+                    disabled={index === 0}
+                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all hover:scale-110 group"
+                    title="Subir"
+                  >
+                    <PiCaretUp className="w-4 h-4 text-gray-400 group-hover:text-emerald-600" />
+                  </button>
+                  <button
+                    onClick={() => moveBlock(index, 'down')}
+                    disabled={index === blocks.length - 1}
+                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all hover:scale-110 group"
+                    title="Bajar"
+                  >
+                    <PiCaretDown className="w-4 h-4 text-gray-400 group-hover:text-emerald-600" />
+                  </button>
+                  <button
+                    onClick={() => duplicateBlock(index)}
+                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all hover:scale-110 group"
+                    title="Duplicar"
+                  >
+                    <PiCopy className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  </button>
+                  <button
+                    onClick={() => removeBlock(index)}
+                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all hover:scale-110 group"
+                    title="Eliminar"
+                  >
+                    <PiTrash className="w-4 h-4 text-gray-400 group-hover:text-red-600" />
+                  </button>
+                </div>
+
+                {renderBlock(block, index, forceCollapse)}
+
                 <div className="flex justify-center my-4">
                   <button
-                    onClick={() => setShowBlockMenu(`before-${index}`)}
+                    onClick={() => setShowBlockMenu(`after-${index}`)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold transition-colors"
                   >
                     + Agregar Bloque
                   </button>
                 </div>
 
-                {showBlockMenu === `before-${index}` && (
-                  <div className="mb-3 p-4 bg-white border rounded-xl shadow-lg">
+                {showBlockMenu === `after-${index}` && (
+                  <div className="mt-3 p-4 bg-white border rounded-xl shadow-lg">
                     <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
                     <div className="grid grid-cols-3 gap-2">
-                      <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index - 1)} />
-                      <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image', index - 1)} />
-                      <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index - 1)} />
+                      <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index)} />
+                      <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image', index)} />
+                      <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index)} />
+                      <BlockTypeButton icon="🎪" label="Carrusel" onClick={() => addBlock('carrusel', index)} />
                     </div>
                     <button
                       onClick={() => setShowBlockMenu(false)}
@@ -1065,116 +1136,65 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     </button>
                   </div>
                 )}
-              </>
-            )}
+              </div>
+            ))}
 
-            <div className="flex justify-end gap-2 mb-2 sm:absolute sm:-left-12 sm:top-4 sm:flex-col">
-              <button
-                onClick={() => moveBlock(index, 'up')}
-                disabled={index === 0}
-                className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-gray-50 disabled:opacity-30 flex items-center justify-center text-xs"
-              >↑</button>
-              <button
-                onClick={() => moveBlock(index, 'down')}
-                disabled={index === blocks.length - 1}
-                className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-gray-50 disabled:opacity-30 flex items-center justify-center text-xs"
-              >↓</button>
-              <button
-                onClick={() => duplicateBlock(index)}
-                className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-blue-50 flex items-center justify-center text-xs"
-                title="Duplicar"
-              >⧉</button>
-              <button
-                onClick={() => removeBlock(index)}
-                className="w-8 h-8 bg-white border shadow-sm rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center text-xs"
-              >✕</button>
-            </div>
-
-            {renderBlock(block, index, forceCollapse)}
-
-            <div className="flex justify-center my-4">
-              <button
-                onClick={() => setShowBlockMenu(`after-${index}`)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold transition-colors"
-              >
-                + Agregar Bloque
-              </button>
-            </div>
-
-            {showBlockMenu === `after-${index}` && (
-              <div className="mt-3 p-4 bg-white border rounded-xl shadow-lg">
-                <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                <div className="grid grid-cols-3 gap-2">
-                  <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section', index)} />
-                  <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image', index)} />
-                  <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery', index)} />
-                </div>
+            {blocks.length === 0 && (
+              <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
+                <div className="mb-4 text-4xl">📭</div>
+                <p className="text-gray-500 font-bold uppercase text-xs mb-6">El menú está vacío. Comienza agregando contenido.</p>
                 <button
-                  onClick={() => setShowBlockMenu(false)}
-                  className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                  onClick={() => setShowBlockMenu(true)}
+                  className="bg-black text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-gray-800 shadow-xl transition-all"
                 >
-                  Cancelar
+                  + Agregar Primer Bloque
                 </button>
+
+                {showBlockMenu === true && (
+                  <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl animate-in zoom-in-95">
+                    <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section')} />
+                      <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image')} />
+                      <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery')} />
+                      <BlockTypeButton icon="🎪" label="Carrusel" onClick={() => addBlock('carrusel')} />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        ))}
-
-        {blocks.length === 0 && (
-          <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
-            <div className="mb-4 text-4xl">📭</div>
-            <p className="text-gray-500 font-bold uppercase text-xs mb-6">El menú está vacío. Comienza agregando contenido.</p>
-            <button
-              onClick={() => setShowBlockMenu(true)}
-              className="bg-black text-white px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-gray-800 shadow-xl transition-all"
-            >
-              + Agregar Primer Bloque
-            </button>
-
-            {showBlockMenu === true && (
-              <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-2xl animate-in zoom-in-95">
-                <p className="text-xs font-black text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
-                <div className="grid grid-cols-3 gap-3">
-                  <BlockTypeButton icon="📋" label="Sección" onClick={() => addBlock('section')} />
-                  <BlockTypeButton icon="🖼️" label="Imagen" onClick={() => addBlock('image')} />
-                  <BlockTypeButton icon="🎨" label="Galería" onClick={() => addBlock('gallery')} />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </>
-  ) : (
-    <div className="mx-4 sm:mx-0 overflow-hidden rounded-3xl border shadow-2xl bg-[#0A0A0A]">
-      <div className="bg-gray-800 p-2 flex items-center justify-between px-6 border-b border-white/10">
-        <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-400" />
-          <div className="w-3 h-3 rounded-full bg-yellow-400" />
-          <div className="w-3 h-3 rounded-full bg-green-400" />
-        </div>
-        <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Vista Previa en Vivo</div>
-        <div className="w-12" />
-      </div>
-      {placeType === 'motel' ? (
-        <MotelPageRenderer 
-          place={{ 
-            ...placeData, 
-            content: { blocks, semantic_data: semanticData, view_settings: { layout: 'grid', show_prices: true } } 
-          }} 
-          isPreview={true} 
-        />
+        </>
       ) : (
-        <div className="p-20 text-center bg-gray-50">
-          <div className="text-6xl mb-6">👁️</div>
-          <h2 className="text-2xl font-black uppercase mb-4">Vista Previa</h2>
-          <p className="text-gray-500 text-sm">Próximamente disponible para Restaurantes. Use el editor para realizar cambios.</p>
+        <div className="mx-4 sm:mx-0 overflow-hidden rounded-2xl border shadow-xl bg-[#0A0A0A]">
+          <div className="bg-gray-800 p-2 flex items-center justify-between px-6 border-b border-white/10">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-400" />
+              <div className="w-3 h-3 rounded-full bg-yellow-400" />
+              <div className="w-3 h-3 rounded-full bg-green-400" />
+            </div>
+            <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Vista Previa en Vivo</div>
+            <div className="w-12" />
+          </div>
+          {placeType === 'motel' ? (
+            <MotelPageRenderer
+              place={{
+                ...placeData,
+                content: { blocks, semantic_data: semanticData, view_settings: { layout: 'grid', show_prices: true } }
+              }}
+              isPreview={true}
+            />
+          ) : (
+            <div className="p-20 text-center bg-gray-50">
+              <div className="text-6xl mb-6">👁️</div>
+              <h2 className="text-2xl font-bold uppercase mb-4">Vista Previa</h2>
+              <p className="text-gray-500 text-sm">Próximamente disponible para Restaurantes. Use el editor para realizar cambios.</p>
+            </div>
+          )}
         </div>
       )}
     </div>
-  )}
-</div>
-);
+  );
 }
 
 function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
@@ -1192,7 +1212,7 @@ function BlockTypeButton({ icon, label, onClick }: { icon: string; label: string
 function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: string[]; onSelect: (url: string) => void; onClose: () => void }) {
   if (existingImages.length === 0) {
     return (
-      <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl border-2 border-gray-200 shadow-2xl p-6 text-center z-50">
+      <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl border-2 border-gray-200 shadow-xl p-6 text-center z-50">
         <div className="text-4xl mb-2">📭</div>
         <p className="text-sm text-gray-500">No hay imágenes disponibles todavía</p>
         <button onClick={onClose} className="mt-3 text-xs text-gray-400 hover:text-gray-600">Cerrar</button>
@@ -1201,9 +1221,9 @@ function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: 
   }
 
   return (
-    <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl border-2 border-gray-200 shadow-2xl p-4 z-50 max-h-96 overflow-y-auto">
+    <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl border-2 border-gray-200 shadow-xl p-4 z-50 max-h-96 overflow-y-auto">
       <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-        <span className="text-xs font-black uppercase text-gray-600">Selecciona una imagen</span>
+        <span className="text-xs font-bold uppercase text-gray-600">Selecciona una imagen</span>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold">✕</button>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -1230,8 +1250,8 @@ function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: 
 function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse, existingImages }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean; existingImages?: string[] }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showImageSelector, setShowImageSelector] = useState(false);
-  const [showItemImageSelector, setShowItemImageSelector] = useState<{[key: number]: boolean}>({});
-  const [showItemGallerySelector, setShowItemGallerySelector] = useState<{[key: number]: boolean}>({});
+  const [showItemImageSelector, setShowItemImageSelector] = useState<{ [key: number]: boolean }>({});
+  const [showItemGallerySelector, setShowItemGallerySelector] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     if (forceCollapse !== undefined) {
@@ -1272,44 +1292,52 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
   };
 
   return (
-    <div className={`bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 transition-all ${isCollapsed ? 'p-3' : 'p-4 sm:p-6'}`}>
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
+    <div className={`bg-white rounded-2xl border-2 transition-all duration-500 overflow-hidden ${isCollapsed ? 'border-gray-100 shadow-sm' : 'border-emerald-100 shadow-xl shadow-emerald-500/5'}`}>
+      <div className={`${isCollapsed ? 'bg-white' : 'bg-gradient-to-r from-emerald-50 to-teal-50'} p-4 transition-all uppercase tracking-wide`}>
+        <div className="flex items-center gap-4">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-purple-600 font-bold border border-purple-100 hover:bg-purple-50 transition-colors"
+            className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl shadow-sm font-bold transition-all ${isCollapsed ? 'bg-gray-100 text-gray-400 hover:bg-gray-200' : 'bg-emerald-600 text-white shadow-emerald-200'}`}
           >
-            {isCollapsed ? '+' : '−'}
+            <PiPlus className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? '' : 'rotate-45'}`} />
           </button>
-          
-          <input
-            value={data.title}
-            onChange={(e) => onChange({ ...data, title: e.target.value })}
-            placeholder="Título de la Sección"
-            className={`w-full font-black uppercase bg-transparent outline-none focus:border-purple-600 transition-all ${
-              isCollapsed ? 'text-sm' : 'text-xl sm:text-2xl border-b-2 border-purple-300 pb-2'
-            }`}
-          />
 
-          {isCollapsed && (
+          <div className="flex-1">
+            <input
+              value={data.title}
+              onChange={(e) => onChange({ ...data, title: e.target.value })}
+              placeholder="Ej: PLATILLOS FUERTES"
+              className={`w-full font-bold uppercase bg-transparent outline-none transition-all tracking-wider ${isCollapsed ? 'text-xs text-gray-500' : 'text-xl sm:text-2xl text-emerald-950 px-1 border-b-2 border-emerald-200'
+                }`}
+            />
+            {isCollapsed && (
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1 leading-none">
+                Sección Dinámica • {data.items.length} Elementos
+              </p>
+            )}
+          </div>
+
+          {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black bg-purple-200 text-purple-700 px-2 py-1 rounded-full whitespace-nowrap">
-                {data.items.length} ITEMS
+              <span className="hidden sm:inline-block text-[10px] font-bold bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full">
+                {data.items.length} PLATILLOS
               </span>
-              {data.image && <span className="text-xs">🖼️</span>}
             </div>
           )}
         </div>
 
         {!isCollapsed && (
-          <div className="animate-in fade-in slide-in-from-top-1 duration-200 space-y-4">
-            <textarea
-              value={data.description || ''}
-              onChange={(e) => onChange({ ...data, description: e.target.value })}
-              placeholder="Descripción (opcional)"
-              rows={2}
-              className="w-full text-sm bg-white/50 p-3 rounded-lg border border-purple-200 outline-none focus:border-purple-600"
-            />
+          <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
+            <div className="bg-white/50 p-4 rounded-xl border border-emerald-100/50">
+              <label className="text-[10px] font-bold text-emerald-800/40 uppercase mb-2 block tracking-widest px-1">Concepto de la Sección:</label>
+              <textarea
+                value={data.description || ''}
+                onChange={(e) => onChange({ ...data, description: e.target.value })}
+                placeholder="Breve historia o descripción de esta categoría..."
+                rows={2}
+                className="w-full text-sm bg-white p-3 rounded-xl border border-emerald-100 outline-none focus:border-emerald-600 shadow-sm"
+              />
+            </div>
 
             <div className="relative">
               <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Imagen de fondo:</label>
@@ -1343,12 +1371,12 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
 
             <div className="mt-6 space-y-3">
               <div className="flex justify-between items-center border-t border-purple-100 pt-4">
-                <h4 className="text-xs font-black text-purple-800 uppercase tracking-widest">Contenido de la sección</h4>
+                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Contenido de la sección</h4>
                 <button
                   onClick={addItem}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-full text-xs font-black transition-all shadow-sm hover:shadow-md"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-purple-100 flex items-center gap-2"
                 >
-                  + AGREGAR ITEM
+                  <PiPlus className="w-3 h-3" /> Agregar Ítem
                 </button>
               </div>
 
@@ -1360,183 +1388,183 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
 
               {data.items.map((item, itemIndex) => (
                 <div key={item.id} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
-              <div className="flex justify-end gap-2 mb-3">
-                <button
-                  onClick={() => moveItem(itemIndex, 'up')}
-                  disabled={itemIndex === 0}
-                  className="w-6 h-6 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-30 flex items-center justify-center text-xs"
-                >↑</button>
-                <button
-                  onClick={() => moveItem(itemIndex, 'down')}
-                  disabled={itemIndex === data.items.length - 1}
-                  className="w-6 h-6 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-30 flex items-center justify-center text-xs"
-                >↓</button>
-                <button
-                  onClick={() => removeItem(itemIndex)}
-                  className="w-6 h-6 bg-red-50 border border-red-200 rounded hover:bg-red-100 text-red-500 flex items-center justify-center text-xs"
-                >✕</button>
-              </div>
-
-              <div className="space-y-3">
-                <div className="grid grid-cols-4 gap-2">
-                  <input
-                    value={item.name}
-                    onChange={(e) => updateItem(itemIndex, { name: e.target.value })}
-                    placeholder="Nombre del platillo"
-                    className="col-span-3 text-sm sm:text-base font-bold bg-gray-50 border border-gray-200 rounded px-3 py-2 outline-none focus:border-purple-600"
-                  />
-                  <input
-                    type="number"
-                    value={item.price}
-                    onChange={(e) => updateItem(itemIndex, { price: parseFloat(e.target.value) })}
-                    placeholder="0.00"
-                    className="text-left sm:text-right text-sm sm:text-base font-black text-red-600 bg-gray-50 border border-gray-200 rounded px-3 py-2 outline-none focus:border-purple-600"
-                  />
-                </div>
-
-                <textarea
-                  value={item.description}
-                  onChange={(e) => updateItem(itemIndex, { description: e.target.value })}
-                  placeholder="Descripción del platillo..."
-                  rows={2}
-                  className="w-full text-sm text-gray-700 p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600 resize-none"
-                />
-
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">{placeType === 'motel' ? 'CARACTERÍSTICAS DE LA HABITACIÓN (ej: Jacuzzi, Smart TV, Tina):' : 'CARACTERÍSTICAS DEL PLATILLO (ej: Picante, Vegetariano):'}</label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {item.features?.map((feature, fIdx) => (
-                      <span key={fIdx} className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                        {feature}
-                        <button
-                          onClick={() => {
-                            const newFeatures = item.features?.filter((_, i) => i !== fIdx);
-                            updateItem(itemIndex, { features: newFeatures });
-                          }}
-                          className="hover:text-red-600"
-                        >×</button>
-                      </span>
-                    ))}
+                  <div className="flex justify-end gap-2 mb-3">
+                    <button
+                      onClick={() => moveItem(itemIndex, 'up')}
+                      disabled={itemIndex === 0}
+                      className="w-6 h-6 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-30 flex items-center justify-center text-xs"
+                    >↑</button>
+                    <button
+                      onClick={() => moveItem(itemIndex, 'down')}
+                      disabled={itemIndex === data.items.length - 1}
+                      className="w-6 h-6 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-30 flex items-center justify-center text-xs"
+                    >↓</button>
+                    <button
+                      onClick={() => removeItem(itemIndex)}
+                      className="w-6 h-6 bg-red-50 border border-red-200 rounded hover:bg-red-100 text-red-500 flex items-center justify-center text-xs"
+                    >✕</button>
                   </div>
-                  <input
-                    type="text"
-                    placeholder={placeType === 'motel' ? 'Agregar característica de habitación (Enter)' : 'Agregar característica del platillo (Enter)'}
-                    className="w-full text-sm p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                        const newFeature = e.currentTarget.value.trim();
-                        const currentFeatures = item.features || [];
-                        updateItem(itemIndex, { features: [...currentFeatures, newFeature] });
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                  />
-                </div>
 
-                <div className="w-full">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN PRINCIPAL:</label>
-                  <div className="relative">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <ManualUploader
-                          currentImage={item.image}
-                          onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
-                          onImageRemove={() => updateItem(itemIndex, { image: '' })}
-                          onUploadStart={() => console.log('Subiendo imagen del item...')}
-                          onUploadError={() => console.error('Error al subir imagen')}
-                        />
-                      </div>
-                      {existingImages && existingImages.length > 0 && (
-                        <button
-                          onClick={() => setShowItemImageSelector({...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex]})}
-                          className="px-3 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-xs font-bold whitespace-nowrap"
-                        >
-                          📚 Existentes
-                        </button>
-                      )}
-                    </div>
-                    {showItemImageSelector[itemIndex] && existingImages && (
-                      <ImageSelector
-                        existingImages={existingImages}
-                        onSelect={(url) => updateItem(itemIndex, { image: url })}
-                        onClose={() => setShowItemImageSelector({...showItemImageSelector, [itemIndex]: false})}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-4 gap-2">
+                      <input
+                        value={item.name}
+                        onChange={(e) => updateItem(itemIndex, { name: e.target.value })}
+                        placeholder="Nombre del platillo"
+                        className="col-span-3 text-sm font-bold bg-white border border-gray-100 rounded-xl px-3 py-2 outline-none focus:border-purple-600 shadow-sm"
                       />
-                    )}
-                  </div>
-                </div>
+                      <input
+                        type="number"
+                        value={item.price}
+                        onChange={(e) => updateItem(itemIndex, { price: parseFloat(e.target.value) })}
+                        placeholder="0.00"
+                        className="text-left sm:text-right text-sm sm:text-base font-bold text-red-600 bg-gray-50 border border-gray-200 rounded px-3 py-2 outline-none focus:border-purple-600"
+                      />
+                    </div>
 
-                <div className="w-full">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">GALERÍA DEL ITEM (opcional):</label>
-                  <div className="space-y-2">
-                    <ManualUploader
-                      currentImage=""
-                      multiple={true}
-                      onFilesUploaded={(urls) => {
-                        const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
-                        const currentGallery = item.gallery || [];
-                        updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
-                      }}
-                      onUploadStart={() => console.log('Subiendo galería...')}
-                      onUploadError={() => console.error('Error al subir galería')}
+                    <textarea
+                      value={item.description}
+                      onChange={(e) => updateItem(itemIndex, { description: e.target.value })}
+                      placeholder="Descripción del platillo..."
+                      rows={2}
+                      className="w-full text-sm text-gray-700 p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600 resize-none"
                     />
-                    
-                    {existingImages && existingImages.length > 0 && (
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-600 mb-2 block">{placeType === 'motel' ? 'CARACTERÍSTICAS DE LA HABITACIÓN (ej: Jacuzzi, Smart TV, Tina):' : 'CARACTERÍSTICAS DEL PLATILLO (ej: Picante, Vegetariano):'}</label>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {item.features?.map((feature, fIdx) => (
+                          <span key={fIdx} className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                            {feature}
+                            <button
+                              onClick={() => {
+                                const newFeatures = item.features?.filter((_, i) => i !== fIdx);
+                                updateItem(itemIndex, { features: newFeatures });
+                              }}
+                              className="hover:text-red-600"
+                            >×</button>
+                          </span>
+                        ))}
+                      </div>
+                      <input
+                        type="text"
+                        placeholder={placeType === 'motel' ? 'Agregar característica de habitación (Enter)' : 'Agregar característica del platillo (Enter)'}
+                        className="w-full text-sm p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                            const newFeature = e.currentTarget.value.trim();
+                            const currentFeatures = item.features || [];
+                            updateItem(itemIndex, { features: [...currentFeatures, newFeature] });
+                            e.currentTarget.value = '';
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN PRINCIPAL:</label>
                       <div className="relative">
-                        <button
-                          onClick={() => setShowItemGallerySelector({...showItemGallerySelector, [itemIndex]: !showItemGallerySelector[itemIndex]})}
-                          className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-xs font-bold border border-purple-200"
-                        >
-                          📚 Agregar desde existentes
-                        </button>
-                        {showItemGallerySelector[itemIndex] && (
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <ManualUploader
+                              currentImage={item.image}
+                              onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
+                              onImageRemove={() => updateItem(itemIndex, { image: '' })}
+                              onUploadStart={() => console.log('Subiendo imagen del item...')}
+                              onUploadError={() => console.error('Error al subir imagen')}
+                            />
+                          </div>
+                          {existingImages && existingImages.length > 0 && (
+                            <button
+                              onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex] })}
+                              className="px-3 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-xs font-bold whitespace-nowrap"
+                            >
+                              📚 Existentes
+                            </button>
+                          )}
+                        </div>
+                        {showItemImageSelector[itemIndex] && existingImages && (
                           <ImageSelector
                             existingImages={existingImages}
-                            onSelect={(url) => {
-                              const newGalleryItem = { src: url, alt: item.name, title: '' };
-                              const currentGallery = item.gallery || [];
-                              updateItem(itemIndex, { gallery: [...currentGallery, newGalleryItem] });
-                            }}
-                            onClose={() => setShowItemGallerySelector({...showItemGallerySelector, [itemIndex]: false})}
+                            onSelect={(url) => updateItem(itemIndex, { image: url })}
+                            onClose={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false })}
                           />
                         )}
                       </div>
-                    )}
-                  </div>
-                  
-                  {item.gallery && item.gallery.length > 0 && (
-                    <div className="mt-3 grid grid-cols-4 gap-2">
-                      {item.gallery.map((img, gIdx) => (
-                        <div key={gIdx} className="relative group">
-                          <img src={img.src} alt={img.alt || ''} className="w-full h-20 object-cover rounded" />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
-                              updateItem(itemIndex, { gallery: newGallery });
-                            }}
-                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
                     </div>
-                  )}
+
+                    <div className="w-full">
+                      <label className="text-xs font-bold text-gray-600 mb-2 block">GALERÍA DEL ITEM (opcional):</label>
+                      <div className="space-y-2">
+                        <ManualUploader
+                          currentImage=""
+                          multiple={true}
+                          onFilesUploaded={(urls) => {
+                            const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
+                            const currentGallery = item.gallery || [];
+                            updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
+                          }}
+                          onUploadStart={() => console.log('Subiendo galería...')}
+                          onUploadError={() => console.error('Error al subir galería')}
+                        />
+
+                        {existingImages && existingImages.length > 0 && (
+                          <div className="relative">
+                            <button
+                              onClick={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: !showItemGallerySelector[itemIndex] })}
+                              className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-xs font-bold border border-purple-200"
+                            >
+                              📚 Agregar desde existentes
+                            </button>
+                            {showItemGallerySelector[itemIndex] && (
+                              <ImageSelector
+                                existingImages={existingImages}
+                                onSelect={(url) => {
+                                  const newGalleryItem = { src: url, alt: item.name, title: '' };
+                                  const currentGallery = item.gallery || [];
+                                  updateItem(itemIndex, { gallery: [...currentGallery, newGalleryItem] });
+                                }}
+                                onClose={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: false })}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {item.gallery && item.gallery.length > 0 && (
+                        <div className="mt-3 grid grid-cols-4 gap-2">
+                          {item.gallery.map((img, gIdx) => (
+                            <div key={gIdx} className="relative group">
+                              <img src={img.src} alt={img.alt || ''} className="w-full h-20 object-cover rounded" />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
+                                  updateItem(itemIndex, { gallery: newGallery });
+                                }}
+                                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
-    )}
-  </div>
-</div>
-);
+    </div>
+  );
 }
 
 function GalleryBlock({ data, onChange, existingImages }: { data: GalleryData; onChange: (data: GalleryData) => void; existingImages?: string[] }) {
   const [showImageSelector, setShowImageSelector] = useState(false);
-  
+
   const addImageToGallery = (urls: string[]) => {
     const newImages = urls.map(url => ({ src: url, alt: '', title: '' }));
     onChange({
@@ -1553,49 +1581,45 @@ function GalleryBlock({ data, onChange, existingImages }: { data: GalleryData; o
   };
 
   return (
-    <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-xl border-2 border-gray-700">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-xl sm:text-2xl">🎨</span>
-        <span className="text-xs font-bold text-gray-300 uppercase">Galería</span>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        {data.images?.map((img, gIdx) => (
-          <div key={gIdx} className="relative aspect-square group overflow-hidden rounded-xl">
-            <img src={img.src} alt={img.alt || ''} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-            <button
-              onClick={() => removeImageFromGallery(gIdx)}
-              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded-full sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-red-700"
-            >✕</button>
+    <div className="bg-white rounded-2xl border-2 border-emerald-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b-2 border-emerald-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-500 rounded-xl text-white shadow-lg">
+            <PiSparkle className="w-5 h-5" />
           </div>
-        ))}
-
-        <div className="aspect-square flex items-center justify-center border-2 border-dashed border-gray-700 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors">
-          <ManualUploader
-            onFilesUploaded={addImageToGallery}
-            multiple
-            onUploadError={() => console.error('Error al subir imagen')}
-          />
+          <h3 className="font-bold text-emerald-900 uppercase tracking-wider text-sm">Galería de Imágenes</h3>
         </div>
       </div>
-      
-      <div className="mt-4 flex gap-2">
-        {existingImages && existingImages.length > 0 && (
-          <div className="relative flex-1">
-            <button
-              onClick={() => setShowImageSelector(!showImageSelector)}
-              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-bold"
-            >
-              📚 Agregar desde existentes
-            </button>
-            {showImageSelector && (
-              <ImageSelector
-                existingImages={existingImages}
-                onSelect={(url) => addImageToGallery([url])}
-                onClose={() => setShowImageSelector(false)}
-              />
-            )}
-          </div>
+
+      <div className="p-6 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {data.images?.map((img, gIdx) => (
+            <div key={gIdx} className="relative aspect-square group overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+              <img src={img.src} alt={img.alt || ''} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+              <button
+                onClick={() => removeImageFromGallery(gIdx)}
+                className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-600/90 backdrop-blur text-white rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-red-700 shadow-lg scale-75 group-hover:scale-100"
+              >
+                <PiX className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+
+          <button
+            onClick={() => setShowImageSelector(true)}
+            className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-emerald-200 rounded-2xl hover:bg-emerald-50 hover:border-emerald-400 transition-all text-emerald-600 group"
+          >
+            <PiPlus className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+            <span className="text-[10px] font-bold uppercase tracking-widest px-2 text-center">Agregar Foto</span>
+          </button>
+        </div>
+
+        {showImageSelector && existingImages && (
+          <ImageSelector
+            existingImages={existingImages}
+            onSelect={(url) => addImageToGallery([url])}
+            onClose={() => setShowImageSelector(false)}
+          />
         )}
       </div>
     </div>
@@ -1610,66 +1634,265 @@ interface ImageData {
 
 function ImageBlock({ data, onChange, existingImages }: { data: ImageData; onChange: (data: ImageData) => void; existingImages?: string[] }) {
   const [showImageSelector, setShowImageSelector] = useState(false);
-  
-  return (
-    <div className="bg-blue-50 p-4 sm:p-6 rounded-xl border-2 border-blue-200">
-      <div className="space-y-4">
-        {data.src ? (
-          <div className="relative">
-            <img
-              src={data.src}
-              alt={data.alt || ''}
-              className="w-full rounded-lg shadow-lg"
-            />
-          </div>
-        ) : (
-          <div className="bg-white/50 rounded-lg p-8 text-center text-gray-400">
-            Sube una imagen
-          </div>
-        )}
 
-        <div className="relative">
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <ManualUploader
-                currentImage={data.src}
-                onFilesUploaded={(url) => onChange({ ...data, src: url[0] })}
-                onUploadStart={() => console.log('Subiendo imagen...')}
-                onUploadError={() => console.error('Error al subir imagen')}
+  return (
+    <div className="bg-white rounded-2xl border-2 border-emerald-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b-2 border-emerald-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-500 rounded-xl text-white shadow-lg">
+            <PiImage className="w-5 h-5" />
+          </div>
+          <h3 className="font-bold text-emerald-900 uppercase tracking-wider text-sm">Bloque de Imagen</h3>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-full md:w-1/3 space-y-4">
+            <div className="relative group rounded-2xl overflow-hidden border border-emerald-100 bg-emerald-50 aspect-square">
+              {data.src ? (
+                <>
+                  <img src={data.src} alt={data.alt || ''} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button onClick={() => onChange({ ...data, src: '' })} className="bg-red-600 text-white p-2 rounded-xl">
+                      <PiTrash className="w-5 h-5" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-emerald-200">
+                  <PiImage className="w-16 h-16" />
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowImageSelector(true)}
+              className="w-full py-3 bg-emerald-50 text-emerald-700 rounded-xl font-bold uppercase text-[10px] tracking-widest border border-emerald-100 hover:bg-emerald-100 transition-all"
+            >
+              Seleccionar Foto
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-4">
+            <div>
+              <label className="text-[10px] font-bold text-emerald-800/40 uppercase mb-2 block tracking-widest px-1">Texto Alternativo:</label>
+              <input
+                value={data.alt || ''}
+                onChange={(e) => onChange({ ...data, alt: e.target.value })}
+                placeholder="Describe la imagen para accesibilidad..."
+                className="w-full text-sm bg-white p-3 rounded-xl border border-emerald-100 outline-none focus:border-emerald-600 shadow-sm"
               />
             </div>
-            {existingImages && existingImages.length > 0 && (
-              <button
-                onClick={() => setShowImageSelector(!showImageSelector)}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-bold whitespace-nowrap"
-              >
-                📚 Existentes
-              </button>
-            )}
+
+            <div>
+              <label className="text-[10px] font-bold text-emerald-800/40 uppercase mb-2 block tracking-widest px-1">Pie de Foto:</label>
+              <textarea
+                value={data.caption || ''}
+                onChange={(e) => onChange({ ...data, caption: e.target.value })}
+                placeholder="Texto que aparecerá debajo de la imagen..."
+                rows={3}
+                className="w-full text-sm bg-white p-3 rounded-xl border border-emerald-100 outline-none focus:border-emerald-600 shadow-sm resize-none"
+              />
+            </div>
           </div>
-          {showImageSelector && existingImages && (
-            <ImageSelector
-              existingImages={existingImages}
-              onSelect={(url) => onChange({ ...data, src: url })}
-              onClose={() => setShowImageSelector(false)}
-            />
-          )}
         </div>
 
-        <input
-          value={data.alt || ''}
-          onChange={(e) => onChange({ ...data, alt: e.target.value })}
-          placeholder="Texto alternativo (opcional)"
-          className="w-full text-sm bg-white/50 p-3 rounded-lg border border-blue-200 outline-none focus:border-blue-600"
-        />
+        {showImageSelector && existingImages && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowImageSelector(false)} />
+            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-xl animate-in zoom-in-95">
+              <div className="p-6 border-b flex items-center justify-between">
+                <h3 className="font-bold uppercase tracking-widest">Seleccionar Imagen</h3>
+                <button onClick={() => setShowImageSelector(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <PiX className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="overflow-y-auto p-6 max-h-[calc(90vh-140px)]">
+                <div className="space-y-8">
+                  <section>
+                    <ManualUploader
+                      currentImage={data.src}
+                      onFilesUploaded={(url) => {
+                        onChange({ ...data, src: url[0] });
+                        setShowImageSelector(false);
+                      }}
+                      onImageRemove={() => onChange({ ...data, src: '' })}
+                    />
+                  </section>
 
-        <textarea
-          value={data.caption || ''}
-          onChange={(e) => onChange({ ...data, caption: e.target.value })}
-          placeholder="Pie de imagen (opcional)"
-          rows={2}
-          className="w-full text-sm bg-white/50 p-3 rounded-lg border border-blue-200 outline-none focus:border-blue-600 resize-none"
-        />
+                  {existingImages.length > 0 && (
+                    <section>
+                      <h4 className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">Imágenes Existentes:</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {existingImages.map((url, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              onChange({ ...data, src: url });
+                              setShowImageSelector(false);
+                            }}
+                            className="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-emerald-500 transition-all"
+                          >
+                            <img src={url} className="w-full h-full object-cover" alt="" />
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface CarruselItem {
+  src: string;
+  alt?: string;
+  link?: string;
+  caption?: string;
+}
+
+interface CarruselData {
+  items: CarruselItem[];
+}
+
+function CarruselBlock({ data, onChange, existingImages }: { data: CarruselData; onChange: (data: CarruselData) => void; existingImages?: string[] }) {
+  const [showImageSelector, setShowImageSelector] = useState(false);
+
+  const addItem = (urls: string[]) => {
+    const newItems = urls.map(url => ({ src: url, alt: '', link: '', caption: '' }));
+    onChange({ ...data, items: [...(data.items || []), ...newItems] });
+  };
+
+  const removeItem = (index: number) => {
+    const newItems = [...data.items];
+    newItems.splice(index, 1);
+    onChange({ ...data, items: newItems });
+  };
+
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= data.items.length) return;
+    const newItems = [...data.items];
+    [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];
+    onChange({ ...data, items: newItems });
+  };
+
+  const updateItem = (index: number, itemData: Partial<CarruselItem>) => {
+    const newItems = [...data.items];
+    newItems[index] = { ...newItems[index], ...itemData };
+    onChange({ ...data, items: newItems });
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border-2 border-emerald-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b-2 border-emerald-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-500 rounded-xl text-white shadow-lg">
+            <PiLayout className="w-5 h-5" />
+          </div>
+          <h3 className="font-bold text-emerald-900 uppercase tracking-wider text-sm">Carrusel de Promociones</h3>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {data.items?.map((item, idx) => (
+            <div key={idx} className="group relative bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all">
+              <div className="aspect-video relative overflow-hidden bg-gray-200">
+                {item.src ? (
+                  <img src={item.src} className="w-full h-full object-cover" alt={item.alt} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <PiImage className="w-10 h-10 opacity-20" />
+                  </div>
+                )}
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => moveItem(idx, 'up')} className="p-1.5 bg-white/90 backdrop-blur shadow-sm rounded-lg hover:bg-white text-gray-700">↑</button>
+                  <button onClick={() => moveItem(idx, 'down')} className="p-1.5 bg-white/90 backdrop-blur shadow-sm rounded-lg hover:bg-white text-gray-700">↓</button>
+                  <button onClick={() => removeItem(idx)} className="p-1.5 bg-white/90 backdrop-blur shadow-sm rounded-lg hover:bg-red-50 text-red-500">✕</button>
+                </div>
+              </div>
+
+              <div className="p-3 space-y-2">
+                <input
+                  value={item.caption || ''}
+                  onChange={(e) => updateItem(idx, { caption: e.target.value })}
+                  placeholder="Título / Promo"
+                  className="w-full text-xs font-bold bg-white p-2 rounded-lg border border-gray-200 outline-none focus:border-emerald-500"
+                />
+                <input
+                  value={item.link || ''}
+                  onChange={(e) => updateItem(idx, { link: e.target.value })}
+                  placeholder="Enlace (opcional)"
+                  className="w-full text-[10px] bg-white p-2 rounded-lg border border-gray-200 outline-none focus:border-emerald-500"
+                />
+              </div>
+            </div>
+          ))}
+
+          <button
+            onClick={() => setShowImageSelector(true)}
+            className="aspect-video flex flex-col items-center justify-center border-2 border-dashed border-emerald-200 rounded-2xl hover:bg-emerald-50 hover:border-emerald-400 transition-all text-emerald-600 group"
+          >
+            <PiPlus className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold uppercase tracking-widest">Agregar Foto</span>
+          </button>
+        </div>
+
+        {showImageSelector && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowImageSelector(false)} />
+            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-xl animate-in zoom-in-95">
+              <div className="p-6 border-b flex items-center justify-between">
+                <h3 className="font-bold uppercase tracking-widest">Seleccionar Imágenes</h3>
+                <button onClick={() => setShowImageSelector(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <PiX className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="overflow-y-auto p-6 max-h-[calc(90vh-140px)]">
+                <div className="space-y-8">
+                  <section>
+                    <h4 className="text-xs font-bold text-emerald-600 uppercase mb-4 tracking-widest">Subir Nueva:</h4>
+                    <ManualUploader
+                      onFilesUploaded={(urls) => {
+                        addItem(urls);
+                        setShowImageSelector(false);
+                      }}
+                      multiple={true}
+                    />
+                  </section>
+
+                  {existingImages && existingImages.length > 0 && (
+                    <section>
+                      <h4 className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">Imágenes Existentes:</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {existingImages.map((url, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              addItem([url]);
+                              setShowImageSelector(false);
+                            }}
+                            className="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-emerald-500 transition-all group relative"
+                          >
+                            <img src={url} className="w-full h-full object-cover" alt="" />
+                            <div className="absolute inset-0 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
