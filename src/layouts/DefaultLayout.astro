@@ -9,7 +9,7 @@ export interface Props {
 	description: string;
 	image?: string;
 	type?: "WebSite" | "Organization" | "WebPage" | "Article";
-  showAds?: boolean;
+	showAds?: boolean;
 	textWhite?: boolean;
 	backgroundColor?: string;
 	favicon?: string;
@@ -135,6 +135,7 @@ const finalSchema = customSchema || defaultSchema;
 				/>
 			)
 		} -->
+		<link rel="manifest" href="/manifest.json" />
 	</head>
 	<body>
 		<Header textWhite={textWhite} backgroundColor={backgroundColor} />

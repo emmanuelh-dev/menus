@@ -1,53 +1,56 @@
+export const prerender = false;
+
 import type { APIRoute } from "astro";
 import { supabase } from "../lib/supabase";
 
-export const GET: APIRoute = async ({ request }) => {
-	const url = new URL(request.url);
+export const GET: APIRoute = async ({ url }) => {
 	const slug = url.searchParams.get("slug");
-	const type = url.searchParams.get("type"); // 'admin' or establishment type
+	const type = url.searchParams.get("type");
 
-	let name = "Menús";
-	let shortName = "Menús";
+	// Valores base
+	let name = "Menú Digital";
+	let shortName = "Menú";
 	let startUrl = "/";
 	let themeColor = "#ffffff";
 	let icon = "/android-chrome-512x512.png";
 
 	if (type === "admin") {
-		name = "Admin Panel | Menús";
+		name = "Gestión de Menús";
 		shortName = "Admin";
 		startUrl = "/admin/dashboard";
-		themeColor = "#000000";
+		themeColor = "#10b981";
 	} else if (slug) {
-		const { data: place } = await supabase
-			.from("places")
-			.select("*")
-			.eq("short_name", slug)
-			.single();
+		// LOG: Intentando buscar datos para el slug
+		console.log(`[PWA Manifest] Buscando datos para: ${slug}`);
 
-		if (place) {
+		// Hacemos una búsqueda simple en la tabla places para obtener el nombre exacto
+		const { data: place, error } = await supabase
+			.from("places")
+			.select("name, type, image, menu, short_name")
+			.eq("short_name", slug)
+			.maybeSingle();
+
+		if (!error && place) {
+			console.log(`[PWA Manifest] Encontrado: ${place.name}`);
 			name = place.name;
-			shortName = place.name.substring(0, 12);
-			// Determine the correct start_url
-			if (place.type === "motel") {
-				// Motels have state-based URLs usually, but we can try to deduce or just use the menu field
-				startUrl = place.menu || `/moteles/${slug}`;
-			} else {
-				startUrl = place.menu || `/menus/${slug}`;
-			}
+			shortName = place.name;
+			startUrl = place.menu || (place.type === "motel" ? `/moteles/${slug}` : `/menus/${slug}`);
 			
-			if (place.image) {
-				icon = place.image;
-			}
-			
-			// Custom theme color based on type if wanted
-			if (place.type === "motel") themeColor = "#1a1a1a";
+			if (place.image) icon = place.image;
+			if (place.type === "motel") themeColor = "#000000";
 			else if (place.type === "cafe") themeColor = "#6f4e37";
+		} else {
+			console.error(`[PWA Manifest] No se pudo encontrar datos para el slug: ${slug}`, error);
+			// Si falla la DB, al menos intentamos que el nombre no sea genérico usando el slug formateado
+			const capitalizedSlug = slug.split('-').map(word => word.charAt(0)).join('').toUpperCase();
+			name = `Menú ${slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ')}`;
+			shortName = name;
 		}
 	}
 
 	const manifest = {
 		name: name,
-		short_name: shortName,
+		short_name: shortName.substring(0, 12),
 		start_url: startUrl,
 		display: "standalone",
 		background_color: "#ffffff",
@@ -56,7 +59,7 @@ export const GET: APIRoute = async ({ request }) => {
 			{
 				src: icon,
 				sizes: "512x512",
-				type: icon.endsWith(".png") ? "image/png" : "image/webp",
+				type: icon.toLowerCase().endsWith(".png") ? "image/png" : "image/webp",
 				purpose: "any maskable",
 			},
 			{
@@ -70,7 +73,10 @@ export const GET: APIRoute = async ({ request }) => {
 	return new Response(JSON.stringify(manifest), {
 		headers: {
 			"Content-Type": "application/manifest+json",
-			"Cache-Control": "public, max-age=3600",
+			"Cache-Control": "no-cache, no-store, must-revalidate",
+			"Pragma": "no-cache",
+			"Expires": "0",
+			"Access-Control-Allow-Origin": "*",
 		},
 	});
 };
