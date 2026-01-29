@@ -1,11 +1,4 @@
 ---
-export const prerender = false;
-
-import {
-	supabase,
-	createSupabaseClient,
-	createAuthenticatedClient,
-} from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import {
 	UserPlus,
@@ -17,29 +10,28 @@ import {
 	CheckCircle2,
 } from "lucide-react";
 
-const accessTokenCookie = Astro.cookies.get("sb-access-token");
-const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
-
-if (accessTokenCookie && refreshTokenCookie) {
-	try {
-		const supabaseWithAuth = await createAuthenticatedClient(
-			accessTokenCookie.value,
-			refreshTokenCookie.value,
-		);
-		const { data } = await supabaseWithAuth.auth.getUser();
-		if (data?.user) {
-			return Astro.redirect("/admin/dashboard");
-		}
-	} catch (error) {
-		console.error("Token validation error:", error);
-	}
-}
+// Esta página ahora es estática para carga instantánea
 ---
 
 <RestaurantLayout title="Crear Cuenta" description="Tu éxito comienza aquí">
 	<div
 		class="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden py-12"
 	>
+		<!-- Auth Check Script (Client Side) -->
+		<script is:inline>
+			const cookies = document.cookie.split(";");
+			const hasTokens = cookies.some((c) =>
+				c.trim().startsWith("sb-access-token="),
+			);
+			if (hasTokens) {
+				fetch("/api/auth/me")
+					.then((res) => res.json())
+					.then((data) => {
+						if (data.user) window.location.href = "/admin/dashboard";
+					});
+			}
+		</script>
+
 		<!-- Decorative elements -->
 		<div
 			class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full -mr-48 -mt-48"
@@ -274,91 +266,90 @@ if (accessTokenCookie && refreshTokenCookie) {
 			</div>
 		</div>
 	</div>
-</RestaurantLayout>
 
-<script>
-	const form = document.getElementById("register-form") as HTMLFormElement;
-	const errorMessage = document.getElementById("error-message");
-	const successMessage = document.getElementById("success-message");
+	<script>
+		const form = document.getElementById("register-form") as HTMLFormElement;
+		const errorMessage = document.getElementById("error-message");
+		const successMessage = document.getElementById("success-message");
 
-	form?.addEventListener("submit", async (e) => {
-		e.preventDefault();
+		form?.addEventListener("submit", async (e) => {
+			e.preventDefault();
 
-		const formData = new FormData(form);
-		const email = formData.get("email") as string;
-		const password = formData.get("password") as string;
-		const confirmPassword = formData.get("confirm-password") as string;
-		const name = formData.get("name") as string;
-		const whatsapp = formData.get("whatsapp") as string;
+			const formData = new FormData(form);
+			const email = formData.get("email") as string;
+			const password = formData.get("password") as string;
+			const confirmPassword = formData.get("confirm-password") as string;
+			const name = formData.get("name") as string;
+			const whatsapp = formData.get("whatsapp") as string;
 
-		if (password !== confirmPassword) {
-			errorMessage!.textContent = "Las contraseñas no coinciden";
-			errorMessage!.classList.remove("hidden");
-			successMessage!.classList.add("hidden");
-			return;
-		}
+			if (password !== confirmPassword) {
+				errorMessage!.textContent = "Las contraseñas no coinciden";
+				errorMessage!.classList.remove("hidden");
+				successMessage!.classList.add("hidden");
+				return;
+			}
 
-		const submitButton = form.querySelector(
-			'button[type="submit"]',
-		) as HTMLButtonElement;
-		submitButton.disabled = true;
-		submitButton.textContent = "Creando cuenta...";
+			const submitButton = form.querySelector(
+				'button[type="submit"]',
+			) as HTMLButtonElement;
+			submitButton.disabled = true;
+			submitButton.textContent = "Creando cuenta...";
 
-		try {
-			const response = await fetch("/api/auth/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					email,
-					password,
-					name,
-					whatsapp,
-				}),
-			});
+			try {
+				const response = await fetch("/api/auth/register", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email,
+						password,
+						name,
+						whatsapp,
+					}),
+				});
 
-			const data = await response.json();
-			const loginUrl = "/admin/login";
+				const data = await response.json();
+				const loginUrl = "/admin/login";
 
-			if (response.ok) {
-				if (data.session) {
-					successMessage!.textContent =
-						"¡Cuenta creada exitosamente! Redirigiendo...";
-					successMessage!.classList.remove("hidden");
-					errorMessage!.classList.add("hidden");
+				if (response.ok) {
+					if (data.session) {
+						successMessage!.textContent =
+							"¡Cuenta creada exitosamente! Redirigiendo...";
+						successMessage!.classList.remove("hidden");
+						errorMessage!.classList.add("hidden");
 
-					setTimeout(() => {
-						window.location.href = "/admin/dashboard";
-					}, 1500);
+						setTimeout(() => {
+							window.location.href = "/admin/dashboard";
+						}, 1500);
+					} else {
+						successMessage!.innerHTML = `
+							<div class="flex flex-col gap-2">
+								<p class="font-bold text-lg">¡Casi listo! </p>
+								<p>Hemos enviado un enlace de confirmación a <strong>${email}</strong>.</p>
+								<p class="text-xs opacity-80">Por favor, confirma tu correo para poder iniciar sesión.</p>
+								<a href="${loginUrl}" class="mt-2 text-emerald-700 underline font-bold">Ir al Login</a>
+							</div>
+						`;
+						successMessage!.classList.remove("hidden");
+						errorMessage!.classList.add("hidden");
+						submitButton.classList.add("hidden");
+					}
 				} else {
-					// Caso donde Supabase requiere verificación de correo
-					successMessage!.innerHTML = `
-						<div class="flex flex-col gap-2">
-							<p class="font-bold text-lg">¡Casi listo! </p>
-							<p>Hemos enviado un enlace de confirmación a <strong>${email}</strong>.</p>
-							<p class="text-xs opacity-80">Por favor, confirma tu correo para poder iniciar sesión.</p>
-							<a href="${loginUrl}" class="mt-2 text-emerald-700 underline font-bold">Ir al Login</a>
-						</div>
-					`;
-					successMessage!.classList.remove("hidden");
-					errorMessage!.classList.add("hidden");
-					submitButton.classList.add("hidden");
+					errorMessage!.textContent = data.error || "Error al crear la cuenta";
+					errorMessage!.classList.remove("hidden");
+					successMessage!.classList.add("hidden");
+					submitButton.disabled = false;
+					submitButton.textContent = "Crear cuenta";
 				}
-			} else {
-				errorMessage!.textContent = data.error || "Error al crear la cuenta";
+			} catch (error) {
+				console.error("Error:", error);
+				errorMessage!.textContent = "Error de conexión. Intenta de nuevo.";
 				errorMessage!.classList.remove("hidden");
 				successMessage!.classList.add("hidden");
 				submitButton.disabled = false;
 				submitButton.textContent = "Crear cuenta";
 			}
-		} catch (error) {
-			console.error("Error:", error);
-			errorMessage!.textContent = "Error de conexión. Intenta de nuevo.";
-			errorMessage!.classList.remove("hidden");
-			successMessage!.classList.add("hidden");
-			submitButton.disabled = false;
-			submitButton.textContent = "Crear cuenta";
-		}
-	});
-</script>
+		});
+	</script>
+</RestaurantLayout>

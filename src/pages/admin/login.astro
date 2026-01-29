@@ -1,33 +1,9 @@
 ---
-export const prerender = false;
-
-import { supabase, createAuthenticatedClient } from "../../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { LogIn, Mail, Lock, ArrowRight, Utensils } from "lucide-react";
 
-const accessTokenCookie = Astro.cookies.get("sb-access-token");
-const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
-
-console.log("Access Token:", accessTokenCookie);
-console.log("Refresh Token:", refreshTokenCookie);
-
-if (accessTokenCookie && refreshTokenCookie) {
-	try {
-		// Crear cliente con los tokens existentes
-		const supabaseWithAuth = await createAuthenticatedClient(
-			accessTokenCookie.value,
-			refreshTokenCookie.value,
-		);
-		const { data } = await supabaseWithAuth.auth.getUser();
-
-		if (data?.user) {
-			return Astro.redirect("/admin/dashboard");
-		}
-	} catch (error) {
-		// If token validation fails, continue to login page
-		console.error("Token validation error:", error);
-	}
-}
+// Esta página ahora es estática para carga instantánea
 ---
 
 <RestaurantLayout
@@ -37,6 +13,26 @@ if (accessTokenCookie && refreshTokenCookie) {
 	<div
 		class="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden"
 	>
+		<!-- Auth Check Script (Client Side) -->
+		<script is:inline>
+			// Check if tokens exist in cookies
+			const cookies = document.cookie.split(";");
+			const hasTokens = cookies.some((c) =>
+				c.trim().startsWith("sb-access-token="),
+			);
+			if (hasTokens) {
+				// If tokens exist, we don't redirect immediately to avoid false positives,
+				// but the page is already static so it's instant anyway.
+				// The fetch('/api/auth/me') in AdminHeader or similar will handle deep state,
+				// but for a quick redirect if already logged:
+				fetch("/api/auth/me")
+					.then((res) => res.json())
+					.then((data) => {
+						if (data.user) window.location.href = "/admin/dashboard";
+					});
+			}
+		</script>
+
 		<!-- Decorative elements -->
 		<div
 			class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full -mr-48 -mt-48"
@@ -191,6 +187,8 @@ if (accessTokenCookie && refreshTokenCookie) {
 					return;
 
 				loginButton.disabled = true;
+				const originalText = loginButton.innerHTML;
+				loginButton.textContent = "Iniciando sesión...";
 				errorMessage.classList.add("hidden");
 
 				const email = emailInput.value.trim();
@@ -225,6 +223,7 @@ if (accessTokenCookie && refreshTokenCookie) {
 
 					if (loginButton) {
 						loginButton.disabled = false;
+						loginButton.innerHTML = originalText;
 					}
 				}
 			});

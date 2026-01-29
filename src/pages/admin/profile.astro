@@ -1,40 +1,10 @@
 ---
-export const prerender = false;
-
-import { createAuthenticatedClient } from "../../lib/supabase";
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { User as UserIcon, Mail, Phone, Save, ArrowLeft } from "lucide-react";
+import ProfileContainer from "../../components/admin/ProfileContainer";
+import { ArrowLeft } from "lucide-react";
 
-import { type User } from "@supabase/supabase-js";
-
-const accessTokenCookie = Astro.cookies.get("sb-access-token");
-const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
-
-if (!accessTokenCookie || !refreshTokenCookie) {
-	return Astro.redirect("/admin/login");
-}
-
-let user: User | null = null;
-try {
-	const supabaseWithAuth = await createAuthenticatedClient(
-		accessTokenCookie.value,
-		refreshTokenCookie.value,
-	);
-	const { data } = await supabaseWithAuth.auth.getUser();
-	if (data?.user) {
-		user = data.user;
-	} else {
-		return Astro.redirect("/admin/login");
-	}
-} catch (error) {
-	return Astro.redirect("/admin/login");
-}
-
-const profile = {
-	name: user?.user_metadata?.name || "",
-	whatsapp: user?.user_metadata?.whatsapp || "",
-	email: user?.email || "",
-};
+// Esta página ahora es estática (la concha/shell)
+// Delegamos la lógica al componente React
 ---
 
 <AdminLayout title="Mi Perfil | Administrador">
@@ -61,198 +31,40 @@ const profile = {
 			</a>
 		</header>
 
-		<div class="max-w-2xl">
-			<div
-				class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 md:p-10"
-			>
+		<ProfileContainer client:only="react" />
+
+		<div
+			class="max-w-2xl mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100"
+		>
+			<div class="flex items-center gap-4">
 				<div
-					id="status-message"
-					class="hidden p-4 rounded-xl mb-8 text-center text-xs font-black uppercase tracking-widest"
+					class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-slate-400"
 				>
-				</div>
-
-				<form id="profile-form" class="space-y-6">
-					<div class="space-y-1.5">
-						<label
-							for="email"
-							class="block text-[10px] font-black uppercase text-slate-400 ml-1"
-						>
-							Correo Electrónico
-						</label>
-						<div class="relative group opacity-50">
-							<div
-								class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"
-							>
-								<Mail className="h-4 w-4" />
-							</div>
-							<input
-								type="email"
-								id="email"
-								value={profile.email}
-								disabled
-								class="block w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-slate-600 text-sm font-medium cursor-not-allowed"
-							/>
-						</div>
-						<p class="text-[9px] text-slate-400 ml-1 font-medium italic">
-							No se puede modificar por seguridad.
-						</p>
-					</div>
-
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="space-y-1.5">
-							<label
-								for="name"
-								class="block text-[10px] font-black uppercase text-slate-400 ml-1"
-							>
-								Nombre Completo
-							</label>
-							<div class="relative group">
-								<div
-									class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-black transition-colors"
-								>
-									<UserIcon className="h-4 w-4" />
-								</div>
-								<input
-									type="text"
-									id="name"
-									name="name"
-									value={profile.name}
-									required
-									placeholder="Tu nombre"
-									class="block w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black transition-all outline-none text-slate-900 text-sm font-medium"
-								/>
-							</div>
-						</div>
-
-						<div class="space-y-1.5">
-							<label
-								for="whatsapp"
-								class="block text-[10px] font-black uppercase text-slate-400 ml-1"
-							>
-								WhatsApp / Teléfono
-							</label>
-							<div class="relative group">
-								<div
-									class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-black transition-colors"
-								>
-									<Phone className="h-4 w-4" />
-								</div>
-								<input
-									type="tel"
-									id="whatsapp"
-									name="whatsapp"
-									value={profile.whatsapp}
-									required
-									placeholder="+52 ..."
-									class="block w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-black focus:ring-1 focus:ring-black transition-all outline-none text-slate-900 text-sm font-medium"
-								/>
-							</div>
-						</div>
-					</div>
-
-					<div class="pt-4">
-						<button
-							type="submit"
-							id="save-button"
-							class="w-full flex justify-center items-center py-4 px-6 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all duration-300 shadow-lg shadow-slate-900/10 group active:scale-[0.98] uppercase text-xs tracking-widest"
-						>
-							<Save
-								className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform"
-							/>
-							Guardar Cambios
-						</button>
-					</div>
-				</form>
-			</div>
-
-			<div class="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-				<div class="flex items-center gap-4">
-					<div
-						class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-slate-400"
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg
-						>
-					</div>
-					<div>
-						<h4
-							class="text-xs font-black uppercase tracking-tight text-slate-900"
-						>
-							Seguridad
-						</h4>
-						<p class="text-[10px] text-slate-500 font-medium leading-relaxed">
-							Tus datos están protegidos y solo se usan para la gestión de tus
-							menús.
-						</p>
-					</div>
+				</div>
+				<div>
+					<h4
+						class="text-xs font-black uppercase tracking-tight text-slate-900"
+					>
+						Seguridad
+					</h4>
+					<p class="text-[10px] text-slate-500 font-medium leading-relaxed">
+						Tus datos están protegidos y solo se usan para la gestión de tus
+						menús.
+					</p>
 				</div>
 			</div>
 		</div>
 	</div>
-
-	<script>
-		const form = document.getElementById("profile-form") as HTMLFormElement;
-		const statusMessage = document.getElementById("status-message");
-		const saveButton = document.getElementById(
-			"save-button",
-		) as HTMLButtonElement;
-
-		form?.addEventListener("submit", async (e) => {
-			e.preventDefault();
-
-			const formData = new FormData(form);
-			const name = formData.get("name");
-			const whatsapp = formData.get("whatsapp");
-
-			saveButton.disabled = true;
-			const originalText = saveButton.innerHTML;
-			saveButton.textContent = "Guardando...";
-
-			try {
-				const response = await fetch("/api/auth/update-profile", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ name, whatsapp }),
-				});
-
-				const data = await response.json();
-
-				if (response.ok) {
-					statusMessage?.classList.remove(
-						"hidden",
-						"bg-red-50",
-						"text-red-600",
-					);
-					statusMessage?.classList.add("bg-emerald-50", "text-emerald-600");
-					statusMessage!.textContent = "✓ Perfil actualizado con éxito";
-
-					setTimeout(() => {
-						statusMessage?.classList.add("hidden");
-					}, 3000);
-				} else {
-					throw new Error(data.error || "Error al actualizar");
-				}
-			} catch (error: any) {
-				statusMessage?.classList.remove(
-					"hidden",
-					"bg-emerald-50",
-					"text-emerald-600",
-				);
-				statusMessage?.classList.add("bg-red-50", "text-red-600");
-				statusMessage!.textContent = "✕ " + error.message;
-			} finally {
-				saveButton.disabled = false;
-				saveButton.innerHTML = originalText;
-			}
-		});
-	</script>
 </AdminLayout>
