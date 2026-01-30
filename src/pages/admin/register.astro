@@ -1,4 +1,5 @@
 ---
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import {
 	UserPlus,
@@ -13,7 +14,10 @@ import {
 // Esta página ahora es estática para carga instantánea
 ---
 
-<RestaurantLayout title="Crear Cuenta" description="Tu éxito comienza aquí">
+<DefaultLayout
+	title="Crea tu cuenta para crear tu menu digital"
+	description="Tu éxito comienza aquí"
+>
 	<div
 		class="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden py-12"
 	>
@@ -352,4 +356,4 @@ import {
 			}
 		});
 	</script>
-</RestaurantLayout>
+</DefaultLayout>

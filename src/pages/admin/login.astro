@@ -2,12 +2,13 @@
 import { supabase } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { LogIn, Mail, Lock, ArrowRight, Utensils } from "lucide-react";
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
 
 // Esta página ahora es estática para carga instantánea
 ---
 
-<RestaurantLayout
-	title="Iniciar Sesión"
+<DefaultLayout
+	title="Inicia sesión para gestionar tu menú digital"
 	description="El futuro de tu restaurante comienza aquí"
 >
 	<div
@@ -229,4 +230,4 @@ import { LogIn, Mail, Lock, ArrowRight, Utensils } from "lucide-react";
 			});
 		});
 	</script>
-</RestaurantLayout>
+</DefaultLayout>
