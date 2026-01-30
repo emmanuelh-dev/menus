@@ -90,8 +90,8 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
             <ContentEditor
               placeId={place.id}
               initialContent={place.content}
@@ -101,69 +101,69 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl p-5 border border-slate-100">
             <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-4">
               Información general
             </h2>
             <div className="space-y-4 text-sm">
               <div>
-                <span className="text-slate-400 font-medium text-xs block mb-0.5">
+                <span className="text-slate-400 font-medium text-[11px] block mb-0.5">
                   Categoría
                 </span>
-                <p className="font-semibold text-slate-900 capitalize">{place.type}</p>
+                <p className="font-semibold text-slate-900 capitalize italic">{place.type}</p>
               </div>
               {place.states && (
                 <div>
-                  <span className="text-slate-400 font-medium text-xs block mb-0.5">
+                  <span className="text-slate-400 font-medium text-[11px] block mb-0.5">
                     Ubicación
                   </span>
                   <p className="font-semibold text-slate-900">{place.states.name}</p>
                 </div>
               )}
               <div>
-                <span className="text-slate-400 font-medium text-xs block mb-0.5">
+                <span className="text-slate-400 font-medium text-[11px] block mb-0.5">
                   Dirección
                 </span>
-                <p className="font-medium text-slate-600 leading-relaxed text-xs">{place.address}</p>
+                <p className="font-medium text-slate-500 leading-relaxed text-[11px]">{place.address}</p>
               </div>
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-2">
-                <div className="bg-amber-50 text-amber-600 border border-amber-100 px-1.5 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+              <div className="flex items-center gap-2 pt-3 border-t border-slate-50 mt-2">
+                <div className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
                   <span>★</span> {place.rating}
                 </div>
-                <span className="text-slate-400 font-medium text-[11px]">Rating promedio</span>
+                <span className="text-slate-400 font-medium text-[10px]">Rating promedio</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+          <div className="bg-white rounded-xl p-5 border border-slate-100">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
                 Reseñas recientes
               </h2>
-              <a href="/admin/comments" className="text-[11px] font-bold text-slate-600 hover:text-slate-900 transition-colors">
+              <a href="/admin/comments" className="text-[10px] font-bold text-slate-400 hover:text-slate-900 transition-colors">
                 Ver todas
               </a>
             </div>
             <div className="space-y-4">
               {reviews && reviews.length > 0 ? (
                 reviews.slice(0, 3).map((rev) => (
-                  <div key={rev.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                    <p className="text-xs text-slate-600 mb-2 leading-relaxed italic">
+                  <div key={rev.id} className="pb-4 last:pb-0 last:border-0 border-b border-slate-50">
+                    <p className="text-[11px] text-slate-600 mb-2 leading-relaxed italic">
                       "{rev.comment}"
                     </p>
                     <div className="flex items-center justify-between text-[10px]">
-                      <span className="font-medium text-slate-400">
+                      <span className="font-medium text-slate-300">
                         {new Date(rev.created_at).toLocaleDateString()}
                       </span>
-                      <div className="flex text-amber-400">
+                      <div className="flex text-amber-300">
                         {"★".repeat(rev.rate)}
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-slate-400 text-xs italic py-2">Sin reseñas aún.</p>
+                <p className="text-slate-300 text-[11px] py-1">Sin reseñas aún.</p>
               )}
             </div>
           </div>

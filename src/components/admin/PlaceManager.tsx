@@ -216,65 +216,79 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
           <button
             onClick={() => openModal()}
-            className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+            className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-slate-800 flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             <Plus size={16} />
             Crear nuevo
           </button>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-3 bg-slate-50 p-1.5 rounded-xl">
-          <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-              <Search size={16} />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar por nombre..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border-none pl-10 pr-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm placeholder:text-slate-400 shadow-sm"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <div className="relative w-full md:w-40">
+        {restaurants.length > 10 && (
+          <div className="flex flex-col md:flex-row gap-3 bg-slate-50 p-1.5 rounded-xl">
+            <div className="relative flex-1">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-                <Filter size={14} />
+                <Search size={16} />
               </div>
-              <select
-                value={sortBy}
-                onChange={(e: any) => setSortBy(e.target.value)}
-                className="w-full bg-white border-none pl-9 pr-8 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm appearance-none cursor-pointer font-medium shadow-sm"
-              >
-                <option value="newest">Recientes</option>
-                <option value="oldest">Antiguos</option>
-                <option value="name">Nombre</option>
-              </select>
+              <input
+                type="text"
+                placeholder="Buscar por nombre..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white border-none pl-10 pr-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm placeholder:text-slate-400 shadow-sm"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <div className="relative w-full md:w-40">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                  <Filter size={14} />
+                </div>
+                <select
+                  value={sortBy}
+                  onChange={(e: any) => setSortBy(e.target.value)}
+                  className="w-full bg-white border-none pl-9 pr-8 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm appearance-none cursor-pointer font-medium shadow-sm"
+                >
+                  <option value="newest">Recientes</option>
+                  <option value="oldest">Antiguos</option>
+                  <option value="name">Nombre</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRestaurants.map((r) => (
           <div
             key={r.id}
-            className="group bg-white rounded-xl overflow-hidden border border-slate-100 hover:border-slate-200 transition-all duration-200"
+            className="bg-white rounded-xl overflow-hidden border border-slate-100"
           >
             <div className="relative h-40 overflow-hidden bg-slate-50">
               <img
                 key={r.image}
                 src={r.image || '/placeholder.svg'}
                 alt={r.name}
-                className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0 transition-all duration-300"
+                className="w-full h-full object-cover"
               />
 
               {r.states && (
-                <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/80 backdrop-blur rounded text-[10px] font-bold text-slate-600 uppercase tracking-tight shadow-sm">
+                <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur rounded text-[10px] font-bold text-slate-600 uppercase tracking-tight shadow-sm">
                   {r.states.name}
                 </div>
               )}
+
+              <div className="absolute bottom-2 right-2">
+                <a
+                  href={r.type === 'motel' && r.states?.slug
+                    ? `/moteles/estados/${r.states.slug}/${r.short_name}`
+                    : `/${(r.type === 'cafe' || r.type === 'restaurant') ? 'menus' : (formater[r.type as keyof typeof formater] || r.type)}/${r.short_name}`}
+                  target='_blank'
+                  className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-400 shadow-sm"
+                >
+                  <FaEye size={14} />
+                </a>
+              </div>
             </div>
 
             <div className="p-4">
@@ -287,21 +301,18 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => openModal(r)}
+                  className="bg-slate-50 text-slate-600 text-center py-1.5 rounded-lg text-xs font-semibold"
+                >
+                  Info básica
+                </button>
                 <a
                   href={`/admin/place/${r.id}`}
-                  className="flex-1 bg-slate-900 text-white text-center py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-800 transition-colors shadow-sm"
+                  className="bg-slate-900 text-white text-center py-1.5 rounded-lg text-xs font-semibold shadow-sm"
                 >
                   Gestionar
-                </a>
-                <a
-                  href={r.type === 'motel' && r.states?.slug
-                    ? `/moteles/estados/${r.states.slug}/${r.short_name}`
-                    : `/${(r.type === 'cafe' || r.type === 'restaurant') ? 'menus' : (formater[r.type as keyof typeof formater] || r.type)}/${r.short_name}`}
-                  target='_blank'
-                  className="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 border border-transparent rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-all"
-                >
-                  <FaEye size={14} />
                 </a>
               </div>
             </div>
