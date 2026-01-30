@@ -3,6 +3,7 @@ export const prerender = false;
 
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../../components/Gallery.astro";
+import Carousel from "../../../../components/Carousel";
 import WhatsappButton from "../../../../components/WhatsappButton";
 import CopyClabe from "../../../../components/CopyClabe";
 import { supabase } from "../../../../lib/supabase";
@@ -15,16 +16,6 @@ const { data: place } = await supabase
 	.single();
 
 const { blocks = [], view_settings = {} } = place.content || {};
-
-const socialMedia = {
-	instagram: { name: "antojitos_tauro", url: "#" },
-	facebook: { name: "Antojitos Tauro", url: "#" },
-};
-
-const contactInfo = {
-	whatsapp: "8180000000",
-	clabes: [],
-};
 ---
 
 <RestaurantLayout
@@ -37,11 +28,11 @@ const contactInfo = {
 		<div class="max-w-2xl mx-auto px-6 py-20">
 			{/* Header con Aire de Revista */}
 			<header class="mb-24 flex flex-col items-center">
-				<div class="relative mb-8">
+				<div>
 					<img
 						src={place.image}
 						alt={place.name}
-						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
+						class="w-full max-w-[300px] h-auto transition-all duration-700 object-cover"
 					/>
 				</div>
 				<h1 class="text-5xl font-light tracking-tighter serif italic mb-2">
@@ -122,6 +113,14 @@ const contactInfo = {
 									images={block.data.images || []}
 									buttonClasses="inline-block font-oswald bg-red-900 text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-red-900 after:skew-x-[20deg] after:-z-10"
 								/>
+							);
+						}
+
+						if (block.type === "carrusel") {
+							return (
+								<div class="py-12">
+									<Carousel items={block.data.items || []} client:load />
+								</div>
 							);
 						}
 					})

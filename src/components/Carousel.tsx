@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface CarouselItem {
   src: string;
@@ -10,65 +10,160 @@ interface CarouselItem {
 interface CarouselProps {
   items: CarouselItem[];
   className?: string;
+  autoPlay?: boolean;
+  interval?: number;
 }
 
-export default function Carousel({ items, className = "" }: CarouselProps) {
+export default function Carousel({ items, className = "", autoPlay = true, interval = 5000 }: CarouselProps) {
+  // Para el scroll infinito clonamos el primero y el último
+  const extendedItems = items.length > 1 ? [items[items.length - 1], ...items, items[0]] : items;
+
+  const [activeIndex, setActiveIndex] = useState(0); // Índice del item real (0 a items.length - 1)
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isJumping = useRef(false);
+  const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
+
   if (!items || items.length === 0) return null;
 
+  const getRealIndex = (scrollLeft: number, clientWidth: number) => {
+    const rawIndex = Math.round(scrollLeft / clientWidth);
+    if (items.length <= 1) return 0;
+
+    // Ajustamos el índice real basado en los clones
+    if (rawIndex === 0) return items.length - 1;
+    if (rawIndex === items.length + 1) return 0;
+    return rawIndex - 1;
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || items.length <= 1) return;
+
+    // Empezar en el primer elemento real (índice 1 del extended)
+    el.scrollLeft = el.clientWidth;
+
+    const handleScroll = () => {
+      if (isJumping.current) return;
+
+      const { scrollLeft, clientWidth } = el;
+      if (clientWidth === 0) return;
+
+      const rawIndex = Math.round(scrollLeft / clientWidth);
+
+      // Actualizar el puntito indicador
+      setActiveIndex(getRealIndex(scrollLeft, clientWidth));
+
+      // Lógica de salto infinito "silencioso"
+      if (scrollLeft <= 0) {
+        // Estamos en el clon del último, saltar al último real
+        isJumping.current = true;
+        el.style.scrollBehavior = 'auto';
+        el.scrollLeft = items.length * clientWidth;
+        setTimeout(() => {
+          el.style.scrollBehavior = 'smooth';
+          isJumping.current = false;
+        }, 50);
+      } else if (scrollLeft >= (items.length + 1) * clientWidth) {
+        // Estamos en el clon del primero, saltar al primero real
+        isJumping.current = true;
+        el.style.scrollBehavior = 'auto';
+        el.scrollLeft = clientWidth;
+        setTimeout(() => {
+          el.style.scrollBehavior = 'smooth';
+          isJumping.current = false;
+        }, 50);
+      }
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [items.length]);
+
+  // Auto-play logic
+  useEffect(() => {
+    if (!autoPlay || items.length <= 1) return;
+
+    const startAutoPlay = () => {
+      autoPlayTimer.current = setInterval(() => {
+        if (scrollRef.current) {
+          const { scrollLeft, clientWidth } = scrollRef.current;
+          scrollRef.current.scrollTo({
+            left: scrollLeft + clientWidth,
+            behavior: 'smooth'
+          });
+        }
+      }, interval);
+    };
+
+    startAutoPlay();
+    return () => {
+      if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
+    };
+  }, [autoPlay, interval, items.length]);
+
+  const scrollTo = (index: number) => {
+    if (scrollRef.current) {
+      // +1 porque el índice 0 es el clon del último
+      scrollRef.current.scrollTo({
+        left: (index + 1) * scrollRef.current.clientWidth,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <div className={`relative group/carousel w-full overflow-hidden rounded-none bg-stone-100 ${className}`}>
+    <div className={`w-full relative group ${className}`}>
+      {/* Contenedor con scroll táctil habilitado */}
       <div
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        ref={scrollRef}
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide touch-pan-x"
+        style={{
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth'
+        }}
       >
-        {items.map((item, index) => (
+        {extendedItems.map((item, index) => (
           <div
-            key={index}
-            className="flex-none w-full snap-start relative"
+            key={`${index}-${item.src}`}
+            className="flex-none w-full snap-center"
           >
             {item.link ? (
               <a href={item.link} className="block w-full">
                 <img
                   src={item.src}
-                  alt={item.alt || item.caption || `Promoción ${index + 1}`}
-                  className="w-full h-auto object-cover bg-stone-900"
+                  alt={item.alt || item.caption || `Slide ${index}`}
+                  className="w-full h-auto object-cover pointer-events-none"
+                  loading={index === 1 ? "eager" : "lazy"}
                 />
               </a>
             ) : (
               <img
                 src={item.src}
-                alt={item.alt || item.caption || `Promoción ${index + 1}`}
-                className="w-full h-auto object-cover bg-stone-900"
+                alt={item.alt || item.caption || `Slide ${index}`}
+                className="w-full h-auto object-cover pointer-events-none"
               />
-            )}
-
-            {item.caption && (
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white">
-                <p className="text-sm md:text-lg font-bold uppercase tracking-widest drop-shadow-md">
-                  {item.caption}
-                </p>
-              </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Indicadores visuales (puntos) */}
       {items.length > 1 && (
-        <div className="absolute bottom-4 right-6 flex gap-2">
+        <div className="flex justify-center gap-2 mt-4">
           {items.map((_, index) => (
-            <div
+            <button
               key={index}
-              className="w-1.5 h-1.5 rounded-full bg-white/40 border border-white/20"
+              onClick={() => scrollTo(index)}
+              className={`w-3 h-3 rounded-full transition-all border ${activeIndex === index
+                ? 'bg-emerald-500 scale-125 border-emerald-600'
+                : 'bg-stone-300 border-stone-400'
+                }`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
       )}
-
-      {/* Instrucción de scroll para mobile */}
-      <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black/20 to-transparent flex items-center justify-center sm:hidden pointer-events-none opacity-50">
-        <span className="text-white text-xs rotate-90 whitespace-nowrap font-black tracking-widest">SCROLL →</span>
-      </div>
     </div>
   );
 }

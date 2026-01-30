@@ -3,7 +3,7 @@ import { ManualUploader } from '../ManualUploader';
 import { FaEye } from 'react-icons/fa';
 import { getStates } from '../../lib/supabase';
 import { formater } from '../../types/app';
-import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus } from 'lucide-react';
+import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus, Copy } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select as UISelect } from '../ui/Select';
@@ -71,6 +71,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     short_name: '',
     image: '',
     state_id: null as number | null,
+    content: null as any,
   });
 
   useEffect(() => {
@@ -95,15 +96,49 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         short_name: restaurant.short_name || '',
         image: restaurant.image || '',
         state_id: restaurant.state_id || null,
+        content: restaurant.content || null,
       });
       setStep(1); // Always step 1 for editing
     } else {
       setEditingId(null);
-      setFormData({ name: '', address: '', rating: 4.0, priceRange: '$$', hours: '', featured: false, type: 'restaurant', short_name: '', image: '', state_id: null });
+      setFormData({
+        name: '',
+        address: '',
+        rating: 4.0,
+        priceRange: '$$',
+        hours: '',
+        featured: false,
+        type: 'restaurant',
+        short_name: '',
+        image: '',
+        state_id: null,
+        content: null,
+      });
       setStep(1);
       setCreatedPlaceId(null);
       setMenuImages([]);
     }
+    setIsModalOpen(true);
+  };
+
+  const handleClone = (restaurant: Restaurant) => {
+    setEditingId(null);
+    setFormData({
+      name: `${restaurant.name} (Copia)`,
+      address: restaurant.address,
+      rating: restaurant.rating,
+      priceRange: restaurant.priceRange,
+      hours: restaurant.hours,
+      featured: restaurant.featured,
+      type: restaurant.type || 'restaurant',
+      short_name: `${restaurant.short_name}-copia`,
+      image: restaurant.image || '',
+      state_id: restaurant.state_id || null,
+      content: restaurant.content || null,
+    });
+    setStep(1);
+    setCreatedPlaceId(null);
+    setMenuImages([]);
     setIsModalOpen(true);
   };
 
@@ -150,8 +185,13 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         setIsModalOpen(false);
       } else {
         setRestaurants(prev => [result.data, ...prev]);
-        setCreatedPlaceId(result.data.id);
-        setStep(2); // Go to step 2 for AI menu upload
+        if (formData.content) {
+          // Si estamos clonando (ya hay contenido), vamos directo a editar el menú
+          window.location.href = `/admin/place/${result.data.id}`;
+        } else {
+          setCreatedPlaceId(result.data.id);
+          setStep(2); // Go to step 2 for AI menu upload
+        }
       }
     } catch (err) {
       console.error(err);
@@ -306,10 +346,21 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                   variant="secondary"
                   size="sm"
                   onClick={() => openModal(r)}
+                  className="px-2"
+                  title="Editar info básica"
                 >
-                  Info básica
+                  Info
                 </Button>
-                <a href={`/admin/place/${r.id}`} className="w-full">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleClone(r)}
+                  className="px-2"
+                  title="Clonar restaurante"
+                >
+                  <Copy size={14} />
+                </Button>
+                <a href={`/admin/place/${r.id}`} className="col-span-2">
                   <Button size="sm" className="w-full">
                     Editar Menú
                   </Button>
