@@ -373,7 +373,7 @@ const config = templateConfigs[template] || templateConfigs.default;
 																item.price > 0 && (
 																	<div class="flex gap-2 mt-3">
 																		<button
-																			class="cart-add-btn px-6 py-2 bg-black text-white text-[10px] font-bold uppercase tracking-widest rounded-full transition-all hover:scale-105 active:scale-95"
+																			class="cart-add-btn px-6 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm"
 																			data-item={JSON.stringify({
 																				id: item.id,
 																				name: item.name,
@@ -452,10 +452,27 @@ const config = templateConfigs[template] || templateConfigs.default;
 	</div>
 
 	<style define:vars={{ fontFamily: config.fontFamily }}>
-		@import url(`https://fonts.googleapis.com/css2?${config.fontImport}&display=swap`);
+		@import url(`https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&${config.fontImport}&display=swap`);
 
-		* {
+		body {
 			font-family: var(--fontFamily);
+		}
+
+		h1,
+		h2,
+		h3,
+		.serif {
+			font-family: var(--fontFamily);
+		}
+
+		/* Fuente más suave y legible para UI, Carrito y botones */
+		button,
+		input,
+		textarea,
+		.cart-manager-container,
+		.cart-add-btn,
+		footer p {
+			font-family: "Outfit", sans-serif !important;
 		}
 
 		.serif {

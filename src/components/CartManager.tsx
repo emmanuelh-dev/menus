@@ -245,7 +245,7 @@ export default function CartManager({
   );
 
   return (
-    <>
+    <div className="cart-manager-container">
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setShowCart(!showCart)}
@@ -456,6 +456,6 @@ export default function CartManager({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
