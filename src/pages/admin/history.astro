@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import HistoryContainer from "../../components/admin/HistoryContainer";
+---
+
+<AdminLayout title="Historial | Panel de Administrador">
+	<div class="px-8 py-10">
+		<HistoryContainer client:only="react" />
+	</div>
+</AdminLayout>

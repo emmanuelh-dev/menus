@@ -3,7 +3,7 @@ import { ManualUploader } from '../ManualUploader';
 import { FaEye } from 'react-icons/fa';
 import { getStates } from '../../lib/supabase';
 import { formater } from '../../types/app';
-import { Sparkles, CheckCircle2, Upload, ArrowRight, X } from 'lucide-react';
+import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus } from 'lucide-react';
 
 interface State {
   id: number;
@@ -203,67 +203,105 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
 
   return (
     <div className="p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div className="flex flex-wrap gap-4 w-full md:w-auto">
-        <span>({restaurants.length})</span>
+      <div className="space-y-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
+              Establecimientos
+              <span className="text-[11px] bg-slate-50 text-slate-500 px-2 py-0.5 rounded font-medium">
+                {restaurants.length}
+              </span>
+            </h1>
+          </div>
 
-          <div className="relative flex-1 min-w-[240px]">
+          <button
+            onClick={() => openModal()}
+            className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+          >
+            <Plus size={16} />
+            Crear nuevo
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-3 bg-slate-50 p-1.5 rounded-xl">
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+              <Search size={16} />
+            </div>
             <input
               type="text"
-              placeholder="Buscar establecimiento... "
+              placeholder="Buscar por nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-gray-200 px-4 py-2 rounded-xl outline-none focus:border-black transition-all text-sm"
+              className="w-full bg-white border-none pl-10 pr-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm placeholder:text-slate-400 shadow-sm"
             />
           </div>
 
-          <select
-            value={sortBy}
-            onChange={(e: any) => setSortBy(e.target.value)}
-            className="bg-white border border-gray-200 px-4 py-2 rounded-xl outline-none focus:border-black transition-all text-sm font-medium"
-          >
-            <option value="newest">Más Recientes</option>
-            <option value="oldest">Más Antiguos</option>
-            <option value="name">Nombre (A-Z)</option>
-          </select>
-       
+          <div className="flex gap-2">
+            <div className="relative w-full md:w-40">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                <Filter size={14} />
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e: any) => setSortBy(e.target.value)}
+                className="w-full bg-white border-none pl-9 pr-8 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm appearance-none cursor-pointer font-medium shadow-sm"
+              >
+                <option value="newest">Recientes</option>
+                <option value="oldest">Antiguos</option>
+                <option value="name">Nombre</option>
+              </select>
+            </div>
+          </div>
         </div>
-  
-        <button onClick={() => openModal()} className="w-full md:w-auto bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-slate-800 transition-colors">
-          + Añadir Lugar
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRestaurants.map((r) => (
-          <div key={r.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-            <img key={r.image} src={r.image || '/placeholder.svg'} alt={r.name} className="w-full h-44 object-cover" />
-            <div className="p-5">
-              <div className="flex justify-between items-start mb-1">
-                <h3 className="font-bold text-xl">{r.name}</h3>
-                {r.states && (
-                  <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full font-bold uppercase text-gray-500">
-                    {r.states.name}
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-400 text-sm mb-4">{r.address}</p>
+          <div
+            key={r.id}
+            className="group bg-white rounded-xl overflow-hidden border border-slate-100 hover:border-slate-200 transition-all duration-200"
+          >
+            <div className="relative h-40 overflow-hidden bg-slate-50">
+              <img
+                key={r.image}
+                src={r.image || '/placeholder.svg'}
+                alt={r.name}
+                className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0 transition-all duration-300"
+              />
 
-              <div className="flex gap-2">
+              {r.states && (
+                <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/80 backdrop-blur rounded text-[10px] font-bold text-slate-600 uppercase tracking-tight shadow-sm">
+                  {r.states.name}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4">
+              <div className="mb-4">
+                <h3 className="font-bold text-sm text-slate-900 line-clamp-1">
+                  {r.name}
+                </h3>
+                <p className="text-slate-400 text-[11px] line-clamp-1 mt-0.5">
+                  {r.address}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <a
+                  href={`/admin/place/${r.id}`}
+                  className="flex-1 bg-slate-900 text-white text-center py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-800 transition-colors shadow-sm"
+                >
+                  Gestionar
+                </a>
                 <a
                   href={r.type === 'motel' && r.states?.slug
                     ? `/moteles/estados/${r.states.slug}/${r.short_name}`
                     : `/${(r.type === 'cafe' || r.type === 'restaurant') ? 'menus' : (formater[r.type as keyof typeof formater] || r.type)}/${r.short_name}`}
                   target='_blank'
-                  className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm items-center justify-center"
+                  className="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 border border-transparent rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-all"
                 >
-                  <FaEye className="inline" />
-                </a>
-                <button onClick={() => openModal(r)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
-                  Editar Info
-                </button>
-                <a href={`/admin/place/${r.id}`} className="flex-1 bg-black text-white hover:text-white hover:bg-neutral-700 text-center py-2 rounded-lg font-bold text-sm">
-                  Editar Menú
+                  <FaEye size={14} />
                 </a>
               </div>
             </div>

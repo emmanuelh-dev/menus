@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import CommentsContainer from "../../components/admin/CommentsContainer";
+---
+
+<AdminLayout title="Comentarios | Panel de Administrador">
+	<div class="px-8 py-10">
+		<CommentsContainer client:only="react" />
+	</div>
+</AdminLayout>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import PlaceManager from "./PlaceManager";
-import HistoryManager from "./HistoryManager";
 
 interface DashboardData {
   user: any;
@@ -71,50 +70,87 @@ export default function DashboardContainer() {
       <PlaceManager initialRestaurants={places || []} />
 
       {places && places.length === 0 ? (
-        <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center">
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-            <span className="text-2xl">✨</span>
+        <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-10 text-center">
+          <div className="w-12 h-12 bg-white border border-slate-200 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <span className="text-xl">✨</span>
           </div>
-          <h2 className="text-2xl font-black uppercase tracking-tighter text-slate-900 mb-2">
+          <h2 className="text-lg font-bold text-slate-900 mb-1">
             Comienza creando tu primer lugar
           </h2>
-          <p className="text-slate-500 font-medium max-w-sm mx-auto mb-8">
+          <p className="text-slate-500 text-sm max-w-sm mx-auto mb-6">
             Registra tu establecimiento y sube tu menú para empezar a recibir
             pedidos por WhatsApp.
           </p>
         </div>
       ) : (
-        <div className="space-y-12">
-          {isAdmin && (
-            <div>
-              <HistoryManager initialHistory={history || []} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a
+            href="/admin/comments"
+            className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-all group"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:bg-emerald-50 transition-all">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="size-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+              </div>
+              <span className="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
+                Gestionar →
+              </span>
             </div>
-          )}
+            <h3 className="text-base font-bold text-slate-900 mb-1">
+              Reseñas y feedback
+            </h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Consulta los últimos comentarios y opiniones de tus clientes.
+            </p>
+          </a>
 
-          {recentComments && recentComments.length > 0 && (
-            <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm max-w-2xl">
-              <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                Actividad Reciente
-              </h2>
-              <ul className="space-y-4">
-                {recentComments.slice(0, 5).map((comment, idx) => (
-                  <li key={comment.id || idx} className="flex flex-col gap-1">
-                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-tight">
-                      <span className="text-emerald-600">
-                        {comment.places?.name}
-                      </span>
-                      <span className="text-slate-300">
-                        {new Date(comment.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium text-slate-700 leading-snug">
-                      "{comment.comment}"
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {isAdmin && (
+            <a
+              href="/admin/history"
+              className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-all group"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-slate-900 group-hover:bg-slate-100 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="size-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <span className="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
+                  Auditar →
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-slate-900 mb-1">
+                Historial de IA
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Control de versiones y registros de cambios generados por la
+                IA.
+              </p>
+            </a>
           )}
         </div>
       )}
