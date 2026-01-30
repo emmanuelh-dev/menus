@@ -142,6 +142,37 @@ try {
 	console.error("Error fetching motel reviews:", error);
 }
 
+// Fallback image logic
+let ogImage = image || place?.image;
+if (!ogImage && place?.content?.blocks) {
+	for (const block of place.content.blocks) {
+		if (block.type === "carrusel" && block.data.items?.[0]?.src) {
+			ogImage = block.data.items[0].src;
+			break;
+		}
+		if (block.type === "section" && block.data.items) {
+			const itemWithImage = block.data.items.find((item: any) => item.image);
+			if (itemWithImage) {
+				ogImage = itemWithImage.image;
+				break;
+			}
+		}
+		if (block.type === "gallery" && block.data.images?.[0]?.src) {
+			ogImage = block.data.images[0].src;
+			break;
+		}
+	}
+} else if (!ogImage && place?.content?.sections) {
+	// Old structure fallback
+	for (const section of place.content.sections) {
+		const itemWithImage = section.items?.find((item: any) => item.image);
+		if (itemWithImage) {
+			ogImage = itemWithImage.image;
+			break;
+		}
+	}
+}
+
 // Schema.org structured data para moteles
 const schema: any = {
 	"@context": "https://schema.org",
@@ -295,7 +326,18 @@ if (reviewStats.reviewCount > 0) {
 		<meta property="og:url" content={ogUrl || Astro.url} />
 		<meta property="og:title" content={seoTitle} />
 		<meta property="og:description" content={seoDescription} />
-		{image && <meta property="og:image" content={new URL(image, Astro.url)} />}
+		{
+			ogImage && (
+				<meta
+					property="og:image"
+					content={
+						ogImage.startsWith("http")
+							? ogImage
+							: new URL(ogImage, Astro.url).toString()
+					}
+				/>
+			)
+		}
 
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
@@ -303,8 +345,15 @@ if (reviewStats.reviewCount > 0) {
 		<meta property="twitter:title" content={seoTitle} />
 		<meta property="twitter:description" content={seoDescription} />
 		{
-			image && (
-				<meta property="twitter:image" content={new URL(image, Astro.url)} />
+			ogImage && (
+				<meta
+					property="twitter:image"
+					content={
+						ogImage.startsWith("http")
+							? ogImage
+							: new URL(ogImage, Astro.url).toString()
+					}
+				/>
 			)
 		}
 

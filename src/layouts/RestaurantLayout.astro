@@ -154,6 +154,30 @@ try {
 const seoTitle = generateSEOTitle();
 const seoDescription = generateSEODescription();
 
+// Fallback image logic
+let ogImage = image || place.image;
+if (!ogImage && place.content?.blocks) {
+	const firstBlockWithImage = place.content.blocks.find((block: any) => {
+		if (block.type === "carrusel" && block.data.items?.[0]?.src) return true;
+		if (
+			block.type === "section" &&
+			block.data.items?.some((item: any) => item.image)
+		)
+			return true;
+		if (block.type === "gallery" && block.data.images?.[0]?.src) return true;
+		return false;
+	});
+
+	if (firstBlockWithImage) {
+		if (firstBlockWithImage.type === "carrusel")
+			ogImage = firstBlockWithImage.data.items[0].src;
+		else if (firstBlockWithImage.type === "section")
+			ogImage = firstBlockWithImage.data.items.find((i: any) => i.image).image;
+		else if (firstBlockWithImage.type === "gallery")
+			ogImage = firstBlockWithImage.data.images[0].src;
+	}
+}
+
 const schema: any = {
 	"@context": "https://schema.org",
 	"@type": type,
@@ -161,8 +185,10 @@ const schema: any = {
 	description: seoDescription,
 };
 
-if (image) {
-	schema.image = new URL(image, Astro.url);
+if (ogImage) {
+	schema.image = ogImage.startsWith("http")
+		? ogImage
+		: new URL(ogImage, Astro.url).toString();
 }
 
 if (schemaEnrichment.address) {
@@ -278,17 +304,33 @@ if (schemaEnrichment.suitableForDiet) {
 		<meta property="og:url" content={ogUrl || Astro.url} />
 		<meta property="og:title" content={seoTitle} />
 		<meta property="og:description" content={seoDescription} />
-		{image && <meta property="og:image" content={new URL(image, Astro.url)} />}
-
-		{place.image && <meta property="og:image" content={place.image} />}
+		{
+			ogImage && (
+				<meta
+					property="og:image"
+					content={
+						ogImage.startsWith("http")
+							? ogImage
+							: new URL(ogImage, Astro.url).toString()
+					}
+				/>
+			)
+		}
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
 		<meta property="twitter:url" content={ogUrl || Astro.url} />
 		<meta property="twitter:title" content={seoTitle} />
 		<meta property="twitter:description" content={seoDescription} />
 		{
-			image && (
-				<meta property="twitter:image" content={new URL(image, Astro.url)} />
+			ogImage && (
+				<meta
+					property="twitter:image"
+					content={
+						ogImage.startsWith("http")
+							? ogImage
+							: new URL(ogImage, Astro.url).toString()
+					}
+				/>
 			)
 		}
 
