@@ -67,17 +67,6 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 						</div>
 					</div>
 				</div>
-
-				{
-					navItems.map((item) => (
-						<a
-							href={item.href}
-							class={`text-sm font-medium ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"}`}
-						>
-							{item.name}
-						</a>
-					))
-				}
 			</div>
 
 			<div class="flex items-center space-x-3">

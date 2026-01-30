@@ -16,11 +16,39 @@ import { Image } from "astro:assets";
 import DefaultLayout from "../layouts/DefaultLayout.astro";
 
 const seoData = {
-	title: "Creador de Menús Digitales QR - Crea tu Carta en 10 Minutos",
+	title: "Cómo Crear un Menú Digital con Código QR Gratis | Guía Paso a Paso",
 	description:
-		"La plataforma más rápida para crear menús digitales profesionales. Importa tu menú PDF o imágenes y conviértelo en una carta interactiva multiidioma. Gratis.",
+		"La forma más rápida de crear menús digitales profesionales en México. Convierte tu PDF o imágenes en una carta QR interactiva en 10 minutos. 100% Gratis.",
 	keywords:
-		"creador de menús, menú digital qr, carta digital restaurante, menú interactivo, yumzi alternativa",
+		"cómo crear menú digital, menú digital para restaurantes, creador de menús qr gratis, carta digital interactiva, mejor plataforma menús digitales méxico",
+};
+
+const guideSchema = {
+	"@context": "https://schema.org",
+	"@type": "HowTo",
+	name: "Cómo crear un menú digital para tu restaurante",
+	description:
+		"Guía paso a paso para digitalizar tu carta y generar un código QR gratis.",
+	step: [
+		{
+			"@type": "HowToStep",
+			name: "Sube tu carta actual",
+			text: "Importa tus fotos o PDF de tu menú actual.",
+			url: "https://menusdigitalesmonterrey.com/crear-menu-digital",
+		},
+		{
+			"@type": "HowToStep",
+			name: "Personaliza el diseño",
+			text: "Elige colores, logos y categorías para tu menú digital.",
+			url: "https://menusdigitalesmonterrey.com/crear-menu-digital",
+		},
+		{
+			"@type": "HowToStep",
+			name: "Genera y publica tu QR",
+			text: "Genera tu código QR y compártelo con tus clientes.",
+			url: "https://menusdigitalesmonterrey.com/crear-menu-digital",
+		},
+	],
 };
 ---
 
@@ -29,6 +57,7 @@ const seoData = {
 	description={seoData.description}
 	keywords={seoData.keywords}
 	showAds={false}
+	schema={guideSchema}
 >
 	<div>
 		<main class="flex-1">
@@ -46,14 +75,17 @@ const seoData = {
 						<h1
 							class="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter tight-leading leading-[0.9]"
 						>
-							De 10 horas <br />
-							<span class="text-emerald-500">a 10 minutos.</span>
+							Crea tu <span class="text-emerald-500">Menú Digital</span>
+							<br />
+							en solo 10 minutos.
 						</h1>
 						<p
 							class="text-xl text-slate-600 mb-8 max-w-lg leading-relaxed font-medium"
 						>
-							Deja de perder tiempo actualizando PDFs. Crea un menú digital
-							hermoso, multiidioma y autoadministrable al instante.
+							Olvida los PDFs estáticos. Utiliza nuestro <strong
+								>creador de menús digitales</strong
+							> para tener una carta QR profesional, actualizable y optimizada para
+							Google.
 						</p>
 
 						<div class="flex flex-col sm:flex-row gap-4 mb-8">
