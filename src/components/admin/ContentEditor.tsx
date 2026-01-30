@@ -180,6 +180,15 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [forceCollapse, setForceCollapse] = useState(true);
+  const [viewSettings, setViewSettings] = useState(() => {
+    const vs = initialContent?.view_settings || { layout: 'grid', show_prices: true };
+    return {
+      layout: vs.layout || 'grid',
+      show_prices: vs.show_prices ?? true,
+      template: vs.template || 'default'
+    };
+  });
+  const [showViewSettings, setShowViewSettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBlock = (id: string) => {
@@ -280,7 +289,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           content: {
             semantic_data: semanticData,
             blocks,
-            view_settings: { layout: 'grid', show_prices: true }
+            view_settings: viewSettings
           }
         })
       });
@@ -869,6 +878,90 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             )}
           </div>
 
+          <div className="mx-4 sm:mx-0">
+            <button
+              onClick={() => setShowViewSettings(!showViewSettings)}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
+            >
+              <div className="flex items-center gap-4">
+                <div className={`p-3 bg-white rounded-2xl shadow-sm text-gray-700 group transition-transform ${showViewSettings ? 'shadow-inner' : ''}`}>
+                  <PiLayout className={`w-5 h-5 transition-transform duration-300 ${showViewSettings ? 'rotate-12 text-indigo-500' : ''}`} />
+                </div>
+                <div className="text-left">
+                  <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-800 block mb-1">Diseño de Página</span>
+                  <p className="text-xs text-gray-600 font-medium">Plantilla, distribución y visualización</p>
+                </div>
+              </div>
+            </button>
+
+            {showViewSettings && (
+              <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-xl space-y-6">
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-4 block uppercase tracking-wider">Plantilla del {placeType === 'restaurant' ? 'Menú' : 'Motel'}:</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {(placeType === 'restaurant'
+                      ? [
+                        { id: 'default', name: 'Tradicional', desc: 'Limpio y elegante', icon: '📖' },
+                        { id: 'modern', name: 'Moderno', desc: 'Aire de revista', icon: '✨' },
+                        { id: 'elegant', name: 'Gourmet', desc: 'Estilo Premium', icon: '🍷' },
+                      ]
+                      : [
+                        { id: 'default', name: 'Urbano App', desc: 'Oscuro y moderno', icon: '📱' },
+                        { id: 'classic', name: 'Clásico VIP', desc: 'Dorado y elegante', icon: '🏛️' },
+                        { id: 'night', name: 'Neon Night', desc: 'Vibrante y atrevido', icon: '🌃' },
+                      ]
+                    ).map((tpl) => (
+                      <button
+                        key={tpl.id}
+                        onClick={() => setViewSettings({ ...viewSettings, template: tpl.id })}
+                        className={`p-4 rounded-xl border-2 text-left transition-all ${viewSettings.template === tpl.id
+                          ? 'border-indigo-600 bg-indigo-50/50'
+                          : 'border-gray-100 hover:border-indigo-200 bg-gray-50/30'}`}
+                      >
+                        <div className="text-2xl mb-2">{tpl.icon}</div>
+                        <div className={`font-bold text-sm ${viewSettings.template === tpl.id ? 'text-indigo-900' : 'text-gray-700'}`}>{tpl.name}</div>
+                        <div className="text-[10px] text-gray-500 uppercase font-bold tracking-tight">{tpl.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Distribución:</label>
+                    <div className="flex bg-gray-100 p-1 rounded-xl">
+                      <button
+                        onClick={() => setViewSettings({ ...viewSettings, layout: 'grid' })}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase transition-all ${viewSettings.layout === 'grid' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Cuadrícula (Grid)
+                      </button>
+                      <button
+                        onClick={() => setViewSettings({ ...viewSettings, layout: 'list' })}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase transition-all ${viewSettings.layout === 'list' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Lista
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <input
+                      type="checkbox"
+                      id="show_prices"
+                      checked={viewSettings.show_prices}
+                      onChange={(e) => setViewSettings({ ...viewSettings, show_prices: e.target.checked })}
+                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                    />
+                    <label htmlFor="show_prices" className="text-sm font-bold text-gray-700 cursor-pointer">
+                      Mostrar precios al público
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {showAIChat && (
             <div className="mx-4 sm:mx-0 p-6 bg-gray-50 rounded-2xl border-2 border-purple-200 shadow-xl overflow-hidden">
               <div className="flex justify-between items-center mb-6">
@@ -1181,7 +1274,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <MotelPageRenderer
               place={{
                 ...placeData,
-                content: { blocks, semantic_data: semanticData, view_settings: { layout: 'grid', show_prices: true } }
+                content: { blocks, semantic_data: semanticData, view_settings: viewSettings }
               }}
               isPreview={true}
             />

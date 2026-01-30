@@ -116,7 +116,7 @@ export default function Carousel({ items, className = "", autoPlay = true, inter
       {/* Contenedor con scroll táctil habilitado */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide touch-pan-x"
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide touch-auto"
         style={{
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
