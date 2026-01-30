@@ -208,18 +208,19 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
   return (
     <div className="p-6">
       <div className="space-y-4 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
-              Establecimientos
-              <Badge>{restaurants.length}</Badge>
+              Todos<Badge>({restaurants.length})</Badge>
             </h1>
           </div>
 
-          <Button onClick={() => openModal()}>
-            <Plus size={16} className="mr-2" />
-            Crear nuevo
-          </Button>
+          <div>
+            <Button onClick={() => openModal()}>
+              <Plus size={16} className="mr-2" />
+              Crear
+            </Button>
+          </div>
         </div>
 
         {restaurants.length > 10 && (
@@ -310,7 +311,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                 </Button>
                 <a href={`/admin/place/${r.id}`} className="w-full">
                   <Button size="sm" className="w-full">
-                    Gestionar
+                    Editar Menú
                   </Button>
                 </a>
               </div>
