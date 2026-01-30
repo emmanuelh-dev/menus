@@ -4,6 +4,10 @@ import { FaEye } from 'react-icons/fa';
 import { getStates } from '../../lib/supabase';
 import { formater } from '../../types/app';
 import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Select as UISelect } from '../ui/Select';
+import { Badge } from '../ui/Badge';
 
 interface State {
   id: number;
@@ -208,50 +212,45 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
           <div>
             <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
               Establecimientos
-              <span className="text-[11px] bg-slate-50 text-slate-500 px-2 py-0.5 rounded font-medium">
-                {restaurants.length}
-              </span>
+              <Badge>{restaurants.length}</Badge>
             </h1>
           </div>
 
-          <button
-            onClick={() => openModal()}
-            className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-slate-800 flex items-center justify-center gap-2 active:scale-[0.98]"
-          >
-            <Plus size={16} />
+          <Button onClick={() => openModal()}>
+            <Plus size={16} className="mr-2" />
             Crear nuevo
-          </button>
+          </Button>
         </div>
 
         {restaurants.length > 10 && (
           <div className="flex flex-col md:flex-row gap-3 bg-slate-50 p-1.5 rounded-xl">
             <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400 z-10">
                 <Search size={16} />
               </div>
-              <input
-                type="text"
+              <Input
                 placeholder="Buscar por nombre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white border-none pl-10 pr-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm placeholder:text-slate-400 shadow-sm"
+                className="pl-10 shadow-none border-none"
               />
             </div>
 
             <div className="flex gap-2">
               <div className="relative w-full md:w-40">
-                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400 z-10">
                   <Filter size={14} />
                 </div>
-                <select
+                <UISelect
                   value={sortBy}
                   onChange={(e: any) => setSortBy(e.target.value)}
-                  className="w-full bg-white border-none pl-9 pr-8 py-2 rounded-lg outline-none focus:ring-2 focus:ring-slate-900/5 transition-all text-sm appearance-none cursor-pointer font-medium shadow-sm"
-                >
-                  <option value="newest">Recientes</option>
-                  <option value="oldest">Antiguos</option>
-                  <option value="name">Nombre</option>
-                </select>
+                  className="pl-9 shadow-none border-none"
+                  options={[
+                    { value: "newest", label: "Recientes" },
+                    { value: "oldest", label: "Antiguos" },
+                    { value: "name", label: "Nombre" }
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -302,17 +301,17 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => openModal(r)}
-                  className="bg-slate-50 text-slate-600 text-center py-1.5 rounded-lg text-xs font-semibold"
                 >
                   Info básica
-                </button>
-                <a
-                  href={`/admin/place/${r.id}`}
-                  className="bg-slate-900 text-white text-center py-1.5 rounded-lg text-xs font-semibold shadow-sm"
-                >
-                  Gestionar
+                </Button>
+                <a href={`/admin/place/${r.id}`} className="w-full">
+                  <Button size="sm" className="w-full">
+                    Gestionar
+                  </Button>
                 </a>
               </div>
             </div>
@@ -350,36 +349,54 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Nombre</label>
-                      <input name="name" placeholder="Ej: La Central" value={formData.name} onChange={handleInputChange} required className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Ubicación</label>
-                      <input name="address" placeholder="Ej: San Pedro GG" value={formData.address} onChange={handleInputChange} required className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-                    </div>
+                    <Input
+                      label="Nombre"
+                      name="name"
+                      placeholder="Ej: La Central"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <Input
+                      label="Ubicación"
+                      name="address"
+                      placeholder="Ej: San Pedro GG"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Estado</label>
-                      <select name="state_id" value={formData.state_id || ''} onChange={handleInputChange} required className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-black transition-all text-sm appearance-none">
-                        <option value="" disabled>Seleccionar...</option>
-                        {states.map((state) => <option key={state.id} value={state.id}>{state.name}</option>)}
-                      </select>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Categoría</label>
-                      <select name="type" value={formData.type} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-black transition-all text-sm appearance-none">
-                        <option value="restaurant">Restaurante</option>
-                        <option value="motel">Motel</option>
-                        <option value="cafe">Cafetería</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">URL (Slug)</label>
-                      <input name="short_name" placeholder="la-central" value={formData.short_name} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-black transition-all text-sm" />
-                    </div>
+                    <UISelect
+                      label="Estado"
+                      name="state_id"
+                      value={formData.state_id || ''}
+                      onChange={handleInputChange}
+                      required
+                      options={[
+                        { value: "", label: "Seleccionar..." },
+                        ...states.map(s => ({ value: s.id, label: s.name }))
+                      ]}
+                    />
+                    <UISelect
+                      label="Categoría"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleInputChange}
+                      options={[
+                        { value: "restaurant", label: "Restaurante" },
+                        { value: "motel", label: "Motel" },
+                        { value: "cafe", label: "Cafetería" }
+                      ]}
+                    />
+                    <Input
+                      label="URL (Slug)"
+                      name="short_name"
+                      placeholder="la-central"
+                      value={formData.short_name}
+                      onChange={handleInputChange}
+                    />
                   </div>
 
                   <div className="space-y-1">

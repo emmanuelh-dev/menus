@@ -1,12 +1,14 @@
 ---
+export const prerender = false;
+
 import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { isAuthenticated } from "../../../middleware/auth";
 import PlaceEditContainer from "../../../components/admin/PlaceEditContainer";
 
 const { id } = Astro.params;
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
-// Esta página es una concha (shell) estática.
-// La verificación de autenticación y carga de datos se realiza
-// en el cliente para una respuesta instantánea.
+if (!isAuth) return Astro.redirect("/admin/login");
 ---
 
 <AdminLayout title={`Editar | BysMax`}>
