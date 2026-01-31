@@ -349,6 +349,20 @@ const config = templateConfigs[template] || templateConfigs.default;
 										</summary>
 
 										<div class="space-y-12 pt-8 animate-in fade-in slide-in-from-top-2 duration-500 overflow-hidden">
+											{block.data.image && (
+												<div class="mb-8 overflow-hidden rounded-2xl shadow-lg -mx-2 sm:mx-0">
+													<Image
+														src={block.data.image}
+														alt={block.data.title}
+														width={800}
+														height={400}
+														class="w-full h-48 sm:h-64 object-cover transition-transform duration-700 hover:scale-105"
+														loading="lazy"
+														format="webp"
+													/>
+												</div>
+											)}
+
 											{block.data.description && (
 												<p class="text-stone-400 text-sm font-light italic mb-8 border-l-2 border-stone-200 px-4">
 													{block.data.description}
