@@ -90,7 +90,7 @@ const city = schemaEnrichment.address?.addressLocality || "Monterrey";
 
 function generateSEOTitle(): string {
 	const location = streetAddress ? `${streetAddress}, ${city}` : city;
-	return `Menú Digital de ${title} en ${location} | Precios y Opiniones ${currentYear}`;
+	return `${title} Menú Digital en ${location} | Precios y Opiniones ${currentYear}`;
 }
 
 function generateSEODescription(): string {
