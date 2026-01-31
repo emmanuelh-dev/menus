@@ -423,53 +423,60 @@ export default function CartManager({
     const deliveryPrice = wantsDelivery && shippingZone ? shippingZone.price : 0;
     const total = subtotal + deliveryPrice;
 
-    // Intentar separar calle y número (asumiendo formato "Calle Numero")
-    let calle = deliveryStreet;
-    let numero = 'S/N';
-    const streetParts = deliveryStreet.split(',');
-    const mainStreet = streetParts[0].trim();
-    const numMatch = mainStreet.match(/(.*\D)\s+(\d+\s*[a-zA-Z]?)$/);
-    if (numMatch) {
-      calle = numMatch[1].trim();
-      numero = numMatch[2].trim();
-    }
+    // Estructura del Mensaje
+    // Iconos en formato Unicode para evitar errores de visualización
+    const icons = {
+      order: '\uD83D\uDCC4',   // 📄
+      customer: '\uD83D\uDC64',// 👤
+      pin: '\uD83D\uDCCD',     // 📍
+      list: '\uD83D\uDCCB',    // 📋
+      money: '\uD83D\uDCB5',   // 💵
+      check: '\u2705'          // ✅
+    };
 
-    let message = `#${order.id}\n\n`;
-    message += `*Nombre:* ${customerName}\n`;
-    message += `*Celular:* +52 ${customerPhone.replace(/\D/g, '')}\n\n`;
+    let message = `${icons.order} *ORDEN #${order.id}*\n`;
+    message += `--------------------------\n`;
+    message += `${icons.customer} *CLIENTE*\n`;
+    message += `• *Nombre:* ${customerName}\n`;
+    message += `• *Teléfono:* ${customerPhone}\n\n`;
 
-    message += `---\n`;
-    message += `\u{1F4CD} *Dirección*\n`;
+    message += `${icons.pin} *ENTREGA*\n`;
     if (wantsDelivery) {
-      message += `• *Calle:* ${calle}\n`;
-      message += `• *Número:* ${numero}\n`;
+      message += `• *Tipo:* Envío a domicilio\n`;
+      message += `• *Dirección:* ${deliveryStreet}\n`;
       message += `• *Colonia:* ${deliveryColony}\n`;
     } else {
       message += `• *Tipo:* Recoger en sucursal\n`;
     }
 
-    message += `\n---\n`;
-    message += `\u{1F4B5} *Resumen*\n`;
-    message += `• *Productos:* $${subtotal}\n`;
-    message += `• *Envío:* ${wantsDelivery ? `$${deliveryPrice}` : 'N/A'}\n`;
-    message += `• *Propina:* $0\n`;
-    message += `• *Total:* $${total} en TRANSFERENCIA\n\n`;
-
-    message += `---\n`;
-    message += `\u{1F4CB} *Pedido*\n`;
-    const allNotes = cart.map(i => i.notes).filter(Boolean).join('. ');
-    message += `*Comentarios generales:* ${allNotes || 'Sin comentarios'}\n\n`;
-
+    message += `\n${icons.list} *DETALLE DEL PEDIDO*\n`;
     cart.forEach((item) => {
-      message += `*${item.quantity}x ${item.name}* ($${item.price * item.quantity})\n`;
-      if (item.notes) {
-        message += `\u{25B6} ${item.notes}\n`;
-      }
+      message += `• ${item.quantity}x ${item.name} - $${item.price * item.quantity}\n`;
+      if (item.notes) message += `  _Nota: ${item.notes}_\n`;
     });
 
-    const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
+    message += `\n--------------------------\n`;
+    message += `${icons.money} *RESUMEN DE PAGO*\n`;
+    message += `• *Subtotal:* $${subtotal}\n`;
+    if (wantsDelivery) message += `• *Envío:* $${deliveryPrice}\n`;
+    message += `*TOTAL A PAGAR: $${total}*\n`;
+    message += `--------------------------\n`;
 
+    try {
+      const order = await createOrder();
+      if (!order) return;
+
+      const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+
+      // En lugar de window.open, usamos location.href
+      // Esto evita el bloqueo de popups en móviles y escritorio
+      window.location.href = url;
+
+      clearCart();
+      setShowCheckout(false);
+    } catch (error) {
+      console.error("Error al procesar:", error);
+    }
     clearCart();
     setShowCheckout(false);
   };
