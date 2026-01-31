@@ -38,7 +38,7 @@ export const GET: APIRoute = async ({ url }) => {
 
   let query = supabase
     .from('orders')
-    .select('*, customers(*)')
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (placeId) {

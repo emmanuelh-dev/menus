@@ -370,7 +370,8 @@ export default function CartManager({
       const fullAddress = wantsDelivery ? `${deliveryStreet}, ${deliveryColony}` : '';
 
       const orderData = {
-        place_id: placeId,
+        place_id: Number(placeId),
+        customer_id: customerId,
         customer_name: customerName,
         customer_phone: customerPhone,
         delivery_address: fullAddress,

@@ -35,15 +35,22 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
     return () => clearInterval(interval);
   }, [placeId]);
 
+  const [error, setError] = useState<string | null>(null);
+
   const fetchOrders = async () => {
     try {
+      setError(null);
       const response = await fetch(`/api/orders?place_id=${placeId}`);
       if (response.ok) {
         const data = await response.json();
-        setOrders(data.orders);
+        setOrders(data.orders || []);
+      } else {
+        const errData = await response.json();
+        setError(errData.error || 'Error al cargar pedidos');
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
+      setError('Error de conexión');
     } finally {
       setLoading(false);
     }
@@ -88,7 +95,13 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
         </button>
       </div>
 
-      {orders.length === 0 ? (
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 font-medium text-sm">
+          {error}
+        </div>
+      )}
+
+      {orders.length === 0 && !error ? (
         <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
           <p className="text-slate-400">No hay pedidos registrados aún.</p>
         </div>
