@@ -3,6 +3,8 @@ import { Plus, Trash2, MapPin, Check, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 
+declare const google: any;
+
 interface ShippingZone {
   id?: number;
   place_id: number;

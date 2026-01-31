@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+declare const google: any;
+
 interface GooglePlacesAutocompleteProps {
   value: string;
   onChange: (address: string) => void;
@@ -84,7 +86,7 @@ export default function GooglePlacesAutocomplete({
       });
 
       const formatted = place.formatted_address || '';
-      
+
       onPlaceSelected({
         address: place.name || formatted,
         formatted_address: formatted,
