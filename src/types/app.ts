@@ -9,6 +9,10 @@ export interface Place {
   reviewCount: number;
   priceRange: string;
   address: string;
+  formatted_address?: string;
+  lat?: number;
+  lng?: number;
+  category?: string;
   hours: string;
   amenities: string[];
   image?: any;
@@ -90,6 +94,7 @@ export interface SemanticData {
   phone?: string;
   whatsapp?: string;
   enable_cart?: boolean;
+  enable_delivery?: boolean;
   reservation_url?: string;
   cuisine_type?: string;
   zone?: string;
@@ -97,4 +102,35 @@ export interface SemanticData {
   parking?: string;
   variety?: string;
   additional_features?: string[];
+}
+
+export interface ShippingZone {
+  id: number;
+  place_id: number;
+  name: string;
+  price: number;
+  area?: any;
+  colonies?: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Order {
+  id: number;
+  place_id: number;
+  customer_name: string;
+  customer_phone: string;
+  delivery_address: string;
+  delivery_colony?: string;
+  shipping_zone_id?: number;
+  delivery_price: number;
+  delivery_enabled: boolean;
+  items: any;
+  subtotal: number;
+  total: number;
+  notes?: string;
+  status: 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+  created_at: string;
+  updated_at: string;
 }

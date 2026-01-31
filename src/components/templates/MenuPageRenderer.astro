@@ -15,6 +15,10 @@ const { place, name } = Astro.props;
 
 let { blocks = [], view_settings = {} } = place.content || {};
 const enableCart = place.content?.semantic_data?.enable_cart || false;
+const enableDelivery =
+	place.content?.semantic_data?.enable_delivery ||
+	place.allow_delivery ||
+	false;
 const whatsappNumber = place.content?.semantic_data?.whatsapp || "";
 
 // Limpieza de bloques
@@ -289,12 +293,14 @@ const config = templateConfigs[template] || templateConfigs.default;
 
 			{/* Cart Manager - Only when enabled */}
 			{
-				enableCart && whatsappNumber && (
+				(enableCart || enableDelivery) && whatsappNumber && (
 					<CartManager
 						client:load
 						placeName={place.name}
 						placeSlug={name}
+						placeId={place.id}
 						whatsappNumber={whatsappNumber}
+						deliveryEnabled={enableDelivery}
 						blocks={blocks}
 					/>
 				)
@@ -368,7 +374,7 @@ const config = templateConfigs[template] || templateConfigs.default;
 																	{item.description}
 																</p>
 															)}
-															{enableCart &&
+															{(enableCart || enableDelivery) &&
 																whatsappNumber &&
 																item.price > 0 && (
 																	<div class="flex gap-2 mt-3">

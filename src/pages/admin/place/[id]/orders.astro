@@ -1,0 +1,35 @@
+---
+export const prerender = false;
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import OrdersManager from "../../../../components/admin/OrdersManager";
+import { supabase } from "../../../../lib/supabase";
+
+const { id } = Astro.params;
+
+const { data: place, error } = await supabase
+	.from("places")
+	.select("name")
+	.eq("id", id)
+	.single();
+
+if (error || !place) {
+	return Astro.redirect("/admin");
+}
+---
+
+<AdminLayout title={`Pedidos - ${place.name}`}>
+	<div class="max-w-6xl mx-auto px-4 py-12">
+		<div class="flex items-center gap-4 mb-8">
+			<a
+				href="/admin"
+				class="text-slate-400 hover:text-black transition-colors"
+			>
+				Establecimientos
+			</a>
+			<span class="text-slate-300">/</span>
+			<h1 class="text-xl font-bold">{place.name}</h1>
+		</div>
+
+		<OrdersManager placeId={Number(id)} client:load />
+	</div>
+</AdminLayout>

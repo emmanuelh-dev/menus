@@ -205,6 +205,21 @@ export async function getStates() {
     total_places: state.places[0]?.count || 0
   }));
 }
+
+export async function getMunicipalities(stateId: number) {
+  const { data, error } = await supabase
+    .from('municipalities')
+    .select('*')
+    .eq('state_id', stateId)
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching municipalities:', error);
+    return [];
+  }
+
+  return data;
+}
 // Función para obtener cafeterías destacadas
 export async function getCafeteriasDestacadas() {
   const { data, error } = await supabase

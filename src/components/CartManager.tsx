@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, X, Trash2, Send } from 'lucide-react';
+import { ShoppingCart, Heart, X, Trash2, Send, MapPin, User, Phone, Search, Truck } from 'lucide-react';
+import GooglePlacesAutocomplete from './admin/GooglePlacesAutocomplete';
 
 interface CartItem {
   id: string;
@@ -16,15 +17,32 @@ interface Favorite {
   slug: string;
 }
 
+interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  default_address?: string;
+  default_colony?: string;
+}
+
+interface ShippingZone {
+  id: number;
+  name: string;
+  price: number;
+}
+
 interface CartManagerProps {
   placeName: string;
   placeSlug: string;
   whatsappNumber: string;
   blocks: any[];
+  placeId: number;
+  deliveryEnabled?: boolean;
 }
 
 const getCartKey = (slug: string) => `cart_${slug}`;
 const getFavoritesKey = (slug: string) => `favorites_${slug}`;
+const getCustomerIdKey = () => 'customer_id';
 
 function getCart(slug: string): CartItem[] {
   if (typeof window === "undefined") return [];
@@ -51,21 +69,40 @@ export default function CartManager({
   placeSlug,
   whatsappNumber,
   blocks,
+  placeId,
+  deliveryEnabled = false,
 }: CartManagerProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [deliveryStreet, setDeliveryStreet] = useState('');
+  const [deliveryColony, setDeliveryColony] = useState<string>('');
+  const [deliveryMunicipality, setDeliveryMunicipality] = useState<string>('');
+  const [deliveryState, setDeliveryState] = useState<string>('');
+  const [deliveryLat, setDeliveryLat] = useState<number | undefined>();
+  const [deliveryLng, setDeliveryLng] = useState<number | undefined>();
+  const [availableColonies, setAvailableColonies] = useState<Array<{ colony: string, zoneName: string, price: number }>>([]);
+  const [shippingZone, setShippingZone] = useState<ShippingZone | null>(null);
+  const [wantsDelivery, setWantsDelivery] = useState(false);
+  const [loadingCustomer, setLoadingCustomer] = useState(true);
+  const [creatingOrder, setCreatingOrder] = useState(false);
 
   useEffect(() => {
     setCart(getCart(placeSlug));
     setFavorites(getFavorites(placeSlug));
+    loadCustomer();
+    loadAvailableColonies();
 
     const handleAddToCart = (e: any) => {
       const button = e.currentTarget;
       const itemData = JSON.parse(button.dataset.item);
       addToCart(itemData);
-      // setShowCart(true); // Removido para que el modal no se abra automáticamente
     };
 
     const handleToggleFavorite = (e: any) => {
@@ -78,6 +115,7 @@ export default function CartManager({
       if (e.key === "Escape") {
         setShowCart(false);
         setShowFavorites(false);
+        setShowCheckout(false);
       }
     };
 
@@ -101,6 +139,104 @@ export default function CartManager({
       document.removeEventListener("keydown", handleEscape);
     };
   }, [placeSlug]);
+
+  useEffect(() => {
+    if (deliveryColony && wantsDelivery) {
+      updateShippingPrice();
+    }
+  }, [deliveryColony, wantsDelivery]);
+
+  const loadCustomer = async () => {
+    const customerId = localStorage.getItem(getCustomerIdKey());
+    if (customerId) {
+      try {
+        const response = await fetch(`/api/customers/${customerId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCustomer(data.customer);
+          setCustomerName(data.customer.name);
+          setCustomerPhone(data.customer.phone);
+          if (data.customer.default_address) {
+            setDeliveryStreet(data.customer.default_address);
+            setDeliveryColony(data.customer.default_colony || '');
+            setDeliveryMunicipality(data.customer.default_municipality || '');
+            setDeliveryState(data.customer.default_state || '');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading customer:', error);
+      }
+    }
+    setLoadingCustomer(false);
+  };
+
+  const loadAvailableColonies = async () => {
+    try {
+      const response = await fetch(`/api/shipping-zones?place_id=${placeId}`);
+      const data = await response.json();
+
+      const coloniesMap: Array<{ colony: string, zoneName: string, price: number }> = [];
+
+      data.zones?.forEach((zone: any) => {
+        if (zone.is_active && zone.colonies) {
+          zone.colonies.forEach((colony: string) => {
+            coloniesMap.push({
+              colony,
+              zoneName: zone.name,
+              price: zone.price
+            });
+          });
+        }
+      });
+
+      setAvailableColonies(coloniesMap);
+    } catch (error) {
+      console.error('Error loading colonies:', error);
+    }
+  };
+
+  const updateShippingPrice = () => {
+    const selected = availableColonies.find(c => c.colony === deliveryColony);
+    if (selected) {
+      setShippingZone({
+        id: 0,
+        name: selected.zoneName,
+        price: selected.price
+      });
+    } else {
+      setShippingZone(null);
+    }
+  };
+
+  const saveOrUpdateCustomer = async () => {
+    if (!customerName || !customerPhone) return null;
+
+    try {
+      const fullAddress = wantsDelivery ? `${deliveryStreet}, ${deliveryColony}` : '';
+      const customerData = {
+        name: customerName,
+        phone: customerPhone,
+        default_address: fullAddress,
+        default_colony: deliveryColony
+      };
+
+      const response = await fetch('/api/customers', {
+        method: customer ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customer ? { ...customerData, id: customer.id } : customerData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem(getCustomerIdKey(), data.customer.id.toString());
+        setCustomer(data.customer);
+        return data.customer.id;
+      }
+    } catch (error) {
+      console.error('Error saving customer:', error);
+    }
+    return null;
+  };
 
   useEffect(() => {
     // Actualizar visual de favoritos en botones externos
@@ -200,42 +336,141 @@ export default function CartManager({
   const clearCart = () => {
     setCart([]);
     saveCart(placeSlug, []);
+    setShowCart(false);
   };
 
-  const sendToWhatsApp = () => {
-    if (cart.length === 0) return;
+  const proceedToCheckout = () => {
+    setShowCart(false);
+    setShowCheckout(true);
+  };
 
-    let cleanNumber = whatsappNumber.replace(/\D/g, "");
-
-    // Si tiene 10 dígitos (México) y no tiene el 52, agregarlo
-    if (cleanNumber.length === 10) {
-      cleanNumber = `52${cleanNumber}`;
+  const createOrder = async () => {
+    if (cart.length === 0) return false;
+    if (!customerName || !customerPhone) {
+      alert('Por favor completa tu nombre y teléfono');
+      return false;
+    }
+    if (wantsDelivery && deliveryEnabled && (!deliveryColony || !deliveryStreet)) {
+      alert('Por favor completa tu colonia y calle');
+      return false;
+    }
+    if (wantsDelivery && deliveryEnabled && !shippingZone) {
+      alert('Por favor selecciona una colonia válida para ver el costo de envío');
+      return false;
     }
 
+    setCreatingOrder(true);
+
+    try {
+      const customerId = await saveOrUpdateCustomer();
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const deliveryPrice = wantsDelivery && shippingZone ? shippingZone.price : 0;
+      const total = subtotal + deliveryPrice;
+      const fullAddress = wantsDelivery ? `${deliveryStreet}, ${deliveryColony}` : '';
+
+      const orderData = {
+        place_id: placeId,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        delivery_address: fullAddress,
+        delivery_lat: deliveryLat,
+        delivery_lng: deliveryLng,
+        delivery_colony: wantsDelivery ? deliveryColony : '',
+        shipping_zone_id: shippingZone?.id || null,
+        delivery_price: deliveryPrice,
+        items: cart, // Supabase handles jsonb
+        subtotal,
+        total,
+        notes: cart.map(i => i.notes).filter(Boolean).join('. '),
+        status: 'pending'
+      };
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.order;
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert('Error al crear el pedido. Intenta de nuevo.');
+    } finally {
+      setCreatingOrder(false);
+    }
+
+    return null;
+  };
+
+  const sendToWhatsApp = async () => {
+    const order = await createOrder();
+    if (!order) return;
+
+    let cleanNumber = whatsappNumber.replace(/\D/g, "");
+    if (cleanNumber.length === 10) cleanNumber = `52${cleanNumber}`;
+
     if (!cleanNumber || cleanNumber.length < 10) {
-      alert(
-        "Error: Número de WhatsApp inválido. Por favor contacta al restaurante.",
-      );
+      alert("Error: Número de WhatsApp inválido.");
       return;
     }
 
-    let message = `Hola! Me gustaría hacer un pedido de *${placeName}*:\n\n`;
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const deliveryPrice = wantsDelivery && shippingZone ? shippingZone.price : 0;
+    const total = subtotal + deliveryPrice;
+
+    // Intentar separar calle y número (asumiendo formato "Calle Numero")
+    let calle = deliveryStreet;
+    let numero = 'S/N';
+    const streetParts = deliveryStreet.split(',');
+    const mainStreet = streetParts[0].trim();
+    const numMatch = mainStreet.match(/(.*\D)\s+(\d+\s*[a-zA-Z]?)$/);
+    if (numMatch) {
+      calle = numMatch[1].trim();
+      numero = numMatch[2].trim();
+    }
+
+    let message = `#${order.id}\n\n`;
+    message += `*Nombre:* ${customerName}\n`;
+    message += `*Celular:* +52 ${customerPhone.replace(/\D/g, '')}\n\n`;
+
+    message += `---\n`;
+    message += `\u{1F4CD} *Dirección*\n`;
+    if (wantsDelivery) {
+      message += `• *Calle:* ${calle}\n`;
+      message += `• *Número:* ${numero}\n`;
+      message += `• *Colonia:* ${deliveryColony}\n`;
+    } else {
+      message += `• *Tipo:* Recoger en sucursal\n`;
+    }
+
+    message += `\n---\n`;
+    message += `\u{1F4B5} *Resumen*\n`;
+    message += `• *Productos:* $${subtotal}\n`;
+    message += `• *Envío:* ${wantsDelivery ? `$${deliveryPrice}` : 'N/A'}\n`;
+    message += `• *Propina:* $0\n`;
+    message += `• *Total:* $${total} en TRANSFERENCIA\n\n`;
+
+    message += `---\n`;
+    message += `\u{1F4CB} *Pedido*\n`;
+    const allNotes = cart.map(i => i.notes).filter(Boolean).join('. ');
+    message += `*Comentarios generales:* ${allNotes || 'Sin comentarios'}\n\n`;
 
     cart.forEach((item) => {
-      message += `• ${item.quantity}x ${item.name} - $${item.price * item.quantity}\n`;
+      message += `*${item.quantity}x ${item.name}* ($${item.price * item.quantity})\n`;
       if (item.notes) {
-        message += `  _Nota: ${item.notes}_\n`;
+        message += `\u{25B6} ${item.notes}\n`;
       }
     });
 
-    const total = cart.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    );
-    message += `\n*Total: $${total}*`;
-
     const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
+
+    clearCart();
+    setShowCheckout(false);
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -427,13 +662,92 @@ export default function CartManager({
                   ))}
                 </div>
               )}
+              <div className='mt-4'>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Truck size={18} className={wantsDelivery ? "text-red-500" : "text-slate-400"} />
+                    <span className="text-sm font-bold text-slate-700">Envío a Domicilio</span>
+                  </div>
+                  <button
+                    onClick={() => setWantsDelivery(!wantsDelivery)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${wantsDelivery ? 'bg-red-600' : 'bg-slate-200'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${wantsDelivery ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                </div>
+
+                {wantsDelivery && (
+                  <div className="pt-2 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                    {availableColonies.length > 0 ? (
+                      <>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase text-slate-400 ml-1">Selecciona tu Colonia</label>
+                          <select
+                            value={deliveryColony}
+                            onChange={(e) => setDeliveryColony(e.target.value)}
+                            className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                          >
+                            <option value="">Buscar colonia...</option>
+                            {availableColonies.map((item, idx) => (
+                              <option key={idx} value={item.colony}>
+                                {item.colony} - ${item.price}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase text-slate-400 ml-1">Calle y Número</label>
+                          <GooglePlacesAutocomplete
+                            value={deliveryStreet}
+                            onChange={(val) => setDeliveryStreet(val)}
+                            onPlaceSelected={(place) => {
+                              setDeliveryStreet(place.formatted_address || place.address);
+                              setDeliveryLat(place.lat);
+                              setDeliveryLng(place.lng);
+                              if (place.colony && !deliveryColony) {
+                                // Intentar matchear automáticamente
+                                const exists = availableColonies.find(c => c.colony === place.colony);
+                                if (exists) setDeliveryColony(place.colony);
+                              }
+                            }}
+                            placeholder="Ej: Av. Principal 123..."
+                            className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                        <p className="text-[11px] text-amber-700 leading-tight">
+                          ⚠️ Esta sucursal aún no tiene zonas de envío configuradas. Por favor, contacta al negocio directamente.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {cart.length > 0 && (
               <div className="p-6 border-t border-gray-100 space-y-4">
-                <div className="flex justify-between items-center text-lg font-bold">
+                {wantsDelivery && shippingZone && (
+                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-red-600 shadow-sm border border-red-50">
+                        <Truck size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-800 tracking-tight">Servicio a Domicilio</p>
+                        <p className="text-[10px] text-red-600 font-bold uppercase tracking-wide">{deliveryColony}</p>
+                      </div>
+                    </div>
+                    <span className="font-bold text-red-600">${shippingZone.price}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center text-lg font-bold pt-2">
                   <span>Total</span>
-                  <span>${totalPrice}</span>
+                  <span>${totalPrice + (wantsDelivery && shippingZone ? shippingZone.price : 0)}</span>
                 </div>
 
                 <div className="flex gap-3">
@@ -444,15 +758,106 @@ export default function CartManager({
                     Limpiar
                   </button>
                   <button
-                    onClick={sendToWhatsApp}
-                    className="flex-[2] py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2"
+                    onClick={proceedToCheckout}
+                    className="flex-[2] py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                    <Send className="w-5 h-5" />
-                    Enviar por WhatsApp
+                    Continuar
                   </button>
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showCheckout && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowCheckout(false);
+          }}
+        >
+          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold">
+                  {customer ? `Hola ${customer.name}` : 'Completa tu pedido'}
+                </h2>
+                <p className="text-sm text-gray-500">Revisa tu pedido y confirma</p>
+              </div>
+              <button onClick={() => setShowCheckout(false)}>
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <User className="w-4 h-4 inline mr-1" />
+                    Nombre
+                  </label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Tu nombre completo"
+                    className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Phone className="w-4 h-4 inline mr-1" />
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="10 dígitos"
+                    className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+
+                {/* Delivery details already handled in initial cart view if availableColonies exist */}
+              </div>
+
+              <div className="border-t pt-4 space-y-2">
+                <h3 className="font-bold text-sm text-gray-700 mb-3">Resumen del pedido</h3>
+                {cart.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span>{item.quantity}x {item.name}</span>
+                    <span className="font-medium">${item.price * item.quantity}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between text-sm border-t pt-2">
+                  <span>Subtotal</span>
+                  <span className="font-medium">${totalPrice}</span>
+                </div>
+                {wantsDelivery && shippingZone && (
+                  <div className="flex justify-between text-sm">
+                    <span>Envío</span>
+                    <span className="font-medium">${shippingZone.price}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-lg font-bold border-t pt-2">
+                  <span>Total</span>
+                  <span>${totalPrice + (wantsDelivery && shippingZone ? shippingZone.price : 0)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-100">
+              <button
+                onClick={sendToWhatsApp}
+                disabled={creatingOrder || (wantsDelivery && deliveryEnabled && !shippingZone)}
+                className="w-full py-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold flex items-center justify-center gap-2"
+              >
+                <Send className="w-5 h-5" />
+                {creatingOrder ? 'Procesando...' : 'Enviar por WhatsApp'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select as UISelect } from '../ui/Select';
 import { Badge } from '../ui/Badge';
+import GooglePlacesAutocomplete from './GooglePlacesAutocomplete';
 
 interface State {
   id: number;
@@ -30,6 +31,10 @@ interface Restaurant {
   id: number;
   name: string;
   address: string;
+  formatted_address?: string;
+  lat?: number;
+  lng?: number;
+  category?: string;
   rating: number;
   priceRange: string;
   hours: string;
@@ -39,6 +44,7 @@ interface Restaurant {
   short_name?: string;
   content?: any;
   state_id?: number | null;
+  municipality_id?: number | null;
   states?: {
     id: number;
     name: string;
@@ -59,10 +65,16 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
   const [extractedPreview, setExtractedPreview] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest');
+  const [municipalities, setMunicipalities] = useState<any[]>([]);
+  const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     address: '',
+    formatted_address: '',
+    lat: undefined as number | undefined,
+    lng: undefined as number | undefined,
+    category: '',
     rating: 4.0,
     priceRange: '$$',
     hours: '',
@@ -71,6 +83,8 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     short_name: '',
     image: '',
     state_id: null as number | null,
+    municipality_id: null as number | null,
+    allow_delivery: false,
     content: null as any,
   });
 
@@ -88,6 +102,10 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
       setFormData({
         name: restaurant.name,
         address: restaurant.address,
+        formatted_address: restaurant.formatted_address || '',
+        lat: restaurant.lat,
+        lng: restaurant.lng,
+        category: restaurant.category || '',
         rating: restaurant.rating,
         priceRange: restaurant.priceRange,
         hours: restaurant.hours,
@@ -96,6 +114,8 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         short_name: restaurant.short_name || '',
         image: restaurant.image || '',
         state_id: restaurant.state_id || null,
+        municipality_id: (restaurant as any).municipality_id || null,
+        allow_delivery: (restaurant as any).allow_delivery || false,
         content: restaurant.content || null,
       });
       setStep(1); // Always step 1 for editing
@@ -104,6 +124,10 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
       setFormData({
         name: '',
         address: '',
+        formatted_address: '',
+        lat: undefined,
+        lng: undefined,
+        category: '',
         rating: 4.0,
         priceRange: '$$',
         hours: '',
@@ -112,6 +136,8 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         short_name: '',
         image: '',
         state_id: null,
+        municipality_id: null,
+        allow_delivery: false,
         content: null,
       });
       setStep(1);
@@ -126,6 +152,10 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     setFormData({
       name: `${restaurant.name} (Copia)`,
       address: restaurant.address,
+      formatted_address: restaurant.formatted_address || '',
+      lat: restaurant.lat,
+      lng: restaurant.lng,
+      category: restaurant.category || '',
       rating: restaurant.rating,
       priceRange: restaurant.priceRange,
       hours: restaurant.hours,
@@ -134,6 +164,8 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
       short_name: `${restaurant.short_name}-copia`,
       image: restaurant.image || '',
       state_id: restaurant.state_id || null,
+      municipality_id: (restaurant as any).municipality_id || null,
+      allow_delivery: (restaurant as any).allow_delivery || false,
       content: restaurant.content || null,
     });
     setStep(1);
@@ -141,6 +173,26 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     setMenuImages([]);
     setIsModalOpen(true);
   };
+
+  useEffect(() => {
+    const fetchMunicipalities = async () => {
+      if (!formData.state_id) {
+        setMunicipalities([]);
+        return;
+      }
+      setLoadingMunicipalities(true);
+      try {
+        const response = await fetch(`/api/municipalities?state_id=${formData.state_id}`);
+        const data = await response.json();
+        setMunicipalities(data);
+      } catch (err) {
+        console.error('Error fetching municipalities:', err);
+      } finally {
+        setLoadingMunicipalities(false);
+      }
+    };
+    fetchMunicipalities();
+  }, [formData.state_id]);
 
   const handleInputChange = (e: any) => {
     const { name, value, type, checked } = e.target;
@@ -351,6 +403,26 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                 >
                   Info
                 </Button>
+                <a href={`/admin/place/${r.id}/orders`} className="">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full px-2"
+                    title="Ver pedidos"
+                  >
+                    Pedidos
+                  </Button>
+                </a>
+                <a href={`/admin/place/${r.id}/shipping`} className="">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full px-2"
+                    title="Zonas de envío"
+                  >
+                    Zonas
+                  </Button>
+                </a>
                 <Button
                   variant="secondary"
                   size="sm"
@@ -362,7 +434,7 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                 </Button>
                 <a href={`/admin/place/${r.id}`} className="col-span-2">
                   <Button size="sm" className="w-full">
-                    Editar Menú
+                    Gestionar Menú
                   </Button>
                 </a>
               </div>
@@ -409,14 +481,39 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                       onChange={handleInputChange}
                       required
                     />
-                    <Input
-                      label="Ubicación"
-                      name="address"
-                      placeholder="Ej: San Pedro GG"
-                      value={formData.address}
+                    <UISelect
+                      label="Categoría"
+                      name="type"
+                      value={formData.type}
                       onChange={handleInputChange}
-                      required
+                      options={[
+                        { value: "restaurant", label: "Restaurante" },
+                        { value: "motel", label: "Motel" },
+                        { value: "cafe", label: "Cafetería" }
+                      ]}
                     />
+                    <Input
+                      label="Tipo de Comida"
+                      name="category"
+                      placeholder="Ej: tacos, birria, pizza"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                    />
+
+                    <div className="flex items-center gap-2 pt-6">
+                      <input
+                        type="checkbox"
+                        id="allow_delivery"
+                        name="allow_delivery"
+                        checked={formData.allow_delivery}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 rounded border-slate-300 text-black focus:ring-black"
+                      />
+                      <label htmlFor="allow_delivery" className="text-sm font-medium text-slate-700">
+                        Habilitar pedidos a domicilio
+                      </label>
+                    </div>
+
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -432,16 +529,80 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                       ]}
                     />
                     <UISelect
-                      label="Categoría"
-                      name="type"
-                      value={formData.type}
+                      label="Municipio"
+                      name="municipality_id"
+                      value={formData.municipality_id || ''}
                       onChange={handleInputChange}
+                      disabled={!formData.state_id || loadingMunicipalities}
                       options={[
-                        { value: "restaurant", label: "Restaurante" },
-                        { value: "motel", label: "Motel" },
-                        { value: "cafe", label: "Cafetería" }
+                        { value: "", label: loadingMunicipalities ? "Cargando..." : "Seleccionar..." },
+                        ...municipalities.map(m => ({ value: m.id, label: m.name }))
                       ]}
                     />
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase text-slate-500 ml-1">Dirección *</label>
+                      <GooglePlacesAutocomplete
+                        value={formData.formatted_address || formData.address}
+                        onChange={(address) => setFormData(prev => ({ ...prev, address }))}
+                        onPlaceSelected={async (place) => {
+                          const normalize = (str: string) =>
+                            str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+                          const matchedState = states.find(s =>
+                            normalize(s.name) === normalize(place.state || '')
+                          );
+
+                          let matchedMunicipalityId = null;
+                          if (matchedState) {
+                            try {
+                              const response = await fetch(`/api/municipalities?state_id=${matchedState.id}`);
+                              const munis = await response.json();
+                              const matchedMuni = munis.find((m: any) =>
+                                normalize(m.name) === normalize(place.city || '')
+                              );
+                              if (matchedMuni) {
+                                matchedMunicipalityId = matchedMuni.id;
+                              } else if (place.city) {
+                                // Si no existe en la DB pero Google nos dio el nombre, lo creamos
+                                const createRes = await fetch('/api/municipalities', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    name: place.city,
+                                    state_id: matchedState.id,
+                                    slug: slugify(place.city)
+                                  })
+                                });
+                                if (createRes.ok) {
+                                  const newMuni = await createRes.json();
+                                  matchedMunicipalityId = newMuni.id;
+                                  // Recargar lista local para que aparezca en el select
+                                  setMunicipalities(prev => [...prev, newMuni].sort((a, b) => a.name.localeCompare(b.name)));
+                                }
+                              }
+                            } catch (err) {
+                              console.error('Error auto-filling/creating municipality:', err);
+                            }
+                          }
+
+                          setFormData(prev => ({
+                            ...prev,
+                            address: place.address,
+                            formatted_address: place.formatted_address,
+                            lat: place.lat,
+                            lng: place.lng,
+                            state_id: matchedState ? matchedState.id : prev.state_id,
+                            municipality_id: matchedMunicipalityId || prev.municipality_id
+                          }));
+                        }}
+                        placeholder="Buscar en Google Maps..."
+                        className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all"
+                      />
+                    </div>
+
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
                     <Input
                       label="URL (Slug)"
                       name="short_name"
@@ -477,55 +638,15 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                     <p className="text-slate-500 text-xs">Sube fotos o capturas. La IA las convertirá en tu menú digital.</p>
                   </div>
 
-                  <div className="p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
-                    <ManualUploader
-                      onFilesUploaded={(urls) => setMenuImages(prev => [...prev, ...urls])}
-                      onUploadError={handleUploadError}
-                      currentImage={menuImages[0]}
-                    />
-                    {menuImages.length > 0 && (
-                      <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-                        {menuImages.map((img, i) => (
-                          <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
-                            <img src={img} className="w-full h-full object-cover" />
-                            <button onClick={() => setMenuImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-0.5">
-                              <X size={10} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
 
                   <div className="flex flex-col gap-2">
-                    <button
-                      onClick={handleAIMenuExtraction}
-                      disabled={aiProcessing || menuImages.length === 0}
+                    <a
+                      href={`/admin/place/${createdPlaceId}`}
                       className="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold uppercase text-xs tracking-wider hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                     >
-                      {aiProcessing ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Procesando...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={16} />
-                          Analizar Menú con IA
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        if (createdPlaceId) {
-                          window.location.href = `/admin/place/${createdPlaceId}`;
-                        }
-                      }}
-                      className="w-full py-2 text-slate-400 font-bold uppercase text-[10px] tracking-tight hover:text-slate-600"
-                    >
-                      Saltar por ahora
-                    </button>
+                      <Sparkles size={16} />
+                      Comienza a editar tu menú
+                    </a>
                   </div>
                 </div>
               ) : step === 3 ? (

@@ -17,6 +17,11 @@ const { title, description = "Panel de administrador" } = Astro.props;
 			rel="manifest"
 			href={`/manifest.json?type=admin&v=4&path=${Astro.url.pathname}`}
 		/>
+		<script
+			src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=es&region=MX`}
+			async
+			defer
+		></script>
 	</head>
 	<body class="bg-gray-50 min-h-screen">
 		<AdminHeader client:load />
