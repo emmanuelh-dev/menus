@@ -47,7 +47,7 @@ export const GET: APIRoute = async ({ cookies }) => {
 			query.eq("user_id", user?.id);
 		}
 
-		const { data: places, error: placesError } = await query.order(
+		const { data: places } = await query.order(
 			"created_at",
 			{
 				ascending: false,

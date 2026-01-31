@@ -2,396 +2,461 @@
 export const prerender = false;
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { isAuthenticated } from "../../../middleware/auth";
-import { createAuthenticatedClient, createSupabaseClient } from "../../../lib/supabase";
+import {
+	createAuthenticatedClient,
+	createSupabaseClient,
+} from "../../../lib/supabase";
 
 const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 
 if (!isAuth) {
-  return Astro.redirect("/admin/login");
+	return Astro.redirect("/admin/login");
 }
 
 const accessTokenCookie = Astro.cookies.get("sb-access-token");
 const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 
 if (!accessTokenCookie || !refreshTokenCookie) {
-  return Astro.redirect("/admin/login");
+	return Astro.redirect("/admin/login");
 }
 
 const supabase = await createAuthenticatedClient(
-  accessTokenCookie.value,
-  refreshTokenCookie.value
+	accessTokenCookie.value,
+	refreshTokenCookie.value,
 );
 
-const { data: { user }, error: userError } = await supabase.auth.getUser();
+const {
+	data: { user },
+} = await supabase.auth.getUser();
 
 if (!user) {
-  return Astro.redirect("/admin/login");
+	return Astro.redirect("/admin/login");
 }
 
-let error = '';
+let error = "";
 
 // Obtener restaurantes del usuario
 const { data: restaurants } = await supabase
-  .from("places")
-  .select("id, name")
-  .eq("user_id", user.id)
-  .order("name");
+	.from("places")
+	.select("id, name")
+	.eq("user_id", user.id)
+	.order("name");
 
 // Procesar formulario
-if (Astro.request.method === "POST") {  try {
-    const formData = await Astro.request.formData();
-    
-    // Manejar subida de imagen
-    let imageUrl: string | null = null;
-    const imageFile = formData.get('image') as File;
-      if (imageFile && imageFile.size > 0) {
-      // Crear FormData para la imagen
-      const uploadFormData = new FormData();
-      uploadFormData.append('image', imageFile);
-      
-      // Construir URL absoluta para la API
-      const uploadUrl = new URL('/api/upload', Astro.url.origin);
-      
-      // Subir imagen usando la API existente
-      const uploadResponse = await fetch(uploadUrl, {
-        method: 'POST',
-        body: uploadFormData,
-        headers: {
-          'Cookie': Astro.request.headers.get('cookie') || ''
-        }
-      });
-      
-      if (uploadResponse.ok) {
-        const uploadResult = await uploadResponse.json();
-        imageUrl = uploadResult.url;
-      } else {
-        const errorData = await uploadResponse.json();
-        error = errorData.error || 'Error al subir la imagen';
-        throw new Error(error);
-      }
-    }
-    
-    // Procesar días de disponibilidad
-    const availabilityDays: number[] = [];
-    for (let i = 0; i <= 6; i++) {
-      if (formData.get(`day_${i}`)) {
-        availabilityDays.push(i);
-      }
-    }    const menuData = {
-      restaurant_id: parseInt(formData.get("restaurant_id") as string),
-      name: formData.get("name") as string,
-      menu: formData.get("menu") as string || null,
-      description: formData.get("description") as string,
-      address: formData.get("address") as string || null,
-      menu_type: formData.get("menu_type") as string,
-      image: imageUrl,
-      is_active: formData.get("is_active") === "on",
-      start_date: formData.get("start_date") as string || null,
-      end_date: formData.get("end_date") as string || null,
-      availability_start: formData.get("availability_start") as string || null,
-      availability_end: formData.get("availability_end") as string || null,
-      display_order: parseInt(formData.get("display_order") as string) || 0,
-      availability_days: availabilityDays.length > 0 ? availabilityDays : null,
-      user_id: user.id,
-    };
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await Astro.request.formData();
 
-    const { error: insertError } = await supabase
-      .from("menus")
-      .insert([menuData]);    if (insertError) {
-      error = insertError.message;
-    } else {
-      // Redirect immediately after successful creation
-      return Astro.redirect("/admin/menus?success=menu_created");
-    }
-  } catch (e) {
-    error = "Error al procesar el formulario";
-  }
+		// Manejar subida de imagen
+		let imageUrl: string | null = null;
+		const imageFile = formData.get("image") as File;
+		if (imageFile && imageFile.size > 0) {
+			// Crear FormData para la imagen
+			const uploadFormData = new FormData();
+			uploadFormData.append("image", imageFile);
+
+			// Construir URL absoluta para la API
+			const uploadUrl = new URL("/api/upload", Astro.url.origin);
+
+			// Subir imagen usando la API existente
+			const uploadResponse = await fetch(uploadUrl, {
+				method: "POST",
+				body: uploadFormData,
+				headers: {
+					Cookie: Astro.request.headers.get("cookie") || "",
+				},
+			});
+
+			if (uploadResponse.ok) {
+				const uploadResult = await uploadResponse.json();
+				imageUrl = uploadResult.url;
+			} else {
+				const errorData = await uploadResponse.json();
+				error = errorData.error || "Error al subir la imagen";
+				throw new Error(error);
+			}
+		}
+
+		// Procesar días de disponibilidad
+		const availabilityDays: number[] = [];
+		for (let i = 0; i <= 6; i++) {
+			if (formData.get(`day_${i}`)) {
+				availabilityDays.push(i);
+			}
+		}
+		const menuData = {
+			restaurant_id: parseInt(formData.get("restaurant_id") as string),
+			name: formData.get("name") as string,
+			menu: (formData.get("menu") as string) || null,
+			description: formData.get("description") as string,
+			address: (formData.get("address") as string) || null,
+			menu_type: formData.get("menu_type") as string,
+			image: imageUrl,
+			is_active: formData.get("is_active") === "on",
+			start_date: (formData.get("start_date") as string) || null,
+			end_date: (formData.get("end_date") as string) || null,
+			availability_start:
+				(formData.get("availability_start") as string) || null,
+			availability_end: (formData.get("availability_end") as string) || null,
+			display_order: parseInt(formData.get("display_order") as string) || 0,
+			availability_days: availabilityDays.length > 0 ? availabilityDays : null,
+			user_id: user.id,
+		};
+
+		const { error: insertError } = await supabase
+			.from("menus")
+			.insert([menuData]);
+		if (insertError) {
+			error = insertError.message;
+		} else {
+			// Redirect immediately after successful creation
+			return Astro.redirect("/admin/menus?success=menu_created");
+		}
+	} catch (e) {
+		error = "Error al procesar el formulario";
+	}
 }
 ---
 
 <AdminLayout title="Crear Nuevo Menú">
-  <div class="max-w-4xl mx-auto">
-    <div class="flex items-center mb-6">
-      <a href="/admin/menus" class="text-black -600 hover:text-black -800 mr-4">
-        ← Volver a Menús
-      </a>
-      <h1 class="text-2xl font-bold">Crear Nuevo Menú</h1>
-    </div>    {error && (
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-        Error: {error}
-      </div>
-    )}    <div class="bg-white shadow rounded-lg p-6">
-      <form method="POST" enctype="multipart/form-data" class="space-y-6">
-        <!-- Información básica -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label for="restaurant_id" class="block text-sm font-medium text-gray-700 mb-2">
-              Restaurante *
-            </label>
-            <select
-              id="restaurant_id"
-              name="restaurant_id"
-              required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-            >
-              <option value="">Seleccionar restaurante</option>
-              {restaurants?.map((restaurant) => (
-                <option value={restaurant.id}>{restaurant.name}</option>
-              ))}
-            </select>
-          </div>
+	<div class="max-w-4xl mx-auto">
+		<div class="flex items-center mb-6">
+			<a href="/admin/menus" class="text-black -600 hover:text-black -800 mr-4">
+				← Volver a Menús
+			</a>
+			<h1 class="text-2xl font-bold">Crear Nuevo Menú</h1>
+		</div>
+		{
+			error && (
+				<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+					Error: {error}
+				</div>
+			)
+		}
+		<div class="bg-white shadow rounded-lg p-6">
+			<form method="POST" enctype="multipart/form-data" class="space-y-6">
+				<!-- Información básica -->
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div>
+						<label
+							for="restaurant_id"
+							class="block text-sm font-medium text-gray-700 mb-2"
+						>
+							Restaurante *
+						</label>
+						<select
+							id="restaurant_id"
+							name="restaurant_id"
+							required
+							class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+						>
+							<option value="">Seleccionar restaurante</option>
+							{
+								restaurants?.map((restaurant) => (
+									<option value={restaurant.id}>{restaurant.name}</option>
+								))
+							}
+						</select>
+					</div>
 
-          <div>
-            <label for="menu_type" class="block text-sm font-medium text-gray-700 mb-2">
-              Tipo de Menú
-            </label>
-            <select
-              id="menu_type"
-              name="menu_type"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-            >
-              <option value="main">Principal</option>
-              <option value="kids">Infantil</option>
-              <option value="daily">Del Día</option>
-              <option value="drinks">Bebidas</option>
-              <option value="desserts">Postres</option>
-              <option value="breakfast">Desayuno</option>
-              <option value="lunch">Almuerzo</option>
-              <option value="dinner">Cena</option>
-              <option value="special">Especial</option>
-            </select>
-          </div>
-        </div>
+					<div>
+						<label
+							for="menu_type"
+							class="block text-sm font-medium text-gray-700 mb-2"
+						>
+							Tipo de Menú
+						</label>
+						<select
+							id="menu_type"
+							name="menu_type"
+							class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+						>
+							<option value="main">Principal</option>
+							<option value="kids">Infantil</option>
+							<option value="daily">Del Día</option>
+							<option value="drinks">Bebidas</option>
+							<option value="desserts">Postres</option>
+							<option value="breakfast">Desayuno</option>
+							<option value="lunch">Almuerzo</option>
+							<option value="dinner">Cena</option>
+							<option value="special">Especial</option>
+						</select>
+					</div>
+				</div>
 
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-            Nombre del Menú *
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            required
-            placeholder="Ej: Menú Principal, Menú Infantil, etc."
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-          />
-        </div>
-        <div>
-          <label for="menu" class="block text-sm font-medium text-gray-700 mb-2">
-            Nombre corto *
-          </label>
-          <input
-            type="text"
-            id="menu"
-            name="menu"
-            required
-            placeholder="Ej: Menú Principal, Menú Infantil, etc."
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-          />
-        </div>        <div>
-          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-            Descripción
-          </label>          <textarea
-            id="description"
-            name="description"
-            rows="3"
-            placeholder="Descripción del menú..."
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-          ></textarea>
-        </div>
+				<div>
+					<label
+						for="name"
+						class="block text-sm font-medium text-gray-700 mb-2"
+					>
+						Nombre del Menú *
+					</label>
+					<input
+						type="text"
+						id="name"
+						name="name"
+						required
+						placeholder="Ej: Menú Principal, Menú Infantil, etc."
+						class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+					/>
+				</div>
+				<div>
+					<label
+						for="menu"
+						class="block text-sm font-medium text-gray-700 mb-2"
+					>
+						Nombre corto *
+					</label>
+					<input
+						type="text"
+						id="menu"
+						name="menu"
+						required
+						placeholder="Ej: Menú Principal, Menú Infantil, etc."
+						class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+					/>
+				</div>
+				<div>
+					<label
+						for="description"
+						class="block text-sm font-medium text-gray-700 mb-2"
+					>
+						Descripción
+					</label>
+					<textarea
+						id="description"
+						name="description"
+						rows="3"
+						placeholder="Descripción del menú..."
+						class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+					></textarea>
+				</div>
 
-        <div>
-          <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-            Dirección
-          </label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            placeholder="Ej: Calle Principal 123, Colonia Centro"
-            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-          />
-        </div>        <div>
-          <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-            Imagen del Menú
-          </label>
-          
-          <div id="imagePreview" class="hidden mb-4">
-            <img 
-              id="previewImg" 
-              alt="Vista previa" 
-              class="w-32 h-32 object-cover rounded-lg shadow-sm"
-            />
-            <p class="text-sm text-gray-500 mt-1">Vista previa</p>
-          </div>
-          
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
-            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
-          />
-          <p class="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
-        </div>
+				<div>
+					<label
+						for="address"
+						class="block text-sm font-medium text-gray-700 mb-2"
+					>
+						Dirección
+					</label>
+					<input
+						type="text"
+						id="address"
+						name="address"
+						placeholder="Ej: Calle Principal 123, Colonia Centro"
+						class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+					/>
+				</div>
+				<div>
+					<label
+						for="image"
+						class="block text-sm font-medium text-gray-700 mb-2"
+					>
+						Imagen del Menú
+					</label>
 
-        <!-- Configuración de disponibilidad -->
-        <div class="border-t pt-6">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Configuración de Disponibilidad</h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
-                Fecha de Inicio
-              </label>
-              <input
-                type="date"
-                id="start_date"
-                name="start_date"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-              />
-            </div>
+					<div id="imagePreview" class="hidden mb-4">
+						<img
+							id="previewImg"
+							alt="Vista previa"
+							class="w-32 h-32 object-cover rounded-lg shadow-sm"
+						/>
+						<p class="text-sm text-gray-500 mt-1">Vista previa</p>
+					</div>
 
-            <div>
-              <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
-                Fecha de Fin
-              </label>
-              <input
-                type="date"
-                id="end_date"
-                name="end_date"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-              />
-            </div>
-          </div>
+					<input
+						type="file"
+						id="image"
+						name="image"
+						accept="image/*"
+						class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black -50 file:text-black -700 hover:file:bg-black -100"
+					/>
+					<p class="mt-1 text-sm text-gray-500">PNG, JPG o WEBP (máx. 2MB)</p>
+				</div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <div>
-              <label for="availability_start" class="block text-sm font-medium text-gray-700 mb-2">
-                Hora de Inicio
-              </label>
-              <input
-                type="time"
-                id="availability_start"
-                name="availability_start"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-              />
-            </div>
+				<!-- Configuración de disponibilidad -->
+				<div class="border-t pt-6">
+					<h3 class="text-lg font-medium text-gray-900 mb-4">
+						Configuración de Disponibilidad
+					</h3>
 
-            <div>
-              <label for="availability_end" class="block text-sm font-medium text-gray-700 mb-2">
-                Hora de Fin
-              </label>
-              <input
-                type="time"
-                id="availability_end"
-                name="availability_end"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-              />
-            </div>
-          </div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<label
+								for="start_date"
+								class="block text-sm font-medium text-gray-700 mb-2"
+							>
+								Fecha de Inicio
+							</label>
+							<input
+								type="date"
+								id="start_date"
+								name="start_date"
+								class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+							/>
+						</div>
 
-          <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Días de Disponibilidad
-            </label>
-            <div class="grid grid-cols-4 md:grid-cols-7 gap-2">
-              {[
-                { value: 0, label: 'Dom' },
-                { value: 1, label: 'Lun' },
-                { value: 2, label: 'Mar' },
-                { value: 3, label: 'Mié' },
-                { value: 4, label: 'Jue' },
-                { value: 5, label: 'Vie' },
-                { value: 6, label: 'Sáb' }
-              ].map((day) => (
-                <label class="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name={`day_${day.value}`}
-                    value={day.value}
-                    class="rounded border-gray-300 focus:ring-black -500"
-                  />
-                  <span class="text-sm text-gray-700">{day.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
+						<div>
+							<label
+								for="end_date"
+								class="block text-sm font-medium text-gray-700 mb-2"
+							>
+								Fecha de Fin
+							</label>
+							<input
+								type="date"
+								id="end_date"
+								name="end_date"
+								class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+							/>
+						</div>
+					</div>
 
-        <!-- Configuración adicional -->
-        <div class="border-t pt-6">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Configuración Adicional</h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">
-                Orden de Visualización
-              </label>
-              <input
-                type="number"
-                id="display_order"
-                name="display_order"
-                min="0"
-                value="0"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
-              />
-            </div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+						<div>
+							<label
+								for="availability_start"
+								class="block text-sm font-medium text-gray-700 mb-2"
+							>
+								Hora de Inicio
+							</label>
+							<input
+								type="time"
+								id="availability_start"
+								name="availability_start"
+								class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+							/>
+						</div>
 
-            <div class="flex items-center space-x-2 pt-8">
-              <input
-                type="checkbox"
-                id="is_active"
-                name="is_active"
-                checked
-                class="rounded border-gray-300 focus:ring-black -500"
-              />
-              <label for="is_active" class="text-sm font-medium text-gray-700">
-                Menú activo
-              </label>
-            </div>
-          </div>
-        </div>
+						<div>
+							<label
+								for="availability_end"
+								class="block text-sm font-medium text-gray-700 mb-2"
+							>
+								Hora de Fin
+							</label>
+							<input
+								type="time"
+								id="availability_end"
+								name="availability_end"
+								class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+							/>
+						</div>
+					</div>
 
-        <div class="flex justify-end space-x-4 pt-6">
-          <a
-            href="/admin/menus"
-            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Cancelar
-          </a>
-          <button
-            type="submit"
-            class="px-4 py-2 bg-black -600 text-white rounded-md text-sm font-medium hover:bg-black -700"
-          >
-            Crear Menú
-          </button>
-        </div>      </form>
-    </div>
-  </div>
-  <script>
-    // Image preview functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const imageInput = document.getElementById('image') as HTMLInputElement;
-      const imagePreview = document.getElementById('imagePreview') as HTMLElement;
-      const previewImg = document.getElementById('previewImg') as HTMLImageElement;
+					<div class="mt-4">
+						<label class="block text-sm font-medium text-gray-700 mb-2">
+							Días de Disponibilidad
+						</label>
+						<div class="grid grid-cols-4 md:grid-cols-7 gap-2">
+							{
+								[
+									{ value: 0, label: "Dom" },
+									{ value: 1, label: "Lun" },
+									{ value: 2, label: "Mar" },
+									{ value: 3, label: "Mié" },
+									{ value: 4, label: "Jue" },
+									{ value: 5, label: "Vie" },
+									{ value: 6, label: "Sáb" },
+								].map((day) => (
+									<label class="flex items-center space-x-2">
+										<input
+											type="checkbox"
+											name={`day_${day.value}`}
+											value={day.value}
+											class="rounded border-gray-300 focus:ring-black -500"
+										/>
+										<span class="text-sm text-gray-700">{day.label}</span>
+									</label>
+								))
+							}
+						</div>
+					</div>
+				</div>
 
-      imageInput?.addEventListener('change', function(e) {
-        const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            if (e.target?.result && previewImg) {
-              previewImg.src = e.target.result as string;
-              imagePreview?.classList.remove('hidden');
-            }
-          };
-          reader.readAsDataURL(file);
-        } else {
-          imagePreview?.classList.add('hidden');
-        }
-      });
-    });
-  </script>
+				<!-- Configuración adicional -->
+				<div class="border-t pt-6">
+					<h3 class="text-lg font-medium text-gray-900 mb-4">
+						Configuración Adicional
+					</h3>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<label
+								for="display_order"
+								class="block text-sm font-medium text-gray-700 mb-2"
+							>
+								Orden de Visualización
+							</label>
+							<input
+								type="number"
+								id="display_order"
+								name="display_order"
+								min="0"
+								value="0"
+								class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black -500"
+							/>
+						</div>
+
+						<div class="flex items-center space-x-2 pt-8">
+							<input
+								type="checkbox"
+								id="is_active"
+								name="is_active"
+								checked
+								class="rounded border-gray-300 focus:ring-black -500"
+							/>
+							<label for="is_active" class="text-sm font-medium text-gray-700">
+								Menú activo
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex justify-end space-x-4 pt-6">
+					<a
+						href="/admin/menus"
+						class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+					>
+						Cancelar
+					</a>
+					<button
+						type="submit"
+						class="px-4 py-2 bg-black -600 text-white rounded-md text-sm font-medium hover:bg-black -700"
+					>
+						Crear Menú
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script>
+		// Image preview functionality
+		document.addEventListener("DOMContentLoaded", function () {
+			const imageInput = document.getElementById("image") as HTMLInputElement;
+			const imagePreview = document.getElementById(
+				"imagePreview",
+			) as HTMLElement;
+			const previewImg = document.getElementById(
+				"previewImg",
+			) as HTMLImageElement;
+
+			imageInput?.addEventListener("change", function (e) {
+				const target = e.target as HTMLInputElement;
+				const file = target.files?.[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.onload = function (e) {
+						if (e.target?.result && previewImg) {
+							previewImg.src = e.target.result as string;
+							imagePreview?.classList.remove("hidden");
+						}
+					};
+					reader.readAsDataURL(file);
+				} else {
+					imagePreview?.classList.add("hidden");
+				}
+			});
+		});
+	</script>
 </AdminLayout>

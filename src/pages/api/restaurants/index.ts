@@ -19,9 +19,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     
     // Obtener usuario autenticado
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    if (userError || !user) {
+    if (!user) {
       return new Response(
         JSON.stringify({ error: 'No autorizado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }

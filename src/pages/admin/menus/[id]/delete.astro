@@ -45,7 +45,7 @@ let itemCount = 0;
 
 try {
     // Obtener datos del menú
-    const { data: menuData, error: menuError } = await supabase
+    const { data: menuData } = await supabase
         .from('menus')
         .select(`
             *,

@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return new Response(JSON.stringify({ error: "No autorizado" }), {
