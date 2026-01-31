@@ -95,33 +95,33 @@ const enableCart = true;
 			<CopyClabe client:load clabes={contactInfo.clabes} />
 
 			{
-				enableCart && (
+				enableCart && place && (
 					<CartManager
 						client:load
-						placeName={place.name}
+						placeId={place.id as number}
+						placeName={place.name as string}
 						placeSlug="elpapirey"
-						placeId={place.id}
-						whatsappNumber={contactInfo.whatsapp}
-						deliveryEnabled={place.allow_delivery}
-						blocks={blocks}
+						whatsappNumber={contactInfo.whatsapp as string}
+						deliveryEnabled={(place.allow_delivery as boolean) || false}
+						blocks={blocks as any[]}
 					/>
 				)
 			}
 
 			<div class="space-y-6 mb-8">
 				{
-					blocks.map((block: any, blockIdx: number) => {
-						if (block.type === "section") {
+					blocks.map((menuBlock: any, menuBlockIdx: number) => {
+						if (menuBlock.type === "section") {
 							return (
 								<div class="mt-6">
 									<h2
-										class={`${categoryColors[blockIdx % categoryColors.length]} text-xl font-bold tracking-wide mb-4`}
+										class={`${categoryColors[menuBlockIdx % categoryColors.length]} text-xl font-bold tracking-wide mb-4`}
 									>
-										{block.data.title.toUpperCase()}
+										{menuBlock.data.title.toUpperCase()}
 									</h2>
 
 									<div class="space-y-4">
-										{block.data.items?.map((item: any) => (
+										{menuBlock.data.items?.map((item: any) => (
 											<div class="px-4 flex justify-between items-start">
 												<div class="flex-1">
 													<span class="text-white text-lg font-medium">
@@ -143,7 +143,7 @@ const enableCart = true;
 														<button
 															class="cart-add-btn bg-red-600 hover:bg-red-800 text-white text-[10px] px-2 py-1 rounded font-sans uppercase font-black transition-all"
 															data-item={JSON.stringify({
-																id: item.id || `${blockIdx}-${item.name}`,
+																id: item.id || `${menuBlockIdx}-${item.name}`,
 																name: item.name,
 																price: item.price,
 																image: item.image,
@@ -160,10 +160,10 @@ const enableCart = true;
 							);
 						}
 
-						if (block.type === "gallery") {
+						if (menuBlock.type === "gallery") {
 							return (
 								<Gallery
-									images={block.data.images || []}
+									images={menuBlock.data.images || []}
 									buttonClasses="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10"
 								/>
 							);
