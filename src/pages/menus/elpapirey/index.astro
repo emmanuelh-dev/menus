@@ -100,7 +100,9 @@ const enableCart = true;
 						client:load
 						placeName={place.name}
 						placeSlug="elpapirey"
+						placeId={place.id}
 						whatsappNumber={contactInfo.whatsapp}
+						deliveryEnabled={place.allow_delivery}
 						blocks={blocks}
 					/>
 				)
@@ -108,7 +110,7 @@ const enableCart = true;
 
 			<div class="space-y-6 mb-8">
 				{
-					blocks.map((block, blockIdx) => {
+					blocks.map((block: any, blockIdx: number) => {
 						if (block.type === "section") {
 							return (
 								<div class="mt-6">
@@ -119,7 +121,7 @@ const enableCart = true;
 									</h2>
 
 									<div class="space-y-4">
-										{block.data.items?.map((item) => (
+										{block.data.items?.map((item: any) => (
 											<div class="px-4 flex justify-between items-start">
 												<div class="flex-1">
 													<span class="text-white text-lg font-medium">
