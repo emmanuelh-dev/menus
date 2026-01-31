@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 
+export const prerender = false;
+
 export const GET: APIRoute = async ({ url }) => {
   const placeId = url.searchParams.get('place_id');
   const lat = url.searchParams.get('lat');

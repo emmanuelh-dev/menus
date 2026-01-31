@@ -345,18 +345,18 @@ export default function CartManager({
   };
 
   const createOrder = async () => {
-    if (cart.length === 0) return false;
+    if (cart.length === 0) return null;
     if (!customerName || !customerPhone) {
       alert('Por favor completa tu nombre y teléfono');
-      return false;
+      return null;
     }
     if (wantsDelivery && deliveryEnabled && (!deliveryColony || !deliveryStreet)) {
       alert('Por favor completa tu colonia y calle');
-      return false;
+      return null;
     }
     if (wantsDelivery && deliveryEnabled && !shippingZone) {
       alert('Por favor selecciona una colonia válida para ver el costo de envío');
-      return false;
+      return null;
     }
 
     setCreatingOrder(true);

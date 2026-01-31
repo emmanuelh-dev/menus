@@ -108,7 +108,8 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {orders.map((order) => {
-            const StatusIcon = statusConfig[order.status].icon;
+            const config = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pending;
+            const StatusIcon = config.icon;
             return (
               <div key={order.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
                 <div className="p-6">
@@ -120,8 +121,8 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="text-lg font-bold text-slate-900">Pedido #{order.id}</h3>
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusConfig[order.status].color}`}>
-                            {statusConfig[order.status].label}
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.color}`}>
+                            {config.label}
                           </span>
                         </div>
                         <p className="text-sm text-slate-500">
