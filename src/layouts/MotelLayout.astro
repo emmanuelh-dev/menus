@@ -5,8 +5,6 @@ import ScrollTopAndComment from "../components/ScrollTopAndComment";
 import { supabase } from "../lib/supabase";
 import type { Place } from "../types/app";
 
-const path = Astro.url.pathname;
-
 function hasAmenity(amenity: string, amenities?: string[]): boolean {
 	if (!amenities) return false;
 	return amenities.some((a) => a.toLowerCase().includes(amenity.toLowerCase()));

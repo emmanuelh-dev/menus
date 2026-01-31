@@ -8,19 +8,13 @@ Astro.response.headers.set(
 
 const { name, state } = Astro.params;
 
-import RestaurantLayout from "../../../../../layouts/RestaurantLayout.astro";
-import Gallery from "../../../../../components/Gallery.astro";
-import WhatsappButton from "../../../../../components/WhatsappButton";
-import CopyClabe from "../../../../../components/CopyClabe";
 import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
 import {
-	getRestaurantByName,
 	supabase,
 	getStates,
 	getPlaceRating,
 } from "../../../../../lib/supabase";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
-import QuickFeed from "../../../../../components/QuickFeed";
 import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
 import { isAuthenticated } from "../../../../../middleware/auth";
 

@@ -16,6 +16,10 @@ const { data: place } = await supabase
 	.eq("short_name", "elpapirey")
 	.single();
 
+if (!place) {
+	return Astro.redirect("/404");
+}
+
 const { blocks = [], view_settings = {} } = place.content || {};
 
 const categoryColors = [
