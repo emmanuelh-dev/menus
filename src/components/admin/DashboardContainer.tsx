@@ -37,14 +37,7 @@ export default function DashboardContainer() {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-6 pb-20 animate-pulse">
-        <div className="h-64 bg-slate-100 rounded-3xl" />
-        <div className="h-96 bg-slate-100 rounded-3xl" />
-      </div>
-    );
-  }
+  if (loading) return null;
 
   if (error) {
     return (

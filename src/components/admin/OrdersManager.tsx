@@ -30,7 +30,6 @@ const statusConfig = {
 export default function OrdersManager({ placeId }: { placeId: number }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showWaiterMode, setShowWaiterMode] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -74,29 +73,23 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Pedidos Recientes</h2>
-          <p className="text-slate-500 text-sm">Gestiona los pedidos a domicilio de tu sucursal.</p>
+          <h2 className="text-2xl font-bold text-slate-900">Caja y Pedidos</h2>
+          <p className="text-slate-500 text-sm">Control central de comandas y pedidos a domicilio.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowWaiterMode(true)}
+          <a
+            href={`/admin/place/${placeId}/comanda`}
             className="px-4 py-2 text-sm font-bold bg-slate-900 text-white rounded-lg hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-slate-100"
           >
             <Plus size={16} />
             Nueva Comanda
-          </button>
+          </a>
           <button
             onClick={fetchOrders}
             className="px-4 py-2 text-sm font-medium bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all flex items-center gap-2"
@@ -124,20 +117,20 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
             const StatusIcon = config.icon;
             return (
               <div key={order.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-slate-100 rounded-xl">
-                        <StatusIcon className="text-slate-600" size={24} />
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="p-2 sm:p-3 bg-slate-100 rounded-xl">
+                        <StatusIcon className="text-slate-600" size={20} />
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold text-slate-900">Pedido #{order.id}</h3>
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.color}`}>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900">Pedido #{order.id}</h3>
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${config.color}`}>
                             {config.label}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-[11px] sm:text-sm text-slate-500">
                           {new Date(order.created_at).toLocaleString('es-MX', {
                             day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
                           })}
@@ -145,11 +138,11 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 ml-auto sm:ml-0">
                       <select
                         value={order.status}
                         onChange={(e) => updateStatus(order.id, e.target.value)}
-                        className="text-sm border-slate-200 rounded-lg focus:ring-black"
+                        className="text-xs sm:text-sm border-slate-200 rounded-lg focus:ring-black py-1"
                       >
                         {Object.entries(statusConfig).map(([val, config]) => (
                           <option key={val} value={val}>{config.label}</option>
@@ -158,7 +151,7 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                     <div className="space-y-4">
                       <div>
                         <label className="text-[10px] font-bold uppercase text-slate-400 flex items-center gap-1.5 mb-1.5">
@@ -224,11 +217,11 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 rounded-2xl p-4">
+                    <div className="bg-slate-50 rounded-2xl p-4 flex flex-col h-full">
                       <label className="text-[10px] font-bold uppercase text-slate-400 mb-3 block">Artículos</label>
-                      <div className="space-y-2 mb-4">
+                      <div className="space-y-2 mb-4 overflow-y-auto max-h-[220px] pr-2 custom-scrollbar flex-1">
                         {order.items.map((item, idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
+                          <div key={idx} className="flex justify-between text-sm py-1 border-b border-slate-100 last:border-0">
                             <span className="text-slate-600">
                               <span className="font-bold text-slate-900">{item.quantity}x</span> {item.name}
                             </span>
@@ -260,13 +253,6 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
         </div>
       )}
 
-      {showWaiterMode && (
-        <WaiterMode
-          placeId={placeId}
-          onClose={() => setShowWaiterMode(false)}
-          onOrderCreated={fetchOrders}
-        />
-      )}
     </div>
   );
 }

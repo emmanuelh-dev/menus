@@ -20,25 +20,31 @@ const { title, description = "Panel de administrador" } = Astro.props;
 		<script
 			src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=es&region=MX`}
 			async
-			defer
-		></script>
+			defer></script>
 	</head>
 	<body class="bg-gray-50 min-h-screen">
 		<AdminHeader client:load />
 
-		<div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+		<div
+			class="main-content-wrapper flex-1 flex flex-col min-h-screen transition-[margin] duration-300 ease-in-out"
+		>
 			<main>
 				<div class="max-w-7xl mx-auto">
 					<slot />
 				</div>
 			</main>
-
-			<!-- <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
-        <div class="px-8 text-center text-gray-500 text-xs">
-          &copy; {new Date().getFullYear()} Menús BysMax. Todos los derechos reservados.
-        </div>
-      </footer> -->
 		</div>
+
+		<style is:global>
+			.main-content-wrapper {
+				margin-left: 0;
+			}
+			@media (min-width: 1024px) {
+				html:not(.sidebar-collapsed) .main-content-wrapper {
+					margin-left: 16rem;
+				}
+			}
+		</style>
 
 		<script type="text/javascript">
 			(function (c, l, a, r, i, t, y) {

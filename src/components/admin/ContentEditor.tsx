@@ -1141,7 +1141,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           : 'bg-purple-600 text-white shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-90'
                           }`}
                       >
-                        {aiProcessing ? <PiArrowCounterClockwise className="w-5 h-5 animate-spin" /> : <PiPaperPlaneTilt className="w-5 h-5" />}
+                        {aiProcessing ? <PiArrowCounterClockwise className="w-5 h-5" /> : <PiPaperPlaneTilt className="w-5 h-5" />}
                       </button>
                     </div>
                   </div>

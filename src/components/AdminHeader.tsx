@@ -17,9 +17,23 @@ function AdminHeader() {
     setCurrentPath(window.location.pathname);
 
     const checkIfMobile = () => {
-      const isMobileWidth = window.innerWidth < 768;
+      const isMobileWidth = window.innerWidth < 1024; // Aumentamos a 1024 para incluir tablets
       setIsMobile(isMobileWidth);
-      setIsOpen(!isMobileWidth);
+
+      // Si es comanda, cerramos por defecto
+      const isComanda = window.location.pathname.includes('/comanda');
+      const shouldBeOpen = !isMobileWidth && !isComanda;
+
+      setIsOpen(shouldBeOpen);
+      updateBodyClass(shouldBeOpen);
+    };
+
+    const updateBodyClass = (open: boolean) => {
+      if (open) {
+        document.documentElement.classList.remove('sidebar-collapsed');
+      } else {
+        document.documentElement.classList.add('sidebar-collapsed');
+      }
     };
 
     const fetchUser = async () => {
@@ -67,21 +81,30 @@ function AdminHeader() {
 
   return (
     <>
-      <div className="flex-grow w-full px-8 py-6">
-        {isMobile && (
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {isOpen
-                ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              }
+      <div className="fixed top-4 left-4 z-50">
+        <button
+          onClick={() => {
+            const newState = !isOpen;
+            setIsOpen(newState);
+            if (newState) {
+              document.documentElement.classList.remove('sidebar-collapsed');
+            } else {
+              document.documentElement.classList.add('sidebar-collapsed');
+            }
+          }}
+          className="p-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 transition-all text-gray-500"
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+        >
+          {isOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
-        )}
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Sidebar */}
@@ -90,9 +113,7 @@ function AdminHeader() {
                 w-64 h-screen
                 fixed left-0 top-0 z-10 
                 transition-transform duration-300 ease-in-out 
-                ${isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0'}
-                md:translate-x-0 
-                lg:block
+                ${!isOpen ? '-translate-x-full' : 'translate-x-0'}
             `}>
         <div className="flex flex-col h-[100dvh]">
           <div className="p-6 border-b border-gray-100">

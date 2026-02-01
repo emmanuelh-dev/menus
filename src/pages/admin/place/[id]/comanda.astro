@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
-import OrdersManager from "../../../../components/admin/OrdersManager";
+import WaiterMode from "../../../../components/admin/WaiterMode";
 import { supabase } from "../../../../lib/supabase";
 
 const { id } = Astro.params;
@@ -17,19 +17,19 @@ if (error || !place) {
 }
 ---
 
-<AdminLayout title={`Caja - ${place.name}`}>
-	<div class="max-w-6xl mx-auto px-4 py-8 md:py-12">
-		<div class="flex items-center gap-4 mb-8">
+<AdminLayout title={`Nueva Comanda - ${place.name}`}>
+	<div class="h-[calc(100vh-140px)] min-h-[600px]">
+		<div class="flex items-center gap-4 mb-6 px-4 pt-4 lg:pl-16">
 			<a
-				href="/admin"
+				href={`/admin/place/${id}/orders`}
 				class="text-slate-400 hover:text-black transition-colors"
 			>
-				Establecimientos
+				Regresar a Caja
 			</a>
 			<span class="text-slate-300">/</span>
-			<h1 class="text-xl font-bold">{place.name}</h1>
+			<h1 class="text-xl font-bold">Nueva Comanda</h1>
 		</div>
 
-		<OrdersManager placeId={Number(id)} client:load />
+		<WaiterMode placeId={Number(id)} client:load isPage={true} />
 	</div>
 </AdminLayout>

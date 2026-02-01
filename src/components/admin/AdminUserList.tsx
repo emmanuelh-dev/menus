@@ -43,13 +43,7 @@ const AdminUserList = () => {
     user.whatsapp?.includes(searchTerm)
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   if (error) {
     return (

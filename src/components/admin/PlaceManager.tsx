@@ -403,14 +403,14 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                 >
                   Info
                 </Button>
-                <a href={`/admin/place/${r.id}/orders`} className="">
+                <a href={`/admin/place/${r.id}/caja`} className="">
                   <Button
                     variant="secondary"
                     size="sm"
                     className="w-full px-2"
                     title="Ver pedidos"
                   >
-                    Pedidos
+                    Caja
                   </Button>
                 </a>
                 <a href={`/admin/place/${r.id}/shipping`} className="">

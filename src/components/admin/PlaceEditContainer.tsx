@@ -36,20 +36,7 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
     fetchData();
   }, [placeId]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-8 animate-pulse p-8">
-        <div className="h-20 bg-slate-100 rounded-3xl w-1/2" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 h-[600px] bg-slate-100 rounded-3xl" />
-          <div className="space-y-6">
-            <div className="h-48 bg-slate-100 rounded-3xl" />
-            <div className="h-64 bg-slate-100 rounded-3xl" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   if (error || !data) {
     return (
