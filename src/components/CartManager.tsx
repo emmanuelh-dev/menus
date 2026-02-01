@@ -113,6 +113,17 @@ export default function CartManager({
     return match ? parseInt(match[1]) : null;
   };
 
+  // Helper to generate a key for a specific combination of prefix options
+  const getCombinationKey = (prefixOptions: { [key: string]: string }, flavor: string) => {
+    return JSON.stringify(prefixOptions) + '|||' + flavor;
+  };
+
+  // Helper to parse flavor and options from a combination key
+  const parseCombinationKey = (key: string) => {
+    const [optsJson, flavor] = key.split('|||');
+    return { options: JSON.parse(optsJson), flavor };
+  };
+
   useEffect(() => {
     setCart(getCart(placeSlug));
     setFavorites(getFavorites(placeSlug));
@@ -123,22 +134,16 @@ export default function CartManager({
       const button = e.currentTarget;
       const itemData = JSON.parse(button.dataset.item);
 
-      if (itemData.options && itemData.options.length === 1) {
-        // Multi-counter mode for single option group
-        const initialCounts: any = {};
-        itemData.options[0].values.forEach((v: string) => initialCounts[v] = 0);
-        setTempCounts(initialCounts);
-        setConfiguringItem(itemData);
-      } else if (itemData.options && itemData.options.length > 1) {
-        // Standard mode for multiple option groups
-        const initial: any = {};
-        itemData.options.forEach((opt: any) => {
-          if (opt.values && opt.values.length > 0) {
-            initial[opt.name] = opt.values[0];
-          }
+      if (itemData.options && itemData.options.length >= 1) {
+        // Multi-counter mode with prefix options
+        const initialOpts: any = {};
+        // All groups except the last one are prefix selectors
+        itemData.options.slice(0, -1).forEach((opt: any) => {
+          if (opt.values?.length > 0) initialOpts[opt.name] = opt.values[0];
         });
-        setTempOptions(initial);
-        setTempQuantity(1);
+
+        setTempOptions(initialOpts);
+        setTempCounts({}); // Reset counts for new item
         setConfiguringItem(itemData);
       } else {
         addToCart(itemData);
@@ -1017,78 +1022,86 @@ export default function CartManager({
               </div>
 
               <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar p-1">
-                {configuringItem.options?.length === 1 ? (
-                  /* MULTI-COUNTER MODE (FOR GORDITAS/TACOS/ETC) */
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-end px-1 mb-4">
-                      <div>
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-1">
-                          Personaliza tu {detectLimit(configuringItem) ? 'paquete' : 'pedido'}:
+                {configuringItem.options?.length > 0 && (
+                  <div className="space-y-6">
+                    {/* PREFIX SELECTORS (Masa, Tamaño, etc.) */}
+                    {configuringItem.options.slice(0, -1).map((opt: any) => (
+                      <div key={opt.name} className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block px-1">
+                          Selecciona {opt.name}:
                         </label>
-                        <p className="text-[9px] text-gray-400 font-medium italic">Selecciona la cantidad de cada sabor</p>
-                      </div>
-                      {detectLimit(configuringItem) && (
-                        <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + b, 0) === detectLimit(configuringItem)
-                            ? 'bg-emerald-500 border-emerald-500 text-white'
-                            : Object.values(tempCounts).reduce((a, b) => a + b, 0) > (detectLimit(configuringItem) || 0)
-                              ? 'bg-red-500 border-red-500 text-white'
-                              : 'bg-white border-gray-100 text-gray-900'
-                          }`}>
-                          <span className="text-[10px] font-black">{Object.values(tempCounts).reduce((a, b) => a + b, 0)} / {detectLimit(configuringItem)}</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          {opt.values.map((val: string) => (
+                            <button
+                              key={val}
+                              onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
+                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
+                            >
+                              {val}
+                            </button>
+                          ))}
                         </div>
-                      )}
-                    </div>
-                    <div className="space-y-3">
-                      {configuringItem.options[0].values.map((val: string) => (
-                        <div key={val} className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl border border-gray-100/50 hover:bg-white hover:shadow-sm transition-all text-gray-700">
-                          <span className="font-bold text-sm uppercase">{val}</span>
-                          <div className="flex items-center gap-4">
-                            <button
-                              onClick={() => setTempCounts(prev => ({ ...prev, [val]: Math.max(0, (prev[val] || 0) - 1) }))}
-                              className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-red-500 transition-colors border border-gray-100"
-                            >
-                              -
-                            </button>
-                            <span className={`font-black text-sm w-4 text-center ${tempCounts[val] > 0 ? 'text-gray-900' : 'text-gray-300'}`}>
-                              {tempCounts[val] || 0}
-                            </span>
-                            <button
-                              onClick={() => {
-                                const limit = detectLimit(configuringItem);
-                                const currentTotal = Object.values(tempCounts).reduce((a, b) => a + b, 0);
-                                if (!limit || currentTotal < (limit || 0)) {
-                                  setTempCounts(prev => ({ ...prev, [val]: (prev[val] || 0) + 1 }));
-                                }
-                              }}
-                              className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-emerald-500 transition-colors border border-gray-100"
-                            >
-                              +
-                            </button>
+                      </div>
+                    ))}
+
+                    {/* MAIN COUNTER GROUP (Sabor, Ingrediente, etc.) */}
+                    {configuringItem.options.slice(-1).map((opt: any) => (
+                      <div key={opt.name} className="space-y-4">
+                        <div className="flex justify-between items-end px-1 mb-4">
+                          <div>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-1">
+                              {opt.name}:
+                            </label>
+                            <p className="text-[9px] text-gray-400 font-medium italic">Especifica la cantidad de cada uno</p>
                           </div>
+                          {detectLimit(configuringItem) && (
+                            <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + b, 0) === detectLimit(configuringItem)
+                              ? 'bg-emerald-500 border-emerald-500 text-white'
+                              : Object.values(tempCounts).reduce((a, b) => a + b, 0) > (detectLimit(configuringItem) || 0)
+                                ? 'bg-red-500 border-red-500 text-white animate-shake'
+                                : 'bg-white border-gray-100 text-gray-900'
+                              }`}>
+                              <span className="text-[10px] font-black">{Object.values(tempCounts).reduce((a, b) => a + b, 0)} / {detectLimit(configuringItem)}</span>
+                            </div>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  /* STANDARD MODE (RADIO SELECTION) */
-                  configuringItem.options?.map((opt: any) => (
-                    <div key={opt.name} className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block px-1">
-                        {opt.name}:
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {opt.values.map((val: string) => (
-                          <button
-                            key={val}
-                            onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                            className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
-                          >
-                            {val}
-                          </button>
-                        ))}
+                        <div className="space-y-3">
+                          {opt.values.map((val: string) => {
+                            const comboKey = getCombinationKey(tempOptions, val);
+                            const currentCount = tempCounts[comboKey] || 0;
+                            return (
+                              <div key={val} className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl border border-gray-100/50 hover:bg-white hover:shadow-sm transition-all text-gray-700">
+                                <span className="font-bold text-sm uppercase">{val}</span>
+                                <div className="flex items-center gap-4">
+                                  <button
+                                    onClick={() => setTempCounts(prev => ({ ...prev, [comboKey]: Math.max(0, currentCount - 1) }))}
+                                    className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-red-500 transition-colors border border-gray-100"
+                                  >
+                                    -
+                                  </button>
+                                  <span className={`font-black text-sm w-4 text-center ${currentCount > 0 ? 'text-gray-900' : 'text-gray-300'}`}>
+                                    {currentCount}
+                                  </span>
+                                  <button
+                                    onClick={() => {
+                                      const limit = detectLimit(configuringItem);
+                                      const currentTotal = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                                      if (!limit || currentTotal < (limit || 0)) {
+                                        setTempCounts(prev => ({ ...prev, [comboKey]: currentCount + 1 }));
+                                      }
+                                    }}
+                                    className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-emerald-500 transition-colors border border-gray-100"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -1119,36 +1132,34 @@ export default function CartManager({
                     const limit = detectLimit(configuringItem);
                     const totalSelected = Object.values(tempCounts).reduce((a, b) => a + b, 0);
 
-                    if (configuringItem.options?.length === 1) {
-                      if (limit) {
-                        // PACKAGE MODE: Add as a single item with aggregated options
-                        const optionsSummary = Object.entries(tempCounts)
-                          .filter(([_, count]) => count > 0)
-                          .map(([val, count]) => `${count}x ${val}`)
-                          .join(', ');
+                    if (limit) {
+                      // PACKAGE MODE: Group everything into a single cart entry
+                      const combinations = Object.entries(tempCounts).filter(([_, count]) => count > 0);
+                      const detail = combinations.map(([key, count]) => {
+                        const { options, flavor } = parseCombinationKey(key);
+                        const optsString = Object.values(options).join(', ');
+                        return `${count}x ${optsString} ${flavor}`;
+                      }).join(', ');
 
-                        addToCart(configuringItem, { [configuringItem.options[0].name]: optionsSummary }, 1);
-                      } else {
-                        // INDIVIDUAL MODE: Split into separate cart entries
-                        Object.entries(tempCounts).forEach(([val, count]) => {
-                          if (count > 0) {
-                            addToCart(configuringItem, { [configuringItem.options[0].name]: val }, count);
-                          }
-                        });
-                      }
-                      setConfiguringItem(null);
+                      addToCart(configuringItem, { Surtido: detail }, 1);
                     } else {
-                      addToCart(configuringItem, tempOptions, tempQuantity);
-                      setConfiguringItem(null);
+                      // INDIVIDUAL MODE: Each combination is a line item
+                      Object.entries(tempCounts).forEach(([key, count]) => {
+                        if (count > 0) {
+                          const { options, flavor } = parseCombinationKey(key);
+                          const lastOptName = configuringItem.options[configuringItem.options.length - 1].name;
+                          addToCart(configuringItem, { ...options, [lastOptName]: flavor }, count);
+                        }
+                      });
                     }
+                    setConfiguringItem(null);
                     if (!showCart) setShowCart(true);
                   }}
                   disabled={(() => {
                     const limit = detectLimit(configuringItem);
-                    if (configuringItem.options?.length === 1 && limit) {
-                      return Object.values(tempCounts).reduce((a, b) => a + b, 0) !== limit;
-                    }
-                    return false;
+                    const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    if (limit) return total !== limit;
+                    return total === 0;
                   })()}
                   className="w-full py-5 bg-gray-900 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-gray-300 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:shadow-none"
                 >
@@ -1156,12 +1167,11 @@ export default function CartManager({
                   {(() => {
                     const limit = detectLimit(configuringItem);
                     const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
-                    if (configuringItem.options?.length === 1 && limit) {
+                    if (limit) {
                       if (total < limit) return `Faltan ${limit - total} piezas...`;
-                      if (total > limit) return `Sobran ${total - limit} piezas`;
                       return `Confirmar Paquete • $${configuringItem.price.toFixed(2)}`;
                     }
-                    return `Agregar al Carrito • $${(configuringItem.price * tempQuantity).toFixed(2)}`;
+                    return total > 0 ? `Agregar ${total} al Carrito` : 'Selecciona sabores';
                   })()}
                 </button>
 
