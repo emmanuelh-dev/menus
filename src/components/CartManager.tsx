@@ -101,6 +101,17 @@ export default function CartManager({
   const [copied, setCopied] = useState(false);
   const [configuringItem, setConfiguringItem] = useState<any | null>(null);
   const [tempOptions, setTempOptions] = useState<{ [key: string]: string }>({});
+  const [tempCounts, setTempCounts] = useState<{ [value: string]: number }>({});
+  const [tempQuantity, setTempQuantity] = useState(1);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // Helper to detect package size from name or description
+  const detectLimit = (item: any) => {
+    const text = `${item.name} ${item.description}`.toLowerCase();
+    const match = text.match(/(?:paquete|combo|pqt|ord[en]+|pzs|piezas|ítems)\s*(?:de|:)?\s*(\d+)/i) ||
+      text.match(/(\d+)\s*(?:piezas|pzs|pazas|ítems|items|pzas)/i);
+    return match ? parseInt(match[1]) : null;
+  };
 
   useEffect(() => {
     setCart(getCart(placeSlug));
@@ -112,8 +123,14 @@ export default function CartManager({
       const button = e.currentTarget;
       const itemData = JSON.parse(button.dataset.item);
 
-      if (itemData.options && itemData.options.length > 0) {
-        // Initialize temp options with first values of required groups
+      if (itemData.options && itemData.options.length === 1) {
+        // Multi-counter mode for single option group
+        const initialCounts: any = {};
+        itemData.options[0].values.forEach((v: string) => initialCounts[v] = 0);
+        setTempCounts(initialCounts);
+        setConfiguringItem(itemData);
+      } else if (itemData.options && itemData.options.length > 1) {
+        // Standard mode for multiple option groups
         const initial: any = {};
         itemData.options.forEach((opt: any) => {
           if (opt.values && opt.values.length > 0) {
@@ -121,6 +138,7 @@ export default function CartManager({
           }
         });
         setTempOptions(initial);
+        setTempQuantity(1);
         setConfiguringItem(itemData);
       } else {
         addToCart(itemData);
@@ -280,7 +298,7 @@ export default function CartManager({
     });
   }, [favorites]);
 
-  const addToCart = (item: any, options?: { [key: string]: string }) => {
+  const addToCart = (item: any, options?: { [key: string]: string }, quantity = 1) => {
     setCart((prevCart) => {
       const newCart = [...prevCart];
       const optionHash = options ? JSON.stringify(options) : '';
@@ -288,7 +306,7 @@ export default function CartManager({
 
       const existing = newCart.find((i) => i.id === uniqueId);
       if (existing) {
-        existing.quantity++;
+        existing.quantity += (quantity || 1);
       } else {
         newCart.push({
           id: uniqueId,
@@ -296,7 +314,7 @@ export default function CartManager({
           name: item.name,
           price: item.price,
           image: item.image,
-          quantity: 1,
+          quantity: quantity || 1,
           notes: "",
           selectedOptions: options
         });
@@ -306,10 +324,10 @@ export default function CartManager({
       return newCart;
     });
 
-    if (configuringItem) {
-      setConfiguringItem(null);
-      setTempOptions({});
-    }
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+
+    // We don't necessarily close the modal here if called from a multi-add loop
   };
 
   const removeFromCart = (itemId: string) => {
@@ -998,34 +1016,161 @@ export default function CartManager({
                 <p className="text-2xl font-black text-emerald-600 mt-4">${configuringItem.price}</p>
               </div>
 
-              <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                {configuringItem.options?.map((opt: any) => (
-                  <div key={opt.name} className="space-y-3">
-                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 block px-1">
-                      Selecciona {opt.name}:
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {opt.values.map((val: string) => (
-                        <button
-                          key={val}
-                          onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                          className={`p-3 rounded-xl border-2 font-bold text-xs uppercase tracking-wide transition-all ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
-                        >
-                          {val}
-                        </button>
+              <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar p-1">
+                {configuringItem.options?.length === 1 ? (
+                  /* MULTI-COUNTER MODE (FOR GORDITAS/TACOS/ETC) */
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-end px-1 mb-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-1">
+                          Personaliza tu {detectLimit(configuringItem) ? 'paquete' : 'pedido'}:
+                        </label>
+                        <p className="text-[9px] text-gray-400 font-medium italic">Selecciona la cantidad de cada sabor</p>
+                      </div>
+                      {detectLimit(configuringItem) && (
+                        <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + b, 0) === detectLimit(configuringItem)
+                            ? 'bg-emerald-500 border-emerald-500 text-white'
+                            : Object.values(tempCounts).reduce((a, b) => a + b, 0) > (detectLimit(configuringItem) || 0)
+                              ? 'bg-red-500 border-red-500 text-white'
+                              : 'bg-white border-gray-100 text-gray-900'
+                          }`}>
+                          <span className="text-[10px] font-black">{Object.values(tempCounts).reduce((a, b) => a + b, 0)} / {detectLimit(configuringItem)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      {configuringItem.options[0].values.map((val: string) => (
+                        <div key={val} className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl border border-gray-100/50 hover:bg-white hover:shadow-sm transition-all text-gray-700">
+                          <span className="font-bold text-sm uppercase">{val}</span>
+                          <div className="flex items-center gap-4">
+                            <button
+                              onClick={() => setTempCounts(prev => ({ ...prev, [val]: Math.max(0, (prev[val] || 0) - 1) }))}
+                              className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-red-500 transition-colors border border-gray-100"
+                            >
+                              -
+                            </button>
+                            <span className={`font-black text-sm w-4 text-center ${tempCounts[val] > 0 ? 'text-gray-900' : 'text-gray-300'}`}>
+                              {tempCounts[val] || 0}
+                            </span>
+                            <button
+                              onClick={() => {
+                                const limit = detectLimit(configuringItem);
+                                const currentTotal = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                                if (!limit || currentTotal < (limit || 0)) {
+                                  setTempCounts(prev => ({ ...prev, [val]: (prev[val] || 0) + 1 }));
+                                }
+                              }}
+                              className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-emerald-500 transition-colors border border-gray-100"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
-                ))}
+                ) : (
+                  /* STANDARD MODE (RADIO SELECTION) */
+                  configuringItem.options?.map((opt: any) => (
+                    <div key={opt.name} className="space-y-3">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block px-1">
+                        {opt.name}:
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {opt.values.map((val: string) => (
+                          <button
+                            key={val}
+                            onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
+                            className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
 
-              <button
-                onClick={() => addToCart(configuringItem, tempOptions)}
-                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 mt-4"
-              >
-                <ShoppingCart size={18} />
-                Agregar al Carrito
-              </button>
+              <div className="pt-6 border-t border-gray-100 space-y-4">
+                {configuringItem.options?.length !== 1 && (
+                  <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cantidad Total:</span>
+                    <div className="flex items-center gap-6">
+                      <button
+                        onClick={() => setTempQuantity(q => Math.max(1, q - 1))}
+                        className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center font-black text-lg"
+                      >
+                        -
+                      </button>
+                      <span className="font-black text-xl w-6 text-center">{tempQuantity}</span>
+                      <button
+                        onClick={() => setTempQuantity(q => q + 1)}
+                        className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center font-black text-lg"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => {
+                    const limit = detectLimit(configuringItem);
+                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+
+                    if (configuringItem.options?.length === 1) {
+                      if (limit) {
+                        // PACKAGE MODE: Add as a single item with aggregated options
+                        const optionsSummary = Object.entries(tempCounts)
+                          .filter(([_, count]) => count > 0)
+                          .map(([val, count]) => `${count}x ${val}`)
+                          .join(', ');
+
+                        addToCart(configuringItem, { [configuringItem.options[0].name]: optionsSummary }, 1);
+                      } else {
+                        // INDIVIDUAL MODE: Split into separate cart entries
+                        Object.entries(tempCounts).forEach(([val, count]) => {
+                          if (count > 0) {
+                            addToCart(configuringItem, { [configuringItem.options[0].name]: val }, count);
+                          }
+                        });
+                      }
+                      setConfiguringItem(null);
+                    } else {
+                      addToCart(configuringItem, tempOptions, tempQuantity);
+                      setConfiguringItem(null);
+                    }
+                    if (!showCart) setShowCart(true);
+                  }}
+                  disabled={(() => {
+                    const limit = detectLimit(configuringItem);
+                    if (configuringItem.options?.length === 1 && limit) {
+                      return Object.values(tempCounts).reduce((a, b) => a + b, 0) !== limit;
+                    }
+                    return false;
+                  })()}
+                  className="w-full py-5 bg-gray-900 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-gray-300 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:shadow-none"
+                >
+                  <ShoppingCart size={18} />
+                  {(() => {
+                    const limit = detectLimit(configuringItem);
+                    const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    if (configuringItem.options?.length === 1 && limit) {
+                      if (total < limit) return `Faltan ${limit - total} piezas...`;
+                      if (total > limit) return `Sobran ${total - limit} piezas`;
+                      return `Confirmar Paquete • $${configuringItem.price.toFixed(2)}`;
+                    }
+                    return `Agregar al Carrito • $${(configuringItem.price * tempQuantity).toFixed(2)}`;
+                  })()}
+                </button>
+
+                {showSuccess && (
+                  <p className="text-center text-emerald-600 font-bold text-xs animate-bounce">
+                    ✓ ¡Agregado correctamente!
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
