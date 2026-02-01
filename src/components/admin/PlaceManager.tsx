@@ -84,7 +84,6 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
     image: '',
     state_id: null as number | null,
     municipality_id: null as number | null,
-    allow_delivery: false,
     content: null as any,
   });
 
@@ -115,7 +114,6 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         image: restaurant.image || '',
         state_id: restaurant.state_id || null,
         municipality_id: (restaurant as any).municipality_id || null,
-        allow_delivery: (restaurant as any).allow_delivery || false,
         content: restaurant.content || null,
       });
       setStep(1); // Always step 1 for editing
@@ -137,7 +135,6 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
         image: '',
         state_id: null,
         municipality_id: null,
-        allow_delivery: false,
         content: null,
       });
       setStep(1);
@@ -165,7 +162,6 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
       image: restaurant.image || '',
       state_id: restaurant.state_id || null,
       municipality_id: (restaurant as any).municipality_id || null,
-      allow_delivery: (restaurant as any).allow_delivery || false,
       content: restaurant.content || null,
     });
     setStep(1);
@@ -499,21 +495,6 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                       value={formData.category}
                       onChange={handleInputChange}
                     />
-
-                    <div className="flex items-center gap-2 pt-6">
-                      <input
-                        type="checkbox"
-                        id="allow_delivery"
-                        name="allow_delivery"
-                        checked={formData.allow_delivery}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 rounded border-slate-300 text-black focus:ring-black"
-                      />
-                      <label htmlFor="allow_delivery" className="text-sm font-medium text-slate-700">
-                        Habilitar pedidos a domicilio
-                      </label>
-                    </div>
-
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

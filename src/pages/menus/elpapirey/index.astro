@@ -106,7 +106,10 @@ const enableCart = true;
 						placeName={place.name as string}
 						placeSlug="elpapirey"
 						whatsappNumber={contactInfo.whatsapp as string}
-						deliveryEnabled={(place.allow_delivery as boolean) || false}
+						deliveryEnabled={
+							(place.content?.semantic_data?.enable_delivery as boolean) ||
+							false
+						}
 						blocks={blocks as any[]}
 					/>
 				)

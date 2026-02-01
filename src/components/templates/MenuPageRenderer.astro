@@ -15,10 +15,7 @@ const { place, name } = Astro.props;
 
 let { blocks = [], view_settings = {} } = place.content || {};
 const enableCart = place.content?.semantic_data?.enable_cart || false;
-const enableDelivery =
-	place.content?.semantic_data?.enable_delivery ||
-	place.allow_delivery ||
-	false;
+const enableDelivery = place.content?.semantic_data?.enable_delivery || false;
 const whatsappNumber = place.content?.semantic_data?.whatsapp || "";
 
 // Limpieza de bloques
