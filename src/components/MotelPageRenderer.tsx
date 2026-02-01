@@ -241,12 +241,28 @@ export default function MotelPageRenderer({
             if (block.type === "section") {
               return (
                 <section key={block.id || idx} className="relative">
-                  <div className="flex items-center gap-4 mb-10">
+                  <div className="flex items-center gap-4 mb-4">
                     <h2 className="text-3xl font-bold text-white tracking-tight">
                       {block.data.title}
                     </h2>
                     <div className="h-[1px] flex-1 bg-white/10"></div>
                   </div>
+
+                  {block.data.image && (
+                    <div className="mb-10 overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+                      <img
+                        src={block.data.image}
+                        alt={block.data.title}
+                        className="w-full h-48 sm:h-80 object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {block.data.description && (
+                    <p className="text-stone-400 text-sm italic mb-10 px-4 border-l-2 border-stone-800">
+                      {block.data.description}
+                    </p>
+                  )}
 
                   <div className="grid gap-8">
                     {block.data.items?.map((item: any, iIdx: number) => (

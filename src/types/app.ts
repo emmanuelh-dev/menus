@@ -50,8 +50,8 @@ export interface Content {
 
 export interface Block {
   id: string;
-  type: 'section' | 'gallery' | 'image';
-  data: SectionData | GalleryData | ImageData;
+  type: 'section' | 'gallery' | 'image' | 'carrusel';
+  data: SectionData | GalleryData | ImageData | CarruselData;
 }
 
 export interface SectionData {
@@ -81,6 +81,17 @@ export interface ImageData {
   caption?: string;
 }
 
+export interface CarruselItem {
+  src: string;
+  alt?: string;
+  link?: string;
+  caption?: string;
+}
+
+export interface CarruselData {
+  items: CarruselItem[];
+}
+
 export interface SemanticData {
   description?: string;
   areas?: string[];
@@ -102,6 +113,7 @@ export interface SemanticData {
   parking?: string;
   variety?: string;
   additional_features?: string[];
+  clabe?: string;
 }
 
 export interface ShippingZone {
@@ -130,6 +142,7 @@ export interface Order {
   subtotal: number;
   total: number;
   notes?: string;
+  payment_method?: 'cash' | 'card' | 'transfer';
   status: 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;

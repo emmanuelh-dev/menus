@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark } from 'lucide-react';
 
 interface Order {
   id: number;
@@ -13,6 +13,7 @@ interface Order {
   total: number;
   status: 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
   notes?: string;
+  payment_method?: 'cash' | 'card' | 'transfer';
   created_at: string;
 }
 
@@ -183,6 +184,33 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                           <p className="text-sm text-slate-600 bg-slate-50 p-2 rounded-lg italic">"{order.notes}"</p>
                         </div>
                       )}
+
+                      <div>
+                        <label className="text-[10px] font-bold uppercase text-slate-400 flex items-center gap-1.5 mb-1.5">
+                          Metodo de Pago
+                        </label>
+                        <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                          {order.payment_method === 'cash' && (
+                            <>
+                              <Coins size={16} className="text-emerald-500" />
+                              Efectivo
+                            </>
+                          )}
+                          {order.payment_method === 'card' && (
+                            <>
+                              <CreditCard size={16} className="text-blue-500" />
+                              Tarjeta
+                            </>
+                          )}
+                          {order.payment_method === 'transfer' && (
+                            <>
+                              <Landmark size={16} className="text-purple-500" />
+                              Transferencia
+                            </>
+                          )}
+                          {!order.payment_method && "No especificado"}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="bg-slate-50 rounded-2xl p-4">

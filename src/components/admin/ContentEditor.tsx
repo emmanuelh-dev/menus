@@ -629,14 +629,26 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   </label>
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">URL DE RESERVACIÓN:</label>
-                  <input
-                    value={semanticData.reservation_url || ''}
-                    onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
-                    placeholder="https://reservaciones.com/..."
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block">URL DE RESERVACIÓN:</label>
+                    <input
+                      value={semanticData.reservation_url || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
+                      placeholder="https://reservaciones.com/..."
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">CLABE / Datos de transferencia:</label>
+                    <input
+                      value={semanticData.clabe || ''}
+                      onChange={(e) => setSemanticData({ ...semanticData, clabe: e.target.value })}
+                      placeholder="Ej: 012 345 678..."
+                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tight">Se mostrará si el usuario elige transferencia</p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
