@@ -693,7 +693,7 @@ export default function CartManager({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6">
+            <div className="flex-1 overflow-y-auto px-6 pb-4">
               {activeTab === 'cart' ? (
                 <div className="py-2">
                   {cart.length === 0 ? (
