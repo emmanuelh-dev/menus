@@ -46,6 +46,7 @@ export interface Props {
 	favicon?: string;
 	canonical?: string;
 	ogUrl?: string;
+	keywords?: string;
 	place?: any;
 	schemaEnrichment?: {
 		address?: Address;
@@ -78,6 +79,7 @@ const {
 	schemaEnrichment = {},
 	canonical,
 	ogUrl,
+	keywords,
 	place = {},
 } = Astro.props;
 
@@ -297,6 +299,7 @@ if (schemaEnrichment.suitableForDiet) {
 		<meta name="generator" content={Astro.generator} />
 		<title>{seoTitle}</title>
 		<meta name="description" content={seoDescription} />
+		{keywords && <meta name="keywords" content={keywords} />}
 		<link rel="canonical" href={canonical || Astro.url} />
 
 		<!-- Open Graph / Facebook -->

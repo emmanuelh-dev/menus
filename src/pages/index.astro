@@ -27,30 +27,63 @@ import { Image } from "astro:assets";
 import DefaultLayout from "../layouts/DefaultLayout.astro";
 
 const restaurantData = {
-	name: "Menús Digitales para Restaurantes | Crea tu Menú QR Gratis",
+	name: "Menú Digital y Carta QR para Restaurantes | Crea tu Menú Gratis",
 	description:
-		"Crea tu menú digital GRATIS con código QR en 5 minutos. La mejor plataforma de menús digitales en Monterrey y todo México. Sin comisiones, sin anuncios. Visible en Google.",
+		"Crea tu menú digital y carta QR GRATIS en 5 minutos. La mejor plataforma de menús digitales en México. Sin comisiones, sin anuncios. Visible en Google.",
 	keywords:
-		"menús digitales, menú digital para restaurantes, crear menú digital, menú qr gratis, carta digital qr méxico, menús digitales monterrey",
+		"carta digital, menú digital, menú digital para restaurantes, crear menú digital, menú qr gratis, carta digital qr méxico, menús digitales monterrey, creador de menú digital",
 };
 
 const mainSchema = {
 	"@context": "https://schema.org",
-	"@type": "SoftwareApplication",
-	name: "BySMax Menús Digitales",
-	operatingSystem: "Web",
-	applicationCategory: "BusinessApplication",
-	offers: {
-		"@type": "Offer",
-		price: "0",
-		priceCurrency: "MXN",
-	},
-	description: restaurantData.description,
-	aggregateRating: {
-		"@type": "AggregateRating",
-		ratingValue: "4.9",
-		reviewCount: "10000",
-	},
+	"@graph": [
+		{
+			"@type": "SoftwareApplication",
+			name: "BySMax Menús Digitales",
+			operatingSystem: "Web",
+			applicationCategory: "BusinessApplication",
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "MXN",
+			},
+			description: restaurantData.description,
+			aggregateRating: {
+				"@type": "AggregateRating",
+				ratingValue: "4.9",
+				reviewCount: "10000",
+			},
+		},
+		{
+			"@type": "FAQPage",
+			mainEntity: [
+				{
+					"@type": "Question",
+					name: "¿Por qué mi menú se ve en Google?",
+					acceptedAnswer: {
+						"@type": "Answer",
+						text: "A diferencia de los PDFs o imágenes, nuestros menús son páginas web reales indexadas por Google. Esto significa que aparecen en resultados de búsqueda cuando la gente busca tu restaurante.",
+					},
+				},
+				{
+					"@type": "Question",
+					name: "¿Cómo cambio precios o fotos?",
+					acceptedAnswer: {
+						"@type": "Answer",
+						text: "Desde tu panel de administración puedes actualizar precios, fotos y descripciones en tiempo real. Los cambios se reflejan inmediatamente sin necesidad de reimprimir códigos QR.",
+					},
+				},
+				{
+					"@type": "Question",
+					name: "¿Cómo funciona la IA recomendadora?",
+					acceptedAnswer: {
+						"@type": "Answer",
+						text: "Nuestra IA analiza las preferencias del cliente y sugiere platillos personalizados, aumentando la satisfacción y las ventas promedio por mesa.",
+					},
+				},
+			],
+		},
+	],
 };
 ---
 
@@ -80,17 +113,19 @@ const mainSchema = {
 					<h1
 						class="text-4xl md:text-6xl font-semibold text-slate-900 mb-6 tracking-tight leading-[1.1]"
 					>
-						Los Mejores <span
+						Menús Digitales y <span
 							class="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent font-bold"
-							>Menús Digitales</span
-						> con Código QR para Restaurantes
+							>Cartas QR</span
+						> para Restaurantes
 					</h1>
 					<p
 						class="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed font-medium"
 					>
-						Crea tu <strong>menú digital</strong> profesional en 5 minutos. La solución
-						líder en <strong>Monterrey</strong> y todo <strong>México</strong> para
-						digitalizar tu carta GRATIS.
+						Crea tu <strong>menú digital</strong> y <strong
+							>carta digital</strong
+						> profesional en 5 minutos. La solución líder en <strong
+							>México</strong
+						> para digitalizar tu negocio GRATIS.
 					</p><div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
 						<a
 							href="/admin/register"

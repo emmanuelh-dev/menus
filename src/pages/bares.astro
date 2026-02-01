@@ -1,0 +1,215 @@
+---
+import {
+	GlassWater,
+	Zap,
+	Music,
+	Smartphone,
+	Share2,
+	ArrowRight,
+	Check,
+	Star,
+} from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+
+const seoData = {
+	title: "Menú Digital para Bares y Discotecas | Carta QR | BySMax",
+	description:
+		"La mejor carta digital para bares. Optimizado para ambientes oscuros, carga rápida y pedidos directos. ¡Mejora la experiencia en tu bar hoy!",
+	keywords:
+		"qr para bares, carta digital bar, menu digital para discotecas, carta qr bares monterrey",
+};
+
+const barFeatures = [
+	{
+		title: "Modo Nocturno Nativo",
+		desc: "Diseños optimizados para ambientes con poca luz, facilitando la lectura sin deslumbrar.",
+		icon: "🌙",
+	},
+	{
+		title: "Promociones Flash",
+		desc: "Cambia tus happy hours o promos del día en segundos desde tu celular.",
+		icon: "⚡",
+	},
+	{
+		title: "Social Friendly",
+		desc: "Tus clientes pueden compartir cocktails específicos en sus historias de Instagram fácilmente.",
+		icon: "📸",
+	},
+];
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<main class="flex-1 bg-slate-950 text-white">
+		<!-- Hero Section -->
+		<section
+			class="relative py-24 md:py-32 overflow-hidden border-b border-white/10"
+		>
+			<div
+				class="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-slate-950 to-emerald-900/10"
+			>
+			</div>
+			<div class="max-w-5xl mx-auto px-6 relative text-center">
+				<div
+					class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-8 backdrop-blur-sm"
+				>
+					<Star className="w-4 h-4 text-emerald-400 fill-current" />
+					<span class="text-sm font-medium"
+						>Especializado en Bares y Mixología</span
+					>
+				</div>
+
+				<h1
+					class="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight"
+				>
+					La Carta Digital que tu <br />
+					<span
+						class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent italic"
+						>Bar merece.</span
+					>
+				</h1>
+
+				<p
+					class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed"
+				>
+					Olvida las cartas físicas pegajosas. Pásate al <strong
+						class="text-white">menú QR premium</strong
+					> diseñado para la vida nocturna. Rápido, visual y elegante.
+				</p>
+
+				<div class="flex flex-col sm:flex-row gap-4 justify-center">
+					<a
+						href="/admin/register"
+						class="inline-flex items-center px-8 py-4 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20"
+					>
+						🚀 Digitalizar mi Bar Gratis
+						<ArrowRight className="ml-2 h-5 w-5" />
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Bar Specific Features -->
+		<section class="py-24 bg-slate-900/50">
+			<div class="max-w-6xl mx-auto px-6">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					{
+						barFeatures.map((feature) => (
+							<div class="p-8 bg-white/5 border border-white/10 rounded-[32px] hover:border-emerald-500/50 transition-colors group">
+								<div class="text-4xl mb-6">{feature.icon}</div>
+								<h3 class="text-xl font-bold mb-4 group-hover:text-emerald-400 transition-colors">
+									{feature.title}
+								</h3>
+								<p class="text-slate-400 leading-relaxed text-sm">
+									{feature.desc}
+								</p>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+
+		<!-- Comparison or Benefit -->
+		<section class="py-24">
+			<div class="max-w-5xl mx-auto px-6">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+					<div>
+						<h2
+							class="text-3xl md:text-5xl font-black mb-8 tracking-tighter leading-tight"
+						>
+							¿Por qué un QR <br />
+							especial para Bares?
+						</h2>
+						<ul class="space-y-6">
+							<li class="flex gap-4">
+								<div
+									class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center shrink-0"
+								>
+									<Check className="w-5 h-5" />
+								</div>
+								<div>
+									<p class="font-bold">Higiene Total</p>
+									<p class="text-slate-400 text-sm">
+										Sin contacto físico con cartas que pasan por cientos de
+										manos.
+									</p>
+								</div>
+							</li>
+							<li class="flex gap-4">
+								<div
+									class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center shrink-0"
+								>
+									<Check className="w-5 h-5" />
+								</div>
+								<div>
+									<p class="font-bold">Ahorro en Impresión</p>
+									<p class="text-slate-400 text-sm">
+										¿Cambió el precio del Tequila? Actualízalo en 1 segundo sin
+										reimprimir.
+									</p>
+								</div>
+							</li>
+							<li class="flex gap-4">
+								<div
+									class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center shrink-0"
+								>
+									<Check className="w-5 h-5" />
+								</div>
+								<div>
+									<p class="font-bold">Fotos de alta resolución</p>
+									<p class="text-slate-400 text-sm">
+										Vende por la vista. Muestra tus mejores cocktails con fotos
+										potentes.
+									</p>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="relative">
+						<div
+							class="absolute inset-0 bg-emerald-500 blur-[120px] opacity-20"
+						>
+						</div>
+						<div
+							class="bg-gradient-to-tr from-slate-800 to-slate-900 border border-white/10 p-8 rounded-[40px] relative"
+						>
+							<h3 class="text-2xl font-bold mb-4">
+								"Desde que pusimos el menú digital, la gente pide cocktails más
+								elaborados porque las fotos los convencen."
+							</h3>
+							<p class="text-emerald-400 font-medium">
+								— Dueño de Speakeasy Mty
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Final CTA -->
+		<section
+			class="py-24 bg-gradient-to-t from-emerald-950 to-slate-950 border-t border-white/10"
+		>
+			<div class="max-w-3xl mx-auto px-6 text-center">
+				<h2 class="text-3xl font-bold mb-6">
+					Únete a la revolución digital nocturna
+				</h2>
+				<p class="text-slate-400 mb-10 text-lg">
+					Configura tu menú hoy y recibe tus primeros clientes digitales esta
+					misma noche.
+				</p>
+				<a
+					href="/admin/login"
+					class="inline-flex items-center px-10 py-5 bg-white text-slate-950 font-black rounded-2xl hover:bg-slate-200 transition-all text-lg"
+				>
+					🍸 Empezar Mi Menú de Bar
+				</a>
+			</div>
+		</section>
+	</main>
+</DefaultLayout>

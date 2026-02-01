@@ -2,8 +2,8 @@
 export const prerender = false;
 
 Astro.response.headers.set(
-  'Cache-Control', 
-  'public, s-maxage=300, stale-while-revalidate=60'
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
 );
 
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
@@ -11,177 +11,213 @@ import { ArrowRight } from "lucide-react";
 import { getRestaurants } from "../../lib/supabase";
 import { formater } from "../../types/app";
 
-
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
 type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
 
 const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"];
-const types: BusinessType[] = ["Todos", "Casual", "Formal", "Fast Food", "Buffet"];
+const types: BusinessType[] = [
+	"Todos",
+	"Casual",
+	"Formal",
+	"Fast Food",
+	"Buffet",
+];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const restaurants = (await getRestaurants({type: null}))
-    .filter(r => r.type !== 'motel')
-    .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+const restaurants = (await getRestaurants({ type: null }))
+	.filter((r) => r.type !== "motel")
+	.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+const seoData = {
+	title: "Ejemplos de Menús Digitales y Cartas QR Reales | BySMax",
+	description:
+		"Inspírate con ejemplos reales de menús digitales y cartas QR. Mira cómo otros restaurantes han digitalizado su carta con éxito en México.",
+	keywords:
+		"ejemplos menu digital, ideas carta qr, ver menu qr online, catálogo digital restaurantes",
+};
 ---
 
-<RestaurantLayout title="Menus" description="Menus" backgroundColor="bg-gray-50">
-    <div class="bg-gradient-to-b from-gray-50 to-white min-h-screen py-16">
-        <div class="max-w-[85%] mx-auto">
-            <h2 class="text-4xl font-bold text-gray-900 mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-                Los restaurantes que usan nuestros menús.
-            </h2>
+<RestaurantLayout
+	title={seoData.title}
+	description={seoData.description}
+	backgroundColor="bg-gray-50"
+>
+	<div class="bg-gradient-to-b from-gray-50 to-white min-h-screen py-16">
+		<div class="max-w-[85%] mx-auto">
+			<h2
+				class="text-4xl font-bold text-gray-900 mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600"
+			>
+				Los restaurantes que usan nuestros menús.
+			</h2>
 
-            <div class="mb-8 flex flex-wrap gap-4 justify-center">
-                <select 
-                    id="industry-filter" 
-                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
-                >
-                    {industries.map((industry) => (
-                        <option value={industry}>{industry}</option>
-                    ))}
-                </select>
+			<div class="mb-8 flex flex-wrap gap-4 justify-center">
+				<select
+					id="industry-filter"
+					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+				>
+					{
+						industries.map((industry) => (
+							<option value={industry}>{industry}</option>
+						))
+					}
+				</select>
 
-                <select 
-                    id="type-filter" 
-                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
-                >
-                    {types.map((type) => (
-                        <option value={type}>{type}</option>
-                    ))}
-                </select>
-            </div>
+				<select
+					id="type-filter"
+					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+				>
+					{types.map((type) => <option value={type}>{type}</option>)}
+				</select>
+			</div>
 
-            <div id="restaurants-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-                {restaurants.map((restaurant) => {
-                    const restaurantUrl = `/menus/${restaurant.short_name}`;
-                    
-                    return (
-                    <div 
-                        class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
-                    >
-                        <div class="aspect-square relative overflow-hidden rounded-lg mb-6">
-                            {restaurant.short_name ? (
-                                <a href={restaurantUrl}>
-                                    <img
-                                        src={restaurant.image}
-                                        alt={restaurant.name}
-                                        class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                    />
-                                </a>
-                            ) : (
-                                <img
-                                    src={restaurant.image}
-                                    alt={restaurant.name}
-                                    class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
-                                />
-                            )}
-                        </div>
-                        <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            <a href={restaurantUrl}>{restaurant.name}</a>
-                        </h2>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-amber-500 text-sm font-bold">★ {restaurant.rating}</span>
-                            <span class="text-gray-400 text-xs text-uppercase">({restaurant.reviewCount} reseñas)</span>
-                        </div>
-                        <p class="text-gray-600 text-sm">{restaurant.address}</p>
-                        <div class="mt-4 flex flex-wrap gap-2">
-                        </div>
-                        {restaurant.short_name && <a href={restaurantUrl} class="group mt-4 block">
-                            <span class="flex items-center justify-between">
-                                Leer la historia completa
-                                <div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
-                                    <ArrowRight />
-                                </div>
-                            </span>
-                        </a>}
-                    </div>
-                )})}
-           
-            </div>
-        </div>
-    </div>
+			<div
+				id="restaurants-grid"
+				class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"
+			>
+				{
+					restaurants.map((restaurant) => {
+						const restaurantUrl = `/menus/${restaurant.short_name}`;
+
+						return (
+							<div class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md">
+								<div class="aspect-square relative overflow-hidden rounded-lg mb-6">
+									{restaurant.short_name ? (
+										<a href={restaurantUrl}>
+											<img
+												src={restaurant.image}
+												alt={restaurant.name}
+												class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+											/>
+										</a>
+									) : (
+										<img
+											src={restaurant.image}
+											alt={restaurant.name}
+											class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+										/>
+									)}
+								</div>
+								<h2 class="text-xl font-semibold text-gray-800 mb-2">
+									<a href={restaurantUrl}>{restaurant.name}</a>
+								</h2>
+								<div class="flex items-center gap-2 mb-2">
+									<span class="text-amber-500 text-sm font-bold">
+										★ {restaurant.rating}
+									</span>
+									<span class="text-gray-400 text-xs text-uppercase">
+										({restaurant.reviewCount} reseñas)
+									</span>
+								</div>
+								<p class="text-gray-600 text-sm">{restaurant.address}</p>
+								<div class="mt-4 flex flex-wrap gap-2"></div>
+								{restaurant.short_name && (
+									<a href={restaurantUrl} class="group mt-4 block">
+										<span class="flex items-center justify-between">
+											Leer la historia completa
+											<div class="p-1 rounded-full border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
+												<ArrowRight />
+											</div>
+										</span>
+									</a>
+								)}
+							</div>
+						);
+					})
+				}
+			</div>
+		</div>
+	</div>
 </RestaurantLayout>
 
 <script>
-    type FilterValue = string | null;
+	type FilterValue = string | null;
 
-    interface HTMLElementWithDataset extends HTMLElement {
-        dataset: {
-            industry: string;
-            type: string;
-            capacity: string;
-        };
-    }
+	interface HTMLElementWithDataset extends HTMLElement {
+		dataset: {
+			industry: string;
+			type: string;
+			capacity: string;
+		};
+	}
 
-    class RestaurantFilter {
-        private industryFilter: HTMLSelectElement;
-        private typeFilter: HTMLSelectElement;
-        private capacityFilter: HTMLSelectElement;
+	class RestaurantFilter {
+		private industryFilter: HTMLSelectElement;
+		private typeFilter: HTMLSelectElement;
+		private capacityFilter: HTMLSelectElement;
 
-        constructor() {
-            // Initialize with null checks
-            const industryElement = document.getElementById('industry-filter');
-            const typeElement = document.getElementById('type-filter');
-            const capacityElement = document.getElementById('capacity-filter');
+		constructor() {
+			// Initialize with null checks
+			const industryElement = document.getElementById("industry-filter");
+			const typeElement = document.getElementById("type-filter");
+			const capacityElement = document.getElementById("capacity-filter");
 
-            if (!industryElement || !typeElement || !capacityElement) {
-                throw new Error('Required filter elements not found');
-            }
+			if (!industryElement || !typeElement || !capacityElement) {
+				throw new Error("Required filter elements not found");
+			}
 
-            this.industryFilter = industryElement as HTMLSelectElement;
-            this.typeFilter = typeElement as HTMLSelectElement;
-            this.capacityFilter = capacityElement as HTMLSelectElement;
+			this.industryFilter = industryElement as HTMLSelectElement;
+			this.typeFilter = typeElement as HTMLSelectElement;
+			this.capacityFilter = capacityElement as HTMLSelectElement;
 
-            this.initializeEventListeners();
-        }
+			this.initializeEventListeners();
+		}
 
-        private initializeEventListeners(): void {
-            this.industryFilter.addEventListener('change', () => this.filterRestaurants());
-            this.typeFilter.addEventListener('change', () => this.filterRestaurants());
-            this.capacityFilter.addEventListener('change', () => this.filterRestaurants());
-        }
+		private initializeEventListeners(): void {
+			this.industryFilter.addEventListener("change", () =>
+				this.filterRestaurants(),
+			);
+			this.typeFilter.addEventListener("change", () =>
+				this.filterRestaurants(),
+			);
+			this.capacityFilter.addEventListener("change", () =>
+				this.filterRestaurants(),
+			);
+		}
 
-        private getFilterValue(element: HTMLSelectElement): FilterValue {
-            return element.value || null;
-        }
+		private getFilterValue(element: HTMLSelectElement): FilterValue {
+			return element.value || null;
+		}
 
-        private filterRestaurants(): void {
-            const industryValue = this.getFilterValue(this.industryFilter);
-            const typeValue = this.getFilterValue(this.typeFilter);
-            const capacityValue = this.getFilterValue(this.capacityFilter);
+		private filterRestaurants(): void {
+			const industryValue = this.getFilterValue(this.industryFilter);
+			const typeValue = this.getFilterValue(this.typeFilter);
+			const capacityValue = this.getFilterValue(this.capacityFilter);
 
-            const restaurants = document.querySelectorAll('.restaurant-card');
+			const restaurants = document.querySelectorAll(".restaurant-card");
 
-            restaurants.forEach((restaurant) => {
-                try {
-                    const element = restaurant as HTMLElementWithDataset;
-                    const industry = element.dataset.industry;
-                    const type = element.dataset.type;
-                    const capacity = element.dataset.capacity;
+			restaurants.forEach((restaurant) => {
+				try {
+					const element = restaurant as HTMLElementWithDataset;
+					const industry = element.dataset.industry;
+					const type = element.dataset.type;
+					const capacity = element.dataset.capacity;
 
-                    if (!industry || !type || !capacity) {
-                        console.error('Missing data attributes on restaurant card');
-                        return;
-                    }
+					if (!industry || !type || !capacity) {
+						console.error("Missing data attributes on restaurant card");
+						return;
+					}
 
-                    const matchIndustry = industryValue === 'Todos' || industry === industryValue;
-                    const matchType = typeValue === 'Todos' || type === typeValue;
-                    const matchCapacity = capacityValue === 'Todos' || capacity === capacityValue;
+					const matchIndustry =
+						industryValue === "Todos" || industry === industryValue;
+					const matchType = typeValue === "Todos" || type === typeValue;
+					const matchCapacity =
+						capacityValue === "Todos" || capacity === capacityValue;
 
-                    element.style.display = (matchIndustry && matchType && matchCapacity) ? 'block' : 'none';
-                } catch (error) {
-                    console.error('Error filtering restaurant:', error);
-                }
-            });
-        }
-    }
+					element.style.display =
+						matchIndustry && matchType && matchCapacity ? "block" : "none";
+				} catch (error) {
+					console.error("Error filtering restaurant:", error);
+				}
+			});
+		}
+	}
 
-    document.addEventListener('DOMContentLoaded', () => {
-        try {
-            new RestaurantFilter();
-        } catch (error) {
-            console.error('Failed to initialize restaurant filter:', error);
-        }
-    });
+	document.addEventListener("DOMContentLoaded", () => {
+		try {
+			new RestaurantFilter();
+		} catch (error) {
+			console.error("Failed to initialize restaurant filter:", error);
+		}
+	});
 </script>

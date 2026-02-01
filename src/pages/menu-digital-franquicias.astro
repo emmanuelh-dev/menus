@@ -1,0 +1,231 @@
+---
+import {
+	Users,
+	ShieldCheck,
+	BarChart3,
+	Globe,
+	Layers,
+	Zap,
+	ArrowRight,
+	Building2,
+	CheckCircle2,
+} from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+
+const seoData = {
+	title: "Sistema de Menú Digital para Cadenas y Franquicias | BySMax",
+	description:
+		"La plataforma de menú digital escalable para múltiples sucursales. Control centralizado, reportes avanzados y el look profesional de las grandes cadenas.",
+	keywords:
+		"sistema de menu digital para restaurantes, menu digital para franquicias, administrar múltiples sucursales restaurante, software menu qr profesional",
+};
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<main class="flex-1 bg-white">
+		<!-- Hero Section -->
+		<section class="py-24 bg-slate-900 text-white relative overflow-hidden">
+			<div
+				class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"
+			>
+			</div>
+			<div class="max-w-6xl mx-auto px-6 relative">
+				<div class="max-w-3xl">
+					<div
+						class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-bold uppercase tracking-widest mb-8"
+					>
+						<Building2 className="w-4 h-4" />
+						Solución para Corporativos y Cadenas
+					</div>
+					<h1
+						class="text-4xl md:text-7xl font-black mb-8 tracking-tighter leading-tight"
+					>
+						Escala tu marca con <br />
+						<span class="text-emerald-500 text-glow"
+							>Control Personalizado.</span
+						>
+					</h1>
+					<p class="text-xl text-slate-400 mb-10 leading-relaxed font-medium">
+						Toda la potencia de los menús digitales de grandes cadenas como <strong
+							>Sanborns</strong
+						> o <strong>Chili's</strong>, ahora al alcance de tu negocio.
+						Gestiona 10, 50 o 100 sucursales desde un solo lugar.
+					</p>
+					<div class="flex flex-col sm:flex-row gap-6">
+						<a
+							href="/admin/dashboard"
+							class="inline-flex items-center justify-center px-10 py-5 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 text-lg"
+						>
+							Solicitar Demo Pro
+							<ArrowRight className="ml-2 h-6 w-6" />
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Multi-unit management -->
+		<section class="py-24 border-b border-slate-100">
+			<div class="max-w-6xl mx-auto px-6">
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+					<div>
+						<h2
+							class="text-3xl md:text-5xl font-black text-slate-900 mb-8 tracking-tighter"
+						>
+							Administración Centralizada <br />
+							<span class="text-slate-400">Sin Caos.</span>
+						</h2>
+						<div class="space-y-8">
+							<div class="flex gap-4">
+								<div
+									class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center shrink-0"
+								>
+									<Layers className="w-6 h-6 text-slate-900" />
+								</div>
+								<div>
+									<h4 class="font-bold text-lg">Catálogo Maestro</h4>
+									<p class="text-slate-500 text-sm">
+										Actualiza un platillo en el menú maestro y refléjalo en
+										todas tus sucursales al instante, o personaliza precios por
+										zona geográfica.
+									</p>
+								</div>
+							</div>
+							<div class="flex gap-4">
+								<div
+									class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center shrink-0"
+								>
+									<Users className="w-6 h-6 text-slate-900" />
+								</div>
+								<div>
+									<h4 class="font-bold text-lg">Roles y Permisos</h4>
+									<p class="text-slate-500 text-sm">
+										Asigna gerentes de sucursal que solo puedan editar el stock
+										disponible, mientras el corporativo mantiene el control de
+										la imagen de marca.
+									</p>
+								</div>
+							</div>
+							<div class="flex gap-4">
+								<div
+									class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center shrink-0"
+								>
+									<BarChart3 className="w-6 h-6 text-slate-900" />
+								</div>
+								<div>
+									<h4 class="font-bold text-lg">Analytics Comparativo</h4>
+									<p class="text-slate-500 text-sm">
+										Descubre qué platillo se vende mejor en cada sucursal y
+										optimiza tu inventario con datos reales.
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						class="bg-slate-50 p-10 rounded-[48px] border border-slate-200 shadow-inner relative overflow-hidden"
+					>
+						<div
+							class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-emerald-500"
+						>
+						</div>
+						<h3 class="text-2xl font-black mb-6 text-center">
+							Panel Multi-Sucursal
+						</h3>
+						<div class="space-y-4">
+							{
+								[1, 2, 3].map((i) => (
+									<div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+										<div class="flex items-center gap-3">
+											<div class="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center text-[10px] font-bold">
+												M{i}
+											</div>
+											<div>
+												<p class="font-bold text-sm">
+													Sucursal{" "}
+													{i === 1 ? "Norte" : i === 2 ? "Valle" : "Santa Fe"}
+												</p>
+												<p class="text-[10px] text-emerald-500 font-bold uppercase tracking-wider">
+													Activo • 1.2k vistas hoy
+												</p>
+											</div>
+										</div>
+										<div class="w-2 h-2 bg-emerald-500 rounded-full" />
+									</div>
+								))
+							}
+						</div>
+						<div class="mt-8 pt-8 border-t border-slate-200">
+							<p class="text-center text-xs text-slate-400 font-medium">
+								Control total sobre tu red de restaurantes
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Brand Experience -->
+		<section class="py-24 bg-white">
+			<div class="max-w-4xl mx-auto px-6 text-center">
+				<h2 class="text-3xl md:text-5xl font-black mb-8 tracking-tighter">
+					Una experiencia de marca consistente.
+				</h2>
+				<p class="text-lg text-slate-600 mb-16">
+					No importa si tu cliente está en Cancún o en Monterrey; tu menú
+					digital debe verse y sentirse igual. BySMax garantiza que tu identidad
+					visual se mantenga impecable en cada escaneo.
+				</p>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+					<div class="p-8 border border-slate-100 rounded-3xl bg-slate-50/50">
+						<CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-4" />
+						<h4 class="font-bold mb-2 text-lg">Dominio Corporativo</h4>
+						<p class="text-sm text-slate-500">
+							menu.tufranquicia.com/sucursal-1
+						</p>
+					</div>
+					<div class="p-8 border border-slate-100 rounded-3xl bg-slate-50/50">
+						<ShieldCheck className="w-8 h-8 text-blue-500 mx-auto mb-4" />
+						<h4 class="font-bold mb-2 text-lg">Seguridad Enterprise</h4>
+						<p class="text-sm text-slate-500">
+							Backups diarios y disponibilidad del 99.9%.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Final CTA -->
+		<section class="py-24 bg-slate-900 text-white text-center">
+			<div class="max-w-2xl mx-auto px-6">
+				<h2 class="text-3xl font-bold mb-6">¿Listo para escalar?</h2>
+				<p class="text-lg text-slate-400 mb-10">
+					Únete a las marcas líderes que ya están transformando su operación con
+					BySMax Enterprise.
+				</p>
+				<a
+					href="/admin/login"
+					class="inline-flex items-center px-10 py-5 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 text-lg"
+				>
+					Contactar Ventas Corporativas
+				</a>
+				<p
+					class="mt-8 text-xs text-slate-500 uppercase tracking-widest font-bold"
+				>
+					Soluciones personalizadas para grupos de más de 5 sucursales
+				</p>
+			</div>
+		</section>
+	</main>
+</DefaultLayout>
+
+<style>
+	.text-glow {
+		text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+	}
+</style>

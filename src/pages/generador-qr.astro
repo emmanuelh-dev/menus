@@ -4,11 +4,25 @@ import { QrCode, Check, Zap, Shield } from "lucide-react";
 import DefaultLayout from "../layouts/DefaultLayout.astro";
 
 const seoData = {
-	title: "Generador de Código QR Gratis - BySMax",
+	title: "Generador de Código QR para Menú de Restaurante Gratis | BySMax",
 	description:
-		"Crea códigos QR personalizados gratis, sin registro y sin caducidad. Personaliza colores y descarga en alta calidad PNG. Ideal para menús, wifi y links.",
+		"Crea códigos QR para la carta de tu restaurante gratis. Personaliza colores, sin registro y descarga en alta calidad. El mejor generador de QR para menú digital.",
 	keywords:
-		"generador codigo qr gratis, crear qr gratis, qr code generator free, qr restaurante gratis",
+		"generador de menu qr, crear qr carta restaurante, hacer qr carta restaurante, código qr menú restaurante, carta con codigo qr, generar qr gratis",
+};
+
+const qrSchema = {
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	name: "Generador QR BySMax",
+	operatingSystem: "Web",
+	applicationCategory: "BusinessApplication",
+	offers: {
+		"@type": "Offer",
+		price: "0",
+		priceCurrency: "MXN",
+	},
+	description: seoData.description,
 };
 ---
 
@@ -17,6 +31,7 @@ const seoData = {
 	description={seoData.description}
 	keywords={seoData.keywords}
 	showAds={false}
+	schema={qrSchema}
 >
 	<div>
 		<main class="flex-1 bg-slate-50">
