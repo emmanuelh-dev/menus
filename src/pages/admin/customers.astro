@@ -1,0 +1,22 @@
+---
+export const prerender = false;
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import CustomersManager from "../../components/admin/CustomersManager";
+---
+
+<AdminLayout title="Mis Clientes">
+	<div class="max-w-7xl mx-auto md:py-12">
+		<div class="flex items-center gap-4 mb-8 px-4">
+			<a
+				href="/admin/dashboard"
+				class="text-slate-400 hover:text-black transition-colors"
+			>
+				Dashboard
+			</a>
+			<span class="text-slate-300">/</span>
+			<h1 class="text-xl font-bold">Clientes</h1>
+		</div>
+
+		<CustomersManager client:load />
+	</div>
+</AdminLayout>

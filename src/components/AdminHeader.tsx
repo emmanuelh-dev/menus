@@ -148,6 +148,19 @@ function AdminHeader() {
               Mi Perfil
             </a>
 
+            <a
+              href="/admin/customers"
+              className={`${isActive('/admin/customers')
+                ? 'bg-gray-100 text-gray-900 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
+            >
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Clientes
+            </a>
+
             {/*
               <a 
                 href="/admin/restaurants" 

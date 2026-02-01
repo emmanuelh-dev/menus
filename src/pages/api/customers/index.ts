@@ -102,3 +102,49 @@ export const PUT: APIRoute = async ({ request }) => {
     });
   }
 };
+export const GET: APIRoute = async ({ url }) => {
+  const phone = url.searchParams.get('phone');
+  const placeId = url.searchParams.get('place_id');
+  
+  let query = supabase
+    .from('customers')
+    .select('*')
+    .order('name', { ascending: true });
+
+  if (phone) {
+    query = query.eq('phone', phone);
+  }
+
+  // Si hay placeId, filtramos por clientes que hayan pedido en ese local
+  if (placeId) {
+    const { data: orders } = await supabase
+      .from('orders')
+      .select('customer_phone')
+      .eq('place_id', placeId);
+    
+    if (orders && orders.length > 0) {
+      const phones = Array.from(new Set(orders.map(o => o.customer_phone)));
+      query = query.in('phone', phones);
+    } else {
+      // Si no hay órdenes, no hay clientes para este local
+      return new Response(JSON.stringify({ customers: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  const { data: customers, error } = await query;
+
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return new Response(JSON.stringify({ customers }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
