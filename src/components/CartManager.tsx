@@ -475,9 +475,6 @@ export default function CartManager({
     message += `--------------------------\n`;
 
     try {
-      const order = await createOrder();
-      if (!order) return;
-
       const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
 
       // En lugar de window.open, usamos location.href
