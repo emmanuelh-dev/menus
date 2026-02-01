@@ -213,15 +213,23 @@ export const POST: APIRoute = async ({ request }) => {
       newImages: aiResponse.new_gallery_images?.length || 0
     };
 
+    // DETECTAR SI HUBO CAMBIOS REALES
+    const contentChanged = JSON.stringify(currentContent.blocks) !== JSON.stringify(newContent.blocks) || 
+                           JSON.stringify(currentContent.semantic_data) !== JSON.stringify(newContent.semantic_data);
+
     if (preview) {
+      // Si no hay cambios y es una pregunta/conversación, no mandamos el flag de preview de contenido
+      const isPurelyConversational = !contentChanged || !aiResponse.change_summary;
+
       return new Response(JSON.stringify({ 
         success: true, 
-        preview: true,
-        stats: {
+        preview: !isPurelyConversational,
+        stats: isPurelyConversational ? null : {
           ...stats,
           summary: aiResponse.change_summary
         },
-        content: newContent
+        conversational_response: aiResponse.conversational_response,
+        content: isPurelyConversational ? currentContent : newContent
       }), { status: 200 });
     }
 
@@ -234,8 +242,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: 'Contenido actualizado correctamente',
-      content: newContent
+      stats,
+      conversational_response: aiResponse.conversational_response,
+      content: newContent 
     }), { status: 200 });
 
   } catch (err: any) {

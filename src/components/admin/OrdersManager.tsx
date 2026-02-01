@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark, Plus } from 'lucide-react';
+import WaiterMode from './WaiterMode';
 
 interface Order {
   id: number;
@@ -29,6 +30,7 @@ const statusConfig = {
 export default function OrdersManager({ placeId }: { placeId: number }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWaiterMode, setShowWaiterMode] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -87,13 +89,22 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
           <h2 className="text-2xl font-bold text-slate-900">Pedidos Recientes</h2>
           <p className="text-slate-500 text-sm">Gestiona los pedidos a domicilio de tu sucursal.</p>
         </div>
-        <button
-          onClick={fetchOrders}
-          className="px-4 py-2 text-sm font-medium bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all flex items-center gap-2"
-        >
-          <Calendar size={16} />
-          Actualizar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowWaiterMode(true)}
+            className="px-4 py-2 text-sm font-bold bg-slate-900 text-white rounded-lg hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-slate-100"
+          >
+            <Plus size={16} />
+            Nueva Comanda
+          </button>
+          <button
+            onClick={fetchOrders}
+            className="px-4 py-2 text-sm font-medium bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all flex items-center gap-2"
+          >
+            <Calendar size={16} />
+            Actualizar
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -247,6 +258,14 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
             );
           })}
         </div>
+      )}
+
+      {showWaiterMode && (
+        <WaiterMode
+          placeId={placeId}
+          onClose={() => setShowWaiterMode(false)}
+          onOrderCreated={fetchOrders}
+        />
       )}
     </div>
   );

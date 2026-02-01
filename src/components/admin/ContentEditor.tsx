@@ -178,6 +178,25 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [textInput, setTextInput] = useState('');
   const [aiFiles, setAiFiles] = useState<{ name: string; data: string; type: string }[]>([]);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant', content: string, stats?: any }[]>([]);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
+
+  useEffect(() => {
+    if (showAIChat && chatMessages.length === 0) {
+      setChatMessages([
+        {
+          role: 'assistant',
+          content: '¡Hola! Soy tu asistente de BysMax. ✨ ¿En qué puedo ayudarte hoy? Puedo analizar fotos de tu menú, actualizar precios o responder dudas sobre la plataforma.'
+        }
+      ]);
+    }
+  }, [showAIChat]);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [forceCollapse, setForceCollapse] = useState(true);
   const [viewSettings, setViewSettings] = useState(() => {
@@ -348,26 +367,47 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         })
       });
 
+      const userMsg = textInput.trim();
+      setChatMessages(prev => [...prev, { role: 'user', content: userMsg || (aiFiles.length > 0 ? "Analizando imagen..." : "") }]);
+
       const result = await response.json();
 
-      if (result.success && result.preview) {
-        setPendingAiContent(result.content);
-        setAiStats(result.stats);
-      } else if (result.success) {
-        setBlocks(result.content.blocks);
-        setSemanticData(result.content.semantic_data);
-        setShowAIChat(false);
-        setAiFiles([]);
-        setTextInput('');
-        alert('✓ Contenido actualizado con IA');
+      if (result.success) {
+        if (result.preview) {
+          setPendingAiContent(result.content);
+          setAiStats(result.stats);
+
+          setChatMessages(prev => [...prev, {
+            role: 'assistant',
+            content: result.conversational_response || result.stats?.summary || 'He analizado tu solicitud y preparado los cambios.',
+            stats: result.stats
+          }]);
+        } else {
+          // Si no hay preview de cambios, es porque es puramente conversacional o ya se aplicaron
+          setChatMessages(prev => [...prev, {
+            role: 'assistant',
+            content: result.conversational_response || '✓ Operación completada.'
+          }]);
+
+          // Solo actualizamos el estado si no veníamos de un preview (caso raro aquí, pero por seguridad)
+          if (result.content && JSON.stringify(result.content.blocks) !== JSON.stringify(blocks)) {
+            setBlocks(result.content.blocks);
+            setSemanticData(result.content.semantic_data);
+          }
+        }
       } else {
         throw new Error(result.error || 'Error al procesar con IA');
       }
     } catch (err: any) {
       console.error('Error IA:', err);
-      alert(err.message || 'Error al procesar con IA');
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `Lo siento, hubo un error al procesar tu solicitud: ${err.message}`
+      }]);
     } finally {
       setAiProcessing(false);
+      setTextInput('');
+      setAiFiles([]);
     }
   };
 
@@ -437,15 +477,18 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         setSemanticData(result.content.semantic_data);
         setPendingAiContent(null);
         setAiStats(null);
-        setShowAIChat(false);
-        setAiFiles([]);
-        setTextInput('');
-        alert('✓ Cambios aplicados correctamente');
+        setChatMessages(prev => [...prev, {
+          role: 'assistant',
+          content: '✓ ¡Excelente! Los cambios han sido aplicados y publicados en tu menú. ¿Hay algo más en lo que pueda ayudarte?'
+        }]);
       } else {
         throw new Error(result.error || 'Error al guardar cambios');
       }
     } catch (err: any) {
-      alert(err.message);
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `Lo siento, hubo un problema al guardar los cambios: ${err.message}`
+      }]);
     } finally {
       setAiProcessing(false);
     }
@@ -494,23 +537,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </button>
         </div>
 
-        <div className="flex gap-2 w-full">
-          <button
-            onClick={() => setShowAIChat(!showAIChat)}
-            className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg font-semibold uppercase tracking-wide text-[9px] sm:text-[10px] shadow-md flex items-center justify-center gap-1.5"
-          >
-            <PiSparkle className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline">Asistente</span> IA
-          </button>
-          <button
-            onClick={saveChanges}
-            disabled={isSaving}
-            className="flex-1 bg-gray-800 text-white px-3 py-1.5 rounded-lg font-semibold uppercase tracking-wide text-[9px] sm:text-[10px] shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
-          >
-            {isSaving ? <PiArrowCounterClockwise className="w-3.5 h-3.5 animate-spin" /> : <PiFloppyDisk className="w-3.5 h-3.5" />}
-            {isSaving ? 'Guardando...' : 'Publicar'}
-          </button>
-        </div>
+        <button
+          onClick={saveChanges}
+          disabled={isSaving}
+          className="w-full bg-gray-800 text-white px-3 py-2 sm:py-2.5 rounded-lg font-bold uppercase tracking-widest text-[10px] sm:text-xs shadow-md flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-gray-900 active:scale-95"
+        >
+          {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
+          {isSaving ? 'Guardando...' : 'Publicar Menú'}
+        </button>
       </header>
 
       {/* Floating Quick Nav for Mobile */}
@@ -975,177 +1009,155 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </div>
 
           {showAIChat && (
-            <div className="mx-4 sm:mx-0 p-6 bg-gray-50 rounded-2xl border-2 border-purple-200 shadow-xl overflow-hidden">
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <PiSparkle className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold uppercase tracking-tight leading-none">Asistente IA</h2>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Sube fotos, pega texto o arrastra archivos</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowAIChat(false)}
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                >
-                  <PiX className="w-5 h-5 text-gray-400" />
-                </button>
-              </div>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 animate-in fade-in duration-300">
+              <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onClick={() => setShowAIChat(false)} />
 
-              {!pendingAiContent ? (
-                <div className="bg-white rounded-xl border-2 border-gray-100 shadow-sm overflow-hidden focus-within:border-purple-400 transition-all">
-                  {/* Archivos adjuntos */}
+              <div className="relative w-full max-w-4xl h-[85vh] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-white/20">
+                {/* Header */}
+                <div className="p-5 border-b flex items-center justify-between bg-white shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-200">
+                      <PiSparkle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-black uppercase tracking-tight leading-none text-gray-900">Asistente BysMax <span className="text-purple-600">IA</span></h2>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">En línea • Especialista en {placeType === 'motel' ? 'Moteles' : 'Restaurantes'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowAIChat(false)}
+                    className="p-2.5 hover:bg-gray-100 rounded-full transition-all active:scale-90"
+                  >
+                    <PiX className="w-5 h-5 text-gray-400" />
+                  </button>
+                </div>
+
+                {/* Chat History */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
+                  {chatMessages.map((msg, idx) => (
+                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
+                      <div className={`max-w-[85%] sm:max-w-[70%] ${msg.role === 'user' ? 'order-1' : 'order-2'}`}>
+                        <div className={`p-4 rounded-2xl shadow-sm border ${msg.role === 'user'
+                          ? 'bg-slate-900 text-white border-slate-800 rounded-tr-none'
+                          : 'bg-white text-gray-800 border-gray-100 rounded-tl-none'
+                          }`}>
+                          <p className={`text-sm leading-relaxed ${msg.role === 'user' ? 'font-medium' : 'font-normal'}`}>
+                            {msg.content}
+                          </p>
+
+                          {/* AI Stats / Pending Changes Card */}
+                          {msg.role === 'assistant' && msg.stats && (
+                            <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                  <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Secciones</p>
+                                  <p className="text-lg font-black text-gray-900">{msg.stats.sections}</p>
+                                </div>
+                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                  <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Productos</p>
+                                  <p className="text-lg font-black text-gray-900">{msg.stats.items}</p>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={confirmAiChanges}
+                                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 flex items-center justify-center gap-2"
+                              >
+                                {aiProcessing ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiCheckCircle className="w-4 h-4" />}
+                                Aplicar estos cambios
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={chatEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="p-5 bg-white border-t shrink-0">
                   {aiFiles.length > 0 && (
-                    <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border-b border-gray-100">
+                    <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 rounded-2xl border border-gray-100">
                       {aiFiles.map((file, idx) => (
-                        <div key={idx} className="group relative">
+                        <div key={idx} className="group relative transition-all hover:scale-105">
                           <img
                             src={file.data}
                             alt={file.name}
-                            className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                            className="w-14 h-14 object-cover rounded-xl border border-gray-200 shadow-sm"
                           />
                           <button
                             onClick={() => removeAiFile(idx)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                            className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 shadow-md z-10 hover:bg-red-600"
                           >
-                            <PiX className="w-3 h-3" />
+                            <PiX size={10} />
                           </button>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  <textarea
-                    className="w-full p-4 text-sm resize-none outline-none min-h-[140px] focus:ring-0"
-                    placeholder="Escribe instrucciones (ej: 'agrega estos platillos'), pega una imagen del menú directamente aquí, o arrastra archivos..."
-                    onPaste={handlePaste}
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    disabled={aiProcessing}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                        analyzeMenuWithAI();
-                      }
-                    }}
-                  />
+                  <div className="relative group transition-all">
+                    <textarea
+                      className="w-full p-4 pr-16 text-sm bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-500 focus:bg-white outline-none resize-none transition-all placeholder:text-gray-400 font-medium min-h-[50px] max-h-[150px]"
+                      placeholder="Escribe algo... o pega una imagen del menú"
+                      rows={1}
+                      onPaste={handlePaste}
+                      value={textInput}
+                      onChange={(e) => setTextInput(e.target.value)}
+                      disabled={aiProcessing}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          analyzeMenuWithAI();
+                        }
+                      }}
+                    />
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 border-t border-gray-100">
-                    <div className="flex items-center gap-1">
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={aiProcessing}
-                        className="p-2 hover:bg-white text-gray-600 rounded-lg transition-colors flex items-center gap-1.5 border border-transparent hover:border-gray-200"
+                        className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
+                        title="Adjuntar imagen"
                       >
-                        <PiPaperclip className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase">Adjuntar</span>
+                        <PiPaperclip className="w-5 h-5" />
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          multiple
+                          className="hidden"
+                          onChange={handleAIImagesUpload}
+                          accept="image/*"
+                        />
                       </button>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        className="hidden"
-                        onChange={handleAIImagesUpload}
-                        accept="image/*,application/pdf"
-                      />
+                      <button
+                        onClick={analyzeMenuWithAI}
+                        disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
+                        className={`p-2.5 rounded-xl transition-all ${aiProcessing || (!textInput.trim() && aiFiles.length === 0)
+                          ? 'text-gray-200'
+                          : 'bg-purple-600 text-white shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-90'
+                          }`}
+                      >
+                        {aiProcessing ? <PiArrowCounterClockwise className="w-5 h-5 animate-spin" /> : <PiPaperPlaneTilt className="w-5 h-5" />}
+                      </button>
                     </div>
-
-                    <button
-                      onClick={analyzeMenuWithAI}
-                      disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
-                      className="bg-purple-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-100 active:scale-95"
-                    >
-                      {aiProcessing ? (
-                        <>
-                          <PiArrowCounterClockwise className="w-4 h-4 animate-spin" />
-                          Analizando...
-                        </>
-                      ) : (
-                        <>
-                          <PiPaperPlaneTilt className="w-4 h-4" />
-                          Analizar con IA
-                        </>
-                      )}
-                    </button>
                   </div>
+                  <p className="text-center text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-3">
+                    Presiona Enter para enviar • Shift + Enter para salto de línea
+                  </p>
                 </div>
-              ) : (
-                <div className="p-6 bg-white rounded-2xl border-2 border-green-500 shadow-xl">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <PiCheckCircle className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold uppercase text-green-900 leading-none">Análisis Completado</h3>
-                      <p className="text-xs text-green-600 font-bold uppercase mt-1">Revisa los cambios detectados</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                      <p className="text-[10px] text-green-600 uppercase font-bold mb-1">Secciones</p>
-                      <p className="text-3xl font-bold text-green-900">{aiStats?.sections || 0}</p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                      <p className="text-[10px] text-green-600 uppercase font-bold mb-1">Productos</p>
-                      <p className="text-3xl font-bold text-green-900">{aiStats?.items || 0}</p>
-                    </div>
-                    {aiStats?.newImages > 0 && (
-                      <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 col-span-2 flex items-center justify-between">
-                        <div>
-                          <p className="text-[10px] text-blue-600 uppercase font-bold">Galería</p>
-                          <p className="text-lg font-bold text-blue-900">+{aiStats.newImages} fotos detectadas</p>
-                        </div>
-                        <PiImage className="w-8 h-8 text-blue-200" />
-                      </div>
-                    )}
-                    {(aiStats?.hasAddress || aiStats?.hasPhone) && (
-                      <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 col-span-2">
-                        <p className="text-[10px] text-amber-600 uppercase font-bold mb-1">Contacto Renovado</p>
-                        <div className="flex gap-2">
-                          {aiStats.hasAddress && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📍 Dirección</span>}
-                          {aiStats.hasPhone && <span className="bg-white px-2 py-1 rounded text-[10px] font-bold border border-amber-200 uppercase">📞 Teléfono</span>}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setPendingAiContent(null);
-                        setAiStats(null);
-                      }}
-                      className="flex-1 py-2 px-4 bg-gray-100 text-gray-500 rounded-xl font-semibold hover:bg-gray-200 uppercase text-xs"
-                    >
-                      Descartar
-                    </button>
-                    <button
-                      onClick={confirmAiChanges}
-                      disabled={aiProcessing}
-                      className="flex-[2] py-2 px-4 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 shadow-lg flex items-center justify-center gap-2 uppercase text-xs tracking-wide"
-                    >
-                      {aiProcessing ? (
-                        <>
-                          <PiArrowCounterClockwise className="w-4 h-4 animate-spin" />
-                          Aplicando...
-                        </>
-                      ) : (
-                        <>Aplicar Cambios </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
-                <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
-                <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> CMD + Enter para enviar</span>
-                <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Arrastra fotos o archivos</span>
               </div>
             </div>
           )}
+
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
+            <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
+            <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> CMD + Enter para enviar</span>
+            <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Arrastra fotos o archivos</span>
+          </div>
 
           <div className="space-y-4 lg:px-4 sm:px-0">
             {blocks.map((block, index) => (
@@ -1299,7 +1311,30 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           )}
         </div>
       )}
-    </div>
+
+      {/* Botón Flotante de IA */}
+      <div className="fixed bottom-6 right-6 z-[70] hidden sm:block">
+        <button
+          onClick={() => setShowAIChat(!showAIChat)}
+          className="group relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 text-white shadow-2xl transition-all hover:scale-110 active:scale-95"
+          title="Asistente IA ✨"
+        >
+          <div className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+          <PiSparkle className={`h-8 w-8 transition-transform duration-500 ${showAIChat ? 'rotate-180' : 'group-hover:rotate-12'}`} />
+          <div className="absolute -bottom-1 h-1 w-1 rounded-full bg-white opacity-40 blur-sm group-hover:scale-[20]" />
+        </button>
+      </div>
+
+      {/* Botón Flotante de IA para Mobile */}
+      <div className="fixed bottom-24 right-6 z-40 sm:hidden">
+        <button
+          onClick={() => setShowAIChat(!showAIChat)}
+          className="w-14 h-14 bg-gradient-to-tr from-purple-600 to-indigo-600 text-white rounded-full shadow-xl flex items-center justify-center text-xl active:scale-95 transition-all"
+        >
+          <PiSparkle className="w-6 h-6" />
+        </button>
+      </div>
+    </div >
   );
 }
 
