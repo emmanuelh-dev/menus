@@ -121,7 +121,7 @@ export function SectionBlock({ data, onChange, placeType = 'restaurant', forceCo
                     onClick={() => setShowImageSelector(!showImageSelector)}
                     className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm font-bold whitespace-nowrap"
                   >
-                    📚 Existentes
+                    Existentes
                   </button>
                 )}
               </div>
@@ -243,7 +243,7 @@ export function SectionBlock({ data, onChange, placeType = 'restaurant', forceCo
                             onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex] })}
                             className="px-3 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-xs font-bold whitespace-nowrap"
                           >
-                            📚 Existentes
+                            Existentes
                           </button>
                         )}
                       </div>
@@ -277,7 +277,7 @@ export function SectionBlock({ data, onChange, placeType = 'restaurant', forceCo
                               onClick={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: !showItemGallerySelector[itemIndex] })}
                               className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-xs font-bold border border-purple-200"
                             >
-                              📚 Agregar desde existentes
+                              Agregar desde existentes
                             </button>
                             {showItemGallerySelector[itemIndex] && (
                               <ImageSelector

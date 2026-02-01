@@ -4,11 +4,13 @@ import GooglePlacesAutocomplete from './admin/GooglePlacesAutocomplete';
 
 interface CartItem {
   id: string;
+  productId: string;
   name: string;
   price: number;
   quantity: number;
   image?: string;
   notes?: string;
+  selectedOptions?: { [key: string]: string };
 }
 
 interface Favorite {
@@ -97,6 +99,8 @@ export default function CartManager({
   const [loadingCustomer, setLoadingCustomer] = useState(true);
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [configuringItem, setConfiguringItem] = useState<any | null>(null);
+  const [tempOptions, setTempOptions] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     setCart(getCart(placeSlug));
@@ -107,7 +111,20 @@ export default function CartManager({
     const handleAddToCart = (e: any) => {
       const button = e.currentTarget;
       const itemData = JSON.parse(button.dataset.item);
-      addToCart(itemData);
+
+      if (itemData.options && itemData.options.length > 0) {
+        // Initialize temp options with first values of required groups
+        const initial: any = {};
+        itemData.options.forEach((opt: any) => {
+          if (opt.values && opt.values.length > 0) {
+            initial[opt.name] = opt.values[0];
+          }
+        });
+        setTempOptions(initial);
+        setConfiguringItem(itemData);
+      } else {
+        addToCart(itemData);
+      }
     };
 
     const handleToggleFavorite = (e: any) => {
@@ -263,25 +280,36 @@ export default function CartManager({
     });
   }, [favorites]);
 
-  const addToCart = (item: {
-    id: string;
-    name: string;
-    price: number;
-    image?: string;
-  }) => {
+  const addToCart = (item: any, options?: { [key: string]: string }) => {
     setCart((prevCart) => {
       const newCart = [...prevCart];
-      const existing = newCart.find((i) => i.id === item.id);
+      const optionHash = options ? JSON.stringify(options) : '';
+      const uniqueId = `${item.id}-${optionHash}`;
 
+      const existing = newCart.find((i) => i.id === uniqueId);
       if (existing) {
         existing.quantity++;
       } else {
-        newCart.push({ ...item, quantity: 1, notes: "" });
+        newCart.push({
+          id: uniqueId,
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          quantity: 1,
+          notes: "",
+          selectedOptions: options
+        });
       }
 
       saveCart(placeSlug, newCart);
       return newCart;
     });
+
+    if (configuringItem) {
+      setConfiguringItem(null);
+      setTempOptions({});
+    }
   };
 
   const removeFromCart = (itemId: string) => {
@@ -459,7 +487,14 @@ export default function CartManager({
 
     message += `\n${icons.list} *DETALLE DEL PEDIDO*\n`;
     cart.forEach((item) => {
-      message += `• ${item.quantity}x ${item.name} - $${item.price * item.quantity}\n`;
+      let itemName = item.name;
+      if (item.selectedOptions) {
+        const optValues = Object.entries(item.selectedOptions)
+          .map(([key, val]) => `${val}`)
+          .join(', ');
+        itemName += ` (${optValues})`;
+      }
+      message += `• ${item.quantity}x ${itemName} - $${item.price * item.quantity}\n`;
       if (item.notes) message += `  _Nota: ${item.notes}_\n`;
     });
 
@@ -656,37 +691,46 @@ export default function CartManager({
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="w-16 h-16 object-cover rounded-lg"
+                                className="w-16 h-16 object-cover rounded-lg shadow-sm"
                               />
                             )}
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-medium truncate">{item.name}</h3>
-                              <p className="text-sm text-gray-500">${item.price}</p>
+                              <h3 className="font-bold text-sm truncate">{item.name}</h3>
+                              {item.selectedOptions && (
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {Object.entries(item.selectedOptions).map(([key, val]) => (
+                                    <span key={key} className="text-[9px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded uppercase">
+                                      {val}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              <p className="text-xs font-bold text-emerald-600 mt-1">${item.price}</p>
                               <div className="flex items-center gap-3 mt-2">
                                 <button
                                   onClick={() => updateQuantity(item.id, -1)}
-                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors font-bold"
                                 >
                                   -
                                 </button>
-                                <span className="font-medium w-8 text-center">
+                                <span className="font-bold text-sm w-4 text-center">
                                   {item.quantity}
                                 </span>
                                 <button
                                   onClick={() => updateQuantity(item.id, 1)}
-                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors font-bold"
                                 >
                                   +
                                 </button>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="font-bold">
+                              <p className="font-black text-sm text-gray-800">
                                 ${item.price * item.quantity}
                               </p>
                               <button
                                 onClick={() => removeFromCart(item.id)}
-                                className="text-red-500 hover:text-red-600 mt-2"
+                                className="text-gray-300 hover:text-red-500 mt-2 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -924,6 +968,64 @@ export default function CartManager({
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {configuringItem && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+          <div className="bg-white w-full sm:max-w-md rounded-t-[2.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
+            <div className="relative aspect-video sm:aspect-[16/10] overflow-hidden">
+              {configuringItem.image ? (
+                <img src={configuringItem.image} className="w-full h-full object-cover" alt="" />
+              ) : (
+                <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
+                  <ShoppingCart size={48} />
+                </div>
+              )}
+              <button
+                onClick={() => setConfiguringItem(null)}
+                className="absolute top-4 right-4 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6">
+              <div>
+                <h3 className="text-2xl font-black uppercase text-gray-900 tracking-tight leading-none mb-2">{configuringItem.name}</h3>
+                <p className="text-gray-500 text-sm font-medium leading-relaxed">{configuringItem.description}</p>
+                <p className="text-2xl font-black text-emerald-600 mt-4">${configuringItem.price}</p>
+              </div>
+
+              <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                {configuringItem.options?.map((opt: any) => (
+                  <div key={opt.name} className="space-y-3">
+                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 block px-1">
+                      Selecciona {opt.name}:
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {opt.values.map((val: string) => (
+                        <button
+                          key={val}
+                          onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
+                          className={`p-3 rounded-xl border-2 font-bold text-xs uppercase tracking-wide transition-all ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => addToCart(configuringItem, tempOptions)}
+                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 mt-4"
+              >
+                <ShoppingCart size={18} />
+                Agregar al Carrito
+              </button>
             </div>
           </div>
         </div>

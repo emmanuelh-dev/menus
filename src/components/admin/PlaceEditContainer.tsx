@@ -69,7 +69,7 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
   const { place, reviews } = data;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="xl:p-4 lg:p-8">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <a href="/admin/dashboard" className="text-sm text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors">

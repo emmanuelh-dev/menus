@@ -111,6 +111,12 @@ const migrateFlatToNested = (content: any): Block[] => {
   return nestedBlocks;
 };
 
+interface ItemOption {
+  name: string;
+  values: string[];
+  required?: boolean;
+}
+
 interface ItemData {
   id: string;
   name: string;
@@ -119,6 +125,7 @@ interface ItemData {
   image: string;
   features?: string[];
   gallery?: { src: string; alt?: string; title?: string }[];
+  options?: ItemOption[];
 }
 
 interface SectionData {
@@ -583,7 +590,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           className="w-full bg-gray-800 text-white px-3 py-2 sm:py-2.5 rounded-lg font-bold uppercase tracking-widest text-[10px] sm:text-xs shadow-md flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-gray-900 active:scale-95"
         >
           {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
-          {isSaving ? 'Guardando...' : 'Gardar'}
+          {isSaving ? 'Guardando...' : 'Guardar'}
         </button>
       </header>
 
@@ -1574,7 +1581,8 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
       price: 0,
       description: '',
       image: '',
-      features: []
+      features: [],
+      options: []
     };
     onChange({ ...data, items: [...data.items, newItem] });
     setIsCollapsed(false);
@@ -1600,8 +1608,8 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
   };
 
   return (
-    <div className={`bg-white rounded-2xl border-2 transition-all duration-500 overflow-hidden ${isCollapsed ? 'border-gray-100 shadow-sm' : 'border-gray-200 shadow-xl'}`}>
-      <div className={`${isCollapsed ? 'bg-white' : 'bg-gray-50'} p-4 transition-all uppercase tracking-wide`}>
+    <div className={`xl:bg-white rounded-2xl  duration-500 overflow-hidden ${isCollapsed ? 'border-gray-50 shadow-sm' : 'border-gray-200 shadow-xl'}`}>
+      <div className={`${isCollapsed ? 'bg-white' : 'xl:bg-gray-50'} xl:p-4 transition-all uppercase tracking-wide`}>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -1615,7 +1623,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
               value={data.title}
               onChange={(e) => onChange({ ...data, title: e.target.value })}
               placeholder="Ej: PLATILLOS FUERTES"
-              className={`w-full font-bold uppercase bg-transparent outline-none transition-all tracking-wider ${isCollapsed ? 'text-xs text-gray-500' : 'text-xl sm:text-2xl text-gray-800 px-1 border-b-2 border-gray-300'
+              className={`w-full font-bold uppercase bg-transparent outline-none transition-all tracking-wider ${isCollapsed ? 'text-xs text-gray-800' : 'text-xl sm:text-2xl text-gray-800 px-1 border-b-2 border-gray-300'
                 }`}
             />
             {isCollapsed && (
@@ -1667,7 +1675,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                     onClick={() => setShowImageSelector(!showImageSelector)}
                     className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm font-bold whitespace-nowrap"
                   >
-                    📚 Existentes
+                    Existentes
                   </button>
                 )}
               </div>
@@ -1681,12 +1689,12 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
               )}
             </div>
 
-            <div className="mt-6 space-y-3">
-              <div className="flex justify-between items-center border-t border-purple-100 pt-4">
-                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Contenido de la sección</h4>
+            <div className="mt-8">
+              <div className="flex justify-between items-center border-t border-purple-50 pt-4 px-1">
+                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Listado de Productos</h4>
                 <button
                   onClick={addItem}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-purple-100 flex items-center gap-2"
+                  className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg flex items-center gap-2"
                 >
                   <PiPlus className="w-3 h-3" /> Agregar Ítem
                 </button>
@@ -1699,137 +1707,248 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
               )}
 
               {data.items.map((item, itemIndex) => (
-                <div key={item.id} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
-                  <div className="flex justify-end gap-2 mb-3">
-                    <button
-                      onClick={() => moveItem(itemIndex, 'up')}
-                      disabled={itemIndex === 0}
-                      className="w-6 h-6 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-30 flex items-center justify-center text-xs"
-                    >↑</button>
-                    <button
-                      onClick={() => moveItem(itemIndex, 'down')}
-                      disabled={itemIndex === data.items.length - 1}
-                      className="w-6 h-6 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-30 flex items-center justify-center text-xs"
-                    >↓</button>
-                    <button
-                      onClick={() => removeItem(itemIndex)}
-                      className="w-6 h-6 bg-red-50 border border-red-200 rounded hover:bg-red-100 text-red-500 flex items-center justify-center text-xs"
-                    >✕</button>
-                  </div>
+                <div key={item.id} className="group relative bg-white rounded-[2rem] border border-gray-100 hover:border-emerald-500/30 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 my-4">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-100 group-hover:bg-emerald-500 transition-colors duration-300" />
 
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-4 gap-2">
-                      <input
-                        value={item.name}
-                        onChange={(e) => updateItem(itemIndex, { name: e.target.value })}
-                        placeholder="Nombre del platillo"
-                        className="col-span-3 text-sm font-bold bg-white border border-gray-100 rounded-xl px-3 py-2 outline-none focus:border-purple-600 shadow-sm"
-                      />
-                      <input
-                        type="number"
-                        value={item.price}
-                        onChange={(e) => updateItem(itemIndex, { price: parseFloat(e.target.value) })}
-                        placeholder="0.00"
-                        className="text-left sm:text-right text-sm sm:text-base font-bold text-red-600 bg-gray-50 border border-gray-200 rounded px-3 py-2 outline-none focus:border-purple-600"
-                      />
-                    </div>
-
-                    <textarea
-                      value={item.description}
-                      onChange={(e) => updateItem(itemIndex, { description: e.target.value })}
-                      placeholder="Descripción del platillo..."
-                      rows={2}
-                      className="w-full text-sm text-gray-700 p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600 resize-none"
-                    />
-
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 mb-2 block">{placeType === 'motel' ? 'CARACTERÍSTICAS DE LA HABITACIÓN (ej: Jacuzzi, Smart TV, Tina):' : 'CARACTERÍSTICAS DEL PLATILLO (ej: Picante, Vegetariano):'}</label>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {item.features?.map((feature, fIdx) => (
-                          <span key={fIdx} className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                            {feature}
-                            <button
-                              onClick={() => {
-                                const newFeatures = item.features?.filter((_, i) => i !== fIdx);
-                                updateItem(itemIndex, { features: newFeatures });
-                              }}
-                              className="hover:text-red-600"
-                            >×</button>
-                          </span>
-                        ))}
+                  <div className="p-4 sm:p-6">
+                    <div className="flex items-center justify-between gap-4 mb-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-xs font-black shadow-lg">{itemIndex + 1}</div>
+                        <div>
+                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block leading-none mb-1">Producto</span>
+                          <span className="text-[9px] font-mono text-gray-300 uppercase leading-none">{item.id.split('-').pop()}</span>
+                        </div>
                       </div>
-                      <input
-                        type="text"
-                        placeholder={placeType === 'motel' ? 'Agregar característica de habitación (Enter)' : 'Agregar característica del platillo (Enter)'}
-                        className="w-full text-sm p-2 rounded bg-gray-50 border border-gray-200 outline-none focus:border-purple-600"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                            const newFeature = e.currentTarget.value.trim();
-                            const currentFeatures = item.features || [];
-                            updateItem(itemIndex, { features: [...currentFeatures, newFeature] });
-                            e.currentTarget.value = '';
-                          }
-                        }}
-                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => moveItem(itemIndex, 'up')}
+                          disabled={itemIndex === 0}
+                          className="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white disabled:opacity-30 flex items-center justify-center transition-all"
+                        >
+                          <PiCaretUp className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => moveItem(itemIndex, 'down')}
+                          disabled={itemIndex === data.items.length - 1}
+                          className="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white disabled:opacity-30 flex items-center justify-center transition-all"
+                        >
+                          <PiCaretDown className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => { if (confirm('¿Eliminar este producto?')) removeItem(itemIndex); }}
+                          className="w-10 h-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white flex items-center justify-center transition-all"
+                        >
+                          <PiTrash className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="w-full">
-                      <label className="text-xs font-bold text-gray-600 mb-2 block">IMAGEN PRINCIPAL:</label>
-                      <div className="flex gap-2">
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <div className="flex-1">
-                          <ManualUploader
-                            currentImage={item.image}
-                            onFilesUploaded={(url) => updateItem(itemIndex, { image: url[0] })}
-                            onImageRemove={() => updateItem(itemIndex, { image: '' })}
-                            onUploadStart={() => console.log('Subiendo imagen del item...')}
-                            onUploadError={() => console.error('Error al subir imagen')}
+                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 block">Nombre del Producto</label>
+                          <input
+                            value={item.name}
+                            onChange={(e) => updateItem(itemIndex, { name: e.target.value })}
+                            placeholder="Ej: Gordita de Chicharrón"
+                            className="w-full text-sm font-bold bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 shadow-sm transition-all"
                           />
                         </div>
-                        {existingImages && existingImages.length > 0 && (
-                          <button
-                            onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex] })}
-                            className="px-3 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-xs font-bold whitespace-nowrap"
-                          >
-                            📚 Existentes
-                          </button>
-                        )}
+                        <div className="w-full sm:w-32">
+                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 block">Precio ($)</label>
+                          <input
+                            type="number"
+                            value={item.price}
+                            onChange={(e) => updateItem(itemIndex, { price: parseFloat(e.target.value) })}
+                            placeholder="0.00"
+                            className="w-full text-left sm:text-right text-sm sm:text-base font-bold text-emerald-600 bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 shadow-sm"
+                          />
+                        </div>
                       </div>
-                      {showItemImageSelector[itemIndex] && existingImages && (
-                        <ImageSelector
-                          existingImages={existingImages}
-                          onSelect={(url) => updateItem(itemIndex, { image: url })}
-                          onClose={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false })}
-                        />
-                      )}
-                    </div>
 
-                    <div className="w-full">
-                      <label className="text-xs font-bold text-gray-600 mb-2 block">GALERÍA DEL ITEM (opcional):</label>
-                      <div className="space-y-2">
-                        <ManualUploader
-                          currentImage=""
-                          multiple={true}
-                          onFilesUploaded={(urls) => {
-                            const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
-                            const currentGallery = item.gallery || [];
-                            updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
-                            onUploadToLibrary?.(urls);
-                          }}
-                          onUploadStart={() => console.log('Subiendo galería...')}
-                          onUploadError={() => console.error('Error al subir galería')}
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 block">Descripción</label>
+                        <textarea
+                          value={item.description}
+                          onChange={(e) => updateItem(itemIndex, { description: e.target.value })}
+                          placeholder="Describe los ingredientes, tamaño o lo que incluye..."
+                          rows={2}
+                          className="w-full text-sm text-gray-700 p-3 rounded-xl bg-white border border-gray-200 outline-none focus:border-purple-600 resize-none shadow-sm transition-all"
                         />
+                      </div>
 
-                        {existingImages && existingImages.length > 0 && (
-                          <div>
+                      <div className="space-y-6 pt-2">
+                        <div className="space-y-4">
+                          <label className="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 px-1">
+                            <PiSparkle className="w-4 h-4 text-emerald-500" />
+                            Variantes (Sabores o Tamaños)
+                          </label>
+
+                          <div className="space-y-3">
+                            {item.options?.map((option, optIdx) => (
+                              <div key={optIdx} className="space-y-2 border-b border-gray-50 pb-4 last:border-0">
+                                <div className="flex items-center justify-between gap-4">
+                                  <input
+                                    value={option.name}
+                                    onChange={(e) => {
+                                      const newOptions = [...(item.options || [])];
+                                      newOptions[optIdx].name = e.target.value;
+                                      updateItem(itemIndex, { options: newOptions });
+                                    }}
+                                    placeholder="Ej: Sabor, Tamaño..."
+                                    className="flex-1 text-sm font-bold bg-transparent border-b-2 border-transparent focus:border-emerald-500 outline-none transition-all py-1"
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      const newOptions = item.options?.filter((_, i) => i !== optIdx);
+                                      updateItem(itemIndex, { options: newOptions });
+                                    }}
+                                    className="w-8 h-8 text-gray-300 hover:text-red-500 transition-colors"
+                                  >
+                                    <PiTrash className="w-4 h-4" />
+                                  </button>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2">
+                                  {option.values.map((val, vIdx) => (
+                                    <span key={vIdx} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-2 group border border-emerald-100">
+                                      {val}
+                                      <button
+                                        onClick={() => {
+                                          const newOptions = [...(item.options || [])];
+                                          newOptions[optIdx].values = newOptions[optIdx].values.filter((_, i) => i !== vIdx);
+                                          updateItem(itemIndex, { options: newOptions });
+                                        }}
+                                        className="text-emerald-300 hover:text-red-500"
+                                      >×</button>
+                                    </span>
+                                  ))}
+                                  <input
+                                    placeholder="Escribe sabores separados por comas..."
+                                    className="text-xs bg-gray-50 px-4 py-2 rounded-xl outline-none flex-1 min-w-[200px] border border-transparent focus:border-gray-200"
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      if (val.includes(',')) {
+                                        const parts = val.split(',').map(p => p.trim()).filter(p => p);
+                                        const newOptions = [...(item.options || [])];
+                                        newOptions[optIdx].values = [...newOptions[optIdx].values, ...parts];
+                                        updateItem(itemIndex, { options: newOptions });
+                                        e.target.value = '';
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                        const newOptions = [...(item.options || [])];
+                                        newOptions[optIdx].values.push(e.currentTarget.value.trim());
+                                        updateItem(itemIndex, { options: newOptions });
+                                        e.currentTarget.value = '';
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+
+                            <button onClick={() => {
+                              const newOptions = [...(item.options || []), { name: '', values: [], required: true }];
+                              updateItem(itemIndex, { options: newOptions });
+                            }} className="w-full py-3 bg-gray-50 border-2 border-dashed border-gray-100 rounded-2xl text-[10px] font-black text-gray-400 uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center gap-2">
+                              <PiPlus className="w-4 h-4" /> Añadir Nueva Variante
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block px-1">Etiquetas (Picante, Veggie, etc)</label>
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {item.features?.map((feature, fIdx) => (
+                              <span key={fIdx} className="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-2 border border-gray-200">
+                                {feature}
+                                <button
+                                  onClick={() => {
+                                    const newFeatures = item.features?.filter((_, i) => i !== fIdx);
+                                    updateItem(itemIndex, { features: newFeatures });
+                                  }}
+                                  className="text-gray-400 hover:text-red-600"
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Escribe etiquetas separadas por comas..."
+                            className="w-full text-xs p-4 rounded-xl bg-gray-50 border border-transparent focus:border-gray-200 outline-none transition-all"
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val.includes(',')) {
+                                const parts = val.split(',').map(p => p.trim()).filter(p => p);
+                                const currentFeatures = item.features || [];
+                                updateItem(itemIndex, { features: [...currentFeatures, ...parts] });
+                                e.target.value = '';
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                const newFeature = e.currentTarget.value.trim();
+                                const currentFeatures = item.features || [];
+                                updateItem(itemIndex, { features: [...currentFeatures, newFeature] });
+                                e.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-4 border-t border-gray-50">
+                        <label className="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 px-1">
+                          <PiImage className="w-4 h-4 text-emerald-500" />
+                          Fotos del Producto
+                        </label>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Imagen Principal</p>
+                            <ManualUploader
+                              currentImage={item.image}
+                              onFilesUploaded={(urls) => updateItem(itemIndex, { image: urls[0] })}
+                              onImageRemove={() => updateItem(itemIndex, { image: '' })}
+                            />
+                            <button
+                              onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex] })}
+                              className="w-full py-2 bg-white text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:text-emerald-500 transition-colors"
+                            >
+                              Seleccionar Existente
+                            </button>
+                            {showItemImageSelector[itemIndex] && existingImages && (
+                              <ImageSelector
+                                existingImages={existingImages}
+                                onSelect={(url) => updateItem(itemIndex, { image: url })}
+                                onClose={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false })}
+                              />
+                            )}
+                          </div>
+
+                          <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Galería de Fotos</p>
+                            <ManualUploader
+                              currentImage=""
+                              multiple={true}
+                              onFilesUploaded={(urls) => {
+                                const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
+                                const currentGallery = item.gallery || [];
+                                updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
+                                onUploadToLibrary?.(urls);
+                              }}
+                            />
                             <button
                               onClick={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: !showItemGallerySelector[itemIndex] })}
-                              className="w-full px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-xs font-bold border border-purple-200"
+                              className="w-full py-2 bg-white text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:text-emerald-500 transition-colors"
                             >
-                              📚 Agregar desde existentes
+                              Añadir de Biblioteca
                             </button>
                             {showItemGallerySelector[itemIndex] && (
                               <ImageSelector
-                                existingImages={existingImages}
+                                existingImages={existingImages || []}
                                 multiple={true}
                                 onSelectMultiple={(urls) => {
                                   const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
@@ -1841,28 +1960,28 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                               />
                             )}
                           </div>
+                        </div>
+
+                        {item.gallery && item.gallery.length > 0 && (
+                          <div className="mt-3 grid grid-cols-4 gap-2">
+                            {item.gallery.map((img, gIdx) => (
+                              <div key={gIdx} className="relative group">
+                                <img src={img.src} alt={img.alt || ''} className="w-full h-20 object-cover rounded" />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
+                                    updateItem(itemIndex, { gallery: newGallery });
+                                  }}
+                                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-100 transition-opacity"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
-
-                      {item.gallery && item.gallery.length > 0 && (
-                        <div className="mt-3 grid grid-cols-4 gap-2">
-                          {item.gallery.map((img, gIdx) => (
-                            <div key={gIdx} className="relative group">
-                              <img src={img.src} alt={img.alt || ''} className="w-full h-20 object-cover rounded" />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
-                                  updateItem(itemIndex, { gallery: newGallery });
-                                }}
-                                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-100 transition-opacity"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -1927,7 +2046,7 @@ function GalleryBlock({ data, onChange, existingImages, onUploadToLibrary }: { d
               onClick={() => setShowImageSelector(true)}
               className="w-full py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 border border-blue-100"
             >
-              <PiImage className="w-3 h-3" /> 📚 Biblioteca Existente
+              <PiImage className="w-3 h-3" />  Biblioteca Existente
             </button>
           </div>
         </div>
