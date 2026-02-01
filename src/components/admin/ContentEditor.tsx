@@ -522,7 +522,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
   return (
     <div className="space-y-8 pb-32 xl:px-4 px-0">
-      <header className="flex flex-col gap-2 sticky top-2 bg-white/90 backdrop-blur-xl z-[60] py-2 px-3 sm:px-4 rounded-xl border border-gray-200 shadow-lg mx-2 sm:mx-0">
+      <header className="flex flex gap-2 sticky top-2 bg-white/90 backdrop-blur-xl z-[60] py-2 px-3 sm:px-4 rounded-xl border border-gray-200 shadow-lg mx-2 sm:mx-0">
         <div className="flex items-center justify-between gap-2 w-full">
           <div className="flex bg-gray-100/50 p-1 rounded-xl items-center gap-0.5">
             <button

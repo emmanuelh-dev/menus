@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Restaurant {
   id: number;
@@ -29,20 +29,47 @@ interface Menu {
 }
 
 interface MenuManagerProps {
-  initialMenus: Menu[];
-  restaurants: Restaurant[];
+  initialMenus?: Menu[];
+  initialRestaurants?: Restaurant[];
 }
 
-export default function MenuManager({ initialMenus, restaurants }: MenuManagerProps) {
-  const [menus, setMenus] = useState<Menu[]>(initialMenus);
+export default function MenuManager({ initialMenus, initialRestaurants }: MenuManagerProps) {
+  const [menus, setMenus] = useState<Menu[]>(initialMenus || []);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants || []);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [availabilityDays, setAvailabilityDays] = useState<number[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!initialMenus || initialMenus.length === 0);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [restaurantFilter, setRestaurantFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+
+  useEffect(() => {
+    if (!initialMenus || initialMenus.length === 0) {
+      fetchData();
+    }
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/menus');
+      if (response.status === 401) {
+        window.location.href = '/admin/login';
+        return;
+      }
+      if (!response.ok) throw new Error('Error al cargar datos');
+      const data = await response.json();
+      setMenus(data.menus || []);
+      setRestaurants(data.restaurants || []);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openCreateModal = () => {
     setEditingMenu(null);
@@ -80,26 +107,26 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
   };
 
   const toggleDay = (day: number) => {
-    setAvailabilityDays(prev => 
+    setAvailabilityDays(prev =>
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     );
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    
+
     try {
       let imageUrl = editingMenu?.image || null;
-      
+
       const imageFile = formData.get('image') as File;
       if (imageFile && imageFile.size > 0) {
         const uploadFormData = new FormData();
         uploadFormData.append('image', imageFile);
-        
+
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
           body: uploadFormData,
@@ -165,7 +192,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -204,6 +231,26 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
     { value: 6, label: 'Sáb' }
   ];
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-10 w-40 bg-gray-200 rounded-md animate-pulse"></div>
+        </div>
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="p-8 space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center space-x-4">
+                <div className="h-12 w-full bg-gray-100 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex justify-between items-center mb-6">
@@ -211,7 +258,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
         <button
           onClick={openCreateModal}
           data-create-menu
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black -600 hover:bg-black -700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black -500"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
         >
           <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -220,7 +267,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
         </button>
       </div>
 
-  
+
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
         {filteredMenus.length > 0 ? (
@@ -272,11 +319,10 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        menu.is_active 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${menu.is_active
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}>
                         {menu.is_active ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
@@ -453,18 +499,18 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Imagen del Menú
                 </label>
-                
+
                 {imagePreview && (
                   <div className="mb-4">
-                    <img 
-                      src={imagePreview} 
-                      alt="Vista previa" 
+                    <img
+                      src={imagePreview}
+                      alt="Vista previa"
                       className="w-32 h-32 object-cover rounded-lg shadow-sm"
                     />
                     <p className="text-sm text-gray-500 mt-1">Vista previa</p>
                   </div>
                 )}
-                
+
                 <input
                   type="file"
                   name="image"
@@ -477,7 +523,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
 
               <div className="border-t pt-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Configuración de Disponibilidad</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -552,7 +598,7 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
 
               <div className="border-t pt-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Configuración Adicional</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -591,10 +637,10 @@ export default function MenuManager({ initialMenus, restaurants }: MenuManagerPr
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-4 py-2 bg-black -600 text-white rounded-md text-sm font-medium hover:bg-black -700 disabled:opacity-50"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-black text-white rounded-md text-sm font-medium hover:bg-slate-900 disabled:opacity-50"
                 >
-                  {loading ? 'Guardando...' : (editingMenu ? 'Actualizar' : 'Crear')}
+                  {submitting ? 'Guardando...' : (editingMenu ? 'Actualizar' : 'Crear')}
                 </button>
               </div>
             </form>

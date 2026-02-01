@@ -3,6 +3,78 @@ import { createAuthenticatedClient } from "../../../lib/supabase";
 
 export const prerender = false;
 
+export const GET: APIRoute = async ({ cookies }) => {
+  const accessToken = cookies.get("sb-access-token");
+  const refreshToken = cookies.get("sb-refresh-token");
+
+  if (!accessToken || !refreshToken) {
+    return new Response(JSON.stringify({ error: "No autorizado" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return new Response(JSON.stringify({ error: "No autorizado" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const isAdmin = [
+      "emmanuelh.dev@gmail.com",
+      "admin@bysmax.com",
+      "e805177@gmail.com",
+    ].includes(user.email || "");
+
+    // Obtener menús
+    let menusQuery = supabase
+      .from("menus")
+      .select(`
+        *,
+        restaurants (
+          id,
+          name
+        )
+      `);
+
+    if (!isAdmin) {
+      menusQuery = menusQuery.eq("user_id", user.id);
+    }
+    
+    const { data: menus, error: menusError } = await menusQuery.order("created_at", { ascending: false });
+
+    if (menusError) throw menusError;
+
+    // Obtener restaurantes para el selector
+    let placesQuery = supabase
+      .from("places")
+      .select("id, name");
+
+    if (!isAdmin) {
+      placesQuery = placesQuery.eq("user_id", user.id);
+    }
+
+    const { data: restaurants, error: placesError } = await placesQuery.order("name");
+
+    if (placesError) throw placesError;
+
+    return new Response(JSON.stringify({ menus, restaurants }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error: any) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+};
+
 export const POST: APIRoute = async ({ request, cookies }) => {
   const accessToken = cookies.get("sb-access-token");
   const refreshToken = cookies.get("sb-refresh-token");

@@ -37,7 +37,6 @@ export default function DashboardContainer() {
     fetchData();
   }, []);
 
-  if (loading) return null;
 
   if (error) {
     return (
@@ -54,15 +53,19 @@ export default function DashboardContainer() {
     );
   }
 
-  if (!data) return null;
-
-  const { isAdmin, places, recentComments, history } = data;
+  const places = data?.places || [];
+  const isAdmin = data?.isAdmin || false;
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <PlaceManager initialRestaurants={places || []} />
+      <PlaceManager initialRestaurants={places} loading={loading} />
 
-      {places && places.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+          <div className="h-32 bg-gray-100 rounded-xl"></div>
+          <div className="h-32 bg-gray-100 rounded-xl"></div>
+        </div>
+      ) : places.length === 0 ? (
         <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-10 text-center">
           <div className="w-12 h-12 bg-white border border-slate-200 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
             <span className="text-xl">✨</span>

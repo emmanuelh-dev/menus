@@ -4,7 +4,7 @@ const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY || import.meta.env.PUBLIC_
 const IS_DEVELOP = import.meta.env.DEVELOP === 'true';
 const OLLAMA_HOST = 'http://localhost:11434';
 const OLLAMA_MODEL = 'deepseek-coder:1.3b';
-const GEMINI_MODEL = 'gemini-2.0-flash-lite';
+const GEMINI_MODEL = 'gemini-1.5-flash';
 
 export interface GeminiResponse {
   semantic_data?: any;
@@ -26,26 +26,30 @@ CONOCIMIENTO DE BYSMAX:
 - Ventajas: Profesionalismo, ahorro de tiempo, mejor experiencia de usuario y centralización de pedidos.
 
 TU MISIÓN: 
-1. Si el usuario te da una instrucción de edición (ej: "Sube los precios un 10%" o "Analiza esta foto"), genera el ESTADO FINAL del contenido del lugar en los campos \`blocks\` y \`semantic_data\`.
-2. Si el usuario te hace una pregunta o comentario (ej: "¿Cómo funciona BysMax?" o "Gracias"), responde de forma amable, profesional y concisa en el campo \`conversational_response\`.
-3. MUY IMPORTANTE: Si la solicitud es PURAMENTE INFORMATIVA o el usuario no pide cambios, NO modifiques el contenido. En ese caso, devuelve los campos \`blocks\` y \`semantic_data\` tal cual se te entregaron en el CONTENIDO ACTUAL, y deja el campo \`change_summary\` vacío o nulo.
-4. PUEDES hacer ambas cosas: aplicar cambios y comentar sobre ellos si la situación lo requiere.
+1. Si el usuario te da una instrucción de edición o sube imágenes (ej: "Sube los precios un 10%", "Analiza esta foto" o simplemente sube imágenes de un menú), genera el ESTADO FINAL del contenido del lugar en los campos \`blocks\` y \`semantic_data\`.
+2. EXTRACCIÓN DE MENÚ: Si detectas fotos de un menú físico, debes transcribir TODAS las secciones, platillos (nombres, precios, descripciones) y agregarlos al contenido. Si no hay instrucciones específicas, asume que el usuario quiere añadir lo que aparece en las fotos al menú actual o actualizar precios existentes.
+3. Si el usuario te hace una pregunta o comentario (ej: "¿Cómo funciona BysMax?" o "Gracias"), responde de forma amable, profesional y concisa en el campo \`conversational_response\`.
+4. MUY IMPORTANTE: Si la solicitud es PURAMENTE INFORMATIVA (ej: "¿Qué es BysMax?") y NO incluye imágenes de menú ni peticiones de cambio, NO modifiques el contenido. En ese caso, devuelve los campos \`blocks\` y \`semantic_data\` tal cual se te entregaron en el CONTENIDO ACTUAL, y deja el campo \`change_summary\` vacío o nulo.
+5. PUEDES hacer ambas cosas: aplicar cambios y comentar sobre ellos si la situación lo requiere.
 
 ${currentContent ? `CONTENIDO ACTUAL:
 ${JSON.stringify(currentContent)}` : 'No hay contenido previo.'}
 
 REGLAS DE ORO:
-1. CONSERVACIÓN: Nunca borres contenido importante sin permiso explícito.
-2. PRESERVACIÓN DE IMÁGENES: Usa "[URL_DE_IMAGEN]" para imágenes existentes.
-3. IDs: Mantén los \`id\` originales.
-4. TONO: Profesional, servicial y experto.
+1. CONSERVACIÓN: Nunca borres contenido importante sin permiso explícito. Si extraes cosas nuevas, mézclalas con lo existente de forma coherente.
+2. ESTRUCTURA DE BLOQUE (SECCIÓN): 
+   - Cada sección debe tener un array "items".
+   - Cada item debe tener: "name" (string), "price" (number, sin símbolos de moneda), "description" (string), "image" ("[URL_DE_IMAGEN]").
+3. PRESERVACIÓN DE IMÁGENES: Usa "[URL_DE_IMAGEN]" para imágenes existentes (las que ya vienen en el CONTENIDO ACTUAL).
+4. IDs: Mantén los \`id\` originales para bloques e items existentes. Para nuevos, genera IDs cortos tipo "new-item-1".
+5. TONO: Profesional, servicial y experto.
 
 REGLAS DE FORMATO JSON:
 {
   "semantic_data": { ... },
   "blocks": [ ... ],
   "new_gallery_images": [],
-  "change_summary": "Resumen técnico de cambios",
+  "change_summary": "Resumen técnico de cambios detectados y aplicados",
   "conversational_response": "Tu respuesta directa al usuario aquí. Usa este campo para conversar."
 }
 
@@ -128,15 +132,18 @@ export async function callGemini(
 
   if (images && images.length > 0) {
     images.forEach(base64Image => {
-      const cleanData = base64Image.includes('base64,') 
-        ? base64Image.split('base64,')[1] 
-        : base64Image;
+      const parts = base64Image.split(';base64,');
+      let mimeType = "image/jpeg";
+      let cleanData = base64Image;
 
-      const isPdf = base64Image.startsWith('data:application/pdf');
+      if (parts.length === 2) {
+        mimeType = parts[0].replace('data:', '');
+        cleanData = parts[1];
+      }
 
       contents[0].parts.push({
         inline_data: {
-          mime_type: isPdf ? "application/pdf" : "image/jpeg",
+          mime_type: mimeType,
           data: cleanData
         }
       } as any);

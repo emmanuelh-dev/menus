@@ -20,47 +20,8 @@ const refreshTokenCookie = Astro.cookies.get("sb-refresh-token");
 if (!accessTokenCookie || !refreshTokenCookie) {
 	return Astro.redirect("/admin/login");
 }
-
-const supabase = await createAuthenticatedClient(
-	accessTokenCookie.value,
-	refreshTokenCookie.value,
-);
-
-const {
-	data: { user },
-} = await supabase.auth.getUser();
-
-// Obtener menús con información del restaurante
-const { data: menus, error } = await supabase
-	.from("menus")
-	.select(
-		`
-    *,
-    restaurants (
-      id,
-      name
-    )
-  `,
-	)
-	.eq("user_id", user?.id)
-	.order("created_at", { ascending: false });
-
-// Obtener restaurantes para el selector
-const { data: restaurants } = await supabase
-	.from("places")
-	.select("id, name")
-	.eq("user_id", user?.id)
-	.order("name");
-
-if (error) {
-	console.error("Error fetching menus:", error);
-}
 ---
 
 <AdminLayout title="Gestión de Menús">
-	<MenuManager
-		client:load
-		initialMenus={menus || []}
-		restaurants={restaurants || []}
-	/>
+	<MenuManager client:only="react" />
 </AdminLayout>
