@@ -94,7 +94,7 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
+          <div className="xl:bg-white rounded-xl xl:border xl:border-slate-100 xl:overflow-hidden xl:shadow-sm">
             <ContentEditor
               placeId={place.id}
               initialContent={place.content}

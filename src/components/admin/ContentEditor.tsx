@@ -595,7 +595,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
       {activeTab === 'editor' ? (
         <>
-          <div className="mx-4 sm:mx-0">
+          <div className="mx-0 xl:mx-4">
             <button
               onClick={() => setShowSemanticData(!showSemanticData)}
               className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
@@ -936,7 +936,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             )}
           </div>
 
-          <div className="mx-4 sm:mx-0">
+          <div className="mx-0 xl:mx-4">
             <button
               onClick={() => setShowViewSettings(!showViewSettings)}
               className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
@@ -1165,7 +1165,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             </div>
           )}
 
-          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
+          <div className="hidden xl:block mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
             <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
             <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> CMD + Enter para enviar</span>
             <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Arrastra fotos o archivos</span>
@@ -1174,36 +1174,6 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           <div className="space-y-4 lg:px-4 sm:px-0">
             {blocks.map((block, index) => (
               <div key={block.id} id={block.id} className="relative scroll-mt-24">
-                {index === 0 && (
-                  <>
-                    <div className="flex justify-center -my-2 relative z-10">
-                      <button
-                        onClick={() => setShowBlockMenu(`before-${index}`)}
-                        className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
-                      >
-                        <PiPlus className="w-3 h-3" /> Insertar Bloque
-                      </button>
-                    </div>
-
-                    {showBlockMenu === `before-${index}` && (
-                      <div className="mb-3 p-4 bg-white border rounded-xl shadow-lg">
-                        <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index - 1)} />
-                          <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index - 1)} />
-                          <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index - 1)} />
-                          <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index - 1)} />
-                        </div>
-                        <button
-                          onClick={() => setShowBlockMenu(false)}
-                          className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
 
                 <div className="flex justify-end gap-2 mb-3 ">
                   <button
@@ -1212,7 +1182,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
                     title="Subir"
                   >
-                    <PiCaretUp className="w-4 h-4 text-gray-400 group-hover:text-emerald-600" />
+                    <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
                   </button>
                   <button
                     onClick={() => moveBlock(index, 'down')}
@@ -1220,21 +1190,21 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
                     title="Bajar"
                   >
-                    <PiCaretDown className="w-4 h-4 text-gray-400 group-hover:text-emerald-600" />
+                    <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
                   </button>
                   <button
                     onClick={() => duplicateBlock(index)}
                     className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
                     title="Duplicar"
                   >
-                    <PiCopy className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                    <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
                   </button>
                   <button
                     onClick={() => removeBlock(index)}
                     className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
                     title="Eliminar"
                   >
-                    <PiTrash className="w-4 h-4 text-gray-400 group-hover:text-red-600" />
+                    <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
                   </button>
                 </div>
 
@@ -1243,9 +1213,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 <div className="flex justify-center my-4">
                   <button
                     onClick={() => setShowBlockMenu(`after-${index}`)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold transition-colors"
+                    className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
                   >
-                    + Agregar Bloque
+                    <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
                   </button>
                 </div>
 
@@ -1296,7 +1266,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </div>
         </>
       ) : (
-        <div className="mx-4 sm:mx-0 overflow-hidden rounded-2xl border shadow-xl bg-[#0A0A0A]">
+        <div className="mx-0 xl:mx-4 overflow-hidden rounded-2xl border shadow-xl bg-[#0A0A0A]">
           <div className="bg-gray-800 p-2 flex items-center justify-between px-6 border-b border-white/10">
             <div className="flex gap-1.5">
               <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -1367,14 +1337,15 @@ function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: 
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md">
+        <div className="relative bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full">
           <div className="text-6xl mb-4">📭</div>
-          <p className="text-sm text-gray-500 mb-4">No hay imágenes disponibles todavía</p>
+          <h3 className="text-lg font-bold text-gray-800 mb-2">No tienes imágenes guardadas</h3>
+          <p className="text-sm text-gray-500 mb-6">Usa los botones de "Subir" en cada bloque para agregar contenido nuevo.</p>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold"
+            className="w-full px-4 py-3 bg-gray-900 text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-black transition-all"
           >
-            Cerrar
+            Entendido
           </button>
         </div>
       </div>
@@ -1407,7 +1378,7 @@ function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: 
               >
                 <img src={url} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 text-white text-3xl font-bold">✓</span>
+                  <span className="opacity-100 text-white text-3xl font-bold">✓</span>
                 </div>
               </button>
             ))}
@@ -1469,7 +1440,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl shadow-sm font-bold transition-all ${isCollapsed ? 'bg-gray-100 text-gray-400 hover:bg-gray-200' : 'bg-gray-700 text-white shadow-gray-200'}`}
+            className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl shadow-sm font-bold transition-all ${isCollapsed ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' : 'bg-gray-700 text-white shadow-gray-200'}`}
           >
             <PiPlus className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? '' : 'rotate-45'}`} />
           </button>
@@ -1712,7 +1683,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                                   const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
                                   updateItem(itemIndex, { gallery: newGallery });
                                 }}
-                                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-100 transition-opacity"
                               >
                                 ✕
                               </button>
@@ -1768,20 +1739,25 @@ function GalleryBlock({ data, onChange, existingImages }: { data: GalleryData; o
               <img src={img.src} alt={img.alt || ''} className="w-full h-full object-cover" />
               <button
                 onClick={() => removeImageFromGallery(gIdx)}
-                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-700"
+                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-600/80 text-white rounded-lg opacity-100 sm:opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
               >
                 <PiX className="w-3 h-3" />
               </button>
             </div>
           ))}
 
-          <button
-            onClick={() => setShowImageSelector(true)}
-            className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 text-gray-600"
-          >
-            <PiPlus className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-semibold uppercase tracking-wide px-2 text-center">Agregar</span>
-          </button>
+          <div className="col-span-2 md:col-span-2 space-y-2">
+            <ManualUploader
+              onFilesUploaded={addImageToGallery}
+              multiple={true}
+            />
+            <button
+              onClick={() => setShowImageSelector(true)}
+              className="w-full py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 border border-blue-100"
+            >
+              <PiImage className="w-3 h-3" /> 📚 Biblioteca Existente
+            </button>
+          </div>
         </div>
 
         {showImageSelector && existingImages && (
@@ -1823,7 +1799,7 @@ function ImageBlock({ data, onChange, existingImages }: { data: ImageData; onCha
               {data.src ? (
                 <>
                   <img src={data.src} alt={data.alt || ''} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/20 opacity-100 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button onClick={() => onChange({ ...data, src: '' })} className="bg-red-600 text-white p-2 rounded-xl">
                       <PiTrash className="w-5 h-5" />
                     </button>
@@ -1982,10 +1958,10 @@ function CarruselBlock({ data, onChange, existingImages }: { data: CarruselData;
                     <PiImage className="w-10 h-10 opacity-20" />
                   </div>
                 )}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => moveItem(idx, 'up')} className="p-1.5 bg-white/90 backdrop-blur shadow-sm rounded-lg hover:bg-white text-gray-700">↑</button>
-                  <button onClick={() => moveItem(idx, 'down')} className="p-1.5 bg-white/90 backdrop-blur shadow-sm rounded-lg hover:bg-white text-gray-700">↓</button>
-                  <button onClick={() => removeItem(idx)} className="p-1.5 bg-white/90 backdrop-blur shadow-sm rounded-lg hover:bg-red-50 text-red-500">✕</button>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-100 transition-opacity">
+                  <button onClick={() => moveItem(idx, 'up')} className="p-1.5 bg-white shadow-md rounded-lg hover:bg-gray-50 text-gray-700 border border-gray-100">↑</button>
+                  <button onClick={() => moveItem(idx, 'down')} className="p-1.5 bg-white shadow-md rounded-lg hover:bg-gray-50 text-gray-700 border border-gray-100">↓</button>
+                  <button onClick={() => removeItem(idx)} className="p-1.5 bg-white shadow-md rounded-lg hover:bg-red-50 text-red-600 border border-red-100">✕</button>
                 </div>
               </div>
 
@@ -2052,7 +2028,7 @@ function CarruselBlock({ data, onChange, existingImages }: { data: CarruselData;
                             className="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-emerald-500 transition-all group relative"
                           >
                             <img src={url} className="w-full h-full object-cover" alt="" />
-                            <div className="absolute inset-0 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute inset-0 bg-emerald-500/10 opacity-100 group-hover:opacity-100 transition-opacity" />
                           </button>
                         ))}
                       </div>
