@@ -488,13 +488,6 @@ export default function PlaceManager({ initialRestaurants }: { initialRestaurant
                         { value: "cafe", label: "Cafetería" }
                       ]}
                     />
-                    <Input
-                      label="Tipo de Comida"
-                      name="category"
-                      placeholder="Ej: tacos, birria, pizza"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

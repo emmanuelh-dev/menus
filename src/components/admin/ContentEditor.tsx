@@ -222,16 +222,26 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     const images = new Set<string>();
 
     blocks.forEach(block => {
+      if (!block.data) return;
+
       if (block.type === 'section') {
         if (block.data.image) images.add(block.data.image);
         block.data.items?.forEach((item: ItemData) => {
-          if (item.image) images.add(item.image);
-          item.gallery?.forEach(img => images.add(img.src));
+          if (item?.image) images.add(item.image);
+          item?.gallery?.forEach(img => {
+            if (img?.src) images.add(img.src);
+          });
         });
       } else if (block.type === 'gallery') {
-        block.data.images?.forEach((img: any) => images.add(img.src));
+        block.data.images?.forEach((img: any) => {
+          if (img?.src) images.add(img.src);
+        });
       } else if (block.type === 'image') {
         if (block.data.src) images.add(block.data.src);
+      } else if (block.type === 'carrusel') {
+        block.data.items?.forEach((item: any) => {
+          if (item?.src) images.add(item.src);
+        });
       }
     });
 
@@ -264,6 +274,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         return { images: [] };
       case 'carrusel':
         return { items: [] };
+      case 'image':
+        return { src: '', alt: '', caption: '' };
       default:
         return {};
     }
