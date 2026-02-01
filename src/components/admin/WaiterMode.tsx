@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   X, Plus, Minus, ShoppingCart, Trash2,
   Search, User, Hash,
-  CreditCard, Coins, Landmark, Check, Phone, ChevronDown, Save
+  CreditCard, Coins, Landmark, Check, Phone, ChevronDown, Save,
+  Truck
 } from 'lucide-react';
+
+interface ShippingZone {
+  id: number;
+  name: string;
+  price: number;
+}
 
 interface ItemData {
   id: string;
@@ -49,11 +56,30 @@ export default function WaiterMode({
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [prevCustomers, setPrevCustomers] = useState<{ name: string, phone: string }[]>([]);
   const [showCustomers, setShowCustomers] = useState(false);
+  const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
 
   useEffect(() => {
-    fetchMenu();
-    fetchPrevCustomers();
+    const init = async () => {
+      try {
+        await Promise.all([fetchMenu(), fetchPrevCustomers(), fetchZones()]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
   }, [placeId]);
+
+  const fetchZones = async () => {
+    try {
+      const res = await fetch(`/api/shipping-zones?place_id=${placeId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setShippingZones(data.zones || []);
+      }
+    } catch (e) {
+      console.error('Error fetching zones:', e);
+    }
+  };
 
   const fetchPrevCustomers = async () => {
     try {
@@ -92,14 +118,44 @@ export default function WaiterMode({
         const contentBlocks = data.place?.content?.blocks || [];
         const sections = contentBlocks.filter((b: any) => b.type === 'section');
         setBlocks(sections);
-        if (sections.length > 0) setActiveCategory(sections[0].id);
       }
     } catch (error) {
       console.error('Error fetching menu:', error);
-    } finally {
-      setLoading(false);
     }
   };
+
+  const deliveryBlock = useMemo(() => shippingZones.length > 0 ? {
+    id: 'delivery-service',
+    type: 'section',
+    data: {
+      title: 'Servicio a Domicilio',
+      items: shippingZones.map(zone => ({
+        id: `zone-${zone.id}`,
+        name: `Envío: ${zone.name}`,
+        price: zone.price,
+        description: 'Costo de envío a domicilio',
+        image: undefined
+      }))
+    }
+  } : null, [shippingZones]);
+
+  const allBlocks = useMemo(() => deliveryBlock ? [deliveryBlock, ...blocks] : blocks, [deliveryBlock, blocks]);
+
+  useEffect(() => {
+    if (allBlocks.length > 0 && !activeCategory) {
+      setActiveCategory(allBlocks[0].id);
+    }
+  }, [allBlocks, activeCategory]);
+
+  const filteredBlocks = useMemo(() => allBlocks.map(block => ({
+    ...block,
+    data: {
+      ...block.data,
+      items: (block.data.items || []).filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+  })).filter(block => block.data.items.length > 0), [allBlocks, searchTerm]);
 
   const addToCart = (item: ItemData) => {
     setCart(prev => {
@@ -125,8 +181,7 @@ export default function WaiterMode({
     setCart(prev => prev.filter(i => i.id !== id));
   };
 
-  const subtotal = cart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
-  const total = subtotal;
+  const total = useMemo(() => cart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0), [cart]);
 
   const handleSubmit = async (sendWhatsApp: boolean = false) => {
     if (cart.length === 0) return;
@@ -138,8 +193,8 @@ export default function WaiterMode({
         customer_phone: customerPhone || '0000000000',
         delivery_address: tableNumber ? `Mesa ${tableNumber}` : 'Consumo Local',
         items: cart,
-        subtotal,
-        total,
+        subtotal: total,
+        total: total,
         payment_method: paymentMethod,
         status: 'pending',
         notes: `Comanda - ${customerName} ${tableNumber ? `(Mesa ${tableNumber})` : ''}`
@@ -152,16 +207,18 @@ export default function WaiterMode({
       });
 
       if (response.ok) {
-        // Guardar/Actualizar cliente automáticamente
         if (customerPhone && customerPhone !== '0000000000') {
           saveCustomer();
         }
 
         if (sendWhatsApp && customerPhone) {
+          const hasDelivery = cart.some(i => i.id.startsWith('zone-'));
+          const locationLabel = hasDelivery ? '🏠 A Domicilio' : (tableNumber ? `🪑 Mesa ${tableNumber}` : '🍽️ Consumo Local');
+
           const message = `*🧾 TICKET DE COMPRA*\n` +
             `--------------------------\n` +
             `*Cliente:* ${customerName}\n` +
-            `*Ubicación:* ${tableNumber ? `Mesa ${tableNumber}` : 'Consumo Local'}\n` +
+            `*Ubicación:* ${locationLabel}\n` +
             `*Fecha:* ${new Date().toLocaleDateString()}\n` +
             `--------------------------\n` +
             `*DETALLE:*\n` +
@@ -196,16 +253,6 @@ export default function WaiterMode({
     );
   }
 
-  const filteredBlocks = blocks.map(block => ({
-    ...block,
-    data: {
-      ...block.data,
-      items: block.data.items?.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ) || []
-    }
-  })).filter(block => block.data.items.length > 0);
-
   return (
     <div className={isPage ? "w-full h-full" : "fixed inset-0 bg-slate-900/50 z-[100] flex items-center justify-center"}>
       <div className={`bg-gray-50 w-full h-full flex flex-col md:flex-row max-w-7xl overflow-hidden ${isPage ? '' : 'sm:h-[90vh] sm:rounded-3xl shadow-2xl'}`}>
@@ -220,7 +267,7 @@ export default function WaiterMode({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                placeholder="Buscar platillo..."
+                placeholder="Buscar platillo o zona..."
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm outline-none font-medium"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -230,18 +277,19 @@ export default function WaiterMode({
 
           <div className="flex-1 overflow-y-auto xl:p-4 p-2 space-y-8">
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {blocks.map(block => (
+              {allBlocks.map(block => (
                 <button
                   key={block.id}
                   onClick={() => {
                     setActiveCategory(block.id);
                     document.getElementById(block.id)?.scrollIntoView();
                   }}
-                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border ${activeCategory === block.id
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border flex items-center gap-2 ${activeCategory === block.id
                     ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-white text-gray-500 border-gray-200'
                     }`}
                 >
+                  {block.id === 'delivery-service' && <Truck size={14} />}
                   {block.data.title}
                 </button>
               ))}
