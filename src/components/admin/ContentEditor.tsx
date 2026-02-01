@@ -60,7 +60,15 @@ import {
   PiSparkle,
   PiMagnifyingGlass,
   PiCheckCircle,
-  PiWarningCircle
+  PiWarningCircle,
+  PiPaintBrushBroad,
+  PiImages,
+  PiHouse,
+  PiListBullets,
+  PiSlideshow,
+  PiTray,
+  PiMonitor,
+  PiFolderSimple
 } from 'react-icons/pi';
 
 type BlockType = 'section' | 'gallery' | 'image' | 'carrusel';
@@ -168,6 +176,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   });
 
   const [semanticData, setSemanticData] = useState<SemanticData>(initialContent?.semantic_data || {});
+  const [mediaLibrary, setMediaLibrary] = useState<string[]>(initialContent?.media_library || []);
   const [showSemanticData, setShowSemanticData] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
@@ -177,7 +186,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [aiStats, setAiStats] = useState<any>(null);
   const [textInput, setTextInput] = useState('');
   const [aiFiles, setAiFiles] = useState<{ name: string; data: string; type: string }[]>([]);
-  const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
+  const [activeTab, setActiveTab] = useState<'editor' | 'preview' | 'media'>('editor');
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant', content: string, stats?: any }[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -243,6 +252,11 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           if (item?.src) images.add(item.src);
         });
       }
+    });
+
+    // Add images from media library
+    mediaLibrary.forEach(url => {
+      if (url) images.add(url);
     });
 
     return Array.from(images).filter(Boolean);
@@ -320,7 +334,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           content: {
             semantic_data: semanticData,
             blocks,
-            view_settings: viewSettings
+            view_settings: viewSettings,
+            media_library: mediaLibrary
           }
         })
       });
@@ -508,13 +523,17 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
   function renderBlock(block: Block, index: number, forceCollapse: boolean) {
     const existingImages = getAllExistingImages();
+    const onUploadToLibrary = (urls: string[]) => {
+      setMediaLibrary(prev => [...new Set([...prev, ...urls])]);
+    };
+
     switch (block.type) {
       case 'section':
-        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} />;
+        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       case 'gallery':
-        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
+        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       case 'carrusel':
-        return <CarruselBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
+        return <CarruselBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       default:
         return null;
     }
@@ -522,20 +541,29 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
   return (
     <div className="space-y-8 pb-32 xl:px-4 px-0">
-      <header className="flex flex gap-2 sticky top-2 bg-white/90 backdrop-blur-xl z-[60] py-2 px-3 sm:px-4 rounded-xl border border-gray-200 shadow-lg mx-2 sm:mx-0">
+      <header className="flex flex gap-2 xl:px-4 mt-4">
         <div className="flex items-center justify-between gap-2 w-full">
           <div className="flex bg-gray-100/50 p-1 rounded-xl items-center gap-0.5">
             <button
               onClick={() => setActiveTab('editor')}
-              className={`px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
             >
-              Diseño
+              <PiPaintBrushBroad className="w-3.5 h-3.5" />
+              <span>Diseño</span>
             </button>
             <button
               onClick={() => setActiveTab('preview')}
-              className={`px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide ${activeTab === 'preview' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'preview' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
             >
-              Previa
+              <PiMonitor className="w-3.5 h-3.5" />
+              <span>Previa</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('media')}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'media' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+            >
+              <PiImages className="w-3.5 h-3.5" />
+              <span>Galeria</span>
             </button>
           </div>
 
@@ -555,7 +583,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           className="w-full bg-gray-800 text-white px-3 py-2 sm:py-2.5 rounded-lg font-bold uppercase tracking-widest text-[10px] sm:text-xs shadow-md flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-gray-900 active:scale-95"
         >
           {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
-          {isSaving ? 'Guardando...' : 'Publicar Menú'}
+          {isSaving ? 'Guardando...' : 'Gardar'}
         </button>
       </header>
 
@@ -574,17 +602,17 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <div className="space-y-1">
               <button
                 onClick={() => { setShowSemanticData(true); setShowMobileNav(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-sm font-bold flex items-center gap-2"
+                className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-xs font-bold flex items-center gap-2 text-gray-700"
               >
-                <span>🏢</span> Datos del Lugar
+                <PiHouse className="w-4 h-4 text-emerald-600" /> Datos del Lugar
               </button>
               {blocks.map((block, idx) => (
                 <button
                   key={block.id}
                   onClick={() => scrollToBlock(block.id)}
-                  className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-sm font-bold flex items-center gap-2"
+                  className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-xs font-bold flex items-center gap-2 text-gray-700"
                 >
-                  <span>{block.type === 'section' ? '📋' : block.type === 'gallery' ? '🎨' : '🖼️'}</span>
+                  {block.type === 'section' ? <PiListBullets className="w-4 h-4 text-blue-600" /> : block.type === 'gallery' ? <PiImages className="w-4 h-4 text-purple-600" /> : <PiImage className="w-4 h-4 text-orange-600" />}
                   <span className="truncate">{block.data.title || block.data.caption || `${block.type} ${idx + 1}`}</span>
                 </button>
               ))}
@@ -1241,13 +1269,17 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
             {blocks.length === 0 && (
               <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
-                <div className="mb-4 text-4xl">📭</div>
-                <p className="text-gray-500 font-bold uppercase text-xs mb-6">El menú está vacío. Comienza agregando contenido.</p>
+                <div className="mb-4 flex justify-center">
+                  <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
+                    <PiTray className="w-8 h-8" />
+                  </div>
+                </div>
+                <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
                 <button
                   onClick={() => setShowBlockMenu(true)}
-                  className="bg-black text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-gray-800 shadow-xl transition-all"
+                  className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
                 >
-                  + Agregar Primer Bloque
+                  <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
                 </button>
 
                 {showBlockMenu === true && (
@@ -1265,6 +1297,68 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             )}
           </div>
         </>
+      ) : activeTab === 'media' ? (
+        <div className="mx-0 xl:mx-4 bg-white rounded-2xl border shadow-xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="max-w-4xl mx-auto space-y-12">
+            <header className="text-center">
+              <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900 mb-2">Biblioteca de Medios</h2>
+              <p className="text-gray-500 text-sm font-medium">Gestiona todas las imágenes de tu establecimiento en un solo lugar.</p>
+            </header>
+
+            <section className="bg-gray-50 p-8 rounded-[2.5rem] border-2 border-dashed border-gray-200">
+              <div className="text-center mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400">Subir nuevas imágenes a la biblioteca:</h3>
+              </div>
+              <ManualUploader
+                onFilesUploaded={(urls) => setMediaLibrary(prev => [...new Set([...prev, ...urls])])}
+                multiple={true}
+              />
+            </section>
+
+            <section className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-800">Tus Imágenes ({getAllExistingImages().length})</h3>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {getAllExistingImages().map((url, idx) => (
+                  <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm group transition-all hover:scale-[1.02] hover:shadow-md">
+                    <img src={url} className="w-full h-full object-cover" alt="" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => { navigator.clipboard.writeText(url); alert('URL copiada'); }}
+                        className="p-2.5 bg-white rounded-xl text-gray-800 hover:bg-gray-100 shadow-lg active:scale-95 transition-all"
+                        title="Copiar Link"
+                      >
+                        <PiCopy className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('¿Seguro que quieres eliminar esta imagen de la biblioteca? Dejará de aparecer en los selectores.')) {
+                            setMediaLibrary(prev => prev.filter(u => u !== url));
+                          }
+                        }}
+                        className="p-2.5 bg-red-600 rounded-xl text-white hover:bg-red-700 shadow-lg active:scale-95 transition-all"
+                        title="Eliminar de la biblioteca"
+                      >
+                        <PiTrash className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {getAllExistingImages().length === 0 && (
+                <div className="text-center py-24 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-100">
+                  <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center text-gray-200 mx-auto mb-6">
+                    <PiFolderSimple className="w-10 h-10" />
+                  </div>
+                  <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aún no hay imágenes en la biblioteca.</p>
+                </div>
+              )}
+            </section>
+          </div>
+        </div>
       ) : (
         <div className="mx-0 xl:mx-4 overflow-hidden rounded-2xl border shadow-xl bg-[#0A0A0A]">
           <div className="bg-gray-800 p-2 flex items-center justify-between px-6 border-b border-white/10">
@@ -1286,7 +1380,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             />
           ) : (
             <div className="p-20 text-center bg-gray-50">
-              <div className="text-6xl mb-6">👁️</div>
+              <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center text-gray-200 mx-auto mb-6">
+                <PiEye className="w-10 h-10" />
+              </div>
               <h2 className="text-2xl font-bold uppercase mb-4">Vista Previa</h2>
               <p className="text-gray-500 text-sm">Próximamente disponible para Restaurantes. Use el editor para realizar cambios.</p>
             </div>
@@ -1332,14 +1428,39 @@ function BlockTypeButton({ icon, label, onClick }: { icon: React.ReactNode; labe
   );
 }
 
-function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: string[]; onSelect: (url: string) => void; onClose: () => void }) {
-  if (existingImages.length === 0) {
+function ImageSelector({ existingImages, onSelect, onClose, onUpload, multiple = false, onSelectMultiple }: { existingImages: string[]; onSelect?: (url: string) => void; onClose: () => void; onUpload?: (urls: string[]) => void; multiple?: boolean; onSelectMultiple?: (urls: string[]) => void }) {
+  const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
+
+  const handleToggleSelect = (url: string) => {
+    if (!multiple) {
+      onSelect?.(url);
+      onClose();
+      return;
+    }
+
+    if (selectedUrls.includes(url)) {
+      setSelectedUrls(prev => prev.filter(u => u !== url));
+    } else {
+      setSelectedUrls(prev => [...prev, url]);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (multiple && onSelectMultiple) {
+      onSelectMultiple(selectedUrls);
+    }
+    onClose();
+  };
+
+  if (existingImages.length === 0 && !onUpload) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full">
-          <div className="text-6xl mb-4">📭</div>
-          <h3 className="text-lg font-bold text-gray-800 mb-2">No tienes imágenes guardadas</h3>
+        <div className="relative bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full animate-in zoom-in duration-300">
+          <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 mx-auto mb-6">
+            <PiImages className="w-10 h-10" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-800 mb-2">Biblioteca vacía</h3>
           <p className="text-sm text-gray-500 mb-6">Usa los botones de "Subir" en cada bloque para agregar contenido nuevo.</p>
           <button
             onClick={onClose}
@@ -1357,7 +1478,7 @@ function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: 
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center z-10">
-          <h3 className="text-sm font-bold uppercase text-gray-800 tracking-wide">Selecciona una imagen existente</h3>
+          <h3 className="text-sm font-bold uppercase text-gray-800 tracking-wide">Biblioteca de Medios</h3>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600"
@@ -1365,32 +1486,76 @@ function ImageSelector({ existingImages, onSelect, onClose }: { existingImages: 
             <PiX className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-            {existingImages.map((url, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  onSelect(url);
-                  onClose();
+        <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] space-y-8">
+          {onUpload && (
+            <section className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Subir nuevas imágenes a la biblioteca:</h4>
+              <ManualUploader
+                onFilesUploaded={(urls) => {
+                  onUpload(urls);
                 }}
-                className="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
-              >
-                <img src={url} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <span className="opacity-100 text-white text-3xl font-bold">✓</span>
-                </div>
-              </button>
-            ))}
-          </div>
+                multiple={true}
+              />
+            </section>
+          )}
+
+          <section>
+            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Seleccionar de la biblioteca:</h4>
+            {existingImages.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-4xl mb-2">📸</div>
+                <p className="text-sm text-gray-400">No hay imágenes en la biblioteca. ¡Sube algunas arriba!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                {existingImages.map((url, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleToggleSelect(url)}
+                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all group ${selectedUrls.includes(url) ? 'border-blue-600 shadow-md ring-2 ring-blue-100' : 'border-gray-200 hover:border-blue-400'}`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    <div className={`absolute inset-0 bg-blue-600/10 transition-opacity flex items-center justify-center ${selectedUrls.includes(url) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-hover:bg-black/10'}`}>
+                      <div className={`bg-blue-600 text-white p-1 rounded-full shadow-lg transform transition-transform ${selectedUrls.includes(url) ? 'scale-100' : 'scale-75 group-hover:scale-100'}`}>
+                        <PiCheckCircle className="w-6 h-6" />
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
+
+        {multiple && (
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex justify-between items-center shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)]">
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-none">
+              {selectedUrls.length} seleccionadas
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                disabled={selectedUrls.length === 0}
+                onClick={handleConfirm}
+                className="px-8 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-95"
+              >
+                Insertar Imágenes
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 
-function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse, existingImages }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean; existingImages?: string[] }) {
+function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse, existingImages, onUploadToLibrary }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean; existingImages?: string[]; onUploadToLibrary?: (urls: string[]) => void }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [showItemImageSelector, setShowItemImageSelector] = useState<{ [key: number]: boolean }>({});
@@ -1488,7 +1653,10 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                 <div className="flex-1">
                   <ManualUploader
                     currentImage={data.image}
-                    onFilesUploaded={(url) => onChange({ ...data, image: url[0] })}
+                    onFilesUploaded={(url) => {
+                      onChange({ ...data, image: url[0] });
+                      onUploadToLibrary?.(url);
+                    }}
                     onImageRemove={() => onChange({ ...data, image: '' })}
                     onUploadStart={() => console.log('Subiendo imagen de sección...')}
                     onUploadError={() => console.error('Error al subir imagen')}
@@ -1508,6 +1676,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                   existingImages={existingImages}
                   onSelect={(url) => onChange({ ...data, image: url })}
                   onClose={() => setShowImageSelector(false)}
+                  onUpload={onUploadToLibrary}
                 />
               )}
             </div>
@@ -1644,6 +1813,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                             const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
                             const currentGallery = item.gallery || [];
                             updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
+                            onUploadToLibrary?.(urls);
                           }}
                           onUploadStart={() => console.log('Subiendo galería...')}
                           onUploadError={() => console.error('Error al subir galería')}
@@ -1660,12 +1830,14 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                             {showItemGallerySelector[itemIndex] && (
                               <ImageSelector
                                 existingImages={existingImages}
-                                onSelect={(url) => {
-                                  const newGalleryItem = { src: url, alt: item.name, title: '' };
+                                multiple={true}
+                                onSelectMultiple={(urls) => {
+                                  const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
                                   const currentGallery = item.gallery || [];
-                                  updateItem(itemIndex, { gallery: [...currentGallery, newGalleryItem] });
+                                  updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
                                 }}
                                 onClose={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: false })}
+                                onUpload={onUploadToLibrary}
                               />
                             )}
                           </div>
@@ -1703,7 +1875,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
   );
 }
 
-function GalleryBlock({ data, onChange, existingImages }: { data: GalleryData; onChange: (data: GalleryData) => void; existingImages?: string[] }) {
+function GalleryBlock({ data, onChange, existingImages, onUploadToLibrary }: { data: GalleryData; onChange: (data: GalleryData) => void; existingImages?: string[]; onUploadToLibrary?: (urls: string[]) => void }) {
   const [showImageSelector, setShowImageSelector] = useState(false);
 
   const addImageToGallery = (urls: string[]) => {
@@ -1763,8 +1935,10 @@ function GalleryBlock({ data, onChange, existingImages }: { data: GalleryData; o
         {showImageSelector && existingImages && (
           <ImageSelector
             existingImages={existingImages}
-            onSelect={(url) => addImageToGallery([url])}
+            multiple={true}
+            onSelectMultiple={(urls) => addImageToGallery(urls)}
             onClose={() => setShowImageSelector(false)}
+            onUpload={onUploadToLibrary}
           />
         )}
       </div>
@@ -1907,7 +2081,7 @@ interface CarruselData {
   items: CarruselItem[];
 }
 
-function CarruselBlock({ data, onChange, existingImages }: { data: CarruselData; onChange: (data: CarruselData) => void; existingImages?: string[] }) {
+function CarruselBlock({ data, onChange, existingImages, onUploadToLibrary }: { data: CarruselData; onChange: (data: CarruselData) => void; existingImages?: string[]; onUploadToLibrary?: (urls: string[]) => void }) {
   const [showImageSelector, setShowImageSelector] = useState(false);
 
   const addItem = (urls: string[]) => {
@@ -1992,52 +2166,13 @@ function CarruselBlock({ data, onChange, existingImages }: { data: CarruselData;
         </div>
 
         {showImageSelector && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowImageSelector(false)} />
-            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-xl">
-              <div className="p-6 border-b flex items-center justify-between">
-                <h3 className="font-bold uppercase tracking-widest">Seleccionar Imágenes</h3>
-                <button onClick={() => setShowImageSelector(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <PiX className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="overflow-y-auto p-6 max-h-[calc(90vh-140px)]">
-                <div className="space-y-8">
-                  <section>
-                    <h4 className="text-xs font-bold text-emerald-600 uppercase mb-4 tracking-widest">Subir Nueva:</h4>
-                    <ManualUploader
-                      onFilesUploaded={(urls) => {
-                        addItem(urls);
-                        setShowImageSelector(false);
-                      }}
-                      multiple={true}
-                    />
-                  </section>
-
-                  {existingImages && existingImages.length > 0 && (
-                    <section>
-                      <h4 className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">Imágenes Existentes:</h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {existingImages.map((url, i) => (
-                          <button
-                            key={i}
-                            onClick={() => {
-                              addItem([url]);
-                              setShowImageSelector(false);
-                            }}
-                            className="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-emerald-500 transition-all group relative"
-                          >
-                            <img src={url} className="w-full h-full object-cover" alt="" />
-                            <div className="absolute inset-0 bg-emerald-500/10 opacity-100 group-hover:opacity-100 transition-opacity" />
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <ImageSelector
+            existingImages={existingImages || []}
+            multiple={true}
+            onSelectMultiple={(urls) => addItem(urls)}
+            onClose={() => setShowImageSelector(false)}
+            onUpload={onUploadToLibrary}
+          />
         )}
       </div>
     </div>
