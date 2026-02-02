@@ -1515,20 +1515,39 @@ function ImageSelector({ existingImages, onSelect, onClose, onUpload, multiple =
               </div>
             ) : (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {existingImages.map((url, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleToggleSelect(url)}
-                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all group ${selectedUrls.includes(url) ? 'border-blue-600 shadow-md ring-2 ring-blue-100' : 'border-gray-200 hover:border-blue-400'}`}
-                  >
-                    <img src={url} alt="" className="w-full h-full object-cover" />
-                    <div className={`absolute inset-0 bg-blue-600/10 transition-opacity flex items-center justify-center ${selectedUrls.includes(url) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-hover:bg-black/10'}`}>
-                      <div className={`bg-blue-600 text-white p-1 rounded-full shadow-lg transform transition-transform ${selectedUrls.includes(url) ? 'scale-100' : 'scale-75 group-hover:scale-100'}`}>
-                        <PiCheckCircle className="w-6 h-6" />
-                      </div>
-                    </div>
-                  </button>
-                ))}
+                {existingImages.map((url, idx) => {
+                  const isSelected = selectedUrls.includes(url);
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleToggleSelect(url)}
+                      className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all group ${isSelected
+                        ? 'border-blue-600 shadow-md ring-2 ring-blue-100'
+                        : 'border-gray-200 hover:border-blue-400'
+                        }`}
+                    >
+                      <img src={url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+
+                      {/* Selection Overlay (Only shown if selected) */}
+                      {isSelected && (
+                        <div className="absolute inset-0 bg-blue-600/20 flex items-center justify-center animate-in fade-in zoom-in duration-200">
+                          <div className="bg-blue-600 text-white p-1.5 rounded-full shadow-lg transform scale-110">
+                            <PiCheckCircle className="w-6 h-6" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Hover Indicator (Only for non-selected items) */}
+                      {!isSelected && (
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                          <div className="bg-white/90 text-gray-900 p-2 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200">
+                            <PiPlus className="w-5 h-5" />
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -1707,8 +1726,8 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
               )}
 
               {data.items.map((item, itemIndex) => (
-                <div key={item.id} className="group relative bg-white rounded-[2rem] border border-gray-100 hover:border-emerald-500/30 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 my-4">
-                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-100 group-hover:bg-emerald-500 transition-colors duration-300" />
+                <div key={item.id} className="group relative bg-white rounded-[2rem] border border-gray-100 hover:border-gray-200 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md my-4">
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-100" />
 
                   <div className="p-4 sm:p-6">
                     <div className="flex items-center justify-between gap-4 mb-6">
@@ -1788,16 +1807,19 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                             {item.options?.map((option, optIdx) => (
                               <div key={optIdx} className="space-y-2 border-b border-gray-50 pb-4 last:border-0">
                                 <div className="flex items-center justify-between gap-4">
-                                  <input
-                                    value={option.name}
-                                    onChange={(e) => {
-                                      const newOptions = [...(item.options || [])];
-                                      newOptions[optIdx].name = e.target.value;
-                                      updateItem(itemIndex, { options: newOptions });
-                                    }}
-                                    placeholder="Ej: Sabor, Tamaño..."
-                                    className="flex-1 text-sm font-bold bg-transparent border-b-2 border-transparent focus:border-emerald-500 outline-none transition-all py-1"
-                                  />
+                                  <div className="flex-1">
+                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Nombre del grupo (ej: Sabor, Tamaño):</label>
+                                    <input
+                                      value={option.name}
+                                      onChange={(e) => {
+                                        const newOptions = [...(item.options || [])];
+                                        newOptions[optIdx].name = e.target.value;
+                                        updateItem(itemIndex, { options: newOptions });
+                                      }}
+                                      placeholder="Ej: Sabor de la masa..."
+                                      className="w-full text-sm font-bold bg-white border border-gray-100 rounded-lg px-3 py-1.5 outline-none focus:border-emerald-500 transition-all"
+                                    />
+                                  </div>
                                   <button
                                     onClick={() => {
                                       const newOptions = item.options?.filter((_, i) => i !== optIdx);
@@ -1906,46 +1928,65 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                         </label>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
+                          {/* Main Image Selector */}
+                          <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Imagen Principal</p>
-                            <ManualUploader
-                              currentImage={item.image}
-                              onFilesUploaded={(urls) => updateItem(itemIndex, { image: urls[0] })}
-                              onImageRemove={() => updateItem(itemIndex, { image: '' })}
-                            />
-                            <button
-                              onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: !showItemImageSelector[itemIndex] })}
-                              className="w-full py-2 bg-white text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:text-emerald-500 transition-colors"
-                            >
-                              Seleccionar Existente
-                            </button>
-                            {showItemImageSelector[itemIndex] && existingImages && (
+
+                            {item.image ? (
+                              <div className="space-y-3">
+                                <div className="relative aspect-video rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: true })}
+                                    className="flex-1 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm"
+                                  >
+                                    <PiArrowCounterClockwise size={14} className="text-blue-500" /> Cambiar
+                                  </button>
+                                  <button
+                                    onClick={() => updateItem(itemIndex, { image: '' })}
+                                    className="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-100 active:scale-95 transition-all flex items-center justify-center shadow-sm"
+                                  >
+                                    <PiTrash size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: true })}
+                                className="w-full aspect-video border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group bg-white"
+                              >
+                                <PiImage size={24} className="group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Añadir Foto</span>
+                              </button>
+                            )}
+
+                            {showItemImageSelector[itemIndex] && (
                               <ImageSelector
-                                existingImages={existingImages}
-                                onSelect={(url) => updateItem(itemIndex, { image: url })}
+                                existingImages={existingImages || []}
+                                onSelect={(url) => {
+                                  updateItem(itemIndex, { image: url });
+                                  setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false });
+                                }}
                                 onClose={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false })}
+                                onUpload={onUploadToLibrary}
                               />
                             )}
                           </div>
 
-                          <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
+                          {/* Gallery Selector */}
+                          <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Galería de Fotos</p>
-                            <ManualUploader
-                              currentImage=""
-                              multiple={true}
-                              onFilesUploaded={(urls) => {
-                                const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
-                                const currentGallery = item.gallery || [];
-                                updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
-                                onUploadToLibrary?.(urls);
-                              }}
-                            />
+
                             <button
-                              onClick={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: !showItemGallerySelector[itemIndex] })}
-                              className="w-full py-2 bg-white text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:text-emerald-500 transition-colors"
+                              onClick={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: true })}
+                              className="w-full aspect-video border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group bg-white"
                             >
-                              Añadir de Biblioteca
+                              <PiPlus className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-center px-4">Subir o Elegir<br />de la Galería</span>
                             </button>
+
                             {showItemGallerySelector[itemIndex] && (
                               <ImageSelector
                                 existingImages={existingImages || []}
@@ -1954,6 +1995,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                                   const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
                                   const currentGallery = item.gallery || [];
                                   updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
+                                  setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: false });
                                 }}
                                 onClose={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: false })}
                                 onUpload={onUploadToLibrary}

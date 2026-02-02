@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark, Plus } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark, Plus, MessageCircle } from 'lucide-react';
 import WaiterMode from './WaiterMode';
 
 interface Order {
@@ -146,8 +146,8 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                             key={val}
                             onClick={() => updateStatus(order.id, val)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${isActive
-                                ? `${config.color.replace('text-', 'border-').replace('100', '200')} ${config.color} shadow-sm scale-105`
-                                : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50 hover:border-slate-200'
+                              ? `${config.color.replace('text-', 'border-').replace('100', '200')} ${config.color} shadow-sm scale-105`
+                              : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50 hover:border-slate-200'
                               }`}
                           >
                             {config.label}
@@ -164,15 +164,25 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                           <ExternalLink size={10} />
                           Cliente
                         </label>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           <p className="font-bold text-slate-900">{order.customer_name}</p>
-                          <a
-                            href={`https://wa.me/52${order.customer_phone.replace(/\D/g, '')}`}
-                            target="_blank"
-                            className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100"
-                          >
-                            <Phone size={14} />
-                          </a>
+                          <div className="flex items-center gap-1.5 ml-2">
+                            <a
+                              href={`tel:${order.customer_phone.replace(/\D/g, '')}`}
+                              className="p-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors"
+                              title="Llamar por teléfono"
+                            >
+                              <Phone size={14} />
+                            </a>
+                            <a
+                              href={`https://wa.me/52${order.customer_phone.replace(/\D/g, '')}`}
+                              target="_blank"
+                              className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                              title="Enviar WhatsApp"
+                            >
+                              <MessageCircle size={14} />
+                            </a>
+                          </div>
                         </div>
                         <p className="text-sm text-slate-500">{order.customer_phone}</p>
                       </div>

@@ -1,6 +1,6 @@
 ---
 export const prerender = false;
-import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import PlaceAdminLayout from "../../../../layouts/PlaceAdminLayout.astro";
 import OrdersManager from "../../../../components/admin/OrdersManager";
 import { supabase } from "../../../../lib/supabase";
 
@@ -17,19 +17,8 @@ if (error || !place) {
 }
 ---
 
-<AdminLayout title={`Caja - ${place.name}`}>
-	<div class="max-w-6xl mx-auto md:py-12">
-		<div class="flex items-center gap-4 mb-8">
-			<a
-				href="/admin/dashboard"
-				class="text-slate-400 hover:text-black transition-colors"
-			>
-				Establecimientos
-			</a>
-			<span class="text-slate-300">/</span>
-			<h1 class="text-xl font-bold">{place.name}</h1>
-		</div>
-
+<PlaceAdminLayout title={`Caja - ${place.name}`} placeId={id!}>
+	<div class="max-w-6xl mx-auto">
 		<OrdersManager placeId={Number(id)} client:load />
 	</div>
-</AdminLayout>
+</PlaceAdminLayout>

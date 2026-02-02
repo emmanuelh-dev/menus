@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import AdminLayout from "../../../layouts/AdminLayout.astro";
+import PlaceAdminLayout from "../../../layouts/PlaceAdminLayout.astro";
 import { isAuthenticated } from "../../../middleware/auth";
 import PlaceEditContainer from "../../../components/admin/PlaceEditContainer";
 
@@ -11,6 +11,6 @@ const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
 if (!isAuth) return Astro.redirect("/admin/login");
 ---
 
-<AdminLayout title={`Editar | BysMax`}>
+<PlaceAdminLayout title={`Editar | BysMax`} placeId={id!}>
 	<PlaceEditContainer client:only="react" placeId={id!} />
-</AdminLayout>
+</PlaceAdminLayout>
