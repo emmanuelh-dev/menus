@@ -138,16 +138,22 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 ml-auto sm:ml-0">
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateStatus(order.id, e.target.value)}
-                        className="text-xs sm:text-sm border-slate-200 rounded-lg focus:ring-black py-1"
-                      >
-                        {Object.entries(statusConfig).map(([val, config]) => (
-                          <option key={val} value={val}>{config.label}</option>
-                        ))}
-                      </select>
+                    <div className="flex flex-wrap items-center gap-1.5 ml-auto sm:ml-0">
+                      {Object.entries(statusConfig).map(([val, config]) => {
+                        const isActive = order.status === val;
+                        return (
+                          <button
+                            key={val}
+                            onClick={() => updateStatus(order.id, val)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${isActive
+                                ? `${config.color.replace('text-', 'border-').replace('100', '200')} ${config.color} shadow-sm scale-105`
+                                : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50 hover:border-slate-200'
+                              }`}
+                          >
+                            {config.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
