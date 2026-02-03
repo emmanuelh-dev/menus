@@ -44,6 +44,7 @@ export default function PlaceSecondaryNav({ placeId, currentPath }: Props) {
               <a
                 key={item.label}
                 href={item.href}
+                data-astro-prefetch
                 className={`flex items-center gap-2 text-sm font-bold transition-all h-full border-b-2 px-1 ${item.active
                   ? 'border-gray-900 text-gray-900'
                   : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-200'
@@ -64,9 +65,10 @@ export default function PlaceSecondaryNav({ placeId, currentPath }: Props) {
             <a
               key={item.label}
               href={item.href}
+              data-astro-prefetch
               className={`flex flex-col items-center gap-1.5 py-2.5 px-4 rounded-2xl transition-all duration-300 relative ${item.active
-                  ? 'text-gray-900 bg-gray-50'
-                  : 'text-gray-400 active:scale-90 hover:text-gray-600'
+                ? 'text-gray-900 bg-gray-50'
+                : 'text-gray-400 active:scale-90 hover:text-gray-600'
                 }`}
             >
               <item.icon size={20} className={item.active ? 'stroke-[2.5px]' : 'stroke-2'} />

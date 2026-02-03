@@ -1,0 +1,12 @@
+---
+interface Props {
+	href?: string;
+	[key: string]: any;
+}
+
+const { href = "/", ...rest } = Astro.props;
+---
+
+<a data-astro-prefetch href={href} {...rest}>
+	<slot />
+</a>

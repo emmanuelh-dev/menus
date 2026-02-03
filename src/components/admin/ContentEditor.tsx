@@ -193,7 +193,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [aiStats, setAiStats] = useState<any>(null);
   const [textInput, setTextInput] = useState('');
   const [aiFiles, setAiFiles] = useState<{ name: string; data: string; type: string }[]>([]);
-  const [activeTab, setActiveTab] = useState<'editor' | 'preview' | 'media'>('editor');
+  const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>('editor');
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant', content: string, stats?: any }[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -552,6 +552,13 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         <div className="flex items-center justify-between gap-2 w-full">
           <div className="flex bg-gray-100/50 p-1 rounded-xl items-center gap-0.5">
             <button
+              onClick={() => setActiveTab('info')}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'info' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+            >
+              <PiHouse className="w-3.5 h-3.5" />
+              <span>General</span>
+            </button>
+            <button
               onClick={() => setActiveTab('editor')}
               className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
             >
@@ -608,7 +615,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <h3 className="text-xs font-bold uppercase text-gray-400 mb-3 px-2">Saltar a sección:</h3>
             <div className="space-y-1">
               <button
-                onClick={() => { setShowSemanticData(true); setShowMobileNav(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { setActiveTab('info'); setShowMobileNav(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-xs font-bold flex items-center gap-2 text-gray-700"
               >
                 <PiHouse className="w-4 h-4 text-emerald-600" /> Datos del Lugar
@@ -628,347 +635,292 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         )}
       </div>
 
-      {activeTab === 'editor' ? (
-        <>
-          <div className="mx-0 xl:mx-4">
-            <button
-              onClick={() => setShowSemanticData(!showSemanticData)}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-3 bg-white rounded-2xl shadow-sm text-gray-700 group transition-transform ${showSemanticData ? 'shadow-inner' : ''}`}>
-                  <PiPlus className={`w-5 h-5 transition-transform duration-300 ${showSemanticData ? 'rotate-45 text-red-500' : ''}`} />
-                </div>
-                <div className="text-left">
-                  <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-800 block mb-1">Información General</span>
-                  <p className="text-xs text-gray-600 font-medium">Dirección, horarios, contacto y redes sociales</p>
-                </div>
-              </div>
-            </button>
+      {activeTab === 'info' ? (
+        <div className="mx-0 xl:mx-4 bg-white rounded-3xl border shadow-xl p-8 sm:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <header className="mb-12">
+            <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900 mb-2">Información General</h2>
+            <p className="text-gray-500 text-sm font-medium">Configura los datos básicos, horarios y contacto de tu establecimiento.</p>
+          </header>
 
-            {showSemanticData && (
-              <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-xl space-y-6">
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">DESCRIPCIÓN DEL LUGAR:</label>
+          <div className="space-y-10">
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Datos Básicos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Descripción del Lugar:</label>
                   <textarea
                     value={semanticData.description || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, description: e.target.value })}
                     placeholder="Breve descripción del restaurante, su especialidad y ambiente..."
                     rows={3}
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 resize-none bg-gray-50/30"
                   />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">DIRECCIÓN:</label>
-                    <input
-                      value={semanticData.address || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, address: e.target.value })}
-                      placeholder="Av. Principal #123, Colonia, Ciudad"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">TELÉFONO:</label>
-                    <input
-                      value={semanticData.phone || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, phone: e.target.value })}
-                      placeholder="81 1234 5678"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">WHATSAPP:</label>
-                    <input
-                      value={semanticData.whatsapp || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value.replace(/\D/g, '') })}
-                      placeholder="528112345678"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">
-                      Código de país + número sin espacios ni símbolos (ej: 528112345678)
-                    </p>
-                    {semanticData.whatsapp && !/^\d{10,15}$/.test(semanticData.whatsapp) && (
-                      <p className="text-xs text-red-500 mt-1 font-bold">
-                        ⚠️ Formato incorrecto. Usa solo números (10-15 dígitos)
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <input
-                    type="checkbox"
-                    id="enable_cart"
-                    checked={semanticData.enable_cart || false}
-                    onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
-                    className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
-                  />
-                  <label htmlFor="enable_cart" className="text-sm font-bold text-gray-700 cursor-pointer">
-                    Activar carrito de compras y pedidos por WhatsApp
-                  </label>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">URL DE RESERVACIÓN:</label>
-                    <input
-                      value={semanticData.reservation_url || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
-                      placeholder="https://reservaciones.com/..."
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">CLABE / Datos de transferencia:</label>
-                    <input
-                      value={semanticData.clabe || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, clabe: e.target.value })}
-                      placeholder="Ej: 012 345 678..."
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                    <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tight">Se mostrará si el usuario elige transferencia</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">RANGO DE PRECIOS:</label>
-                    <input
-                      value={semanticData.price_range || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, price_range: e.target.value })}
-                      placeholder="más de MXN500"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">TIPO DE COCINA:</label>
-                    <input
-                      value={semanticData.cuisine_type || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, cuisine_type: e.target.value })}
-                      placeholder="Mexicana contemporánea"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">AMBIENTE:</label>
-                    <input
-                      value={semanticData.ambiance || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, ambiance: e.target.value })}
-                      placeholder="Casual elegante"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">CÓDIGO DE VESTIMENTA:</label>
-                    <input
-                      value={semanticData.dress_code || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, dress_code: e.target.value })}
-                      placeholder="Ropa formal"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">ZONA:</label>
-                    <input
-                      value={semanticData.zone || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, zone: e.target.value })}
-                      placeholder="San Pedro Garza García"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block">INTERSECCIÓN:</label>
-                    <input
-                      value={semanticData.cross_street || ''}
-                      onChange={(e) => setSemanticData({ ...semanticData, cross_street: e.target.value })}
-                      placeholder="Jose Vasconcelos"
-                      className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    />
-                  </div>
-                </div>
-
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">SITIO WEB:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Dirección:</label>
+                  <input
+                    value={semanticData.address || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, address: e.target.value })}
+                    placeholder="Av. Principal #123, Colonia, Ciudad"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Sitio Web:</label>
                   <input
                     value={semanticData.website || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, website: e.target.value })}
                     placeholder="https://www.ejemplo.com"
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
                   />
                 </div>
+              </div>
+            </section>
 
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Contacto y Pedidos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">HORARIOS:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Teléfono:</label>
+                  <input
+                    value={semanticData.phone || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, phone: e.target.value })}
+                    placeholder="81 1234 5678"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">WhatsApp para pedidos:</label>
+                  <input
+                    value={semanticData.whatsapp || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value.replace(/\D/g, '') })}
+                    placeholder="528112345678"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-tight">Código país + número (ej: 52 81 1234 5678)</p>
+                </div>
+                <div className="md:col-span-2 flex items-center gap-4 p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <div className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="enable_cart_tab"
+                      checked={semanticData.enable_cart || false}
+                      onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                  </div>
+                  <div>
+                    <label htmlFor="enable_cart_tab" className="text-sm font-bold text-emerald-900 cursor-pointer block">Activar Carrito de Compras</label>
+                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-0.5">Pedidos por WhatsApp</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Horarios y Disponibilidad</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Horario de Servicio:</label>
                   <textarea
                     value={semanticData.hours || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, hours: e.target.value })}
                     placeholder="Lun-Vie 13:00-23:00, Sáb-Dom 12:00-00:00"
                     rows={3}
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600 resize-none"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 resize-none bg-gray-50/30"
                   />
                 </div>
+              </div>
+            </section>
 
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Detalles Adicionales</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">ESTACIONAMIENTO:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Rango de Precios:</label>
+                  <input
+                    value={semanticData.price_range || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, price_range: e.target.value })}
+                    placeholder="más de MXN500"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Tipo de Cocina:</label>
+                  <input
+                    value={semanticData.cuisine_type || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, cuisine_type: e.target.value })}
+                    placeholder="Mexicana contemporánea"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Ambiente:</label>
+                  <input
+                    value={semanticData.ambiance || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, ambiance: e.target.value })}
+                    placeholder="Casual elegante"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Código de Vestimenta:</label>
+                  <input
+                    value={semanticData.dress_code || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, dress_code: e.target.value })}
+                    placeholder="Ropa formal"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Zona:</label>
+                  <input
+                    value={semanticData.zone || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, zone: e.target.value })}
+                    placeholder="San Pedro Garza García"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Intersección:</label>
+                  <input
+                    value={semanticData.cross_street || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, cross_street: e.target.value })}
+                    placeholder="Jose Vasconcelos"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Estacionamiento:</label>
                   <input
                     value={semanticData.parking || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, parking: e.target.value })}
                     placeholder="Servicio de estacionamiento"
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
                   />
                 </div>
-
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">VARIEDAD:</label>
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Reservación Online (URL):</label>
+                  <input
+                    value={semanticData.reservation_url || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
+                    placeholder="https://reservaciones.com/..."
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Variedad / Amenidades:</label>
                   <input
                     value={semanticData.variety || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, variety: e.target.value })}
-                    placeholder="Pantalla HD de 9 x 4 mts"
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
+                    placeholder="Pantalla HD de 9 x 4 mts, etc."
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
                   />
                 </div>
-
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">ÁREAS DEL RESTAURANTE:</label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {semanticData.areas?.map((area, idx) => (
-                      <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                        {area}
-                        <button
-                          onClick={() => setSemanticData({ ...semanticData, areas: semanticData.areas?.filter((_, i) => i !== idx) })}
-                          className="hover:text-red-600"
-                        >×</button>
-                      </span>
-                    ))}
-                  </div>
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">CLABE / Datos de transferencia:</label>
                   <input
-                    type="text"
-                    placeholder="Agregar área (Enter para añadir)"
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                        const newArea = e.currentTarget.value.trim();
-                        setSemanticData({ ...semanticData, areas: [...(semanticData.areas || []), newArea] });
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">OPCIONES DE PAGO:</label>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].map((option) => {
-                      const isSelected = semanticData.payment_options?.includes(option);
-                      return (
-                        <button
-                          key={option}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) });
-                            } else {
-                              setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), option] });
-                            }
-                          }}
-                          className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${isSelected
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
-                        >
-                          {isSelected && '✓ '}{option}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {semanticData.payment_options?.filter(o => !['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].includes(o)).map((option, idx) => (
-                      <span key={idx} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                        {option}
-                        <button
-                          onClick={() => setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) })}
-                          className="hover:text-red-600"
-                        >×</button>
-                      </span>
-                    ))}
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Agregar método personalizado (Enter)"
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                        const newOption = e.currentTarget.value.trim();
-                        setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), newOption] });
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block">CARACTERÍSTICAS ADICIONALES:</label>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {[
-                      'WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo',
-                      'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar',
-                      'Aire acondicionado', 'Smart TV', 'Acceso para silla de ruedas',
-                      'Jacuzzi', 'Alberca', 'Cochera techada', 'Sillón Tantra', 'Tubo de pole dance', 'Cama King Size', 'Sauna', 'Vapor'
-                    ].map((feature) => {
-                      const isSelected = semanticData.additional_features?.includes(feature);
-                      return (
-                        <button
-                          key={feature}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) });
-                            } else {
-                              setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), feature] });
-                            }
-                          }}
-                          className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${isSelected
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
-                        >
-                          {isSelected && '✓ '}{feature}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {semanticData.additional_features?.filter(f => !['WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo', 'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar', 'Aire acondicionado', 'TV', 'Acceso para silla de ruedas'].includes(f)).map((feature, idx) => (
-                      <span key={idx} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                        {feature}
-                        <button
-                          onClick={() => setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) })}
-                          className="hover:text-red-600"
-                        >×</button>
-                      </span>
-                    ))}
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Agregar característica personalizada (Enter)"
-                    className="w-full text-sm p-3 rounded-lg border border-gray-200 outline-none focus:border-blue-600"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                        const newFeature = e.currentTarget.value.trim();
-                        setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), newFeature] });
-                        e.currentTarget.value = '';
-                      }
-                    }}
+                    value={semanticData.clabe || ''}
+                    onChange={(e) => setSemanticData({ ...semanticData, clabe: e.target.value })}
+                    placeholder="Ej: 012 345 678..."
+                    className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
                   />
                 </div>
               </div>
-            )}
+            </section>
+
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Áreas del Establecimiento</h3>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {semanticData.areas?.map((area, idx) => (
+                  <span key={idx} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 border border-blue-100">
+                    {area}
+                    <button
+                      onClick={() => setSemanticData({ ...semanticData, areas: semanticData.areas?.filter((_, i) => i !== idx) })}
+                      className="hover:text-red-600"
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Agregar área (Enter para añadir)"
+                className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    const newArea = e.currentTarget.value.trim();
+                    setSemanticData({ ...semanticData, areas: [...(semanticData.areas || []), newArea] });
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
+            </section>
+
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Opciones de Pago</h3>
+              <div className="flex flex-wrap gap-2">
+                {['Efectivo', 'Tarjetas de crédito', 'AMEX', 'Visa', 'Mastercard', 'Transferencia', 'Vales'].map((option) => {
+                  const isSelected = semanticData.payment_options?.includes(option);
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSemanticData({ ...semanticData, payment_options: semanticData.payment_options?.filter(o => o !== option) });
+                        } else {
+                          setSemanticData({ ...semanticData, payment_options: [...(semanticData.payment_options || []), option] });
+                        }
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${isSelected
+                        ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                        : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200 hover:text-gray-700'
+                        }`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Características Destacadas</h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  'WiFi', 'Terraza', 'Bar', 'Estacionamiento valet', 'Música en vivo',
+                  'Pet friendly', 'Reservaciones', 'Delivery', 'Para llevar',
+                  'Aire acondicionado', 'Smart TV', 'Acceso para silla de ruedas',
+                  'Jacuzzi', 'Alberca', 'Cochera techada', 'Sillón Tantra'
+                ].map((feature) => {
+                  const isSelected = semanticData.additional_features?.includes(feature);
+                  return (
+                    <button
+                      key={feature}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSemanticData({ ...semanticData, additional_features: semanticData.additional_features?.filter(f => f !== feature) });
+                        } else {
+                          setSemanticData({ ...semanticData, additional_features: [...(semanticData.additional_features || []), feature] });
+                        }
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${isSelected
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg'
+                        : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200 hover:text-gray-700'
+                        }`}
+                    >
+                      {feature}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        </div>
+      ) : activeTab === 'editor' ? (
+        <>
+          <div className="mx-0 xl:mx-4 flex flex-col gap-6">
+
           </div>
 
           <div className="mx-0 xl:mx-4">

@@ -96,22 +96,22 @@ const AdminUserList = () => {
 
     return [
       {
-        id: 'no-business',
-        label: 'Registro Incompleto',
-        subject: `¿Necesitas ayuda con tu menú digital, ${firstName}?`,
-        text: `Hola ${firstName}, vimos que te creaste una cuenta en Menús BysMax, pero aún no registraste tu menú. ¿Necesitas ayuda para comenzar o tienes alguna duda con el proceso? Estamos aquí para apoyarte.`
+        id: 'welcome',
+        label: 'Bienvenida',
+        subject: `¡Gracias por registrarte, ${firstName}!`,
+        text: `Hola ${firstName}, gracias por registrarte en Menús BysMax. Si tienes alguna duda o necesitas ayuda, estamos para ayudarte.`
       },
       {
-        id: 'support',
-        label: 'Soporte Directo',
-        subject: `¿Cómo va todo en ${business}?`,
-        text: `Hola ${firstName}, gracias por registrarte en Menús BysMax. Vi que registraste ${business}. ¿Cómo vas con tu menú digital? Si tienes alguna duda o problema en el proceso, estamos aquí para ayudarte.`
+        id: 'support-business',
+        label: 'Soporte',
+        subject: `Ayuda con ${business}`,
+        text: `Hola ${firstName}, gracias por registrarte. Si tienes alguna duda con ${business}, estamos para ayudarte.`
       },
       {
-        id: 'offer',
-        label: 'Optimización',
-        subject: `Queremos ayudarte con ${business}`,
-        text: `Hola ${firstName}, bienvenido. Noté que ya creaste tu cuenta para ${business}. Queremos asegurar que tengas la mejor experiencia. ¿Te gustaría que te ayudemos a optimizar tu menú digital?`
+        id: 'no-menu',
+        label: 'Sin Menú',
+        subject: `¿Te ayudamos con tu menú, ${firstName}?`,
+        text: `Hola ${firstName}, gracias por registrarte. Si necesitas ayuda para crear tu primer menú, estamos para ayudarte.`
       }
     ];
   };
@@ -423,7 +423,7 @@ const AdminUserList = () => {
                     </button>
 
                     {activeMenu?.id === user.id && activeMenu?.type === 'whatsapp' && (
-                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-emerald-100 z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-emerald-100 z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="p-3 bg-emerald-50 border-b border-emerald-100 text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
                           Plantillas WhatsApp
                         </div>
@@ -437,7 +437,7 @@ const AdminUserList = () => {
                               className="block p-3 hover:bg-emerald-50 rounded-xl transition-colors group/item"
                             >
                               <p className="text-xs font-bold text-slate-800">{template.label}</p>
-                              <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">"{template.text}"</p>
+                              <p className="text-[10px] text-slate-500 mt-1 whitespace-pre-wrap">"{template.text}"</p>
                             </a>
                           ))}
                         </div>
@@ -456,7 +456,7 @@ const AdminUserList = () => {
                     </button>
 
                     {activeMenu?.id === user.id && activeMenu?.type === 'email' && (
-                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-blue-100 z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-blue-100 z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="p-3 bg-blue-50 border-b border-blue-100 text-[10px] font-bold text-blue-600 uppercase tracking-wider">
                           Plantillas Email
                         </div>
@@ -474,7 +474,8 @@ const AdminUserList = () => {
                                   <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
                                 )}
                               </div>
-                              <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">{template.subject}</p>
+                              <p className="text-[10px] font-bold text-slate-600 mt-1">Asunto: {template.subject}</p>
+                              <p className="text-[10px] text-slate-500 mt-1 whitespace-pre-wrap">{template.text}</p>
                             </button>
                           ))}
                         </div>
