@@ -85,7 +85,7 @@ function AdminHeader() {
 
   return (
     <>
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-1 left-3 z-50">
         <button
           onClick={() => {
             const newState = !isOpen;
@@ -96,7 +96,7 @@ function AdminHeader() {
               document.documentElement.classList.add('sidebar-collapsed');
             }
           }}
-          className="p-2.5 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 transition-all text-gray-500"
+          className="p-2.5 bg-white rounded-xl shadow-sm hover:bg-gray-50 transition-all text-gray-500"
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
           {isOpen ? (
@@ -115,12 +115,12 @@ function AdminHeader() {
       <aside className={`
                 bg-white border-r border-gray-200
                 w-64 h-screen
-                fixed left-0 top-0 z-10 
+                fixed left-0 top-0 z-[200]
                 transition-transform duration-300 ease-in-out 
                 ${!isOpen ? '-translate-x-full' : 'translate-x-0'}
             `}>
         <div className="flex flex-col h-[100dvh]">
-          <div className="p-6 border-b border-gray-100">
+          <div className="p-6 border-b border-gray-100 mt-6">
             <h1 className="text-lg font-semibold text-gray-900">Menús</h1>
             <p className="text-xs text-gray-500 mt-0.5">Panel de control</p>
           </div>
@@ -253,15 +253,6 @@ function AdminHeader() {
                 Instalar App
               </button>
             )}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors"
-            >
-              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Cerrar sesión
-            </button>
             <a
               href="https://wa.me/528111913676"
               target="_blank"
@@ -275,6 +266,16 @@ function AdminHeader() {
               </svg>
               ¿Algun problema?
             </a>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors"
+            >
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Cerrar sesión
+            </button>
+
             <div className="px-8 text-center text-gray-500 text-xs">
               &copy; {new Date().getFullYear()} Menús BysMax.
             </div>

@@ -40,6 +40,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 import MotelPageRenderer from '../MotelPageRenderer';
+import AdminPageHeader from './AdminPageHeader';
 import {
   PiPlus,
   PiTrash,
@@ -547,59 +548,62 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   }
 
   return (
-    <div className="space-y-8 pb-32 xl:px-4 px-0">
-      <header className="flex flex gap-2 xl:px-4 mt-4">
-        <div className="flex items-center justify-between gap-2 w-full">
-          <div className="flex bg-gray-100/50 p-1 rounded-xl items-center gap-0.5">
+    <div className="space-y-6 pb-32">
+      <AdminPageHeader
+        leftContent={
+          <div className="flex bg-white/50 p-1 rounded-xl items-center gap-0.5 border border-gray-200 shadow-sm shrink-0">
             <button
               onClick={() => setActiveTab('info')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'info' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'info' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
             >
               <PiHouse className="w-3.5 h-3.5" />
               <span>General</span>
             </button>
             <button
               onClick={() => setActiveTab('editor')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
             >
               <PiPaintBrushBroad className="w-3.5 h-3.5" />
               <span>Diseño</span>
             </button>
             <button
               onClick={() => setActiveTab('preview')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'preview' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'preview' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
             >
               <PiMonitor className="w-3.5 h-3.5" />
               <span>Previa</span>
             </button>
             <button
               onClick={() => setActiveTab('media')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all ${activeTab === 'media' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
             >
               <PiImages className="w-3.5 h-3.5" />
-              <span>Galeria</span>
+              <span>Galería</span>
             </button>
           </div>
+        }
+        rightContent={
+          <>
+            <button
+              onClick={() => setForceCollapse(!forceCollapse)}
+              className="flex-1 flex items-center px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 items-center justify-center gap-2 transition-all shadow-sm"
+              title={forceCollapse ? 'Expandir Todo' : 'Colapsar Todo'}
+            >
+              {forceCollapse ? <PiPlus className="w-3.5 h-3.5" /> : <PiX className="w-3.5 h-3.5" />}
+              <span>{forceCollapse ? 'Abrir' : 'Cerrar'}</span>
+            </button>
 
-          <button
-            onClick={() => setForceCollapse(!forceCollapse)}
-            className="hidden sm:flex px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wide text-gray-600 hover:bg-gray-100 items-center gap-1.5"
-            title={forceCollapse ? 'Expandir Todo' : 'Colapsar Todo'}
-          >
-            {forceCollapse ? <PiPlus className="w-3 h-3" /> : <PiX className="w-3 h-3" />}
-            <span className="hidden md:inline">{forceCollapse ? 'Abrir' : 'Cerrar'}</span>
-          </button>
-        </div>
-
-        <button
-          onClick={saveChanges}
-          disabled={isSaving}
-          className="w-full bg-gray-800 text-white px-3 py-2 sm:py-2.5 rounded-lg font-bold uppercase tracking-widest text-[10px] sm:text-xs shadow-md flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-gray-900 active:scale-95"
-        >
-          {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
-          {isSaving ? 'Guardando...' : 'Guardar'}
-        </button>
-      </header>
+            <button
+              onClick={saveChanges}
+              disabled={isSaving}
+              className="flex-[2] sm:flex-none bg-gray-900 text-white px-6 py-2 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] sm:text-xs shadow-lg shadow-gray-200 flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-black active:scale-95 whitespace-nowrap"
+            >
+              {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
+              {isSaving ? 'Guardando...' : 'Guardar'}
+            </button>
+          </>
+        }
+      />
 
       {/* Floating Quick Nav for Mobile */}
       <div className="fixed bottom-6 right-6 z-40 sm:hidden">
@@ -636,7 +640,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       </div>
 
       {activeTab === 'info' ? (
-        <div className="mx-0 xl:mx-4 bg-white rounded-3xl border shadow-xl p-8 sm:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-white md:rounded-3xl border-y md:border shadow-xl p-6 sm:p-12">
           <header className="mb-12">
             <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900 mb-2">Información General</h2>
             <p className="text-gray-500 text-sm font-medium">Configura los datos básicos, horarios y contacto de tu establecimiento.</p>
@@ -919,11 +923,11 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         </div>
       ) : activeTab === 'editor' ? (
         <>
-          <div className="mx-0 xl:mx-4 flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
 
           </div>
 
-          <div className="mx-0 xl:mx-4">
+          <div className="">
             <button
               onClick={() => setShowViewSettings(!showViewSettings)}
               className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
@@ -1257,7 +1261,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </div>
         </>
       ) : activeTab === 'media' ? (
-        <div className="mx-0 xl:mx-4 bg-white rounded-2xl border shadow-xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-white md:rounded-2xl border-y md:border shadow-xl p-6 sm:p-12">
           <div className="max-w-4xl mx-auto space-y-12">
             <header className="text-center">
               <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900 mb-2">Biblioteca de Medios</h2>
@@ -1281,7 +1285,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {getAllExistingImages().map((url, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm group transition-all hover:scale-[1.02] hover:shadow-md">
+                  <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm group">
                     <img src={url} className="w-full h-full object-cover" alt="" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                       <button
@@ -1319,7 +1323,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </div>
         </div>
       ) : (
-        <div className="mx-0 xl:mx-4 overflow-hidden rounded-2xl border shadow-xl bg-[#0A0A0A]">
+        <div className="overflow-hidden md:rounded-2xl md:border shadow-xl bg-[#0A0A0A]">
           <div className="bg-gray-800 p-2 flex items-center justify-between px-6 border-b border-white/10">
             <div className="flex gap-1.5">
               <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -1755,32 +1759,31 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                             Variantes (Sabores o Tamaños)
                           </label>
 
-                          <div className="space-y-3">
+                          <div className="space-y-4">
                             {item.options?.map((option, optIdx) => (
-                              <div key={optIdx} className="space-y-2 border-b border-gray-50 pb-4 last:border-0">
-                                <div className="flex items-center justify-between gap-4">
-                                  <div className="flex-1">
-                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Nombre del grupo (ej: Sabor, Tamaño):</label>
-                                    <input
-                                      value={option.name}
-                                      onChange={(e) => {
-                                        const newOptions = [...(item.options || [])];
-                                        newOptions[optIdx].name = e.target.value;
-                                        updateItem(itemIndex, { options: newOptions });
-                                      }}
-                                      placeholder="Ej: Sabor de la masa..."
-                                      className="w-full text-sm font-bold bg-white border border-gray-100 rounded-lg px-3 py-1.5 outline-none focus:border-emerald-500 transition-all"
-                                    />
-                                  </div>
-                                  <button
-                                    onClick={() => {
-                                      const newOptions = item.options?.filter((_, i) => i !== optIdx);
+                              <div key={optIdx} className="space-y-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 relative group/opt">
+                                <button
+                                  onClick={() => {
+                                    const newOptions = item.options?.filter((_, i) => i !== optIdx);
+                                    updateItem(itemIndex, { options: newOptions });
+                                  }}
+                                  className="absolute -top-2 -right-2 w-8 h-8 bg-white text-slate-400 hover:text-red-500 rounded-full shadow-sm border border-slate-100 flex items-center justify-center transition-all opacity-0 group-hover/opt:opacity-100"
+                                >
+                                  <PiTrash className="w-4 h-4" />
+                                </button>
+
+                                <div className="flex flex-col gap-2">
+                                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block ml-1">Nombre del grupo (ej: Sabor, Tamaño):</label>
+                                  <input
+                                    value={option.name}
+                                    onChange={(e) => {
+                                      const newOptions = [...(item.options || [])];
+                                      newOptions[optIdx].name = e.target.value;
                                       updateItem(itemIndex, { options: newOptions });
                                     }}
-                                    className="w-8 h-8 text-gray-300 hover:text-red-500 transition-colors"
-                                  >
-                                    <PiTrash className="w-4 h-4" />
-                                  </button>
+                                    placeholder="Ej: Sabor de la masa..."
+                                    className="w-full text-sm font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-emerald-500 transition-all"
+                                  />
                                 </div>
 
                                 <div className="flex flex-wrap gap-2">
@@ -1799,7 +1802,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                                   ))}
                                   <input
                                     placeholder="Escribe sabores separados por comas..."
-                                    className="text-xs bg-gray-50 px-4 py-2 rounded-xl outline-none flex-1 min-w-[200px] border border-transparent focus:border-gray-200"
+                                    className="text-xs bg-white px-4 py-2 rounded-xl outline-none flex-1 min-w-[200px] border border-slate-200 focus:border-emerald-500"
                                     onChange={(e) => {
                                       const val = e.target.value;
                                       if (val.includes(',')) {
@@ -1811,11 +1814,14 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                                       }
                                     }}
                                     onKeyDown={(e) => {
-                                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                                        const newOptions = [...(item.options || [])];
-                                        newOptions[optIdx].values.push(e.currentTarget.value.trim());
-                                        updateItem(itemIndex, { options: newOptions });
-                                        e.currentTarget.value = '';
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        if (e.currentTarget.value.trim()) {
+                                          const newOptions = [...(item.options || [])];
+                                          newOptions[optIdx].values.push(e.currentTarget.value.trim());
+                                          updateItem(itemIndex, { options: newOptions });
+                                          e.currentTarget.value = '';
+                                        }
                                       }
                                     }}
                                   />
@@ -1826,7 +1832,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                             <button onClick={() => {
                               const newOptions = [...(item.options || []), { name: '', values: [], required: true }];
                               updateItem(itemIndex, { options: newOptions });
-                            }} className="w-full py-3 bg-gray-50 border-2 border-dashed border-gray-100 rounded-2xl text-[10px] font-black text-gray-400 uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center gap-2">
+                            }} className="w-full py-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center gap-2">
                               <PiPlus className="w-4 h-4" /> Añadir Nueva Variante
                             </button>
                           </div>

@@ -5,6 +5,7 @@ interface DashboardData {
   user: any;
   isAdmin: boolean;
   places: any[];
+  totalPlaces: number;
   recentComments: any[];
   history: any[];
 }
@@ -14,10 +15,24 @@ export default function DashboardContainer() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Pagination and Filter states
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(50);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("/api/admin/dashboard-data");
+        const params = new URLSearchParams({
+          page: page.toString(),
+          pageSize: pageSize.toString(),
+          search,
+          sortBy
+        });
+
+        const response = await fetch(`/api/admin/dashboard-data?${params.toString()}`);
         if (response.status === 401) {
           window.location.href = "/admin/login";
           return;
@@ -34,8 +49,9 @@ export default function DashboardContainer() {
       }
     };
 
-    fetchData();
-  }, []);
+    const debounce = setTimeout(fetchData, 300);
+    return () => clearTimeout(debounce);
+  }, [page, search, sortBy]);
 
 
   if (error) {
@@ -58,7 +74,17 @@ export default function DashboardContainer() {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <PlaceManager initialRestaurants={places} loading={loading} />
+      <PlaceManager
+        initialRestaurants={places}
+        totalPlaces={data?.totalPlaces || 0}
+        loading={loading}
+        page={page}
+        setPage={setPage}
+        search={search}
+        setSearch={setSearch}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">

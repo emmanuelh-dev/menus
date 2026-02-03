@@ -133,14 +133,20 @@ export const PUT: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ url }) => {
   const phone = url.searchParams.get('phone');
   const placeId = url.searchParams.get('place_id');
+  const page = parseInt(url.searchParams.get('page') || '1');
+  const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
+  const search = url.searchParams.get('search') || '';
   
   let query = supabase
     .from('customers')
-    .select('*')
-    .order('name', { ascending: true });
+    .select('*', { count: 'exact' });
 
   if (phone) {
     query = query.eq('phone', phone);
+  }
+
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
   }
 
   // Si hay placeId, filtramos por clientes que hayan pedido en ese local
@@ -155,14 +161,20 @@ export const GET: APIRoute = async ({ url }) => {
       query = query.in('phone', phones);
     } else {
       // Si no hay órdenes, no hay clientes para este local
-      return new Response(JSON.stringify({ customers: [] }), {
+      return new Response(JSON.stringify({ customers: [], totalCustomers: 0 }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     }
   }
 
-  const { data: customers, error } = await query;
+  // Pagination
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data: customers, error, count: totalCustomers } = await query
+    .order('name', { ascending: true })
+    .range(from, to);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
@@ -171,7 +183,7 @@ export const GET: APIRoute = async ({ url }) => {
     });
   }
 
-  return new Response(JSON.stringify({ customers }), {
+  return new Response(JSON.stringify({ customers, totalCustomers: totalCustomers || 0 }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' }
   });

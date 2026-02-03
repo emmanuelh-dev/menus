@@ -35,11 +35,12 @@ export const POST: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ url }) => {
   const placeId = url.searchParams.get('place_id');
   const status = url.searchParams.get('status');
+  const page = parseInt(url.searchParams.get('page') || '1');
+  const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
 
   let query = supabase
     .from('orders')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*', { count: 'exact' });
 
   if (placeId) {
     query = query.eq('place_id', placeId);
@@ -49,7 +50,13 @@ export const GET: APIRoute = async ({ url }) => {
     query = query.eq('status', status);
   }
 
-  const { data: orders, error } = await query;
+  // Pagination
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data: orders, error, count: totalOrders } = await query
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
@@ -58,7 +65,7 @@ export const GET: APIRoute = async ({ url }) => {
     });
   }
 
-  return new Response(JSON.stringify({ orders }), {
+  return new Response(JSON.stringify({ orders, totalOrders: totalOrders || 0 }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' }
   });

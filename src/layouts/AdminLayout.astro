@@ -1,6 +1,7 @@
 ---
 import AdminHeader from "../components/AdminHeader";
 import BaseHead from "../components/BaseHead.astro";
+import { ViewTransitions } from "astro:transitions";
 
 interface Props {
 	title: string;
@@ -13,6 +14,7 @@ const { title, description = "Panel de administrador" } = Astro.props;
 <html lang="es">
 	<head>
 		<BaseHead title={title} description={description} />
+		<ViewTransitions />
 		<link
 			rel="manifest"
 			href={`/manifest.json?type=admin&v=4&path=${Astro.url.pathname}`}
@@ -29,9 +31,7 @@ const { title, description = "Panel de administrador" } = Astro.props;
 			class="main-content-wrapper flex-1 flex flex-col min-h-screen transition-[margin] duration-300 ease-in-out"
 		>
 			<main>
-				<div class="max-w-7xl mx-auto">
-					<slot />
-				</div>
+				<slot />
 			</main>
 		</div>
 

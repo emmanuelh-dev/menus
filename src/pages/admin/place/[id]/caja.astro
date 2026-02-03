@@ -18,7 +18,5 @@ if (error || !place) {
 ---
 
 <PlaceAdminLayout title={`Caja - ${place.name}`} placeId={id!}>
-	<div class="max-w-6xl mx-auto">
-		<OrdersManager placeId={Number(id)} client:load />
-	</div>
+	<OrdersManager placeId={Number(id)} client:load />
 </PlaceAdminLayout>

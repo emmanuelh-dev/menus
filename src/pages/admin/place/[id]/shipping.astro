@@ -23,14 +23,5 @@ if (!place) {
 ---
 
 <PlaceAdminLayout title={`Zonas de Envío - ${place.name}`} placeId={id!}>
-	<div class="">
-		<div class="mb-6">
-			<h1 class="text-2xl font-bold text-slate-900">
-				Configurar Zonas de Envío
-			</h1>
-			<p class="text-slate-600 mt-1">{place.name}</p>
-		</div>
-
-		<ShippingZonesManager client:load placeId={parseInt(id)} />
-	</div>
+	<ShippingZonesManager client:load placeId={parseInt(id)} />
 </PlaceAdminLayout>

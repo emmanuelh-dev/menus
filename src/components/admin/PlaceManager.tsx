@@ -53,7 +53,27 @@ interface Restaurant {
   };
 }
 
-export default function PlaceManager({ initialRestaurants, loading: externalLoading }: { initialRestaurants: Restaurant[], loading?: boolean }) {
+export default function PlaceManager({
+  initialRestaurants,
+  totalPlaces = 0,
+  loading: externalLoading,
+  page,
+  setPage,
+  search,
+  setSearch,
+  sortBy,
+  setSortBy
+}: {
+  initialRestaurants: Restaurant[],
+  totalPlaces?: number,
+  loading?: boolean,
+  page: number,
+  setPage: (p: number) => void,
+  search: string,
+  setSearch: (s: string) => void,
+  sortBy: 'newest' | 'oldest' | 'name',
+  setSortBy: (s: 'newest' | 'oldest' | 'name') => void
+}) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants || []);
   const [states, setStates] = useState<State[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,8 +90,6 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
   const [aiProcessing, setAiProcessing] = useState(false);
   const [menuImages, setMenuImages] = useState<string[]>([]);
   const [extractedPreview, setExtractedPreview] = useState<any>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest');
   const [municipalities, setMunicipalities] = useState<any[]>([]);
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
 
@@ -298,13 +316,7 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
     ? initialRestaurants
     : restaurants;
 
-  const filteredRestaurants = displayRestaurants
-    .filter(r => r.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'oldest') return a.id - b.id;
-      return b.id - a.id; // newest by default
-    });
+  const totalPages = Math.ceil(totalPlaces / 50);
 
   return (
     <div className="p-6">
@@ -312,7 +324,7 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
-              Todos{isLoading ? <span className="animate-pulse h-6 w-8 bg-gray-100 rounded"></span> : <Badge>({displayRestaurants.length})</Badge>}
+              Todos{isLoading ? <span className="animate-pulse h-6 w-8 bg-gray-100 rounded"></span> : <Badge>({totalPlaces})</Badge>}
             </h1>
           </div>
 
@@ -331,8 +343,11 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
             </div>
             <Input
               placeholder="Buscar por nombre..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1); // Reset to first page on search
+              }}
               className="pl-10 shadow-none border-none"
             />
           </div>
@@ -344,7 +359,10 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
               </div>
               <UISelect
                 value={sortBy}
-                onChange={(e: any) => setSortBy(e.target.value)}
+                onChange={(e: any) => {
+                  setSortBy(e.target.value);
+                  setPage(1);
+                }}
                 className="pl-9 shadow-none border-none"
                 options={[
                   { value: "newest", label: "Recientes" },
@@ -373,7 +391,7 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
             </div>
           ))
         ) : (
-          filteredRestaurants.map((r) => (
+          restaurants.map((r) => (
             <div
               key={r.id}
               className="bg-white rounded-xl overflow-hidden border border-slate-100"
@@ -472,6 +490,30 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
           ))
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-12 flex items-center justify-center gap-2">
+          <Button
+            variant="secondary"
+            disabled={page === 1 || isLoading}
+            onClick={() => setPage(page - 1)}
+          >
+            Anterior
+          </Button>
+          <div className="flex items-center gap-1 px-4">
+            <span className="text-sm font-bold text-slate-900">{page}</span>
+            <span className="text-sm text-slate-400">de</span>
+            <span className="text-sm font-bold text-slate-900">{totalPages}</span>
+          </div>
+          <Button
+            variant="secondary"
+            disabled={page === totalPages || isLoading}
+            onClick={() => setPage(page + 1)}
+          >
+            Siguiente
+          </Button>
+        </div>
+      )}
 
       {
         isModalOpen && (

@@ -18,20 +18,33 @@ export default function CustomersManager() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [pageSize] = useState(50);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Partial<Customer> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchCustomers();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchCustomers();
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, page]);
 
   const fetchCustomers = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/customers');
+      const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+        search: searchTerm
+      });
+      const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         setCustomers(data.customers || []);
+        setTotalCustomers(data.totalCustomers || 0);
       }
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -77,19 +90,14 @@ export default function CustomersManager() {
     }
   };
 
-  const filteredCustomers = customers.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.phone.includes(searchTerm)
-  );
-
-  if (loading) return null;
+  const totalPages = Math.ceil(totalCustomers / pageSize);
 
   return (
     <div className="space-y-6 px-4 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Mis Clientes</h2>
-          <p className="text-slate-500 text-sm">Gestiona tu base de datos de comensales y contactos.</p>
+          <p className="text-slate-500 text-sm">Gestiona tu base de datos de comensales y contactos ({totalCustomers}).</p>
         </div>
         <button
           onClick={() => {
@@ -110,13 +118,29 @@ export default function CustomersManager() {
           placeholder="Buscar por nombre o teléfono..."
           className="w-full pl-12 pr-4 py-4 bg-white border border-slate-100 rounded-[24px] outline-none shadow-sm focus:ring-4 focus:ring-slate-100 transition-all font-medium"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(1);
+          }}
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCustomers.length > 0 ? (
-          filteredCustomers.map(customer => (
+        {loading ? (
+          [1, 2, 3].map(i => (
+            <div key={i} className="bg-white border border-slate-100 rounded-[32px] p-6 animate-pulse space-y-4 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-slate-50 rounded-2xl" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-slate-50 rounded w-3/4" />
+                  <div className="h-3 bg-slate-50 rounded w-1/2" />
+                </div>
+              </div>
+              <div className="h-12 bg-slate-50 rounded-2xl" />
+            </div>
+          ))
+        ) : customers.length > 0 ? (
+          customers.map(customer => (
             <div key={customer.id} className="bg-white border border-slate-100 rounded-[32px] p-6 shadow-sm hover:shadow-md transition-all group">
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -191,6 +215,30 @@ export default function CustomersManager() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-12 flex items-center justify-center gap-2">
+          <button
+            disabled={page === 1 || loading}
+            onClick={() => setPage(page - 1)}
+            className="px-6 py-3 bg-white border border-slate-100 rounded-2xl text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-all shadow-sm"
+          >
+            Anterior
+          </button>
+          <div className="flex items-center gap-1 px-4 text-xs font-bold text-slate-900 bg-white border border-slate-100 rounded-2xl py-3 shadow-sm">
+            <span>{page}</span>
+            <span className="text-slate-300">/</span>
+            <span>{totalPages}</span>
+          </div>
+          <button
+            disabled={page === totalPages || loading}
+            onClick={() => setPage(page + 1)}
+            className="px-6 py-3 bg-white border border-slate-100 rounded-2xl text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-all shadow-sm"
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">

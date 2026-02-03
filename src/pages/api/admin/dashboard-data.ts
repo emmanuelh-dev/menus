@@ -3,7 +3,7 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { createAuthenticatedClient } from "../../../lib/supabase";
 
-export const GET: APIRoute = async ({ cookies }) => {
+export const GET: APIRoute = async ({ cookies, request }) => {
 	try {
 		const accessToken = cookies.get("sb-access-token")?.value;
 		const refreshToken = cookies.get("sb-refresh-token")?.value;
@@ -13,6 +13,12 @@ export const GET: APIRoute = async ({ cookies }) => {
 				status: 401,
 			});
 		}
+
+		const url = new URL(request.url);
+		const page = parseInt(url.searchParams.get("page") || "1");
+		const pageSize = parseInt(url.searchParams.get("pageSize") || "50");
+		const search = url.searchParams.get("search") || "";
+		const sortBy = url.searchParams.get("sortBy") || "newest";
 
 		const supabase = await createAuthenticatedClient(accessToken, refreshToken);
 		const {
@@ -29,7 +35,7 @@ export const GET: APIRoute = async ({ cookies }) => {
 		const { isAdmin: checkAdmin } = await import("../../../lib/admin");
 		const isAdmin = checkAdmin(user.email);
 
-		const query = supabase.from("places").select(
+		let query = supabase.from("places").select(
 			`
 				*,
 				states (
@@ -38,18 +44,31 @@ export const GET: APIRoute = async ({ cookies }) => {
 					slug
 				)
 			`,
+			{ count: "exact" },
 		);
 
 		if (!isAdmin) {
-			query.eq("user_id", user?.id);
+			query = query.eq("user_id", user?.id);
 		}
 
-		const { data: places } = await query.order(
-			"created_at",
-			{
-				ascending: false,
-			},
-		);
+		if (search) {
+			query = query.ilike("name", `%${search}%`);
+		}
+
+		// Sorting
+		if (sortBy === "name") {
+			query = query.order("name", { ascending: true });
+		} else if (sortBy === "oldest") {
+			query = query.order("created_at", { ascending: true });
+		} else {
+			query = query.order("created_at", { ascending: false });
+		}
+
+		// Pagination
+		const from = (page - 1) * pageSize;
+		const to = from + pageSize - 1;
+
+		const { data: places, count: totalPlaces } = await query.range(from, to);
 
 		const commentsQuery = supabase.from("reviews").select(
 			`
@@ -94,6 +113,7 @@ export const GET: APIRoute = async ({ cookies }) => {
 				user,
 				isAdmin,
 				places: places || [],
+				totalPlaces: totalPlaces || 0,
 				recentComments: recentComments || [],
 				history,
 			}),
