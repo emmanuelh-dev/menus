@@ -15,7 +15,10 @@ export const GET: APIRoute = async ({ cookies }) => {
     const supabase = await createAuthenticatedClient(accessToken, refreshToken);
     const { data: { user } } = await supabase.auth.getUser();
 
-    return new Response(JSON.stringify({ user }), { status: 200 });
+    const { isAdmin } = await import("../../../lib/admin");
+    const isUserAdmin = isAdmin(user?.email);
+
+    return new Response(JSON.stringify({ user, isAdmin: isUserAdmin }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ user: null }), { status: 200 });
   }

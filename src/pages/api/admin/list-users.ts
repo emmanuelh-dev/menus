@@ -17,8 +17,8 @@ export const GET: APIRoute = async ({ cookies }) => {
     const supabaseUser = await createAuthenticatedClient(accessToken, refreshToken);
     const { data: { user } } = await supabaseUser.auth.getUser();
 
-    const isAdmin = user?.email === 'emmanuelh.dev@gmail.com' || user?.email === 'admin@bysmax.com';
-    if (!isAdmin) {
+    const { isAdmin } = await import("../../../lib/admin");
+    if (!isAdmin(user?.email)) {
       return new Response(JSON.stringify({ error: "Prohibido" }), { status: 403 });
     }
 
@@ -45,15 +45,24 @@ export const GET: APIRoute = async ({ cookies }) => {
       return new Response(JSON.stringify({ error: error.message }), { status: 400 });
     }
 
+    // Obtener todos los lugares para asociarlos
+    const { data: places } = await adminClient.from('places').select('name, user_id');
+
     // Formatear la data para el componente
-    const formattedUsers = users.map(u => ({
-        id: u.id,
-        email: u.email,
-        name: u.user_metadata?.name || '',
-        whatsapp: u.user_metadata?.whatsapp || '',
-        last_sign_in_at: u.last_sign_in_at,
-        created_at: u.created_at
-    }));
+    const formattedUsers = users.map(u => {
+        const userPlaces = places?.filter(p => p.user_id === u.id).map(p => p.name) || [];
+        
+        return {
+            id: u.id,
+            email: u.email,
+            name: u.user_metadata?.name || '',
+            whatsapp: u.user_metadata?.whatsapp || '',
+            business_name: u.user_metadata?.business_name || '',
+            last_sign_in_at: u.last_sign_in_at,
+            created_at: u.created_at,
+            places: userPlaces
+        };
+    });
 
     return new Response(JSON.stringify({ users: formattedUsers }), { status: 200 });
   } catch (error) {

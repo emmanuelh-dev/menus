@@ -5,6 +5,7 @@ function AdminHeader() {
   const [isMobile, setIsMobile] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
@@ -38,10 +39,13 @@ function AdminHeader() {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch('/api/auth/me'); // I'll create this API
+        const response = await fetch('/api/auth/me');
         const data = await response.json();
         if (data.user) {
           setUserEmail(data.user.email);
+        }
+        if (data.isAdmin) {
+          setIsAdminUser(true);
         }
       } catch (e) {
         console.error("Error fetching user", e);
@@ -204,38 +208,37 @@ function AdminHeader() {
               Reseñas
             </a>
 
-            {(userEmail === 'emmanuelh.dev@gmail.com' || userEmail === 'admin@bysmax.com' || userEmail === 'e805177@gmail.com'
-            ) && (
-                <div className="pt-4 pb-2">
-                  <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">
-                    Administrador
-                  </div>
-                  <a
-                    href="/admin/users"
-                    className={`${isActive('/admin/users')
-                      ? 'bg-gray-100 text-gray-900 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
-                  >
-                    <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    Usuarios Registrados
-                  </a>
-                  <a
-                    href="/admin/history"
-                    className={`${isActive('/admin/history')
-                      ? 'bg-gray-100 text-gray-900 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
-                  >
-                    <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Historial IA
-                  </a>
+            {isAdminUser && (
+              <div className="pt-4 pb-2">
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">
+                  Administrador
                 </div>
-              )}
+                <a
+                  href="/admin/users"
+                  className={`${isActive('/admin/users')
+                    ? 'bg-gray-100 text-gray-900 font-medium'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
+                >
+                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  Usuarios Registrados
+                </a>
+                <a
+                  href="/admin/history"
+                  className={`${isActive('/admin/history')
+                    ? 'bg-gray-100 text-gray-900 font-medium'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
+                >
+                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Historial IA
+                </a>
+              </div>
+            )}
           </nav>
 
           <div className="p-3 border-t border-gray-100 flex flex-col gap-2">

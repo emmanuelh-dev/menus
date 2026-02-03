@@ -26,11 +26,8 @@ export const GET: APIRoute = async ({ cookies }) => {
 			});
 		}
 
-		const isAdmin = [
-			"emmanuelh.dev@gmail.com",
-			"admin@bysmax.com",
-			"e805177@gmail.com",
-		].includes(user.email || "");
+		const { isAdmin: checkAdmin } = await import("../../../lib/admin");
+		const isAdmin = checkAdmin(user.email);
 
 		const query = supabase.from("places").select(
 			`
