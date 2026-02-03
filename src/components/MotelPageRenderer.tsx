@@ -227,12 +227,12 @@ export default function MotelPageRenderer({
             </div>
           </div>
 
-          <ins className="adsbygoogle block h-48"
+          {/* <ins className="adsbygoogle block h-48"
 
             data-ad-client="ca-pub-3646138644530578"
             data-ad-slot="7426120296"
             data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
+            data-full-width-responsive="true"></ins> */}
         </header>
 
         {/* Suites y Servicios */}
