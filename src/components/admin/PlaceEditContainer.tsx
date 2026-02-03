@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ContentEditor from "./ContentEditor";
 import { formater } from "../../types/app";
+import QRDownloadButton from "./QRDownloadButton";
 
 interface PlaceData {
   place: any;
@@ -86,6 +87,14 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
           >
             Ver sitio público
           </a>
+          <QRDownloadButton
+            url={`${typeof window !== 'undefined' ? window.location.origin : ''}${place.type === "motel" && place.states?.slug
+              ? `/moteles/estados/${place.states.slug}/${place.short_name}`
+              : `/${formater[place.type] || place.type}/${place.short_name}`}`}
+            restaurantName={place.name}
+            size="md"
+            variant="solid"
+          />
         </div>
         <h1 className="text-2xl font-bold text-slate-900">
           {place.name}

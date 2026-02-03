@@ -9,6 +9,7 @@ import { Input } from '../ui/Input';
 import { Select as UISelect } from '../ui/Select';
 import { Badge } from '../ui/Badge';
 import GooglePlacesAutocomplete from './GooglePlacesAutocomplete';
+import QRDownloadButton from './QRDownloadButton';
 
 interface State {
   id: number;
@@ -453,6 +454,13 @@ export default function PlaceManager({ initialRestaurants, loading: externalLoad
                   >
                     <Copy size={14} />
                   </Button>
+                  <QRDownloadButton
+                    url={`${typeof window !== 'undefined' ? window.location.origin : ''}${r.type === 'motel' && r.states?.slug
+                      ? `/moteles/estados/${r.states.slug}/${r.short_name}`
+                      : `/${(r.type === 'cafe' || r.type === 'restaurant') ? 'menus' : (formater[r.type as keyof typeof formater] || r.type)}/${r.short_name}`}`}
+                    restaurantName={r.name}
+                    size="sm"
+                  />
                   <a href={`/admin/place/${r.id}`} className="col-span-2">
                     <Button size="sm" className="w-full">
                       Gestionar Menú

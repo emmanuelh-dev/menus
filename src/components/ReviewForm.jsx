@@ -33,7 +33,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!id) return;
-    
+
     setIsSubmitting(true);
     const payload = {
       place_id: id,
@@ -46,14 +46,19 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
       },
       status: 'approved'
     };
-    const { error } = await supabase.from("reviews").insert([payload]);
+    const { data: responseData, error } = await fetch('/api/restaurants/submit-review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(res => res.json().then(data => ({ data, error: !res.ok })));
+
     if (!error) {
       alert("✓ ¡Reseña publicada!");
       setRating(0); setComment(""); setImages([]);
       loadReviews();
     } else {
-      console.error(error);
-      alert("Error al publicar la reseña.");
+      console.error(responseData.error);
+      alert("Error al publicar la reseña: " + (responseData.error || "Error desconocido"));
     }
     setIsSubmitting(false);
   };
@@ -101,25 +106,25 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <input 
-            placeholder="Tu Nombre" 
-            value={authorName} 
-            onChange={e => setAuthorName(e.target.value)} 
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all" 
+          <input
+            placeholder="Tu Nombre"
+            value={authorName}
+            onChange={e => setAuthorName(e.target.value)}
+            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
-          <input 
-            placeholder="WhatsApp (opcional)" 
-            value={whatsapp} 
-            onChange={e => setWhatsapp(e.target.value)} 
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all" 
+          <input
+            placeholder="WhatsApp (opcional)"
+            value={whatsapp}
+            onChange={e => setWhatsapp(e.target.value)}
+            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
         </div>
 
-        <textarea 
-          placeholder="¿Qué tal estuvo la visita? Cuéntanos los detalles..." 
-          value={comment} 
-          onChange={e => setComment(e.target.value)} 
-          className="w-full p-6 bg-white/[0.03] rounded-2xl h-40 mb-6 outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 resize-none transition-all" 
+        <textarea
+          placeholder="¿Qué tal estuvo la visita? Cuéntanos los detalles..."
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          className="w-full p-6 bg-white/[0.03] rounded-2xl h-40 mb-6 outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 resize-none transition-all"
         />
 
         <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-8">
@@ -140,9 +145,9 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
           </div>
         </div>
 
-        <button 
-          type="submit" 
-          disabled={rating === 0 || isSubmitting} 
+        <button
+          type="submit"
+          disabled={rating === 0 || isSubmitting}
           className="w-full bg-white text-black px-12 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] disabled:opacity-20 hover:bg-red-600 hover:text-white transition-all transform active:scale-[0.98] shadow-xl shadow-white/5"
         >
           {isSubmitting ? 'PUBLICANDO...' : 'PUBLICAR RESEÑA'}
@@ -152,7 +157,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
       {/* Listado de Reseñas */}
       <div className="space-y-6">
         <h3 className="text-xs font-black uppercase tracking-[0.4em] text-stone-500 px-4 mb-4">Muro de Revoluciones ({reviews.length})</h3>
-        
+
         {reviews.length === 0 && (
           <div className="text-center py-20 bg-[#0c0c0c] rounded-[2.5rem] border border-dashed border-white/10">
             <p className="text-stone-500 italic">Sé el primero en compartir tu experiencia...</p>
@@ -179,7 +184,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
                 {new Date(rev.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </time>
             </div>
-            
+
             <p className="text-stone-300 leading-relaxed mb-6 text-base italic">"{rev.comment}"</p>
 
             {rev.content?.images?.length > 0 && (
