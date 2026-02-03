@@ -73,12 +73,31 @@ export const POST: APIRoute = async ({ request }) => {
           `
         });
 
-        // 5. Notificar también al admin (copia)
+        // 5. Notificar también al admin (copia detallada)
         await resend.emails.send({
           from: 'Menús BysMax <info@bysmax.com>',
           to: ['info@bysmax.com'],
-          subject: `💬 Reseña en ${place.name} (${payload.rate} estrellas)`,
-          html: `<p>El usuario <strong>${owner.email}</strong> recibió un comentario: "${payload.comment}"</p>`
+          subject: `💬 Nueva reseña en ${place.name} (${payload.rate}★)`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
+              <h2 style="color: #10b981; margin-top: 0;">¡Nueva Actividad!</h2>
+              <p>Se ha publicado una reseña en <strong>${place.name}</strong>:</p>
+              
+              <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
+                <p style="margin: 0; font-style: italic;">"${payload.comment}"</p>
+                <p style="margin: 10px 0 0 0; color: #fbbf24;">${'★'.repeat(payload.rate)}${'☆'.repeat(5 - payload.rate)}</p>
+              </div>
+
+              <ul style="list-style: none; padding: 0; font-size: 14px; color: #64748b;">
+                <li><strong>Cliente:</strong> ${payload.content?.author?.name || 'Anónimo'}</li>
+                <li><strong>WhatsApp:</strong> ${payload.content?.author?.whatsapp || 'No proporcionado'}</li>
+                <li><strong>Dueño avisado:</strong> ${owner.email}</li>
+              </ul>
+
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+              <a href="https://menus.bysmax.com/admin/place/${payload.place_id}" style="display: inline-block; padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px;">Ver en el Panel</a>
+            </div>
+          `
         });
       }
     }

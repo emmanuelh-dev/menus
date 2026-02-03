@@ -8,6 +8,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [authorName, setAuthorName] = useState("");
+  const [authorEmail, setAuthorEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,6 +29,14 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
 
   useEffect(() => {
     loadReviews();
+
+    // Cargar datos desde localStorage (Sistema compartido con CartManager)
+    const storedName = localStorage.getItem('customer_name');
+    const storedEmail = localStorage.getItem('customer_email');
+    const storedPhone = localStorage.getItem('customer_phone');
+    if (storedName) setAuthorName(storedName);
+    if (storedEmail) setAuthorEmail(storedEmail);
+    if (storedPhone) setWhatsapp(storedPhone);
   }, [id, loadReviews]);
 
   const handleSubmit = async (e) => {
@@ -40,7 +49,11 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
       rate: rating,
       comment: comment.trim(),
       content: {
-        author: { name: authorName || "Anónimo", whatsapp: whatsapp.replace(/\D/g, '') },
+        author: {
+          name: authorName || "Anónimo",
+          email: authorEmail,
+          whatsapp: whatsapp.replace(/\D/g, '')
+        },
         images: images,
         device_id: typeof window !== 'undefined' ? localStorage.getItem('device_id') || 'anon-' + Math.random().toString(36).substring(7) : 'server'
       },
@@ -54,6 +67,12 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
 
     if (!error) {
       alert("✓ ¡Reseña publicada!");
+
+      // Guardar datos en localStorage para futuras visitas (Sincronizado con CartManager)
+      if (authorName) localStorage.setItem('customer_name', authorName);
+      if (authorEmail) localStorage.setItem('customer_email', authorEmail);
+      if (whatsapp) localStorage.setItem('customer_phone', whatsapp);
+
       setRating(0); setComment(""); setImages([]);
       loadReviews();
     } else {
@@ -113,10 +132,20 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
           <input
+            type="email"
+            placeholder="Tu Email *"
+            value={authorEmail}
+            onChange={e => setAuthorEmail(e.target.value)}
+            required
+            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
+          />
+        </div>
+        <div className="mb-4">
+          <input
             placeholder="WhatsApp (opcional)"
             value={whatsapp}
             onChange={e => setWhatsapp(e.target.value)}
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="w-full p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
         </div>
 

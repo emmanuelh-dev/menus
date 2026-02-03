@@ -207,6 +207,8 @@ export default function CartManager({
             setDeliveryMunicipality(data.customer.default_municipality || '');
             setDeliveryState(data.customer.default_state || '');
           }
+          if (data.customer.name) localStorage.setItem('customer_name', data.customer.name);
+          if (data.customer.phone) localStorage.setItem('customer_phone', data.customer.phone);
         }
       } catch (error) {
         console.error('Error loading customer:', error);
@@ -274,6 +276,8 @@ export default function CartManager({
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem(getCustomerIdKey(), data.customer.id.toString());
+        if (data.customer.name) localStorage.setItem('customer_name', data.customer.name);
+        if (data.customer.phone) localStorage.setItem('customer_phone', data.customer.phone);
         setCustomer(data.customer);
         return data.customer.id;
       }

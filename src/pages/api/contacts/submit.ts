@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { supabase } from "../../../lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import { resend } from "../../../lib/resend";
 
 export const POST: APIRoute = async ({ request }) => {
@@ -12,8 +12,12 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: "Faltan datos (email, mensaje)" }), { status: 400 });
     }
 
-    // 1. Guardar en la base de datos
-    const { data: contact, error: insertError } = await supabase
+    const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
+    // 1. Guardar en la base de datos (Usando admin para bypass RLS)
+    const { data: contact, error: insertError } = await supabaseAdmin
       .from("contact")
       .insert([{ email, message }])
       .select()
