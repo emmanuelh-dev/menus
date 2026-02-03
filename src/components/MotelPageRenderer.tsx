@@ -353,7 +353,7 @@ export default function MotelPageRenderer({
         )}
 
         {!isPreview && (
-          <section className="mt-40 border-t border-white/5 pt-20">
+          <section id="reviews" data-review-section className="mt-40 border-t border-white/5 pt-20">
             {React.createElement(ReviewForm as any, {
               id: place.id,
               restaurantName: place.name,

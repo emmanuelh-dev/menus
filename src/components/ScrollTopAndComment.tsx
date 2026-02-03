@@ -52,8 +52,21 @@ const ScrollTopAndComment = () => {
   }
 
   const handleScrollToComment = () => {
-    const commentSection = document.querySelector('.review-form-section') || document.getElementById('comment')
-    commentSection?.scrollIntoView({ behavior: 'smooth' })
+    // Try multiple selectors for different page types (restaurants, motels, etc.)
+    const commentSection =
+      document.querySelector('.review-form-section') ||
+      document.querySelector('[data-review-section]') ||
+      document.querySelector('form') ||
+      document.getElementById('reviews') ||
+      document.getElementById('comment')
+
+    if (commentSection) {
+      commentSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else {
+      // Fallback: scroll to bottom of page
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    }
+
     setIsReviewButtonPulsing(false)
     setHasInteracted(true)
 
@@ -97,28 +110,35 @@ const ScrollTopAndComment = () => {
       )}
 
       {/* Floating Buttons Group - Bottom LEFT */}
-      <div className={`fixed bottom-6 left-6 z-[35] flex flex-col gap-2 transition-all duration-500 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        {/* Main Review Button */}
+      <div className={`fixed bottom-6 left-6 z-[35] flex flex-col gap-3 transition-all duration-500 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+        {/* Main Review Button - Enhanced for visibility */}
         <button
           onClick={handleScrollToComment}
-          className={`review-button relative bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105 ${isReviewButtonPulsing ? 'animate-pulse' : ''}`}
+          className={`review-button group relative bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white p-4 rounded-full shadow-2xl transition-all hover:scale-110 border-2 border-white/30 ${isReviewButtonPulsing ? 'animate-pulse' : ''}`}
           aria-label="Escribir reseña"
         >
-          <FaStar className="w-5 h-5" />
+          <FaStar className="w-6 h-6 drop-shadow-lg" />
           {isReviewButtonPulsing && (
-            <span className="absolute -top-1 -right-1 bg-yellow-400 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce text-[10px]">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-bounce shadow-lg border-2 border-white">
               !
             </span>
           )}
+          {/* Tooltip */}
+          <span className="absolute left-full ml-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold shadow-xl border border-white/20">
+            ⭐ Dejar Reseña
+          </span>
         </button>
 
         {/* Scroll to top button */}
         <button
           aria-label="Ir arriba"
           onClick={handleScrollTop}
-          className="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105"
+          className="group relative bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105 border border-white/20"
         >
           <FaChevronUp className="w-5 h-5" />
+          <span className="absolute left-full ml-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold shadow-xl border border-white/20">
+            ↑ Subir
+          </span>
         </button>
       </div>
     </>
