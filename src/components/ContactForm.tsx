@@ -12,18 +12,22 @@ export default function ContactForm() {
     setStatus(null);
 
     try {
-      const { error } = await supabase
-        .from("contact")
-        .insert([{ email, message } as Contact]);
+      const response = await fetch('/api/contacts/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, message })
+      });
 
-      if (error) throw error;
+      const result = await response.json();
 
-      setStatus({ success: true, message: "¡Mensaje enviado con éxito!" });
+      if (!response.ok) throw new Error(result.error || "Error al enviar el mensaje");
+
+      setStatus({ success: true, message: "¡Mensaje enviado con éxito! Revisa tu correo." });
       setEmail("");
       setMessage("");
 
-      // Ocultar mensaje después de 1.5 segundos
-      setTimeout(() => setStatus(null), 1500);
+      // Ocultar mensaje después de 3 segundos
+      setTimeout(() => setStatus(null), 3000);
     } catch (error: any) {
       setStatus({ success: false, message: error.message || "Error al enviar el mensaje" });
     }
