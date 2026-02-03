@@ -22,7 +22,7 @@ export default function AdminPageHeader({
   return (
     <header
       className={`
-        z-[40] bg-gray-100/90 backdrop-blur-md border-b border-gray-200 py-3 px-4 xl:px-8
+        z-[40] bg-gray-100/90 backdrop-blur-md border-b border-gray-200 py-3 px-4
         ${sticky ? 'sticky top-0 md:top-14' : ''} 
         ${className}
       `}
@@ -30,7 +30,7 @@ export default function AdminPageHeader({
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full max-w-[1600px] mx-auto">
         {/* Lado Izquierdo o área de Tabs */}
         {leftContent && (
-          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar scroll-smooth">
+          <div className="flex items-center gap-2 w-full overflow-x-auto pb-1 sm:pb-0 hide-scrollbar scroll-smooth">
             {leftContent}
           </div>
         )}
@@ -44,7 +44,7 @@ export default function AdminPageHeader({
 
         {/* Lado Derecho (Acciones) */}
         {rightContent && (
-          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 transition-all">
+          <div className="flex items-center gap-2 w-full w-full transition-all">
             {rightContent}
           </div>
         )}
