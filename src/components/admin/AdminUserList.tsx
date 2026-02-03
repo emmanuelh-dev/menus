@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, User, Calendar, Search, ExternalLink, Utensils, Clock } from 'lucide-react';
+import { Mail, Phone, User, Calendar, Search, ExternalLink, Utensils, Clock, Send } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -17,11 +17,13 @@ const AdminUserList = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [openMessageId, setOpenMessageId] = useState<string | null>(null);
-  const [whatsappPlatform, setWhatsappPlatform] = useState<'normal' | 'web'>('normal');
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
   const [placeFilter, setPlaceFilter] = useState<'all' | 'with' | 'without'>('all');
-  const [loginFilter, setLoginFilter] = useState<'all' | 'today' | '3days' | 'week' | 'never'>('all');
+  const [loginFilter, setLoginFilter] = useState<'all' | 'v1d' | 'v3d' | 'v7d' | 'never'>('all');
+  const [activeMenu, setActiveMenu] = useState<{ id: string, type: 'whatsapp' | 'email' } | null>(null);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<{ id: string, status: 'success' | 'error' } | null>(null);
+  const [testingEmail, setTestingEmail] = useState(false);
 
   useEffect(() => {
     // ... (rest of fetch remains the same)
@@ -73,9 +75,9 @@ const AdminUserList = () => {
         const now = new Date().getTime();
         const diffDays = (now - lastLogin) / (1000 * 60 * 60 * 24);
 
-        if (loginFilter === 'today') matchesLogin = diffDays <= 1;
-        else if (loginFilter === '3days') matchesLogin = diffDays <= 3;
-        else if (loginFilter === 'week') matchesLogin = diffDays <= 7;
+        if (loginFilter === 'v1d') matchesLogin = diffDays > 1;
+        else if (loginFilter === 'v3d') matchesLogin = diffDays > 3;
+        else if (loginFilter === 'v7d') matchesLogin = diffDays > 7;
         else if (loginFilter === 'never') matchesLogin = false;
       }
     }
@@ -85,9 +87,6 @@ const AdminUserList = () => {
 
   const getWhatsAppLink = (phone: string, text: string) => {
     const cleanPhone = phone.replace(/\D/g, '');
-    if (whatsappPlatform === 'web') {
-      return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
-    }
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
   };
 
@@ -97,26 +96,109 @@ const AdminUserList = () => {
 
     return [
       {
+        id: 'no-business',
+        label: 'Registro Incompleto',
+        subject: `¿Necesitas ayuda con tu menú digital, ${firstName}?`,
+        text: `Hola ${firstName}, vimos que te creaste una cuenta en Menús BysMax, pero aún no registraste tu menú. ¿Necesitas ayuda para comenzar o tienes alguna duda con el proceso? Estamos aquí para apoyarte.`
+      },
+      {
         id: 'support',
         label: 'Soporte Directo',
+        subject: `¿Cómo va todo en ${business}?`,
         text: `Hola ${firstName}, gracias por registrarte en Menús BysMax. Vi que registraste ${business}. ¿Cómo vas con tu menú digital? Si tienes alguna duda o problema en el proceso, estamos aquí para ayudarte.`
       },
       {
-        id: 'friendly',
-        label: 'Saludo Amigable',
-        text: `¡Hola ${firstName}! Qué gusto que te hayas unido a nuestra comunidad. Soy Emmanuel de BysMax. ¿Ya pudiste subir tus platillos a ${business}? Cualquier cosa que necesites para configurar tu menú, dime con confianza.`
-      },
-      {
         id: 'offer',
-        label: 'Ofrecer Ayuda',
+        label: 'Optimización',
+        subject: `Queremos ayudarte con ${business}`,
         text: `Hola ${firstName}, bienvenido. Noté que ya creaste tu cuenta para ${business}. Queremos asegurar que tengas la mejor experiencia. ¿Te gustaría que te ayudemos a optimizar tu menú digital?`
-      },
-      {
-        id: 'no-business',
-        label: 'Sin Negocio / Incompleto',
-        text: `Hola ${firstName}, vimos que te creaste una cuenta en Menús BysMax, pero aún no registraste tu menú. ¿Necesitas ayuda para comenzar o tienes alguna duda con el proceso? Estamos aquí para apoyarte.`
       }
     ];
+  };
+
+  const handleSendEmail = async (user: UserProfile, template: any) => {
+    setSendingEmailId(`${user.id}-${template.id}`);
+    setEmailStatus(null);
+
+    try {
+      const response = await fetch('/api/admin/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: user.email,
+          subject: template.subject,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; rounded: 12px;">
+              <h2 style="color: #10b981;">Menús BysMax</h2>
+              <p style="font-size: 16px; color: #333; line-height: 1.6;">${template.text}</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+              <p style="font-size: 12px; color: #666;">
+                Este es un mensaje de seguimiento de Menús BysMax para ayudarte a digitalizar tu negocio.
+              </p>
+            </div>
+          `
+        })
+      });
+
+      if (response.ok) {
+        setEmailStatus({ id: `${user.id}-${template.id}`, status: 'success' });
+        setTimeout(() => setEmailStatus(null), 3000);
+      } else {
+        const error = await response.json();
+        alert(error.error || "Error al enviar email");
+        setEmailStatus({ id: `${user.id}-${template.id}`, status: 'error' });
+      }
+    } catch (e) {
+      alert("Error de conexión");
+    } finally {
+      setSendingEmailId(null);
+      setActiveMenu(null);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    const testTo = prompt("Introduce el correo para la prueba:", "emmanuelh.dev@gmail.com");
+    if (!testTo) return;
+
+    setTestingEmail(true);
+    try {
+      const response = await fetch('/api/admin/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: testTo,
+          subject: "Prueba de envío - Menús BysMax",
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #eee; border-radius: 24px; text-align: center;">
+              <div style="background: #10b981; width: 64px; height: 64px; border-radius: 20px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center;">
+                <span style="color: white; font-size: 32px;">✓</span>
+              </div>
+              <h1 style="color: #0f172a; margin-bottom: 12px; font-weight: 800;">¡Funciona perfectamente!</h1>
+              <p style="color: #64748b; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
+                Esta es una prueba de configuración de Resend desde tu panel de administración. 
+                Tus plantillas de seguimiento ya están listas para ser enviadas a tus clientes.
+              </p>
+              <div style="background: #f8fafc; padding: 20px; border-radius: 16px; text-align: left;">
+                <p style="margin: 0; font-size: 12px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Detalles técnicos</p>
+                <code style="display: block; font-size: 13px; color: #334155;">Servicio: Resend API</code>
+                <code style="display: block; font-size: 13px; color: #334155;">Fecha: ${new Date().toLocaleString()}</code>
+              </div>
+            </div>
+          `
+        })
+      });
+
+      if (response.ok) {
+        alert("¡Email de prueba enviado con éxito!");
+      } else {
+        const data = await response.json();
+        alert(`Error: ${data.error}`);
+      }
+    } catch (e) {
+      alert("Error de conexión");
+    } finally {
+      setTestingEmail(false);
+    }
   };
 
   const formatRelativeTime = (dateString: string) => {
@@ -170,26 +252,7 @@ const AdminUserList = () => {
           </div>
 
           <div className="flex bg-slate-200/50 p-1 rounded-2xl shrink-0">
-            <button
-              onClick={() => setWhatsappPlatform('normal')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${whatsappPlatform === 'normal'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-                }`}
-            >
-              <Phone className="w-3.5 h-3.5" />
-              WhatsApp App
-            </button>
-            <button
-              onClick={() => setWhatsappPlatform('web')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${whatsappPlatform === 'web'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-                }`}
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              WhatsApp Web
-            </button>
+            {/* Options or count could go here */}
           </div>
         </div>
 
@@ -265,9 +328,9 @@ const AdminUserList = () => {
             <div className="flex bg-slate-200/50 p-1 rounded-2xl shadow-inner">
               {[
                 { id: 'all', label: 'Todos' },
-                { id: 'today', label: 'Hoy' },
-                { id: '3days', label: '3 d' },
-                { id: 'week', label: '7 d' },
+                { id: 'v1d', label: '> 1 día' },
+                { id: 'v3d', label: '> 3 días' },
+                { id: 'v7d', label: '> 7 días' },
                 { id: 'never', label: 'Nunca' }
               ].map((opt) => (
                 <button
@@ -284,12 +347,27 @@ const AdminUserList = () => {
             </div>
           </div>
 
-          <div className="ml-auto flex flex-col items-end gap-2">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 invisible">Meta:</div>
-            <div className="text-xs font-medium text-slate-400 bg-slate-100 px-4 py-2 rounded-2xl border border-slate-200">
-              Usuarios: <span className="text-slate-900 font-bold">{filteredUsers.length}</span>
-            </div>
+          <div className="flex bg-slate-200/50 p-1 rounded-2xl shrink-0">
+            <button
+              onClick={handleTestEmail}
+              disabled={testingEmail}
+              className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {testingEmail ? (
+                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              Enviar Prueba
+            </button>
           </div>
+        </div>
+
+        <div className="flex bg-slate-100/50 px-4 py-2 rounded-2xl border border-slate-100 flex-wrap items-center justify-between gap-4">
+          <div className="text-xs font-medium text-slate-500">
+            Mostrando <span className="text-slate-900 font-bold">{filteredUsers.length}</span> usuarios
+          </div>
+          {/* Add template preview link or similar if needed here */}
         </div>
       </div>
 
@@ -298,7 +376,7 @@ const AdminUserList = () => {
           filteredUsers.map((user) => (
             <div
               key={user.id}
-              className={`bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all group relative ${openMessageId === user.id ? 'z-50' : 'z-0'}`}
+              className={`bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all group relative ${activeMenu?.id === user.id ? 'z-50' : 'z-0'}`}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
@@ -333,33 +411,71 @@ const AdminUserList = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 md:self-center">
+                <div className="flex flex-wrap items-center gap-3 md:self-center">
+                  {/* WhatsApp Button Cluster */}
                   <div className="relative">
                     <button
-                      onClick={() => setOpenMessageId(openMessageId === user.id ? null : user.id)}
-                      className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95"
+                      onClick={() => setActiveMenu(activeMenu?.id === user.id && activeMenu?.type === 'whatsapp' ? null : { id: user.id, type: 'whatsapp' })}
+                      className="px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-emerald-600 transition-all active:scale-95 shadow-lg shadow-emerald-500/10"
                     >
-                      <Phone className="w-4 h-4" />
-                      Seguimiento
+                      <Phone className="w-3.5 h-3.5" />
+                      WhatsApp
                     </button>
 
-                    {openMessageId === user.id && (
-                      <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] overflow-hidden">
-                        <div className="p-3 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Opciones de mensaje
+                    {activeMenu?.id === user.id && activeMenu?.type === 'whatsapp' && (
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-emerald-100 z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-3 bg-emerald-50 border-b border-emerald-100 text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                          Plantillas WhatsApp
                         </div>
-                        <div className="p-2 space-y-1">
+                        <div className="p-1">
                           {getMessageTemplates(user).map((template) => (
                             <a
                               key={template.id}
                               href={getWhatsAppLink(user.whatsapp, template.text)}
                               target="_blank"
-                              onClick={() => setOpenMessageId(null)}
+                              onClick={() => setActiveMenu(null)}
                               className="block p-3 hover:bg-emerald-50 rounded-xl transition-colors group/item"
                             >
-                              <p className="text-sm font-bold text-slate-900 group-hover/item:text-emerald-700">{template.label}</p>
-                              <p className="text-xs text-slate-500 mt-1 line-clamp-2 italic">"{template.text}"</p>
+                              <p className="text-xs font-bold text-slate-800">{template.label}</p>
+                              <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">"{template.text}"</p>
                             </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Email Button Cluster */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setActiveMenu(activeMenu?.id === user.id && activeMenu?.type === 'email' ? null : { id: user.id, type: 'email' })}
+                      className="px-4 py-2.5 bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-blue-600 transition-all active:scale-95 shadow-lg shadow-blue-500/10"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      Email
+                    </button>
+
+                    {activeMenu?.id === user.id && activeMenu?.type === 'email' && (
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-blue-100 z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-3 bg-blue-50 border-b border-blue-100 text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                          Plantillas Email
+                        </div>
+                        <div className="p-1">
+                          {getMessageTemplates(user).map((template) => (
+                            <button
+                              key={template.id}
+                              onClick={() => handleSendEmail(user, template)}
+                              disabled={sendingEmailId === `${user.id}-${template.id}`}
+                              className="w-full text-left p-3 hover:bg-blue-50 rounded-xl transition-colors group/item disabled:opacity-50"
+                            >
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-slate-800">{template.label}</p>
+                                {sendingEmailId === `${user.id}-${template.id}` && (
+                                  <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">{template.subject}</p>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -371,10 +487,9 @@ const AdminUserList = () => {
                       <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       <span>Unido: {new Date(user.created_at).toLocaleDateString()}</span>
                     </div>
-                    <div className={`px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2 ${user.last_sign_in_at ? 'bg-emerald-50/50 text-emerald-600' : 'bg-slate-50 text-slate-400'
-                      }`}>
+                    <div className={`px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2 ${user.last_sign_in_at ? 'bg-emerald-50/50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
                       <Clock className="w-3.5 h-3.5" />
-                      <span>Sessión: {formatRelativeTime(user.last_sign_in_at)}</span>
+                      <span>Sesión: {formatRelativeTime(user.last_sign_in_at)}</span>
                     </div>
                   </div>
                 </div>
