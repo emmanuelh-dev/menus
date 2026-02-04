@@ -114,7 +114,7 @@ const ScrollTopAndComment = () => {
         {/* Main Review Button - Enhanced for visibility */}
         <button
           onClick={handleScrollToComment}
-          className={`review-button group relative bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white p-4 rounded-full shadow-2xl transition-all hover:scale-110 border-2 border-white/30 ${isReviewButtonPulsing ? 'animate-pulse' : ''}`}
+          className={`review-button group relative bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white p-2 rounded-full shadow-2xl transition-all hover:scale-110 border-2 border-white/30 ${isReviewButtonPulsing ? 'animate-pulse' : ''}`}
           aria-label="Escribir reseña"
         >
           <FaStar className="w-6 h-6 drop-shadow-lg" />
