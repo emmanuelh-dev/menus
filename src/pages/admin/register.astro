@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import DefaultLayout from "../../layouts/DefaultLayout.astro";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import {
@@ -10,8 +11,13 @@ import {
 	Utensils,
 	CheckCircle2,
 } from "lucide-react";
+import { isAuthenticated } from "../../middleware/auth";
 
-// Esta página ahora es estática para carga instantánea
+// Si ya está autenticado, redirigir al dashboard desde el servidor
+const alreadyAuth = await isAuthenticated(Astro.request, Astro.cookies);
+if (alreadyAuth) {
+	return Astro.redirect("/admin/dashboard");
+}
 ---
 
 <DefaultLayout

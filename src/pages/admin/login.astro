@@ -1,10 +1,16 @@
 ---
+export const prerender = false;
 import { supabase } from "../../lib/supabase";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { LogIn, Mail, Lock, ArrowRight, Utensils } from "lucide-react";
 import DefaultLayout from "../../layouts/DefaultLayout.astro";
+import { isAuthenticated } from "../../middleware/auth";
 
-// Esta página ahora es estática para carga instantánea
+// Si ya está autenticado, redirigir al dashboard desde el servidor
+const alreadyAuth = await isAuthenticated(Astro.request, Astro.cookies);
+if (alreadyAuth) {
+	return Astro.redirect("/admin/dashboard");
+}
 ---
 
 <DefaultLayout
