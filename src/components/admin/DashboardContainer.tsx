@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PlaceManager from "./PlaceManager";
 
+import OnboardingFlow from "./OnboardingFlow";
+
 interface DashboardData {
   user: any;
   isAdmin: boolean;
@@ -14,6 +16,7 @@ export default function DashboardContainer() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Pagination and Filter states
   const [page, setPage] = useState(1);
@@ -42,6 +45,11 @@ export default function DashboardContainer() {
         }
         const result = await response.json();
         setData(result);
+
+        // Si no hay lugares y no estamos buscando nada, activamos el onboarding
+        if (result.totalPlaces === 0 && !search) {
+          setShowOnboarding(true);
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -72,6 +80,10 @@ export default function DashboardContainer() {
   const places = data?.places || [];
   const isAdmin = data?.isAdmin || false;
 
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={() => setShowOnboarding(false)} />;
+  }
+
   return (
     <div className="flex flex-col gap-6 pb-20">
       <PlaceManager
@@ -84,6 +96,7 @@ export default function DashboardContainer() {
         setSearch={setSearch}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        onStartOnboarding={() => setShowOnboarding(true)}
       />
 
       {loading ? (
@@ -103,6 +116,12 @@ export default function DashboardContainer() {
             Registra tu establecimiento y sube tu menú para empezar a recibir
             pedidos por WhatsApp.
           </p>
+          <button
+            onClick={() => setShowOnboarding(true)}
+            className="px-6 py-2 bg-black text-white rounded-xl font-bold text-xs uppercase tracking-widest"
+          >
+            Configuración Guiada
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

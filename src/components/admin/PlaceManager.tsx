@@ -62,7 +62,8 @@ export default function PlaceManager({
   search,
   setSearch,
   sortBy,
-  setSortBy
+  setSortBy,
+  onStartOnboarding
 }: {
   initialRestaurants: Restaurant[],
   totalPlaces?: number,
@@ -72,7 +73,8 @@ export default function PlaceManager({
   search: string,
   setSearch: (s: string) => void,
   sortBy: 'newest' | 'oldest' | 'name',
-  setSortBy: (s: 'newest' | 'oldest' | 'name') => void
+  setSortBy: (s: 'newest' | 'oldest' | 'name') => void,
+  onStartOnboarding?: () => void
 }) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants || []);
   const [states, setStates] = useState<State[]>([]);
@@ -329,7 +331,7 @@ export default function PlaceManager({
           </div>
 
           <div>
-            <Button onClick={() => openModal()}>
+            <Button onClick={() => onStartOnboarding ? onStartOnboarding() : openModal()}>
               <Plus size={16} className="mr-2" />
               Crear
             </Button>

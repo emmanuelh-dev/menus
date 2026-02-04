@@ -105,7 +105,7 @@ export function SectionBlock({ data, onChange, placeType = 'restaurant', forceCo
             </div>
 
             <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Imagen de fondo:</label>
+              <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Imagen de fondo:</label>
               <div className="flex gap-2">
                 <div className="flex-1">
                   <ManualUploader

@@ -651,7 +651,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Datos Básicos</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Descripción del Lugar:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Descripción del Lugar:</label>
                   <textarea
                     value={semanticData.description || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, description: e.target.value })}
@@ -661,7 +661,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Dirección:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Dirección:</label>
                   <input
                     value={semanticData.address || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, address: e.target.value })}
@@ -670,7 +670,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Sitio Web:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Sitio Web:</label>
                   <input
                     value={semanticData.website || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, website: e.target.value })}
@@ -685,7 +685,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Contacto y Pedidos</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Teléfono:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Teléfono:</label>
                   <input
                     value={semanticData.phone || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, phone: e.target.value })}
@@ -694,7 +694,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">WhatsApp para pedidos:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">WhatsApp para pedidos:</label>
                   <input
                     value={semanticData.whatsapp || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, whatsapp: e.target.value.replace(/\D/g, '') })}
@@ -726,7 +726,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Horarios y Disponibilidad</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Horario de Servicio:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Horario de Servicio:</label>
                   <textarea
                     value={semanticData.hours || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, hours: e.target.value })}
@@ -742,7 +742,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-2">Detalles Adicionales</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Rango de Precios:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Rango de Precios:</label>
                   <input
                     value={semanticData.price_range || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, price_range: e.target.value })}
@@ -751,7 +751,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Tipo de Cocina:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Tipo de Cocina:</label>
                   <input
                     value={semanticData.cuisine_type || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, cuisine_type: e.target.value })}
@@ -760,7 +760,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Ambiente:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Ambiente:</label>
                   <input
                     value={semanticData.ambiance || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, ambiance: e.target.value })}
@@ -769,7 +769,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Código de Vestimenta:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Código de Vestimenta:</label>
                   <input
                     value={semanticData.dress_code || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, dress_code: e.target.value })}
@@ -778,7 +778,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Zona:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Zona:</label>
                   <input
                     value={semanticData.zone || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, zone: e.target.value })}
@@ -787,7 +787,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Intersección:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Intersección:</label>
                   <input
                     value={semanticData.cross_street || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, cross_street: e.target.value })}
@@ -796,7 +796,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Estacionamiento:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Estacionamiento:</label>
                   <input
                     value={semanticData.parking || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, parking: e.target.value })}
@@ -805,7 +805,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Reservación Online (URL):</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Reservación Online (URL):</label>
                   <input
                     value={semanticData.reservation_url || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, reservation_url: e.target.value })}
@@ -814,7 +814,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Variedad / Amenidades:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Variedad / Amenidades:</label>
                   <input
                     value={semanticData.variety || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, variety: e.target.value })}
@@ -823,7 +823,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">CLABE / Datos de transferencia:</label>
+                  <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">CLABE / Datos de transferencia:</label>
                   <input
                     value={semanticData.clabe || ''}
                     onChange={(e) => setSemanticData({ ...semanticData, clabe: e.target.value })}
@@ -977,7 +977,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
                   <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Distribución:</label>
+                    <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Distribución:</label>
                     <div className="flex bg-gray-100 p-1 rounded-xl">
                       <button
                         onClick={() => setViewSettings({ ...viewSettings, layout: 'grid' })}
@@ -1630,34 +1630,48 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
               />
             </div>
 
-            <div>
-              <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider">Imagen de fondo:</label>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <ManualUploader
-                    currentImage={data.image}
-                    onFilesUploaded={(url) => {
-                      onChange({ ...data, image: url[0] });
-                      onUploadToLibrary?.(url);
-                    }}
-                    onImageRemove={() => onChange({ ...data, image: '' })}
-                    onUploadStart={() => console.log('Subiendo imagen de sección...')}
-                    onUploadError={() => console.error('Error al subir imagen')}
-                  />
-                </div>
-                {existingImages && existingImages.length > 0 && (
+            <div className='px-4'>
+              <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Imagen de fondo:</label>
+
+              <div className="bg-white p-4 rounded-2xl border border-gray-100 space-y-4">
+                {data.image ? (
+                  <div className="space-y-3">
+                    <div className="relative aspect-[21/9] rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                      <img src={data.image} alt={data.title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowImageSelector(true)}
+                        className="flex-1 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 active:scale-95 transition-all flex items-center justify-center gap-2"
+                      >
+                        <PiArrowCounterClockwise size={14} className="text-blue-500" /> Cambiar Imagen
+                      </button>
+                      <button
+                        onClick={() => onChange({ ...data, image: '' })}
+                        className="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-100 active:scale-95 transition-all flex items-center justify-center"
+                      >
+                        <PiTrash size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
                   <button
-                    onClick={() => setShowImageSelector(!showImageSelector)}
-                    className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm font-bold whitespace-nowrap"
+                    onClick={() => setShowImageSelector(true)}
+                    className="w-full aspect-[21/9] border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group bg-slate-50/50"
                   >
-                    Existentes
+                    <PiImage size={24} className="group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Elegir Imagen de Fondo</span>
                   </button>
                 )}
               </div>
-              {showImageSelector && existingImages && (
+
+              {showImageSelector && (
                 <ImageSelector
-                  existingImages={existingImages}
-                  onSelect={(url) => onChange({ ...data, image: url })}
+                  existingImages={existingImages || []}
+                  onSelect={(url) => {
+                    onChange({ ...data, image: url });
+                    setShowImageSelector(false);
+                  }}
                   onClose={() => setShowImageSelector(false)}
                   onUpload={onUploadToLibrary}
                 />

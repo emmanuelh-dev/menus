@@ -14,7 +14,7 @@ export const navCategories = [
     {
         title: "Plataforma",
         items: [
-            { name: "Características", href: "#" },
+            { name: "Software para restaurantes", href: "/software-para-restaurantes" },
             { name: "Precios", href: "/precios" },
             { name: "Menús", href: "/menus" },
             { name: "Blog", href: "/blog" },
