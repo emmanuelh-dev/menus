@@ -1058,6 +1058,19 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           {/* AI Stats / Pending Changes Card */}
                           {msg.role === 'assistant' && msg.stats && (
                             <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                              {/* Detailed Change Summary */}
+                              {msg.stats.change_summary && (
+                                <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                                  <p className="text-[9px] text-purple-600 uppercase font-bold mb-2 flex items-center gap-1">
+                                    <PiSparkle className="w-3 h-3" />
+                                    Cambios Detectados
+                                  </p>
+                                  <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
+                                    {msg.stats.change_summary}
+                                  </p>
+                                </div>
+                              )}
+
                               <div className="grid grid-cols-2 gap-2">
                                 <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
                                   <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Secciones</p>
@@ -1082,6 +1095,23 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                       </div>
                     </div>
                   ))}
+
+                  {/* Loading Indicator */}
+                  {aiProcessing && (
+                    <div className="flex justify-start animate-in slide-in-from-bottom-2 duration-300">
+                      <div className="max-w-[85%] sm:max-w-[70%]">
+                        <div className="p-4 rounded-2xl bg-white border border-gray-100 rounded-tl-none">
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            <span className="text-xs text-gray-500 font-medium ml-2">Procesando con IA...</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div ref={chatEndRef} />
                 </div>
 

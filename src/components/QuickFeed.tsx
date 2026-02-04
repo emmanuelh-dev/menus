@@ -12,9 +12,24 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
   const [isProcessing, setIsProcessing] = useState(false);
   const [text, setText] = useState('');
   const [images, setImages] = useState<File[]>([]);
-  const [pendingContent, setPendingContent] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const newFiles: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) newFiles.push(file);
+      }
+    }
+
+    if (newFiles.length > 0) {
+      setImages(prev => [...prev, ...newFiles]);
+    }
+  };
 
   const handleSubmit = async (files?: File[]) => {
     const filesToUpload = files || images;
@@ -25,18 +40,40 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
 
     setIsProcessing(true);
     try {
-      const base64Images: string[] = [];
+      const resizedImages: string[] = [];
 
       for (const file of filesToUpload) {
-        const reader = new FileReader();
-        const promise = new Promise<string>((resolve) => {
-          reader.onloadend = () => {
-            resolve(reader.result as string);
+        const resized = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+              const max = 1200;
+              if (width > height) {
+                if (width > max) {
+                  height *= max / width;
+                  width = max;
+                }
+              } else {
+                if (height > max) {
+                  width *= max / height;
+                  height = max;
+                }
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx?.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.src = e.target?.result as string;
           };
+          reader.readAsDataURL(file);
         });
-        reader.readAsDataURL(file);
-        const result = await promise;
-        base64Images.push(result);
+        resizedImages.push(resized);
       }
 
       const response = await fetch('/api/ai/update-content', {
@@ -44,52 +81,25 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           placeId,
-          images: base64Images,
-          instruction: text || 'Analiza estas fotos de precios o habitaciones y actualiza la información correspondiente. Si es una foto de una habitación específica, asígnala como su imagen principal.',
-          preview: true
+          images: resizedImages,
+          instruction: text || 'Actualizar precios y platillos según las fotos.',
+          preview: false
         })
       });
 
       const result = await response.json();
 
-      if (result.success && result.preview) {
-        setPendingContent(result.content);
-        setStats(result.stats);
-        if (isInline && !isOpen) setIsOpen(true);
+      if (result.success) {
+        setImages([]);
+        setText('');
+        alert('✓ ¡Gracias! Tu aporte ha sido recibido y se está procesando.');
+        window.location.reload();
       } else {
         throw new Error(result.error || 'Error al procesar');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Hubo un error al procesar las imágenes con IA.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleConfirm = async () => {
-    if (!pendingContent) return;
-    setIsProcessing(true);
-    try {
-      const response = await fetch('/api/ai/update-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          placeId,
-          saveOnly: true,
-          currentContent: pendingContent
-        })
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setIsOpen(false);
-        setPendingContent(null);
-        alert('✓ ¡Gracias! Tu aporte ayuda a toda la comunidad. La información ha sido actualizada.');
-        window.location.reload();
-      }
-    } catch (err) {
-      alert('Error al guardar los cambios.');
+      alert(err.message || 'Hubo un problema al procesar la solicitud. Intenta de nuevo.');
     } finally {
       setIsProcessing(false);
     }
@@ -104,22 +114,25 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
 
   if (isInline) {
     return (
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-10 mb-20 relative overflow-hidden group">
+      <div
+        onPaste={handlePaste}
+        className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-10 mb-20 relative overflow-hidden group"
+      >
         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-          <Sparkles size={120} />
+          <Upload size={120} />
         </div>
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
           <div className="flex-1 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-800 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">
               <Info size={12} className="text-zinc-500" />
-              Keep it fresh
+              Actualización rápida
             </div>
             <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-4 italic serif">
-              Ayúdanos a mantener <br />esta información actualizada
+              Sube el Menú <br />Actualizado
             </h2>
             <p className="text-zinc-400 font-medium text-sm max-w-md leading-relaxed">
-              ¿Ves precios diferentes o nuevas habitaciones? Escríbenos o sube una foto y nuestra IA se encargará del resto.
+              ¿Ves precios diferentes? Sube una foto del menú y nuestra IA lo actualizará al instante para toda la comunidad.
             </p>
           </div>
 
@@ -127,7 +140,8 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="¿Qué cambió? (opcional)"
+              onPaste={handlePaste}
+              placeholder="¿Qué platillo o precio cambió? (Puedes pegar imágenes aquí)"
               className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-xs focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[80px] resize-none"
             />
             <input
@@ -147,19 +161,21 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                 }
               }}
               disabled={isProcessing}
-              className="w-full bg-white text-black px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-3 active:scale-95"
+              className="w-full bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3 active:scale-95 border-b-4 border-emerald-700"
             >
-              {isProcessing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  {images.length > 0 ? <CheckCircle2 size={16} /> : <Camera size={16} />}
-                  {images.length > 0 ? `${images.length} Fotos - Actualizar` : text.trim() !== '' ? 'Actualizar con texto' : 'Subir Foto / Actualizar'}
-                </>
-              )}
+              <div className="flex items-center justify-center gap-2">
+                {isProcessing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    <span>Subiendo...</span>
+                  </>
+                ) : (
+                  <>
+                    {images.length > 0 ? <CheckCircle2 size={16} /> : <Camera size={16} />}
+                    <span>{images.length > 0 ? `Subir ${images.length} Fotos` : text.trim() !== '' ? 'Enviar solo texto' : 'Subir o Pegar Menú'}</span>
+                  </>
+                )}
+              </div>
             </button>
             {images.length > 0 && (
               <button
@@ -171,171 +187,75 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
             )}
           </div>
         </div>
-
-        {/* Preview Modal for Inline */}
-        {isOpen && pendingContent && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-            <div className="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-              <div className="p-8 md:p-10">
-                <div className="flex items-center gap-4 mb-6 text-emerald-500">
-                  <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center">
-                    <CheckCircle2 size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-black uppercase tracking-tight text-xl text-white">¡Detección Exitosa!</h3>
-                    <p className="text-emerald-500/80 text-xs font-bold uppercase tracking-wider">La IA ha procesado tus fotos</p>
-                  </div>
-                </div>
-
-                <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 mb-8">
-                  <p className="text-zinc-400 text-xs font-medium leading-relaxed mb-4">
-                    Hemos detectado cambios en <span className="text-white font-bold">{stats?.items || 0} elementos</span> y <span className="text-white font-bold">{stats?.sections || 0} secciones</span>.
-                  </p>
-
-                  {stats?.summary && (
-                    <div className="mb-6 p-5 bg-white/5 rounded-2xl border border-white/5 max-h-48 overflow-y-auto">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-3 flex items-center gap-2">
-                        <Sparkles size={12} />
-                        Resumen de Cambios:
-                      </p>
-                      <div className="space-y-3">
-                        {stats.summary.split('\n').map((line: string, i: number) => (
-                          <div key={i} className="text-xs text-zinc-300 flex gap-3 leading-tight font-medium">
-                            <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
-                            <span>{line}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    {stats?.hasAddress && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[9px] font-bold text-zinc-300">📍 UBICACIÓN</span>}
-                    {stats?.hasPhone && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[9px] font-bold text-zinc-300">📞 TELÉFONO</span>}
-                    {stats?.newImages > 0 && <span className="px-2 py-1 bg-zinc-800 rounded-lg text-[9px] font-bold text-zinc-300">🖼️ {stats.newImages} FOTOS</span>}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <button
-                    onClick={handleConfirm}
-                    disabled={isProcessing}
-                    className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition-all flex items-center justify-center gap-2"
-                  >
-                    {isProcessing ? 'Guardando...' : 'Confirmar y Actualizar '}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      setPendingContent(null);
-                      setText('');
-                      setImages([]);
-                    }}
-                    className="w-full py-2 text-zinc-500 font-bold uppercase text-[10px] tracking-tight hover:text-zinc-300 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
 
-  // Floating Button Version (Optional, keep it for other views if needed)
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-[100] bg-white text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 group border border-zinc-200"
-        title="Mejorar info con IA"
+        title="Actualizar Menú"
       >
-        <Sparkles size={20} className="text-zinc-800" />
-        <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest">Alimentar IA</span>
+        <Upload size={20} className="text-zinc-800" />
+        <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest">Subir Menú</span>
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm px-6">
-          {/* ... Same modal as before or similar ... */}
+        <div
+          onPaste={handlePaste}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm px-6"
+        >
           <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md p-8 rounded-[32px] shadow-2xl text-zinc-300 relative">
             <button
-              onClick={() => {
-                setIsOpen(false);
-                setPendingContent(null);
-                setText('');
-                setImages([]);
-              }}
+              onClick={() => setIsOpen(false)}
               className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
             >
               <X size={24} />
             </button>
 
             <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-6">
-              <Camera size={24} className="text-white" />
+              <Upload size={24} className="text-white" />
             </div>
 
-            <h2 className="text-2xl font-black uppercase tracking-tighter text-white mb-2">Mejorar información</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tighter text-white mb-2">Subir Menú</h2>
             <p className="text-zinc-500 text-sm font-medium mb-8">
-              Sube fotos del menú o habitaciones, o simplemente indícanos qué cambió.
+              Sube fotos del menú o habitaciones para actualizar la información. También puedes pegar imágenes directamente.
             </p>
 
-            {pendingContent ? (
-              <div className="space-y-6">
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
-                  <p className="text-emerald-500 text-xs font-black uppercase tracking-widest mb-2">¡Análisis listo!</p>
-                  <p className="text-zinc-300 text-sm leading-relaxed font-medium mb-4">Hemos encontrado actualizaciones para {stats?.items || 0} elementos.</p>
-
-                  {stats?.summary && (
-                    <div className="space-y-1.5 border-t border-emerald-500/10 pt-3">
-                      {stats.summary.split('\n').map((line: string, i: number) => (
-                        <p key={i} className="text-[10px] text-emerald-500/80 font-medium"> {line}</p>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleConfirm}
-                  disabled={isProcessing}
-                  className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-zinc-100 transition-all"
-                >
-                  {isProcessing ? 'Guardando...' : 'Aplicar Cambios '}
-                </button>
+            <div className="space-y-4">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onPaste={handlePaste}
+                placeholder="Describe los cambios aquí... (Puedes pegar imágenes)"
+                className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[100px] resize-none"
+              />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                multiple
+                accept="image/*"
+              />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group"
+              >
+                <span className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">
+                  {images.length > 0 ? `${images.length} archivos añadidos` : 'Añadir o Pegar Fotos'}
+                </span>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Describe los cambios aquí..."
-                  className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[100px] resize-none"
-                />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                  multiple
-                />
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group"
-                >
-                  <Upload size={24} className="text-zinc-700 group-hover:text-zinc-500 mb-2" />
-                  <span className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">
-                    {images.length > 0 ? `${images.length} archivos` : 'Añadir Fotos'}
-                  </span>
-                </div>
-                <button
-                  onClick={() => handleSubmit()}
-                  disabled={isProcessing || (images.length === 0 && text.trim() === '')}
-                  className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isProcessing ? 'Procesando...' : 'Analizar ahora'}
-                </button>
-              </div>
-            )}
+              <button
+                onClick={() => handleSubmit()}
+                disabled={isProcessing || (images.length === 0 && text.trim() === '')}
+                className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isProcessing ? 'Subiendo...' : images.length > 0 ? `Enviar ${images.length} fotos` : 'Enviar actualización de texto'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -106,11 +106,17 @@ export const POST: APIRoute = async ({ request }) => {
     );
 
     if (!aiResponse) {
+        console.error('AI Empty Response for place:', placeId, 'Instruction:', instruction, 'Images count:', imageList.length);
         return new Response(JSON.stringify({ 
-          error: 'La IA no pudo procesar esta solicitud.',
+          error: 'La IA no pudo procesar la solicitud en este momento. Por favor, intenta ser más específico o añade una imagen.',
           debug_info: 'AI_EMPTY_RESPONSE'
         }), { status: 500 });
     }
+
+    console.log('🤖 AI Response received:');
+    console.log('  - change_summary:', aiResponse.change_summary || '(empty)');
+    console.log('  - conversational_response:', aiResponse.conversational_response || '(empty)');
+    console.log('  - blocks count:', aiResponse.blocks?.length || 0);
 
     const newContent = { ...currentContent };
     
