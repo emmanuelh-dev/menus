@@ -377,8 +377,37 @@ const config = templateConfigs[template] || templateConfigs.default;
 																</h3>
 																<span class="text-sm font-bold text-stone-500 ml-4">
 																	{view_settings.show_prices &&
-																		item.price > 0 &&
-																		`$${item.price}`}
+																		(() => {
+																			let minExtra = Infinity;
+																			let maxExtra = -Infinity;
+																			let hasExtraPrices = false;
+
+																			item.options?.forEach((opt: any) => {
+																				if (opt.prices) {
+																					Object.values(opt.prices).forEach(
+																						(p: any) => {
+																							minExtra = Math.min(minExtra, p);
+																							maxExtra = Math.max(maxExtra, p);
+																							hasExtraPrices = true;
+																						},
+																					);
+																				}
+																			});
+
+																			if (!hasExtraPrices) {
+																				return item.price > 0
+																					? `$${item.price}`
+																					: "";
+																			}
+
+																			// Si el precio base es > 0, asumimos que es el precio inicial
+																			if (item.price > 0) {
+																				return `Desde $${item.price}`;
+																			}
+
+																			// Si el precio base es 0, el mínimo es el menor extra
+																			return `Desde $${minExtra}`;
+																		})()}
 																</span>
 															</div>
 															{item.description && (

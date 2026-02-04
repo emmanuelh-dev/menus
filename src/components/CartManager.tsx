@@ -121,7 +121,11 @@ export default function CartManager({
   // Helper to parse flavor and options from a combination key
   const parseCombinationKey = (key: string) => {
     const [optsJson, flavor] = key.split('|||');
-    return { options: JSON.parse(optsJson), flavor };
+    try {
+      return { options: JSON.parse(optsJson) as { [key: string]: string }, flavor };
+    } catch (e) {
+      return { options: {} as { [key: string]: string }, flavor };
+    }
   };
 
   useEffect(() => {
@@ -307,7 +311,7 @@ export default function CartManager({
     });
   }, [favorites]);
 
-  const addToCart = (item: any, options?: { [key: string]: string }, quantity = 1) => {
+  const addToCart = (item: any, options?: { [key: string]: string }, quantity = 1, customPrice?: number) => {
     setCart((prevCart) => {
       const newCart = [...prevCart];
       const optionHash = options ? JSON.stringify(options) : '';
@@ -321,7 +325,7 @@ export default function CartManager({
           id: uniqueId,
           productId: item.id,
           name: item.name,
-          price: item.price,
+          price: customPrice !== undefined ? customPrice : item.price,
           image: item.image,
           quantity: quantity || 1,
           notes: "",
@@ -1026,6 +1030,8 @@ export default function CartManager({
               </div>
 
               <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar p-1">
+
+
                 {configuringItem.options?.length > 0 && (
                   <div className="space-y-6">
                     {/* PREFIX SELECTORS (Masa, Tamaño, etc.) */}
@@ -1039,9 +1045,12 @@ export default function CartManager({
                             <button
                               key={val}
                               onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
+                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
                             >
-                              {val}
+                              <span>{val}</span>
+                              {opt.prices?.[val] && (
+                                <span className={`text-[8px] mt-1 ${tempOptions[opt.name] === val ? 'text-emerald-300' : 'text-emerald-600'}`}>+$ {opt.prices[val]}</span>
+                              )}
                             </button>
                           ))}
                         </div>
@@ -1059,13 +1068,13 @@ export default function CartManager({
                             <p className="text-[9px] text-gray-400 font-medium italic">Especifica la cantidad de cada uno</p>
                           </div>
                           {detectLimit(configuringItem) && (
-                            <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + b, 0) === detectLimit(configuringItem)
+                            <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + (b as number), 0) === detectLimit(configuringItem)
                               ? 'bg-emerald-500 border-emerald-500 text-white'
-                              : Object.values(tempCounts).reduce((a, b) => a + b, 0) > (detectLimit(configuringItem) || 0)
+                              : Object.values(tempCounts).reduce((a, b) => a + (b as number), 0) > (detectLimit(configuringItem) || 0)
                                 ? 'bg-red-500 border-red-500 text-white animate-shake'
                                 : 'bg-white border-gray-100 text-gray-900'
                               }`}>
-                              <span className="text-[10px] font-black">{Object.values(tempCounts).reduce((a, b) => a + b, 0)} / {detectLimit(configuringItem)}</span>
+                              <span className="text-[10px] font-black">{Object.values(tempCounts).reduce((a, b) => a + (b as number), 0)} / {detectLimit(configuringItem)}</span>
                             </div>
                           )}
                         </div>
@@ -1075,7 +1084,12 @@ export default function CartManager({
                             const currentCount = tempCounts[comboKey] || 0;
                             return (
                               <div key={val} className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl border border-gray-100/50 hover:bg-white hover:shadow-sm transition-all text-gray-700">
-                                <span className="font-bold text-sm uppercase">{val}</span>
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-sm uppercase">{val}</span>
+                                  {opt.prices?.[val] && (
+                                    <span className="text-[10px] font-black text-emerald-600">+$ {opt.prices[val]}</span>
+                                  )}
+                                </div>
                                 <div className="flex items-center gap-4">
                                   <button
                                     onClick={() => setTempCounts(prev => ({ ...prev, [comboKey]: Math.max(0, currentCount - 1) }))}
@@ -1089,7 +1103,7 @@ export default function CartManager({
                                   <button
                                     onClick={() => {
                                       const limit = detectLimit(configuringItem);
-                                      const currentTotal = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                                      const currentTotal = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
                                       if (!limit || currentTotal < (limit || 0)) {
                                         setTempCounts(prev => ({ ...prev, [comboKey]: currentCount + 1 }));
                                       }
@@ -1134,34 +1148,52 @@ export default function CartManager({
                 <button
                   onClick={() => {
                     const limit = detectLimit(configuringItem);
-                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
+
+                    // ALWAYS BUNDLE: Whether it has a limit or not, we bundle to avoid the multiplication bug
+                    const combinations = Object.entries(tempCounts).filter(([_, count]) => (count as number) > 0);
+                    const detail = combinations.map(([key, count]) => {
+                      const { options, flavor } = parseCombinationKey(key);
+                      const optsString = Object.values(options).join(', ');
+                      return `${count}x ${optsString} ${flavor}`;
+                    }).join(', ');
+
+                    // Base price including prefix options (Size, etc.)
+                    let baseAndPrefixPrice = configuringItem.price;
+                    configuringItem.options?.slice(0, -1).forEach((opt: any) => {
+                      const selectedVal = tempOptions[opt.name];
+                      if (selectedVal && opt.prices?.[selectedVal]) baseAndPrefixPrice += opt.prices[selectedVal];
+                    });
+
+                    // Extras price (sum of specific choices * their extra price)
+                    let extrasTotal = 0;
+                    combinations.forEach(([key, count]) => {
+                      const { flavor } = parseCombinationKey(key);
+                      const lastOpt = configuringItem.options[configuringItem.options.length - 1];
+                      if (lastOpt.prices?.[flavor]) extrasTotal += lastOpt.prices[flavor] * (count as number);
+                    });
 
                     if (limit) {
-                      // PACKAGE MODE: Group everything into a single cart entry
-                      const combinations = Object.entries(tempCounts).filter(([_, count]) => count > 0);
-                      const detail = combinations.map(([key, count]) => {
-                        const { options, flavor } = parseCombinationKey(key);
-                        const optsString = Object.values(options).join(', ');
-                        return `${count}x ${optsString} ${flavor}`;
-                      }).join(', ');
-
-                      addToCart(configuringItem, { Surtido: detail }, 1);
+                      // PACKAGE: Everything is one bundle, quantity 1
+                      addToCart(configuringItem, { Surtido: detail }, 1, baseAndPrefixPrice + extrasTotal);
                     } else {
-                      // INDIVIDUAL MODE: Each combination is a line item
-                      Object.entries(tempCounts).forEach(([key, count]) => {
-                        if (count > 0) {
-                          const { options, flavor } = parseCombinationKey(key);
-                          const lastOptName = configuringItem.options[configuringItem.options.length - 1].name;
-                          addToCart(configuringItem, { ...options, [lastOptName]: flavor }, count);
-                        }
-                      });
+                      // INDIVIDUAL/PLATE: Base applies per tempQuantity, extras are added to total
+                      // Final Price = (BaseAndPrefix * tempQuantity) + extrasTotal
+                      // For consistency with addToCart(..., quantity), we pass the averaged price per unit
+                      const totalBundlePrice = (baseAndPrefixPrice * tempQuantity) + extrasTotal;
+                      const averagePrice = totalBundlePrice / tempQuantity;
+
+                      const finalOpts = { ...tempOptions };
+                      if (detail) finalOpts["Opciones"] = detail;
+
+                      addToCart(configuringItem, finalOpts, tempQuantity, averagePrice);
                     }
                     setConfiguringItem(null);
                     if (!showCart) setShowCart(true);
                   }}
                   disabled={(() => {
                     const limit = detectLimit(configuringItem);
-                    const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    const total = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
                     if (limit) return total !== limit;
                     return total === 0;
                   })()}
@@ -1170,12 +1202,35 @@ export default function CartManager({
                   <ShoppingCart size={18} />
                   {(() => {
                     const limit = detectLimit(configuringItem);
-                    const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    const total = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
+
                     if (limit) {
                       if (total < limit) return `Faltan ${limit - total} piezas...`;
-                      return `Confirmar Paquete • $${configuringItem.price.toFixed(2)}`;
+
+                      let packagePrice = configuringItem.price;
+                      configuringItem.options?.slice(0, -1).forEach((opt: any) => {
+                        const selectedVal = tempOptions[opt.name];
+                        if (selectedVal && opt.prices?.[selectedVal]) packagePrice += opt.prices[selectedVal];
+                      });
+                      return `Confirmar Paquete • $${packagePrice.toFixed(2)}`;
                     }
-                    return total > 0 ? `Agregar ${total} al Carrito` : 'Selecciona sabores';
+
+                    let totalPrice = 0;
+                    Object.entries(tempCounts).forEach(([key, count]) => {
+                      if ((count as number) > 0) {
+                        const { options, flavor } = parseCombinationKey(key);
+                        let itemPrice = configuringItem.price;
+                        Object.entries(options).forEach(([optName, val]) => {
+                          const opt = configuringItem.options.find((o: any) => o.name === optName);
+                          if (opt && opt.prices?.[val as string]) itemPrice += opt.prices[val as string];
+                        });
+                        const lastOpt = configuringItem.options[configuringItem.options.length - 1];
+                        if (lastOpt.prices?.[flavor]) itemPrice += lastOpt.prices[flavor];
+                        totalPrice += itemPrice * (count as number);
+                      }
+                    });
+
+                    return total > 0 ? `Agregar al Carrito • $${totalPrice.toFixed(2)}` : 'Selecciona opciones';
                   })()}
                 </button>
 

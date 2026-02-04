@@ -81,7 +81,11 @@ export default function WaiterMode({
 
   const parseCombinationKey = (key: string) => {
     const [optsJson, flavor] = key.split('|||');
-    return { options: JSON.parse(optsJson), flavor };
+    try {
+      return { options: JSON.parse(optsJson) as { [key: string]: string }, flavor };
+    } catch (e) {
+      return { options: {} as { [key: string]: string }, flavor };
+    }
   };
 
   useEffect(() => {
@@ -183,7 +187,7 @@ export default function WaiterMode({
     }
   })).filter(block => block.data.items.length > 0), [allBlocks, searchTerm]);
 
-  const addToCart = (item: ItemData, options?: { [key: string]: string }, quantity = 1) => {
+  const addToCart = (item: ItemData, options?: { [key: string]: string }, quantity = 1, customPrice?: number) => {
     // Si el item tiene opciones y no vienen ya configuradas, abrimos el configurador
     if ((item as any).options?.length >= 1 && !options) {
       const initialOpts: any = {};
@@ -207,6 +211,7 @@ export default function WaiterMode({
         id: uniqueId,
         productId: item.id,
         quantity: quantity,
+        price: customPrice !== undefined ? customPrice : item.price,
         selectedOptions: options
       };
 
@@ -715,9 +720,12 @@ export default function WaiterMode({
                           <button
                             key={val}
                             onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                            className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all ${tempOptions[opt.name] === val ? 'border-slate-900 bg-slate-900 text-white shadow-lg' : 'border-slate-50 bg-slate-50 text-slate-400 hover:border-slate-100 hover:bg-white'}`}
+                            className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-slate-900 bg-slate-900 text-white shadow-lg' : 'border-slate-50 bg-slate-50 text-slate-400 hover:border-slate-100 hover:bg-white'}`}
                           >
-                            {val}
+                            <span>{val}</span>
+                            {opt.prices?.[val] && (
+                              <span className={`text-[8px] mt-1 ${tempOptions[opt.name] === val ? 'text-emerald-300' : 'text-emerald-600'}`}>+$ {opt.prices[val]}</span>
+                            )}
                           </button>
                         ))}
                       </div>
@@ -751,7 +759,12 @@ export default function WaiterMode({
                           const currentCount = tempCounts[comboKey] || 0;
                           return (
                             <div key={val} className="flex items-center justify-between bg-slate-50 p-3 rounded-2xl border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all text-slate-700">
-                              <span className="font-bold text-sm uppercase">{val}</span>
+                              <div className="flex flex-col text-left">
+                                <span className="font-bold text-sm uppercase">{val}</span>
+                                {opt.prices?.[val] && (
+                                  <span className="text-[10px] font-black text-emerald-600">+$ {opt.prices[val]}</span>
+                                )}
+                              </div>
                               <div className="flex items-center gap-4">
                                 <button
                                   onClick={() => setTempCounts(prev => ({ ...prev, [comboKey]: Math.max(0, currentCount - 1) }))}
@@ -809,30 +822,42 @@ export default function WaiterMode({
                 <button
                   onClick={() => {
                     const limit = detectLimit(configuringItem);
-                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
+
+                    const combinations = Object.entries(tempCounts).filter(([_, count]) => (count as number) > 0);
+                    const detail = combinations.map(([key, count]) => {
+                      const { options, flavor } = parseCombinationKey(key);
+                      const optsString = Object.values(options).join(', ');
+                      return `${count}x ${optsString} ${flavor}`;
+                    }).join(', ');
+
+                    let baseAndPrefixPrice = configuringItem.price;
+                    configuringItem.options?.slice(0, -1).forEach((opt: any) => {
+                      const selectedVal = tempOptions[opt.name];
+                      if (selectedVal && opt.prices?.[selectedVal]) baseAndPrefixPrice += opt.prices[selectedVal];
+                    });
+
+                    let extrasTotal = 0;
+                    combinations.forEach(([key, count]) => {
+                      const { flavor } = parseCombinationKey(key);
+                      const lastOpt = configuringItem.options[configuringItem.options.length - 1];
+                      if (lastOpt.prices?.[flavor]) extrasTotal += lastOpt.prices[flavor] * (count as number);
+                    });
 
                     if (limit) {
-                      const combinations = Object.entries(tempCounts).filter(([_, count]) => count > 0);
-                      const detail = combinations.map(([key, count]) => {
-                        const { options, flavor } = parseCombinationKey(key);
-                        const optsString = Object.values(options).join(', ');
-                        return `${count}x ${optsString} ${flavor}`;
-                      }).join(', ');
-                      addToCart(configuringItem, { Surtido: detail }, 1);
+                      addToCart(configuringItem, { Surtido: detail }, 1, baseAndPrefixPrice + extrasTotal);
                     } else {
-                      Object.entries(tempCounts).forEach(([key, count]) => {
-                        if (count > 0) {
-                          const { options, flavor } = parseCombinationKey(key);
-                          const lastOptName = configuringItem.options[configuringItem.options.length - 1].name;
-                          addToCart(configuringItem, { ...options, [lastOptName]: flavor }, count * tempQuantity);
-                        }
-                      });
+                      const totalBundlePrice = (baseAndPrefixPrice * tempQuantity) + extrasTotal;
+                      const averagePrice = totalBundlePrice / tempQuantity;
+                      const finalOpts = { ...tempOptions };
+                      if (detail) finalOpts["Opciones"] = detail;
+                      addToCart(configuringItem, finalOpts, tempQuantity, averagePrice);
                     }
                     setConfiguringItem(null);
                   }}
                   disabled={(() => {
                     const limit = detectLimit(configuringItem);
-                    const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    const total = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
                     if (limit) return total !== limit;
                     return total === 0;
                   })()}
@@ -841,12 +866,55 @@ export default function WaiterMode({
                   <ShoppingCart size={18} />
                   {(() => {
                     const limit = detectLimit(configuringItem);
-                    const total = Object.values(tempCounts).reduce((a, b) => a + b, 0);
+                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
                     if (limit) {
-                      if (total < limit) return `Faltan ${limit - total} piezas...`;
-                      return `Confirmar Paquete • $${configuringItem.price}`;
+                      if (totalSelected < limit) return `Faltan ${limit - totalSelected} piezas...`;
+
+                      let packagePrice = configuringItem.price;
+                      configuringItem.options?.slice(0, -1).forEach((opt: any) => {
+                        const selectedVal = tempOptions[opt.name];
+                        if (selectedVal && opt.prices?.[selectedVal]) packagePrice += opt.prices[selectedVal];
+                      });
+                      return `Confirmar Paquete • $${packagePrice}`;
                     }
-                    return total > 0 ? `Agregar a Comanda` : 'Selecciona opciones';
+
+                    let totalPrice = 0;
+                    Object.entries(tempCounts).forEach(([key, count]) => {
+                      if ((count as number) > 0) {
+                        const { options, flavor } = parseCombinationKey(key);
+                        let itemPrice = configuringItem.price;
+                        Object.entries(options).forEach(([optName, val]) => {
+                          const opt = configuringItem.options.find((o: any) => o.name === optName);
+                          if (opt && opt.prices?.[val]) itemPrice += opt.prices[val];
+                        });
+                        const lastOpt = configuringItem.options[configuringItem.options.length - 1];
+                        if (lastOpt.prices?.[flavor]) itemPrice += lastOpt.prices[flavor];
+                        totalPrice += itemPrice * (count as number) * tempQuantity;
+
+                        // Wait, if it's bundled additive, the correct total is:
+                        // (Base + Prefix) * tempQuantity + (Extras)
+                      }
+                    });
+
+                    // Re-calculate bundle total for display
+                    let baseAndPrefixPrice = configuringItem.price;
+                    configuringItem.options?.slice(0, -1).forEach((opt: any) => {
+                      const selectedVal = tempOptions[opt.name];
+                      if (selectedVal && opt.prices?.[selectedVal]) baseAndPrefixPrice += opt.prices[selectedVal];
+                    });
+
+                    let extrasTotal = 0;
+                    Object.entries(tempCounts).forEach(([key, count]) => {
+                      if ((count as number) > 0) {
+                        const { flavor } = parseCombinationKey(key);
+                        const lastOpt = configuringItem.options[configuringItem.options.length - 1];
+                        if (lastOpt.prices?.[flavor]) extrasTotal += lastOpt.prices[flavor] * (count as number);
+                      }
+                    });
+
+                    const totalBundlePrice = (baseAndPrefixPrice * tempQuantity) + extrasTotal;
+
+                    return totalSelected > 0 ? `Agregar a Comanda • $${totalBundlePrice.toFixed(2)}` : 'Selecciona opciones';
                   })()}
                 </button>
               </div>

@@ -115,6 +115,7 @@ const migrateFlatToNested = (content: any): Block[] => {
 interface ItemOption {
   name: string;
   values: string[];
+  prices?: { [key: string]: number };
   required?: boolean;
 }
 
@@ -1802,16 +1803,44 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
 
                                 <div className="flex flex-wrap gap-2">
                                   {option.values.map((val, vIdx) => (
-                                    <span key={vIdx} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-2 group border border-emerald-100">
-                                      {val}
-                                      <button
-                                        onClick={() => {
-                                          const newOptions = [...(item.options || [])];
-                                          newOptions[optIdx].values = newOptions[optIdx].values.filter((_, i) => i !== vIdx);
-                                          updateItem(itemIndex, { options: newOptions });
-                                        }}
-                                        className="text-emerald-300 hover:text-red-500"
-                                      >×</button>
+                                    <span key={vIdx} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-bold flex flex-col gap-1 border border-emerald-100 group transition-all hover:border-emerald-300">
+                                      <div className="flex items-center gap-2">
+                                        <span className="flex-1 whitespace-nowrap">{val}</span>
+                                        <button
+                                          onClick={() => {
+                                            const newOptions = [...(item.options || [])];
+                                            newOptions[optIdx].values = newOptions[optIdx].values.filter((_, i) => i !== vIdx);
+                                            // Limpiar el precio si existe
+                                            if (newOptions[optIdx].prices) {
+                                              const newPrices = { ...newOptions[optIdx].prices };
+                                              delete newPrices[val];
+                                              newOptions[optIdx].prices = newPrices;
+                                            }
+                                            updateItem(itemIndex, { options: newOptions });
+                                          }}
+                                          className="text-emerald-300 hover:text-red-500 transition-colors"
+                                        >×</button>
+                                      </div>
+                                      <div className="flex items-center gap-1 bg-white/50 rounded-lg px-2 py-0.5 border border-emerald-100/50">
+                                        <span className="text-[8px] text-emerald-400 font-black">+$</span>
+                                        <input
+                                          type="number"
+                                          placeholder="0"
+                                          className="w-12 bg-transparent border-none p-0 text-[10px] font-black text-emerald-600 focus:ring-0 outline-none placeholder:text-emerald-200"
+                                          value={option.prices?.[val] || ''}
+                                          onChange={(e) => {
+                                            const newOptions = [...(item.options || [])];
+                                            const newPrices = { ...(newOptions[optIdx].prices || {}) };
+                                            if (e.target.value) {
+                                              newPrices[val] = parseFloat(e.target.value);
+                                            } else {
+                                              delete newPrices[val];
+                                            }
+                                            newOptions[optIdx].prices = newPrices;
+                                            updateItem(itemIndex, { options: newOptions });
+                                          }}
+                                        />
+                                      </div>
                                     </span>
                                   ))}
                                   <input
