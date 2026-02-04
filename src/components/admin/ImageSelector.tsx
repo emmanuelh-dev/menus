@@ -47,7 +47,7 @@ export function ImageSelector({ existingImages, onSelect, onClose }: ImageSelect
                   onSelect(url);
                   onClose();
                 }}
-                className="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
+                className="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 hover: transition-all group"
               >
                 <img src={url} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">

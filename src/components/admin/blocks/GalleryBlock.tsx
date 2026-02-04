@@ -31,7 +31,7 @@ export function GalleryBlock({ data, onChange, existingImages }: GalleryBlockPro
     <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
       <div className="bg-gray-50 p-2 border-b-2 border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white shadow-lg">
+          <div className="p-2 bg-gray-700 rounded-xl text-white ">
             <PiSparkle className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Galería de Imágenes</h3>

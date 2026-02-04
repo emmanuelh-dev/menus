@@ -13,8 +13,8 @@ interface FloatingCategoryMenuProps {
   textColor?: string;
 }
 
-export default function FloatingCategoryMenu({ 
-  categories, 
+export default function FloatingCategoryMenu({
+  categories,
   backgroundColor = 'bg-white',
   textColor = 'text-gray-700'
 }: FloatingCategoryMenuProps) {
@@ -38,7 +38,7 @@ export default function FloatingCategoryMenu({
       {/* Botón flotante */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 left-4 z-50 bg-black -600 text-white p-3 rounded-full shadow-lg hover:bg-black -700 transition-all duration-200 hover:scale-105"
+        className="fixed bottom-20 left-4 z-50 bg-black -600 text-white p-3 rounded-full  hover:bg-black -700 transition-all duration-200 hover:scale-105"
         title="Navegación rápida"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,11 +50,11 @@ export default function FloatingCategoryMenu({
       {isOpen && (
         <>
           {/* Overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Menú */}
           <div className={`fixed bottom-20 left-4 right-4 md:left-4 md:right-auto md:w-80 ${backgroundColor} rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto`}>
             <div className="p-4">
@@ -71,7 +71,7 @@ export default function FloatingCategoryMenu({
                   </svg>
                 </button>
               </div>
-              
+
               <div className="space-y-2">
                 {categories.map((category, index) => (
                   <button
@@ -80,10 +80,10 @@ export default function FloatingCategoryMenu({
                     className={`w-full text-left px-3 py-3 rounded-lg transition-all duration-200 hover:bg-gray-50 hover:shadow-sm border border-gray-100 ${textColor}`}
                   >
                     <div className="flex items-center space-x-3">
-                      <div 
+                      <div
                         className={`w-3 h-3 rounded-full ${category.color || 'bg-black -500'}`}
-                        style={category.color?.startsWith('text-') ? { 
-                          backgroundColor: category.color.replace('text-', '').replace('-400', '').replace('-500', '') 
+                        style={category.color?.startsWith('text-') ? {
+                          backgroundColor: category.color.replace('text-', '').replace('-400', '').replace('-500', '')
                         } : {}}
                       />
                       <div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FaStar, FaChevronUp, FaDownload } from 'react-icons/fa'
+import { FaStar, FaChevronUp, FaDownload, FaComment } from 'react-icons/fa'
 
 const ScrollTopAndComment = () => {
   const [show, setShow] = useState(false)
@@ -98,7 +98,7 @@ const ScrollTopAndComment = () => {
         <div className={`fixed bottom-6 left-6 z-[1000] transition-all duration-500 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
           <button
             onClick={handleInstall}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105 flex items-center justify-center group relative border-2 border-white"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-full  transition-all hover:scale-105 flex items-center justify-center group relative border-2 border-white"
             aria-label="Instalar App del Menú"
           >
             <FaDownload className="w-5 h-5" />
@@ -117,15 +117,15 @@ const ScrollTopAndComment = () => {
           className={`review-button group relative bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white p-2 rounded-full shadow-2xl transition-all hover:scale-110 border-2 border-white/30 ${isReviewButtonPulsing ? 'animate-pulse' : ''}`}
           aria-label="Escribir reseña"
         >
-          <FaStar className="w-6 h-6 drop-shadow-lg" />
+          <FaComment className="w-6 h-6" />
           {isReviewButtonPulsing && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-bounce shadow-lg border-2 border-white">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-bounce  border-2 border-white">
               !
             </span>
           )}
           {/* Tooltip */}
           <span className="absolute left-full ml-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold shadow-xl border border-white/20">
-            ⭐ Dejar Reseña
+            Comentarios
           </span>
         </button>
 
@@ -133,7 +133,7 @@ const ScrollTopAndComment = () => {
         <button
           aria-label="Ir arriba"
           onClick={handleScrollTop}
-          className="group relative bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105 border border-white/20"
+          className="group relative bg-slate-700 hover:bg-slate-600 text-white p-3 rounded-full  transition-all hover:scale-105 border border-white/20"
         >
           <FaChevronUp className="w-5 h-5" />
           <span className="absolute left-full ml-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold shadow-xl border border-white/20">

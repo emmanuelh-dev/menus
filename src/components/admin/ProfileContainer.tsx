@@ -85,8 +85,8 @@ export default function ProfileContainer() {
         {status && (
           <div
             className={`p-4 rounded-xl mb-8 text-center text-xs font-black uppercase tracking-widest ${status.type === "success"
-                ? "bg-emerald-50 text-emerald-600"
-                : "bg-red-50 text-red-600"
+              ? "bg-emerald-50 text-emerald-600"
+              : "bg-red-50 text-red-600"
               }`}
           >
             {status.message}
@@ -176,7 +176,7 @@ export default function ProfileContainer() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full flex justify-center items-center py-4 px-6 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all duration-300 shadow-lg shadow-slate-900/10 group active:scale-[0.98] uppercase text-xs tracking-widest disabled:opacity-50"
+              className="w-full flex justify-center items-center py-4 px-6 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all duration-300  shadow-slate-900/10 group active:scale-[0.98] uppercase text-xs tracking-widest disabled:opacity-50"
             >
               <Save className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
               {saving ? "Guardando..." : "Guardar Cambios"}

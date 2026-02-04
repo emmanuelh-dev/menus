@@ -139,7 +139,7 @@ export function SectionBlock({ data, onChange, placeType = 'restaurant', forceCo
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Contenido de la sección</h4>
                 <button
                   onClick={addItem}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-purple-100 flex items-center gap-2"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all  shadow-purple-100 flex items-center gap-2"
                 >
                   <PiPlus className="w-3 h-3" /> Agregar Ítem
                 </button>

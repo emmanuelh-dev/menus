@@ -416,7 +416,7 @@ const AdminUserList = () => {
                   <div className="relative">
                     <button
                       onClick={() => setActiveMenu(activeMenu?.id === user.id && activeMenu?.type === 'whatsapp' ? null : { id: user.id, type: 'whatsapp' })}
-                      className="px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-emerald-600 transition-all active:scale-95 shadow-lg shadow-emerald-500/10"
+                      className="px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-emerald-600 transition-all active:scale-95  shadow-emerald-500/10"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       WhatsApp
@@ -449,7 +449,7 @@ const AdminUserList = () => {
                   <div className="relative">
                     <button
                       onClick={() => setActiveMenu(activeMenu?.id === user.id && activeMenu?.type === 'email' ? null : { id: user.id, type: 'email' })}
-                      className="px-4 py-2.5 bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-blue-600 transition-all active:scale-95 shadow-lg shadow-blue-500/10"
+                      className="px-4 py-2.5 bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-blue-600 transition-all active:scale-95  shadow-blue-500/10"
                     >
                       <Mail className="w-3.5 h-3.5" />
                       Email

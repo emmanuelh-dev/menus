@@ -61,6 +61,7 @@ export default function WaiterMode({
   const [prevCustomers, setPrevCustomers] = useState<{ name: string, phone: string }[]>([]);
   const [showCustomers, setShowCustomers] = useState(false);
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
+  const [definedTables, setDefinedTables] = useState<any[]>([]);
   const [step, setStep] = useState(1); // 1: items, 2: checkout (mobile only)
   const [configuringItem, setConfiguringItem] = useState<any | null>(null);
   const [tempOptions, setTempOptions] = useState<{ [key: string]: string }>({});
@@ -97,6 +98,12 @@ export default function WaiterMode({
       }
     };
     init();
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const table = params.get('table');
+      if (table) setTableNumber(table);
+    }
   }, [placeId]);
 
   const fetchZones = async () => {
@@ -148,6 +155,7 @@ export default function WaiterMode({
         const contentBlocks = data.place?.content?.blocks || [];
         const sections = contentBlocks.filter((b: any) => b.type === 'section');
         setBlocks(sections);
+        setDefinedTables(data.place?.content?.pos_config?.tables || []);
       }
     } catch (error) {
       console.error('Error fetching menu:', error);
@@ -332,7 +340,7 @@ export default function WaiterMode({
               {cart.length > 0 && step === 1 && (
                 <button
                   onClick={() => setStep(2)}
-                  className="md:hidden bg-slate-900 text-white px-3 py-2 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 shadow-lg shrink-0"
+                  className="md:hidden bg-slate-900 text-white px-3 py-2 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2  shrink-0"
                 >
                   <ShoppingCart size={12} />
                   Pagar (${total})
@@ -466,7 +474,7 @@ export default function WaiterMode({
                 <button
                   onClick={() => handleSubmit(false)}
                   disabled={cart.length === 0 || isSubmitting}
-                  className="md:hidden bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 shadow-lg mr-2"
+                  className="md:hidden bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2  mr-2"
                 >
                   <Check size={14} />
                   Listos
@@ -575,13 +583,26 @@ export default function WaiterMode({
                 </div>
                 <div className="relative">
                   <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
-                  <input
-                    type="number"
-                    placeholder="Mesa"
-                    className="w-full pl-8 pr-2 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none"
-                    value={tableNumber}
-                    onChange={(e) => setTableNumber(e.target.value)}
-                  />
+                  {definedTables.length > 0 ? (
+                    <select
+                      className="w-full pl-8 pr-2 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none appearance-none"
+                      value={tableNumber}
+                      onChange={(e) => setTableNumber(e.target.value)}
+                    >
+                      <option value="">Sel. Mesa</option>
+                      {definedTables.map(t => (
+                        <option key={t.id} value={t.name}>{t.name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="number"
+                      placeholder="Mesa"
+                      className="w-full pl-8 pr-2 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none"
+                      value={tableNumber}
+                      onChange={(e) => setTableNumber(e.target.value)}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -671,7 +692,7 @@ export default function WaiterMode({
                 {isSubmitting ? (
                   <div className="h-4 w-4 border-2 border-emerald-300 border-t-emerald-600 animate-spin rounded-full"></div>
                 ) : (
-                  <><Phone size={16} /> Guardar y enviar WhatsApp</>
+                  <><Phone size={16} className="pointer-events-none" /> Guardar y enviar WhatsApp</>
                 )}
               </button>
             </div>
@@ -720,7 +741,7 @@ export default function WaiterMode({
                           <button
                             key={val}
                             onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                            className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-slate-900 bg-slate-900 text-white shadow-lg' : 'border-slate-50 bg-slate-50 text-slate-400 hover:border-slate-100 hover:bg-white'}`}
+                            className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-slate-900 bg-slate-900 text-white ' : 'border-slate-50 bg-slate-50 text-slate-400 hover:border-slate-100 hover:bg-white'}`}
                           >
                             <span>{val}</span>
                             {opt.prices?.[val] && (
@@ -859,7 +880,7 @@ export default function WaiterMode({
                     const limit = detectLimit(configuringItem);
                     const total = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
                     if (limit) return total !== limit;
-                    return total === 0;
+                    return false; // For normal items, even if 0 extras are selected, allow adding the base item
                   })()}
                   className="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-slate-300 hover:bg-black transition-all flex items-center justify-center gap-3 disabled:bg-slate-200 disabled:shadow-none"
                 >
@@ -884,11 +905,11 @@ export default function WaiterMode({
                         const { options, flavor } = parseCombinationKey(key);
                         let itemPrice = configuringItem.price;
                         Object.entries(options).forEach(([optName, val]) => {
-                          const opt = configuringItem.options.find((o: any) => o.name === optName);
+                          const opt = configuringItem.options?.find((o: any) => o.name === optName);
                           if (opt && opt.prices?.[val]) itemPrice += opt.prices[val];
                         });
-                        const lastOpt = configuringItem.options[configuringItem.options.length - 1];
-                        if (lastOpt.prices?.[flavor]) itemPrice += lastOpt.prices[flavor];
+                        const lastOpt = configuringItem.options?.[configuringItem.options.length - 1];
+                        if (lastOpt?.prices?.[flavor]) itemPrice += lastOpt.prices[flavor];
                         totalPrice += itemPrice * (count as number) * tempQuantity;
 
                         // Wait, if it's bundled additive, the correct total is:
@@ -907,8 +928,8 @@ export default function WaiterMode({
                     Object.entries(tempCounts).forEach(([key, count]) => {
                       if ((count as number) > 0) {
                         const { flavor } = parseCombinationKey(key);
-                        const lastOpt = configuringItem.options[configuringItem.options.length - 1];
-                        if (lastOpt.prices?.[flavor]) extrasTotal += lastOpt.prices[flavor] * (count as number);
+                        const lastOpt = configuringItem.options?.[configuringItem.options.length - 1];
+                        if (lastOpt?.prices?.[flavor]) extrasTotal += lastOpt.prices[flavor] * (count as number);
                       }
                     });
 

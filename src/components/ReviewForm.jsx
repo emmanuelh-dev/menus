@@ -197,7 +197,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
           <div key={rev.id} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] border border-white/10 shadow-sm group hover:bg-[#111] transition-all text-white">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
-                <div className="size-12 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white font-black text-xl shadow-lg ring-4 ring-white/5">
+                <div className="size-12 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white font-black text-xl  ring-4 ring-white/5">
                   {(rev.content?.author?.name || "A")[0].toUpperCase()}
                 </div>
                 <div>
@@ -236,7 +236,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             {/* MUESTRA LA RESPUESTA SI EXISTE */}
             {rev.content?.reply && (
               <div className="mt-8 p-6 bg-red-600/10 border-l-4 border-red-500 rounded-r-2xl relative ring-1 ring-white/5">
-                <span className="absolute -top-3 left-4 bg-red-500 text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg">STAFF RESPONSE</span>
+                <span className="absolute -top-3 left-4 bg-red-500 text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest ">STAFF RESPONSE</span>
                 <p className="text-sm text-stone-200 leading-relaxed italic mt-2">"{rev.content.reply.text}"</p>
                 <div className="flex items-center gap-2 mt-4">
                   <div className="size-1.5 bg-red-500 rounded-full"></div>

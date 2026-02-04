@@ -81,9 +81,9 @@ export const nicheLinks = [
 
 export const toolLinks = [
     { 
-        name: "Menú Digital QR", 
-        href: "/crear-menu-digital",
-        description: "Carta interactiva sin contacto para tus clientes.",
+        name: "Menú Digital GRATIS", 
+        href: "/menu-digital-gratis",
+        description: "Crea tu carta interactiva 100% gratis hoy.",
         icon: "QrCode"
     },
     { 

@@ -254,7 +254,7 @@ function AdminHeader() {
               </button>
             )}
             <a
-              href="https://wa.me/528111913676"
+              href="https://wa.me/528126060795"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full gap-4 flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors"

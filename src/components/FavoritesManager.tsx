@@ -127,7 +127,7 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
         <div className="fixed bottom-[72px] right-6 z-40">
           <button
             onClick={() => setShowFavorites(!showFavorites)}
-            className="relative bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105"
+            className="relative bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-full  transition-all hover:scale-105"
           >
             <Heart className="w-5 h-5" fill="currentColor" />
             <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px]">

@@ -38,7 +38,7 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 30000); // Auto refresh every 30s
+    const interval = setInterval(fetchOrders, 30000);
     return () => clearInterval(interval);
   }, [placeId, page]);
 
@@ -94,7 +94,7 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
           <div className="flex items-center gap-2">
             <a
               href={`/admin/place/${placeId}/comanda`}
-              className="px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-gray-900 text-white rounded-xl hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-200"
+              className="px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-gray-900 text-white rounded-xl hover:bg-black transition-all flex items-center gap-2 shadow-sm"
             >
               <Plus size={14} />
               Nueva Comanda
@@ -157,8 +157,8 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                             <button
                               key={val}
                               onClick={() => updateStatus(order.id, val)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${isActive
-                                ? `${config.color.replace('text-', 'border-').replace('100', '200')} ${config.color} shadow-sm scale-105`
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${isActive
+                                ? `${config.color.replace('text-', 'border-').replace('100', '200')} ${config.color} shadow-sm`
                                 : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50 hover:border-slate-200'
                                 }`}
                             >

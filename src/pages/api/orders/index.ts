@@ -47,7 +47,11 @@ export const GET: APIRoute = async ({ url }) => {
   }
 
   if (status) {
-    query = query.eq('status', status);
+    if (status.includes(',')) {
+      query = query.in('status', status.split(','));
+    } else {
+      query = query.eq('status', status);
+    }
   }
 
   // Pagination

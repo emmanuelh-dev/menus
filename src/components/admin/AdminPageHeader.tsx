@@ -22,7 +22,7 @@ export default function AdminPageHeader({
   return (
     <header
       className={`
-        z-[40] bg-gray-100/90 backdrop-blur-md border-b border-gray-200 py-3 px-4
+         bg-gray-100/90 backdrop-blur-md border-b border-gray-200 py-3 px-4
         ${sticky ? 'sticky top-0 md:top-14' : ''} 
         ${className}
       `}
@@ -44,7 +44,7 @@ export default function AdminPageHeader({
 
         {/* Lado Derecho (Acciones) */}
         {rightContent && (
-          <div className="flex items-center gap-2 w-full w-full transition-all">
+          <div className="flex items-center gap-2 w-full transition-all">
             {rightContent}
           </div>
         )}

@@ -132,6 +132,7 @@ interface ItemData {
 
 interface SectionData {
   title: string;
+  category?: string;
   description?: string;
   image?: string;
   items: ItemData[];
@@ -597,7 +598,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <button
               onClick={saveChanges}
               disabled={isSaving}
-              className="flex-[2] sm:flex-none bg-gray-900 text-white px-6 py-2 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] sm:text-xs shadow-lg shadow-gray-200 flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-black active:scale-95 whitespace-nowrap"
+              className="flex-[2] sm:flex-none bg-gray-900 text-white px-6 py-2 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] sm:text-xs  shadow-gray-200 flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-black active:scale-95 whitespace-nowrap"
             >
               {isSaving ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiFloppyDisk className="w-4 h-4" />}
               {isSaving ? 'Guardando...' : 'Guardar'}
@@ -631,7 +632,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   onClick={() => scrollToBlock(block.id)}
                   className="w-full text-left p-3 hover:bg-gray-50 rounded-xl text-xs font-bold flex items-center gap-2 text-gray-700"
                 >
-                  {block.type === 'section' ? <PiListBullets className="w-4 h-4 text-blue-600" /> : block.type === 'gallery' ? <PiImages className="w-4 h-4 text-purple-600" /> : <PiImage className="w-4 h-4 text-orange-600" />}
+                  {block.type === 'section' ? <PiListBullets className="w-4 h-4 text-blue-600 pointer-events-none" /> : block.type === 'gallery' ? <PiImages className="w-4 h-4 text-purple-600 pointer-events-none" /> : <PiImage className="w-4 h-4 text-orange-600 pointer-events-none" />}
                   <span className="truncate">{block.data.title || block.data.caption || `${block.type} ${idx + 1}`}</span>
                 </button>
               ))}
@@ -704,8 +705,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   />
                   <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-tight">Código país + número (ej: 52 81 1234 5678)</p>
                 </div>
-                <div className="md:col-span-2 flex items-center gap-4 p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
-                  <div className="relative inline-flex items-center cursor-pointer">
+                <label htmlFor="enable_cart_tab" className="md:col-span-2 flex items-center gap-4 p-5 bg-emerald-50 rounded-2xl border border-emerald-100 cursor-pointer hover:bg-emerald-100 transition-all group">
+                  <div className="relative inline-flex items-center">
                     <input
                       type="checkbox"
                       id="enable_cart_tab"
@@ -716,10 +717,10 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
                   </div>
                   <div>
-                    <label htmlFor="enable_cart_tab" className="text-sm font-bold text-emerald-900 cursor-pointer block">Activar Carrito de Compras</label>
+                    <span className="text-sm font-bold text-emerald-900 block">Activar Carrito de Compras</span>
                     <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-0.5">Pedidos por WhatsApp</p>
                   </div>
-                </div>
+                </label>
               </div>
             </section>
 
@@ -844,7 +845,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     <button
                       onClick={() => setSemanticData({ ...semanticData, areas: semanticData.areas?.filter((_, i) => i !== idx) })}
                       className="hover:text-red-600"
-                    >×</button>
+                    >
+                      <PiX size={10} className="pointer-events-none" />
+                    </button>
                   </span>
                 ))}
               </div>
@@ -878,7 +881,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         }
                       }}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${isSelected
-                        ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                        ? 'bg-gray-900 border-gray-900 text-white '
                         : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200 hover:text-gray-700'
                         }`}
                     >
@@ -910,7 +913,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         }
                       }}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${isSelected
-                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg'
+                        ? 'bg-indigo-600 border-indigo-600 text-white '
                         : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200 hover:text-gray-700'
                         }`}
                     >
@@ -935,7 +938,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             >
               <div className="flex items-center gap-4">
                 <div className={`p-3 bg-white rounded-2xl shadow-sm text-gray-700 group transition-transform ${showViewSettings ? 'shadow-inner' : ''}`}>
-                  <PiLayout className={`w-5 h-5 transition-transform duration-300 ${showViewSettings ? 'rotate-12 text-indigo-500' : ''}`} />
+                  <PiLayout className={`w-5 h-5 transition-transform duration-300 ${showViewSettings ? 'rotate-12 text-indigo-500' : ''} pointer-events-none`} />
                 </div>
                 <div className="text-left">
                   <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-800 block mb-1">Diseño de Página</span>
@@ -968,7 +971,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           ? 'border-indigo-600 bg-indigo-50/50'
                           : 'border-gray-100 hover:border-indigo-200 bg-gray-50/30'}`}
                       >
-                        <div className="text-2xl mb-2">{tpl.icon}</div>
+                        <div className="text-2xl mb-2 pointer-events-none">{tpl.icon}</div>
                         <div className={`font-bold text-sm ${viewSettings.template === tpl.id ? 'text-indigo-900' : 'text-gray-700'}`}>{tpl.name}</div>
                         <div className="text-[10px] text-gray-500 uppercase font-bold tracking-tight">{tpl.desc}</div>
                       </button>
@@ -1020,8 +1023,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 {/* Header */}
                 <div className="p-5 border-b flex items-center justify-between bg-white shrink-0">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-200">
-                      <PiSparkle className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center  shadow-purple-200">
+                      <PiSparkle className="w-6 h-6 text-white pointer-events-none" />
                     </div>
                     <div>
                       <h2 className="text-base font-black uppercase tracking-tight leading-none text-gray-900">Asistente BysMax <span className="text-purple-600">IA</span></h2>
@@ -1035,7 +1038,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     onClick={() => setShowAIChat(false)}
                     className="p-2.5 hover:bg-gray-100 rounded-full transition-all active:scale-90"
                   >
-                    <PiX className="w-5 h-5 text-gray-400" />
+                    <PiX className="w-5 h-5 text-gray-400 pointer-events-none" />
                   </button>
                 </div>
 
@@ -1068,9 +1071,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
                               <button
                                 onClick={confirmAiChanges}
-                                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all  shadow-purple-100 flex items-center justify-center gap-2"
                               >
-                                {aiProcessing ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin" /> : <PiCheckCircle className="w-4 h-4" />}
+                                {aiProcessing ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin pointer-events-none" /> : <PiCheckCircle className="w-4 h-4 pointer-events-none" />}
                                 Aplicar estos cambios
                               </button>
                             </div>
@@ -1097,7 +1100,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                             onClick={() => removeAiFile(idx)}
                             className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 shadow-md z-10 hover:bg-red-600"
                           >
-                            <PiX size={10} />
+                            <PiX size={10} className="pointer-events-none" />
                           </button>
                         </div>
                       ))}
@@ -1142,7 +1145,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
                         className={`p-2.5 rounded-xl transition-all ${aiProcessing || (!textInput.trim() && aiFiles.length === 0)
                           ? 'text-gray-200'
-                          : 'bg-purple-600 text-white shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-90'
+                          : 'bg-purple-600 text-white  shadow-purple-200 hover:bg-purple-700 active:scale-90'
                           }`}
                       >
                         {aiProcessing ? <PiArrowCounterClockwise className="w-5 h-5" /> : <PiPaperPlaneTilt className="w-5 h-5" />}
@@ -1212,7 +1215,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 </div>
 
                 {showBlockMenu === `after-${index}` && (
-                  <div className="mt-3 p-4 bg-white border rounded-xl shadow-lg">
+                  <div className="mt-3 p-4 bg-white border rounded-xl ">
                     <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
                     <div className="grid grid-cols-2 gap-2">
                       <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
@@ -1291,7 +1294,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                       <button
                         onClick={() => { navigator.clipboard.writeText(url); alert('URL copiada'); }}
-                        className="p-2.5 bg-white rounded-xl text-gray-800 hover:bg-gray-100 shadow-lg active:scale-95 transition-all"
+                        className="p-2.5 bg-white rounded-xl text-gray-800 hover:bg-gray-100  active:scale-95 transition-all"
                         title="Copiar Link"
                       >
                         <PiCopy className="w-4 h-4" />
@@ -1302,7 +1305,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                             setMediaLibrary(prev => prev.filter(u => u !== url));
                           }
                         }}
-                        className="p-2.5 bg-red-600 rounded-xl text-white hover:bg-red-700 shadow-lg active:scale-95 transition-all"
+                        className="p-2.5 bg-red-600 rounded-xl text-white hover:bg-red-700  active:scale-95 transition-all"
                         title="Eliminar de la biblioteca"
                       >
                         <PiTrash className="w-4 h-4" />
@@ -1488,7 +1491,7 @@ function ImageSelector({ existingImages, onSelect, onClose, onUpload, multiple =
                       {/* Selection Overlay (Only shown if selected) */}
                       {isSelected && (
                         <div className="absolute inset-0 bg-blue-600/20 flex items-center justify-center animate-in fade-in zoom-in duration-200">
-                          <div className="bg-blue-600 text-white p-1.5 rounded-full shadow-lg transform scale-110">
+                          <div className="bg-blue-600 text-white p-1.5 rounded-full  transform scale-110">
                             <PiCheckCircle className="w-6 h-6" />
                           </div>
                         </div>
@@ -1497,7 +1500,7 @@ function ImageSelector({ existingImages, onSelect, onClose, onUpload, multiple =
                       {/* Hover Indicator (Only for non-selected items) */}
                       {!isSelected && (
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                          <div className="bg-white/90 text-gray-900 p-2 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200">
+                          <div className="bg-white/90 text-gray-900 p-2 rounded-xl  opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200">
                             <PiPlus className="w-5 h-5" />
                           </div>
                         </div>
@@ -1525,7 +1528,7 @@ function ImageSelector({ existingImages, onSelect, onClose, onUpload, multiple =
               <button
                 disabled={selectedUrls.length === 0}
                 onClick={handleConfirm}
-                className="px-8 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-95"
+                className="px-8 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-700  shadow-blue-200 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-95"
               >
                 Insertar Imágenes
               </button>
@@ -1602,6 +1605,14 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
               className={`w-full font-bold uppercase bg-transparent outline-none transition-all tracking-wider ${isCollapsed ? 'text-xs text-gray-800' : 'text-xl sm:text-2xl text-gray-800 px-1 border-b-2 border-gray-300'
                 }`}
             />
+            <div className="flex items-center gap-1 mt-1 opacity-60">
+              <input
+                value={data.category || ''}
+                onChange={(e) => onChange({ ...data, category: e.target.value })}
+                placeholder="Añadir a un Submenú / Grupo (opcional)..."
+                className="text-[10px] font-bold text-blue-600 bg-blue-50/50 px-2 py-0.5 rounded outline-none w-full max-w-[200px] placeholder:text-gray-300"
+              />
+            </div>
             {isCollapsed && (
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1 leading-none">
                 Sección Dinámica • {data.items.length} Elementos
@@ -1684,7 +1695,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Listado de Productos</h4>
                 <button
                   onClick={addItem}
-                  className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg flex items-center gap-2"
+                  className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all  flex items-center gap-2"
                 >
                   <PiPlus className="w-3 h-3" /> Agregar Ítem
                 </button>
@@ -1703,7 +1714,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                   <div className="p-4 sm:p-6">
                     <div className="flex items-center justify-between gap-4 mb-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-xs font-black shadow-lg">{itemIndex + 1}</div>
+                        <div className="w-10 h-10 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-xs font-black ">{itemIndex + 1}</div>
                         <div>
                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block leading-none mb-1">Producto</span>
                           <span className="text-[9px] font-mono text-gray-300 uppercase leading-none">{item.id.split('-').pop()}</span>
@@ -2059,7 +2070,7 @@ function GalleryBlock({ data, onChange, existingImages, onUploadToLibrary }: { d
     <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
       <div className="bg-gray-50 p-2 border-b-2 border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white shadow-lg">
+          <div className="p-2 bg-gray-700 rounded-xl text-white ">
             <PiSparkle className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Galería de Imágenes</h3>
@@ -2121,7 +2132,7 @@ function ImageBlock({ data, onChange, existingImages }: { data: ImageData; onCha
     <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
       <div className="bg-gray-50 p-4 border-b-2 border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white shadow-lg">
+          <div className="p-2 bg-gray-700 rounded-xl text-white ">
             <PiImage className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Bloque de Imagen</h3>
@@ -2275,7 +2286,7 @@ function CarruselBlock({ data, onChange, existingImages, onUploadToLibrary }: { 
     <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
       <div className="bg-gray-50 p-4 border-b-2 border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white shadow-lg">
+          <div className="p-2 bg-gray-700 rounded-xl text-white ">
             <PiLayout className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Carrusel de Promociones</h3>
@@ -2285,7 +2296,7 @@ function CarruselBlock({ data, onChange, existingImages, onUploadToLibrary }: { 
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {data.items?.map((item, idx) => (
-            <div key={idx} className="group relative bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all">
+            <div key={idx} className="group relative bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover: transition-all">
               <div className="aspect-video relative overflow-hidden bg-gray-200">
                 {item.src ? (
                   <img src={item.src} className="w-full h-full object-cover" alt={item.alt} />

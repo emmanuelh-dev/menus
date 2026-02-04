@@ -1,0 +1,26 @@
+---
+export const prerender = false;
+import PlaceAdminLayout from "../../../../layouts/PlaceAdminLayout.astro";
+import TableManager from "../../../../components/admin/TableManager";
+import { supabase } from "../../../../lib/supabase";
+
+const { id } = Astro.params;
+
+const { data: place, error } = await supabase
+	.from("places")
+	.select("*")
+	.eq("id", id)
+	.single();
+
+if (error || !place) {
+	return Astro.redirect("/admin");
+}
+---
+
+<PlaceAdminLayout title={`Mesas - ${place.name}`} placeId={id!}>
+	<TableManager
+		placeId={Number(id)}
+		initialContent={place.content}
+		client:load
+	/>
+</PlaceAdminLayout>

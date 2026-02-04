@@ -219,7 +219,7 @@ export default function MotelPageRenderer({
                   href={semantic_data.reservation_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex-1 md:flex-none text-center ${config.accentBg} text-white px-10 py-4 rounded-2xl text-xs font-bold tracking-[0.2em] shadow-lg transition-all uppercase`}
+                  className={`flex-1 md:flex-none text-center ${config.accentBg} text-white px-10 py-4 rounded-2xl text-xs font-bold tracking-[0.2em]  transition-all uppercase`}
                 >
                   Reservar Ahora
                 </a>
@@ -364,10 +364,22 @@ export default function MotelPageRenderer({
         )}
 
         {!isPreview && (
-          <footer className="mt-40 pb-20 text-center">
-            <p className="text-[10px] text-stone-600 uppercase tracking-[0.5em]">
+          <footer className="mt-40 pb-20 text-center px-6">
+            <p className="text-[10px] text-stone-600 uppercase tracking-[0.5em] mb-8">
               Privacy Guaranteed • {place.name} • 2026
             </p>
+
+            <div className="inline-block bg-white/[0.02] border border-white/5 rounded-3xl p-8 max-w-sm">
+              <p className="text-xs font-bold text-white mb-2 uppercase tracking-tight">¿Administras un motel o restaurante?</p>
+              <p className="text-[10px] text-stone-500 mb-6 leading-relaxed">Moderniza tu establecimiento con un menú digital interactivo. Sube tus habitaciones, precios y servicios gratis.</p>
+              <a
+                href="/menu-digital-gratis"
+                className={`inline-flex items-center gap-2 px-6 py-3 ${config.accentBg} text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-red-900/20`}
+              >
+                Crear Catálogo Gratis
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
+              </a>
+            </div>
           </footer>
         )}
       </div>

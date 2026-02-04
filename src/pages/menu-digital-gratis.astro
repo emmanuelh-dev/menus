@@ -1,0 +1,511 @@
+---
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import {
+	Zap,
+	QrCode,
+	ArrowRight,
+	CheckCircle2,
+	Smartphone,
+	Star,
+	ChefHat,
+	CreditCard,
+	Search,
+	MessageSquare,
+	BarChart3,
+	Clock,
+} from "lucide-react";
+
+const seoData = {
+	title: "Crea tu Menú Digital GRATIS | El Mejor Creador de Cartas QR | BySMax",
+	description:
+		"Crea el menú digital de tu restaurante 100% gratis. Sin comisiones, sin tarjetas de crédito. Carta QR profesional en 5 minutos. ¡Únete hoy!",
+	keywords:
+		"menu digital gratis, crear carta qr gratis, generador de menu qr, restaurante menu digital gratis, carta online gratis",
+};
+
+const faqs = [
+	{
+		q: "¿Es realmente gratis?",
+		a: "Sí, nuestra versión estándar es 100% gratuita y te permite crear un menú profesional con código QR sin costo mensual.",
+	},
+	{
+		q: "¿Necesito conocimientos técnicos?",
+		a: "Para nada. Si sabes usar Facebook o WhatsApp, puedes crear tu menú. Es tan fácil como subir una foto y escribir el nombre del platillo.",
+	},
+	{
+		q: "¿Mis clientes deben descargar una app?",
+		a: "No. Tus clientes solo escanean el QR y el menú se abre instantáneamente en su navegador móvil (Safari, Chrome, etc.).",
+	},
+	{
+		q: "¿Puedo cambiar los precios en tiempo real?",
+		a: "¡Claro! Cualquier cambio que hagas en el panel de administración se refleja al instante en el menú de tus clientes.",
+	},
+];
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<div class="bg-[#0A0F0D] text-white overflow-hidden">
+		<!-- Hero Section -->
+		<section class="relative pt-20 pb-32 md:pt-32 md:pb-48 overflow-hidden">
+			<!-- Glow Gradients -->
+			<div
+				class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/20 blur-[120px] rounded-full"
+			>
+			</div>
+			<div
+				class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full"
+			>
+			</div>
+
+			<div
+				class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+			>
+				<div class="relative z-10 text-center lg:text-left">
+					<div
+						class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-8 animate-fade-in"
+					>
+						<Zap size={14} className="text-emerald-400" />
+						<span
+							class="text-xs font-black uppercase tracking-widest text-emerald-400"
+							>Plataforma #1 en Latinoamérica</span
+						>
+					</div>
+
+					<h1
+						class="text-5xl md:text-7xl xl:text-8xl font-black tracking-tight leading-[0.85] mb-8"
+					>
+						TU MENÚ <br />
+						<span
+							class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200"
+							>DIGITAL</span
+						><br />
+						<span class="text-emerald-500 italic">GRATIS.</span>
+					</h1>
+
+					<p
+						class="text-lg md:text-xl text-slate-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+					>
+						Digitaliza tu restaurante en 5 minutos. Sin comisiones, sin pagos
+						mensuales y con el diseño más premium del mercado.
+					</p>
+
+					<div
+						class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start mb-12"
+					>
+						<a
+							href="/admin/register"
+							class="w-full sm:w-auto px-8 py-5 bg-emerald-500 text-slate-900 font-black text-sm uppercase tracking-widest rounded-2xl hover:bg-emerald-400 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-emerald-500/20 flex items-center justify-center gap-3"
+						>
+							Crear mi menú ahora
+							<ArrowRight size={18} />
+						</a>
+						<div
+							class="flex items-center gap-3 px-6 py-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10"
+						>
+							<QrCode size={20} className="text-emerald-400" />
+							<span class="text-xs font-bold text-slate-300"
+								>QR Incluido Gratis</span
+							>
+						</div>
+					</div>
+
+					<div
+						class="flex flex-wrap justify-center lg:justify-start gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500"
+					>
+						<div class="flex items-center gap-2">
+							<Star className="w-4 h-4 fill-emerald-400 text-emerald-400" />
+							<span class="text-[10px] font-black uppercase tracking-widest"
+								>4.9/5 Calificaciones</span
+							>
+						</div>
+						<div class="flex items-center gap-2">
+							<CheckCircle2 className="w-4 h-4 text-emerald-400" />
+							<span class="text-[10px] font-black uppercase tracking-widest"
+								>+10,000 Negocios</span
+							>
+						</div>
+					</div>
+				</div>
+
+				<div class="relative group">
+					<div
+						class="absolute inset-0 bg-emerald-500/10 blur-[80px] rounded-full group-hover:bg-emerald-500/20 transition-all duration-700"
+					>
+					</div>
+					<img
+						src="/images/landing/hero-free.png"
+						alt="Mockup Menú Digital"
+						class="relative z-10 w-full max-w-lg mx-auto transform hover:rotate-2 hover:scale-105 transition-all duration-700 drop-shadow-2xl"
+					/>
+				</div>
+			</div>
+		</section>
+
+		<!-- Counter Stats / Feature Bar -->
+		<section class="py-12 bg-emerald-500/5 border-y border-emerald-500/10">
+			<div class="max-w-7xl mx-auto px-6">
+				<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+					<div class="text-center">
+						<div class="text-3xl font-black mb-1">100%</div>
+						<div
+							class="text-[10px] font-black text-emerald-500 uppercase tracking-widest"
+						>
+							Gratis x Siempre
+						</div>
+					</div>
+					<div class="text-center">
+						<div class="text-3xl font-black mb-1">5m</div>
+						<div
+							class="text-[10px] font-black text-emerald-500 uppercase tracking-widest"
+						>
+							Configuración
+						</div>
+					</div>
+					<div class="text-center">
+						<div class="text-3xl font-black mb-1">0%</div>
+						<div
+							class="text-[10px] font-black text-emerald-500 uppercase tracking-widest"
+						>
+							Comisiones
+						</div>
+					</div>
+					<div class="text-center">
+						<div class="text-3xl font-black mb-1">24/7</div>
+						<div
+							class="text-[10px] font-black text-emerald-500 uppercase tracking-widest"
+						>
+							Soporte IA
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Main Features -->
+		<section class="py-32 relative">
+			<div class="max-w-7xl mx-auto px-6">
+				<div class="text-center mb-24">
+					<h2
+						class="text-4xl md:text-6xl font-black tracking-tight mb-6 uppercase italic"
+					>
+						Potencia tu <span class="text-emerald-500">Restaurante</span>
+					</h2>
+					<p class="text-slate-500 max-w-2xl mx-auto font-medium">
+						No somos solo un código QR. Somos el motor que moderniza tu
+						establecimiento y mejora la experiencia de tus comensales.
+					</p>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<!-- Card 1 -->
+					<div
+						class="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] hover:border-emerald-500/20 transition-all group"
+					>
+						<div
+							class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform"
+						>
+							<Smartphone className="text-emerald-400" size={28} />
+						</div>
+						<h3 class="text-xl font-bold mb-4 uppercase">
+							Interfaz Ultra Rápida
+						</h3>
+						<p class="text-slate-400 text-sm leading-relaxed mb-6">
+							Tus clientes no esperan. Menú optimizado para abrirse en menos de
+							1 segundo incluso con mala conexión.
+						</p>
+						<ul class="space-y-3">
+							<li
+								class="flex items-center gap-2 text-[10px] font-black uppercase text-emerald-500/80 tracking-widest"
+							>
+								<CheckCircle2 size={14} /> PWA Navegable
+							</li>
+							<li
+								class="flex items-center gap-2 text-[10px] font-black uppercase text-emerald-500/80 tracking-widest"
+							>
+								<CheckCircle2 size={14} /> Responsive Total
+							</li>
+						</ul>
+					</div>
+
+					<!-- Card 2 -->
+					<div
+						class="p-8 rounded-[2.5rem] bg-emerald-500 text-slate-900 group shadow-2xl shadow-emerald-500/20 transform md:-translate-y-8"
+					>
+						<div
+							class="w-14 h-14 bg-black/10 rounded-2xl flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform"
+						>
+							<ChefHat className="text-slate-900" size={28} />
+						</div>
+						<h3 class="text-xl font-black mb-4 uppercase italic">
+							Editor Profesional
+						</h3>
+						<p
+							class="text-slate-900/70 text-sm leading-relaxed mb-6 font-medium"
+						>
+							Gestiona categorías, descripciones, precios y variantes tan fácil
+							como enviar un chat. ¡Control total!
+						</p>
+						<ul class="space-y-3">
+							<li
+								class="flex items-center gap-2 text-[10px] font-black uppercase text-slate-900/50 tracking-widest"
+							>
+								<CheckCircle2 size={14} /> Gestión de Stock
+							</li>
+							<li
+								class="flex items-center gap-2 text-[10px] font-black uppercase text-slate-900/50 tracking-widest"
+							>
+								<CheckCircle2 size={14} /> Fotos de Alta Resolución
+							</li>
+						</ul>
+					</div>
+
+					<!-- Card 3 -->
+					<div
+						class="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] hover:border-emerald-500/20 transition-all group"
+					>
+						<div
+							class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform"
+						>
+							<BarChart3 className="text-emerald-400" size={28} />
+						</div>
+						<h3 class="text-xl font-bold mb-4 uppercase">Analytics IA</h3>
+						<p class="text-slate-400 text-sm leading-relaxed mb-6">
+							Descubre qué platos son los más vistos y cuáles atraen más pedidos
+							con nuestro panel inteligente.
+						</p>
+						<ul class="space-y-3">
+							<li
+								class="flex items-center gap-2 text-[10px] font-black uppercase text-emerald-500/80 tracking-widest"
+							>
+								<CheckCircle2 size={14} /> Conteo de Vistas
+							</li>
+							<li
+								class="flex items-center gap-2 text-[10px] font-black uppercase text-emerald-500/80 tracking-widest"
+							>
+								<CheckCircle2 size={14} /> Reportes Semanales
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Glassmorphism Promotion Section -->
+		<section class="py-24 relative overflow-hidden">
+			<div class="max-w-7xl mx-auto px-6">
+				<div
+					class="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-8 md:p-20 overflow-hidden"
+				>
+					<div
+						class="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/5 -skew-x-12 translate-x-1/2"
+					>
+					</div>
+
+					<div
+						class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10"
+					>
+						<div>
+							<h2
+								class="text-4xl md:text-5xl font-black mb-8 leading-tight tracking-tight uppercase italic"
+							>
+								Ahorra miles de pesos <br />en <span class="text-emerald-400"
+									>impresión.</span
+								>
+							</h2>
+							<p class="text-slate-400 mb-10 leading-relaxed font-medium">
+								¿Cambiaste un precio? ¿Se agotó un ingrediente? Ya no tienes que
+								tachar el menú o volver a imprimir. Cambia todo en un clic desde
+								tu celular y ahorra en papel cada mes.
+							</p>
+
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+								<div class="flex items-center gap-4">
+									<div
+										class="p-3 bg-red-400/10 rounded-xl text-red-400 line-through"
+									>
+										<CreditCard size={24} />
+									</div>
+									<span
+										class="text-xs font-bold uppercase tracking-widest text-slate-500"
+										>Mantenimiento Caro</span
+									>
+								</div>
+								<div class="flex items-center gap-4">
+									<div
+										class="p-3 bg-emerald-400/10 rounded-xl text-emerald-400"
+									>
+										<Zap size={24} />
+									</div>
+									<span
+										class="text-xs font-bold uppercase tracking-widest text-emerald-400"
+										>Actualización Gratis</span
+									>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="bg-slate-900/50 p-6 rounded-3xl border border-white/5 shadow-inner"
+						>
+							<div class="space-y-4">
+								<div
+									class="p-4 bg-white/5 rounded-2xl flex items-center justify-between group cursor-default"
+								>
+									<div class="flex items-center gap-4">
+										<div
+											class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-900"
+										>
+											1
+										</div>
+										<span class="text-sm font-bold tracking-tight"
+											>Regístrate en 30 segundos</span
+										>
+									</div>
+									<CheckCircle2
+										size={20}
+										className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"
+									/>
+								</div>
+								<div
+									class="p-4 bg-white/5 rounded-2xl flex items-center justify-between group cursor-default"
+								>
+									<div class="flex items-center gap-4">
+										<div
+											class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-900"
+										>
+											2
+										</div>
+										<span class="text-sm font-bold tracking-tight"
+											>Sube tus fotos y precios</span
+										>
+									</div>
+									<CheckCircle2
+										size={20}
+										className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"
+									/>
+								</div>
+								<div
+									class="p-4 bg-white/5 rounded-2xl flex items-center justify-between group cursor-default"
+								>
+									<div class="flex items-center gap-4">
+										<div
+											class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-900"
+										>
+											3
+										</div>
+										<span class="text-sm font-bold tracking-tight"
+											>¡Imprime tu QR y listo!</span
+										>
+									</div>
+									<CheckCircle2
+										size={20}
+										className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- FAQ Section -->
+		<section class="py-32">
+			<div class="max-w-4xl mx-auto px-6">
+				<h2 class="text-3xl md:text-5xl font-black text-center mb-20 uppercase">
+					Preguntas <span class="text-emerald-500">Frecuentes</span>
+				</h2>
+
+				<div class="space-y-6">
+					{
+						faqs.map((faq, idx) => (
+							<div class="bg-white/[0.02] border border-white/5 p-8 rounded-3xl hover:bg-white/[0.04] transition-all">
+								<h3 class="text-lg font-bold mb-3 flex items-center gap-3">
+									<MessageSquare size={18} className="text-emerald-500" />
+									{faq.q}
+								</h3>
+								<p class="text-slate-500 text-sm leading-relaxed font-medium">
+									{faq.a}
+								</p>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+
+		<!-- Final CTA -->
+		<section class="py-40 relative">
+			<div class="absolute inset-0 bg-emerald-600/5"></div>
+			<div class="max-w-7xl mx-auto px-6 text-center relative z-10">
+				<h2
+					class="text-5xl md:text-8xl font-black mb-12 tracking-tight italic uppercase"
+				>
+					Empieza <span class="text-emerald-500">Hoy</span>
+					<br />
+					Sin Costo Inicial.
+				</h2>
+				<p
+					class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-medium leading-relaxed"
+				>
+					Unete a los miles de restauranteros que ya están ahorrando tiempo y
+					dinero con el menú más tecnológico de México.
+				</p>
+
+				<div class="flex flex-col sm:flex-row gap-6 justify-center">
+					<a
+						href="/admin/register"
+						class="px-12 py-6 bg-emerald-500 text-slate-900 font-black rounded-2xl text-lg uppercase tracking-widest hover:bg-emerald-400 hover:scale-110 active:scale-95 transition-all shadow-3xl shadow-emerald-500/40"
+					>
+						Crear Menú Gratis Ahora
+					</a>
+				</div>
+
+				<div
+					class="mt-16 flex justify-center gap-12 items-center opacity-40 grayscale"
+				>
+					<Clock size={24} />
+					<CreditCard size={24} />
+					<Search size={24} />
+					<Star size={24} />
+				</div>
+			</div>
+		</section>
+	</div>
+</DefaultLayout>
+
+<style>
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	.animate-fade-in {
+		animation: fade-in 1s ease-out forwards;
+	}
+
+	/* Custom scrollbar for better look */
+	::-webkit-scrollbar {
+		width: 10px;
+	}
+	::-webkit-scrollbar-track {
+		background: #0a0f0d;
+	}
+	::-webkit-scrollbar-thumb {
+		background: #1a2520;
+		border-radius: 10px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: #10b981;
+	}
+</style>

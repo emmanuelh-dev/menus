@@ -567,7 +567,7 @@ export default function CartManager({
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setShowCart(!showCart)}
-          className="relative bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105"
+          className="relative bg-red-600 hover:bg-red-700 text-white p-3 rounded-full  transition-all hover:scale-105"
         >
           <ShoppingCart className="w-5 h-5" />
           {totalItems > 0 && (
@@ -958,7 +958,7 @@ export default function CartManager({
                     <button
                       onClick={() => setActiveTab('checkout')}
                       disabled={cart.length === 0}
-                      className="flex-[2] py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-200 text-white rounded-xl font-bold transition-all shadow-lg shadow-red-100 flex items-center justify-center gap-2"
+                      className="flex-[2] py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-200 text-white rounded-xl font-bold transition-all  shadow-red-100 flex items-center justify-center gap-2"
                     >
                       Siguiente
                       <Send size={16} className="rotate-45" />
@@ -992,7 +992,7 @@ export default function CartManager({
                       <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
-                        <Send size={20} />
+                        <Send size={20} className="pointer-events-none" />
                         Confirmar Pedido
                       </>
                     )}
@@ -1045,7 +1045,7 @@ export default function CartManager({
                             <button
                               key={val}
                               onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white shadow-lg' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
+                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white ' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
                             >
                               <span>{val}</span>
                               {opt.prices?.[val] && (

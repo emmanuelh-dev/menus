@@ -43,11 +43,11 @@ interface Category {
   menu_items?: MenuItem[];
 }
 
-export default function MenuLoader({ 
-  menuSlug, 
+export default function MenuLoader({
+  menuSlug,
   categoryColors = [
     "text-orange-500",
-    "text-cyan-400", 
+    "text-cyan-400",
     "text-red-500",
     "text-purple-500",
     "text-green-400",
@@ -56,7 +56,7 @@ export default function MenuLoader({
     "text-yellow-500",
     "text-black -500",
     "text-teal-500"
-  ], 
+  ],
   whatsappPhone,
   restaurantName,
   layout = "simple",
@@ -78,7 +78,7 @@ export default function MenuLoader({
   async function loadMenuData() {
     try {
       setIsLoading(true);
-      
+
       const { data: restaurant, error: restaurantError } = await supabase
         .from("places")
         .select("*")
@@ -169,7 +169,7 @@ export default function MenuLoader({
   return (
     <>
       {modalImage && (
-        <div 
+        <div
           className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
           onClick={closeImageModal}
         >
@@ -207,7 +207,7 @@ export default function MenuLoader({
                   </div>
                 </div>
               </div>
-              
+
               {category.menu_items
                 ?.filter((item: MenuItem) => item.is_active)
                 ?.sort((a: MenuItem, b: MenuItem) => a.display_order - b.display_order)
@@ -272,7 +272,7 @@ export default function MenuLoader({
                     <img
                       src={category.image}
                       alt={`Menú ${category.name}`}
-                      className="w-full h-auto md:rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                      className="w-full h-auto md:rounded-lg  cursor-pointer hover:opacity-90 transition-opacity"
                       onClick={() => openImageModal(category.image!, `Menú ${category.name}`)}
                     />
                   </div>
@@ -297,7 +297,7 @@ export default function MenuLoader({
                       <img
                         src={category.image}
                         alt={`Categoría ${category.name}`}
-                        className="w-full h-64 object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                        className="w-full h-64 object-cover rounded-lg  cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => openImageModal(category.image!, `Categoría ${category.name}`)}
                       />
                     </div>
@@ -309,7 +309,7 @@ export default function MenuLoader({
                         .filter((item) => item.is_active)
                         .sort((a, b) => a.display_order - b.display_order)
                         .map((item) => (
-                          <div key={item.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105">
+                          <div key={item.id} className="bg-white rounded-xl  hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105">
                             {item.image && (
                               <div className="h-64 overflow-hidden relative">
                                 <img
@@ -319,7 +319,7 @@ export default function MenuLoader({
                                   onClick={() => openImageModal(item.image!, item.name)}
                                 />
                                 {item.is_featured && (
-                                  <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                                  <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold ">
                                     ⭐ Destacado
                                   </div>
                                 )}
@@ -449,12 +449,12 @@ export default function MenuLoader({
       {showWhatsApp && whatsappPhone && (
         <WhatsappButton phone={whatsappPhone} />
       )}
-      
+
       {showRecommendation && (
-        <RecommendationButton 
-          menuItems={menuItemsForAI} 
-          menuText={null} 
-          restaurantName={restaurantName} 
+        <RecommendationButton
+          menuItems={menuItemsForAI}
+          menuText={null}
+          restaurantName={restaurantName}
         />
       )}
     </>

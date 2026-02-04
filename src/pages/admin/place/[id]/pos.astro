@@ -1,0 +1,22 @@
+---
+export const prerender = false;
+import PlaceAdminLayout from "../../../../layouts/PlaceAdminLayout.astro";
+import TablePOS from "../../../../components/admin/TablePOS";
+import { supabase } from "../../../../lib/supabase";
+
+const { id } = Astro.params;
+
+const { data: place, error } = await supabase
+	.from("places")
+	.select("*")
+	.eq("id", id)
+	.single();
+
+if (error || !place) {
+	return Astro.redirect("/admin");
+}
+---
+
+<PlaceAdminLayout title={`Tactil POS - ${place.name}`} placeId={id!}>
+	<TablePOS placeId={Number(id)} client:load />
+</PlaceAdminLayout>

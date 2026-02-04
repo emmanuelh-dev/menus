@@ -14,15 +14,8 @@ function generateSEOTitle(
 	place: Place,
 	year: number = new Date().getFullYear(),
 ): string {
-	const semantic_data = place.content?.semantic_data || {};
-
-	const jacuzzi = hasAmenity("Jacuzzi", place.amenities) ? " con Jacuzzi" : "";
-	const price = semantic_data.price_range
-		? ` desde ${semantic_data.price_range}`
-		: "";
 	const city = place.states?.name || "Monterrey";
-
-	return `${place.name}${jacuzzi} en ${city}${price} | Opiniones y Precios ${year}`;
+	return `${place.name} | ¿Cuánto cuesta? Precios, Habitaciones y Opiniones ${year}${city ? ` en ${city}` : ""}`;
 }
 
 function generateSEODescription(place: Place, description?: string): string {
