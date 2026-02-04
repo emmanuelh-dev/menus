@@ -49,6 +49,14 @@ export function useAIChat({ placeId, currentBlocks, currentSemanticData, onConte
     scrollToBottom();
 
     try {
+      console.log('🚀 Sending to AI:', {
+        placeId,
+        instruction: finalMsg,
+        imagesCount: aiFiles.length,
+        blocksCount: currentBlocks.length,
+        totalItems: currentBlocks.reduce((acc, b: any) => acc + (b.data?.items?.length || 0), 0)
+      });
+
       const response = await fetch('/api/ai/update-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,6 +75,8 @@ export function useAIChat({ placeId, currentBlocks, currentSemanticData, onConte
         if (result.preview) {
           setPendingContent(result.content);
           setAiStats(result.stats);
+
+          console.log('📊 Setting message with stats:', result.stats);
 
           setChatMessages(prev => [...prev, {
             role: 'assistant',

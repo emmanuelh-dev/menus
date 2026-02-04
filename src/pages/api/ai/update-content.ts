@@ -223,16 +223,24 @@ export const POST: APIRoute = async ({ request }) => {
     const contentChanged = JSON.stringify(currentContent.blocks) !== JSON.stringify(newContent.blocks) || 
                            JSON.stringify(currentContent.semantic_data) !== JSON.stringify(newContent.semantic_data);
 
+    console.log('📝 Content change detection:');
+    console.log('  - contentChanged:', contentChanged);
+    console.log('  - has change_summary:', !!aiResponse.change_summary);
+    console.log('  - blocks count before:', currentContent.blocks?.length || 0);
+    console.log('  - blocks count after:', newContent.blocks?.length || 0);
+
     if (preview) {
       // Si no hay cambios y es una pregunta/conversación, no mandamos el flag de preview de contenido
-      const isPurelyConversational = !contentChanged || !aiResponse.change_summary;
+      const isPurelyConversational = !contentChanged && !aiResponse.change_summary;
+      
+      console.log('  - isPurelyConversational:', isPurelyConversational);
 
       return new Response(JSON.stringify({ 
         success: true, 
         preview: !isPurelyConversational,
         stats: isPurelyConversational ? null : {
           ...stats,
-          summary: aiResponse.change_summary
+          change_summary: aiResponse.change_summary
         },
         conversational_response: aiResponse.conversational_response,
         content: isPurelyConversational ? currentContent : newContent

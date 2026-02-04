@@ -40,6 +40,8 @@ import { useState, useRef, useEffect } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 import MotelPageRenderer from '../MotelPageRenderer';
+import AIChat from './AIChat';
+import GalleryManager from './GalleryManager';
 import AdminPageHeader from './AdminPageHeader';
 import {
   PiPlus,
@@ -139,7 +141,7 @@ interface SectionData {
 }
 
 interface GalleryData {
-  images: { src: string; alt?: string; title?: string }[];
+  images: { src: string; alt?: string; title?: string; description?: string }[];
 }
 
 
@@ -364,6 +366,92 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     }
   };
 
+  const deleteFromMediaLibrary = async (urlToDelete: string) => {
+    if (!confirm('¿Seguro que quieres eliminar esta imagen? Se eliminará de la biblioteca y de todo el contenido donde aparezca.')) {
+      return;
+    }
+
+    // Remover de mediaLibrary
+    const updatedLibrary = mediaLibrary.filter(u => u !== urlToDelete);
+    setMediaLibrary(updatedLibrary);
+
+    // Remover de todos los bloques
+    const updatedBlocks = blocks.map(block => {
+      if (!block.data) return block;
+
+      if (block.type === 'section') {
+        return {
+          ...block,
+          data: {
+            ...block.data,
+            image: block.data.image === urlToDelete ? '' : block.data.image,
+            items: block.data.items?.map((item: ItemData) => ({
+              ...item,
+              image: item.image === urlToDelete ? '' : item.image,
+              gallery: item.gallery?.filter(img => img.src !== urlToDelete)
+            }))
+          }
+        };
+      } else if (block.type === 'gallery') {
+        return {
+          ...block,
+          data: {
+            ...block.data,
+            images: block.data.images?.filter((img: any) => img.src !== urlToDelete)
+          }
+        };
+      } else if (block.type === 'image') {
+        return {
+          ...block,
+          data: {
+            ...block.data,
+            src: block.data.src === urlToDelete ? '' : block.data.src
+          }
+        };
+      } else if (block.type === 'carrusel') {
+        return {
+          ...block,
+          data: {
+            ...block.data,
+            items: block.data.items?.filter((item: any) => item.src !== urlToDelete)
+          }
+        };
+      }
+      return block;
+    });
+
+    setBlocks(updatedBlocks);
+
+    // Guardar inmediatamente
+    try {
+      const response = await fetch(`/api/restaurants/${placeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: {
+            semantic_data: semanticData,
+            blocks: updatedBlocks,
+            view_settings: viewSettings,
+            media_library: updatedLibrary
+          }
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Error al eliminar imagen');
+        // Restaurar si falló
+        setMediaLibrary(mediaLibrary);
+        setBlocks(blocks);
+        alert('Error al eliminar la imagen');
+      }
+    } catch (err) {
+      console.error(err);
+      setMediaLibrary(mediaLibrary);
+      setBlocks(blocks);
+      alert('Error al eliminar la imagen');
+    }
+  };
+
   const normalizeTitle = (title: string) => {
     return title
       .toLowerCase()
@@ -541,7 +629,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       case 'section':
         return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       case 'gallery':
-        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
+        return (
+          <GalleryManager
+            images={block.data.images || []}
+            onChange={(images) => updateBlock(index, { ...block.data, images })}
+            existingImages={existingImages}
+            onUploadToLibrary={onUploadToLibrary}
+          />
+        );
       case 'carrusel':
         return <CarruselBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       default:
@@ -553,7 +648,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     <div className=" pb-32">
       <AdminPageHeader
         leftContent={
-          <div className="flex bg-white/50 rounded-xl items-center gap-0.5 border border-gray-200 shadow-sm w-full items-center justify-center">
+          <div className="flex bg-white/50 rounded-xl gap-0.5 border border-gray-200 shadow-sm w-full items-center justify-center">
             <button
               onClick={() => setActiveTab('info')}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'info' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
@@ -1015,180 +1110,17 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             )}
           </div>
 
-          {showAIChat && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12 animate-in fade-in duration-300">
-              <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onClick={() => setShowAIChat(false)} />
-
-              <div className="relative w-full max-w-4xl h-[85vh] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-white/20">
-                {/* Header */}
-                <div className="p-5 border-b flex items-center justify-between bg-white shrink-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center  shadow-purple-200">
-                      <PiSparkle className="w-6 h-6 text-white pointer-events-none" />
-                    </div>
-                    <div>
-                      <h2 className="text-base font-black uppercase tracking-tight leading-none text-gray-900">Asistente BysMax <span className="text-purple-600">IA</span></h2>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">En línea • Especialista en {placeType === 'motel' ? 'Moteles' : 'Restaurantes'}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowAIChat(false)}
-                    className="p-2.5 hover:bg-gray-100 rounded-full transition-all active:scale-90"
-                  >
-                    <PiX className="w-5 h-5 text-gray-400 pointer-events-none" />
-                  </button>
-                </div>
-
-                {/* Chat History */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
-                  {chatMessages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
-                      <div className={`max-w-[85%] sm:max-w-[70%] ${msg.role === 'user' ? 'order-1' : 'order-2'}`}>
-                        <div className={`p-4 rounded-2xl shadow-sm border ${msg.role === 'user'
-                          ? 'bg-slate-900 text-white border-slate-800 rounded-tr-none'
-                          : 'bg-white text-gray-800 border-gray-100 rounded-tl-none'
-                          }`}>
-                          <p className={`text-sm leading-relaxed ${msg.role === 'user' ? 'font-medium' : 'font-normal'}`}>
-                            {msg.content}
-                          </p>
-
-                          {/* AI Stats / Pending Changes Card */}
-                          {msg.role === 'assistant' && msg.stats && (
-                            <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
-                              {/* Detailed Change Summary */}
-                              {msg.stats.change_summary && (
-                                <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
-                                  <p className="text-[9px] text-purple-600 uppercase font-bold mb-2 flex items-center gap-1">
-                                    <PiSparkle className="w-3 h-3" />
-                                    Cambios Detectados
-                                  </p>
-                                  <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
-                                    {msg.stats.change_summary}
-                                  </p>
-                                </div>
-                              )}
-
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                  <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Secciones</p>
-                                  <p className="text-lg font-black text-gray-900">{msg.stats.sections}</p>
-                                </div>
-                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                  <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Productos</p>
-                                  <p className="text-lg font-black text-gray-900">{msg.stats.items}</p>
-                                </div>
-                              </div>
-
-                              <button
-                                onClick={confirmAiChanges}
-                                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all  shadow-purple-100 flex items-center justify-center gap-2"
-                              >
-                                {aiProcessing ? <PiArrowCounterClockwise className="w-4 h-4 animate-spin pointer-events-none" /> : <PiCheckCircle className="w-4 h-4 pointer-events-none" />}
-                                Aplicar estos cambios
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Loading Indicator */}
-                  {aiProcessing && (
-                    <div className="flex justify-start animate-in slide-in-from-bottom-2 duration-300">
-                      <div className="max-w-[85%] sm:max-w-[70%]">
-                        <div className="p-4 rounded-2xl bg-white border border-gray-100 rounded-tl-none">
-                          <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                            <span className="text-xs text-gray-500 font-medium ml-2">Procesando con IA...</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div ref={chatEndRef} />
-                </div>
-
-                {/* Input Area */}
-                <div className="p-5 bg-white border-t shrink-0">
-                  {aiFiles.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                      {aiFiles.map((file, idx) => (
-                        <div key={idx} className="group relative transition-all hover:scale-105">
-                          <img
-                            src={file.data}
-                            alt={file.name}
-                            className="w-14 h-14 object-cover rounded-xl border border-gray-200 shadow-sm"
-                          />
-                          <button
-                            onClick={() => removeAiFile(idx)}
-                            className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-1 shadow-md z-10 hover:bg-red-600"
-                          >
-                            <PiX size={10} className="pointer-events-none" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="relative group transition-all">
-                    <textarea
-                      className="w-full p-4 pr-16 text-sm bg-gray-50 rounded-2xl border-2 border-transparent focus:border-purple-500 focus:bg-white outline-none resize-none transition-all placeholder:text-gray-400 font-medium min-h-[50px] max-h-[150px]"
-                      placeholder="Escribe algo... o pega una imagen del menú"
-                      rows={1}
-                      onPaste={handlePaste}
-                      value={textInput}
-                      onChange={(e) => setTextInput(e.target.value)}
-                      disabled={aiProcessing}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          analyzeMenuWithAI();
-                        }
-                      }}
-                    />
-
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
-                        title="Adjuntar imagen"
-                      >
-                        <PiPaperclip className="w-5 h-5" />
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          multiple
-                          className="hidden"
-                          onChange={handleAIImagesUpload}
-                          accept="image/*"
-                        />
-                      </button>
-                      <button
-                        onClick={analyzeMenuWithAI}
-                        disabled={aiProcessing || (!textInput.trim() && aiFiles.length === 0)}
-                        className={`p-2.5 rounded-xl transition-all ${aiProcessing || (!textInput.trim() && aiFiles.length === 0)
-                          ? 'text-gray-200'
-                          : 'bg-purple-600 text-white  shadow-purple-200 hover:bg-purple-700 active:scale-90'
-                          }`}
-                      >
-                        {aiProcessing ? <PiArrowCounterClockwise className="w-5 h-5" /> : <PiPaperPlaneTilt className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-center text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-3">
-                    Presiona Enter para enviar • Shift + Enter para salto de línea
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+          <AIChat
+            placeId={placeId}
+            currentBlocks={blocks}
+            currentSemanticData={semanticData}
+            onContentUpdate={(newBlocks, newSemanticData) => {
+              setBlocks(newBlocks);
+              setSemanticData(newSemanticData);
+            }}
+            isOpen={showAIChat}
+            onClose={() => setShowAIChat(false)}
+          />
 
           <div className="hidden xl:block mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
             <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
@@ -1330,11 +1262,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         <PiCopy className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm('¿Seguro que quieres eliminar esta imagen de la biblioteca? Dejará de aparecer en los selectores.')) {
-                            setMediaLibrary(prev => prev.filter(u => u !== url));
-                          }
-                        }}
+                        onClick={() => deleteFromMediaLibrary(url)}
                         className="p-2.5 bg-red-600 rounded-xl text-white hover:bg-red-700  active:scale-95 transition-all"
                         title="Eliminar de la biblioteca"
                       >
