@@ -1,6 +1,6 @@
 ---
 import QRGenerator from "../components/QRGenerator.tsx";
-import { QrCode, Check, Zap, Shield } from "lucide-react";
+import { QrCode, Check, Zap, Shield, Palette } from "lucide-react";
 import DefaultLayout from "../layouts/DefaultLayout.astro";
 
 const seoData = {
@@ -66,81 +66,173 @@ const qrSchema = {
 					<!-- Features -->
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
 						<div
-							class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+							class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
 						>
 							<div
-								class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4"
+								class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-6"
 							>
-								<Zap className="w-5 h-5" />
+								<Zap className="w-6 h-6" />
 							</div>
-							<h3 class="font-bold text-slate-900 mb-2">Para Siempre</h3>
-							<p class="text-slate-500 text-sm">
+							<h3 class="font-bold text-slate-900 mb-3 text-lg">
+								Para Siempre
+							</h3>
+							<p class="text-slate-500 text-sm leading-relaxed">
 								Tu código QR nunca caduca. Úsalo todo el tiempo que quieras
-								totalmente gratis.
+								totalmente gratis, sin suscripciones ni costos ocultos.
 							</p>
 						</div>
 						<div
-							class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+							class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
 						>
 							<div
-								class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-4"
+								class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-6"
 							>
-								<Shield className="w-5 h-5" />
+								<Shield className="w-6 h-6" />
 							</div>
-							<h3 class="font-bold text-slate-900 mb-2">Alta Calidad</h3>
-							<p class="text-slate-500 text-sm">
-								Descarga en formato PNG de alta resolución, ideal para imprimir
-								en menús o tarjetas.
+							<h3 class="font-bold text-slate-900 mb-3 text-lg">
+								Alta Calidad
+							</h3>
+							<p class="text-slate-500 text-sm leading-relaxed">
+								Descarga en formato PNG de alta resolución. Perfecto para
+								imprimir en gran formato, menús de mesa o escaparates.
 							</p>
 						</div>
 						<div
-							class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"
+							class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
 						>
 							<div
-								class="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-4"
+								class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-6"
 							>
-								<Check className="w-5 h-5" />
+								<Palette className="w-6 h-6" />
 							</div>
-							<h3 class="font-bold text-slate-900 mb-2">Personalizable</h3>
-							<p class="text-slate-500 text-sm">
-								Elige los colores que coincidan con tu marca para darle un toque
-								profesional.
+							<h3 class="font-bold text-slate-900 mb-3 text-lg">
+								Personalizable
+							</h3>
+							<p class="text-slate-500 text-sm leading-relaxed">
+								Ajusta los colores para que coincidan con la identidad visual de
+								tu marca. ¡Haz que tu QR destaque!
 							</p>
 						</div>
 					</div>
 				</div>
 			</section>
 
-			<!-- SEO Content -->
-			<section class="py-20 bg-white border-t border-slate-100">
-				<div class="max-w-3xl mx-auto px-6">
-					<h2 class="text-2xl font-bold text-slate-900 mb-6">
-						¿Qué es un código QR?
-					</h2>
-					<div class="prose prose-slate max-w-none text-slate-600">
-						<p class="mb-4">
-							Un código QR (Quick Response) es un tipo de código de barras
-							bidimensional que puede ser escaneado fácilmente usando la cámara
-							de la mayoría de los teléfonos inteligentes modernos.
-						</p>
-						<p class="mb-4">
-							Esta herramienta gratuita de BySMax te permite generar códigos QR
-							estáticos para:
-						</p>
-						<ul class="list-disc pl-5 space-y-2 mb-6">
-							<li>Menús digitales de restaurantes</li>
-							<li>Enlaces a sitios web y redes sociales</li>
-							<li>Conexiones a redes WiFi</li>
-							<li>Tarjetas de presentación digitales (vCard)</li>
-						</ul>
-						<p>
-							¿Necesitas un menú digital completo? <a
-								href="/crear-menu-digital"
-								class="text-emerald-600 font-bold hover:underline"
-								>Crea tu menú digital gratis aquí</a
-							>.
-						</p>
+			<!-- SEO Content & Guide -->
+			<section class="py-24 bg-white border-t border-slate-100">
+				<div class="max-w-4xl mx-auto px-6">
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+						<div>
+							<h2 class="text-3xl font-black text-slate-900 mb-8">
+								Cómo usar el generador QR
+							</h2>
+							<div class="space-y-8">
+								<div class="flex gap-4">
+									<div
+										class="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm"
+									>
+										1
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 mb-1">
+											Ingresa el enlace
+										</h4>
+										<p class="text-slate-500 text-sm">
+											Pega la URL de tu menú digital o sitio web en el campo de
+											texto.
+										</p>
+									</div>
+								</div>
+								<div class="flex gap-4">
+									<div
+										class="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm"
+									>
+										2
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 mb-1">
+											Elige tus colores
+										</h4>
+										<p class="text-slate-500 text-sm">
+											Personaliza el color del código y del fondo para que
+											combine con tu negocio.
+										</p>
+									</div>
+								</div>
+								<div class="flex gap-4">
+									<div
+										class="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm"
+									>
+										3
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 mb-1">
+											Descarga y usa
+										</h4>
+										<p class="text-slate-500 text-sm">
+											Haz clic en descargar y coloca tu código QR donde tus
+											clientes puedan verlo.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="bg-slate-50 p-8 rounded-[32px] border border-slate-100">
+							<h3 class="text-xl font-bold text-slate-900 mb-6">
+								Preguntas Frecuentes
+							</h3>
+							<div class="space-y-6">
+								<div>
+									<h4 class="font-bold text-sm text-slate-900 mb-2">
+										¿Es realmente gratis?
+									</h4>
+									<p class="text-xs text-slate-500">
+										Sí, no pedimos registro ni tarjeta. Generas, descargas y
+										listo.
+									</p>
+								</div>
+								<div>
+									<h4 class="font-bold text-sm text-slate-900 mb-2">
+										¿Los códigos caducan?
+									</h4>
+									<p class="text-xs text-slate-500">
+										No. Son códigos QR estáticos que duran para siempre.
+									</p>
+								</div>
+								<div>
+									<h4 class="font-bold text-sm text-slate-900 mb-2">
+										¿Necesito un menú digital?
+									</h4>
+									<p class="text-xs text-slate-500">
+										Si aún no tienes uno, puedes <a
+											href="/crear-menu-digital"
+											class="text-emerald-600 font-bold"
+											>crear tu menú digital aquí</a
+										> gratis.
+									</p>
+								</div>
+							</div>
+						</div>
 					</div>
+				</div>
+			</section>
+
+			<!-- Final CTA -->
+			<section class="py-24 bg-emerald-600">
+				<div class="max-w-4xl mx-auto px-6 text-center">
+					<h2 class="text-3xl font-black text-white mb-6">
+						¿Quieres ir más allá de un simple QR?
+					</h2>
+					<p class="text-emerald-100 mb-10 text-lg">
+						Obtén un menú digital interactivo con pedidos por WhatsApp, gestión
+						de inventario y mucho más.
+					</p>
+					<a
+						href="/admin/register"
+						class="inline-flex items-center px-8 py-4 bg-white text-emerald-600 font-bold rounded-2xl hover:bg-emerald-50 transition-all shadow-xl"
+					>
+						Crear Menú Digital Gratis
+					</a>
 				</div>
 			</section>
 		</main>

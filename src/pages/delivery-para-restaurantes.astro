@@ -1,0 +1,182 @@
+---
+import {
+	Truck,
+	Smartphone,
+	Monitor,
+	MapPin,
+	Zap,
+	Check,
+	ArrowRight,
+	MessageSquare,
+	Clock,
+	Globe,
+} from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import { Image } from "astro:assets";
+import main_menu from "./phone_with_menu.png";
+
+const seoData = {
+	title: "Sistema de Delivery para Restaurantes | BySMax",
+	description:
+		"Gestiona tus pedidos a domicilio sin depender de terceros. Crea tu propia tienda online, recibe pedidos por WhatsApp y coordina tus repartidores.",
+	keywords:
+		"delivery para restaurantes, sistema de pedidos a domicilio, software para entregas domicilio, pedidos online restaurante, repartidores propios restaurante",
+};
+
+const features = [
+	{
+		title: "Tu Propia Tienda Online",
+		description:
+			"Vende directamente sin pagar comisiones excesivas a apps de terceros.",
+		items: [
+			"Menú Digital Interactivo",
+			"Pagos Online con Tarjeta",
+			"Sincronización de Precios",
+			"Personalización de Marca",
+		],
+		icon: Globe,
+		color: "text-emerald-600",
+		bgColor: "bg-emerald-50",
+	},
+	{
+		title: "Pedidos por WhatsApp",
+		description:
+			"Convierte tus chats en ventas reales con carritos de compra integrados.",
+		items: [
+			"Formulario de Pedido Automático",
+			"Ubicación por GPS del Cliente",
+			"Confirmación Instantánea",
+			"Historial de Conversaciones",
+		],
+		icon: MessageSquare,
+		color: "text-green-600",
+		bgColor: "bg-green-50",
+	},
+	{
+		title: "Gestión de Repartidores",
+		description:
+			"Asigna pedidos y conoce el estado de tus entregas en tiempo real.",
+		items: [
+			"Panel de Control de Envíos",
+			"Cálculo Automático de Distancias",
+			"Tiempos de Entrega Estimados",
+			"Reporte de Eficiencia",
+		],
+		icon: Truck,
+		color: "text-blue-600",
+		bgColor: "bg-blue-50",
+	},
+];
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<main class="flex-1">
+		<!-- Hero Section -->
+		<section class="relative py-20 lg:py-32 overflow-hidden bg-white">
+			<div class="max-w-7xl mx-auto px-6 relative">
+				<div class="flex flex-col lg:flex-row items-center gap-16">
+					<div class="flex-1 text-center lg:text-left">
+						<div
+							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 mb-6"
+						>
+							<span
+								class="text-xs font-bold text-emerald-800 uppercase tracking-wider"
+								>GANA MÁS CON REPARTO PROPIO</span
+							>
+						</div>
+
+						<h1
+							class="text-5xl lg:text-7xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight"
+						>
+							Delivery para <br />
+							<span
+								class="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent"
+								>Restaurantes.</span
+							>
+						</h1>
+
+						<p
+							class="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+						>
+							Libérate de las comisiones altas. Toma el control total de tus
+							pedidos a domicilio y fideliza a tus clientes.
+						</p>
+
+						<div
+							class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+						>
+							<a
+								href="/admin/register"
+								class="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
+							>
+								Crear Mi Tienda Online
+								<ArrowRight
+									className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform"
+								/>
+							</a>
+						</div>
+					</div>
+
+					<div class="flex-1 relative w-full max-w-2xl">
+						<div
+							class="absolute -inset-4 bg-gradient-to-tr from-emerald-500/10 to-green-500/10 blur-3xl rounded-full"
+						>
+						</div>
+						<div
+							class="relative bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+						>
+							<Image
+								src={main_menu}
+								alt="Delivery Management System"
+								class="w-full h-auto"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Features -->
+		<section class="py-24 bg-slate-50">
+			<div class="max-w-7xl mx-auto px-6">
+				<h2
+					class="text-3xl lg:text-5xl font-black text-slate-900 mb-20 text-center"
+				>
+					Todo bajo tu control
+				</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					{
+						features.map((f) => (
+							<div class="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+								<div
+									class={`w-14 h-14 ${f.bgColor} ${f.color} rounded-2xl flex items-center justify-center mb-8`}
+								>
+									<f.icon className="w-7 h-7" />
+								</div>
+								<h3 class="text-2xl font-bold text-slate-900 mb-4">
+									{f.title}
+								</h3>
+								<p class="text-slate-600 mb-8 text-sm leading-relaxed">
+									{f.description}
+								</p>
+								<ul class="space-y-3">
+									{f.items.map((item) => (
+										<li class="flex items-center gap-3 text-sm font-medium text-slate-700">
+											<Check className="w-4 h-4 text-emerald-500" />
+											{item}
+										</li>
+									))}
+								</ul>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+	</main>
+</DefaultLayout>

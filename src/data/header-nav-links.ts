@@ -1,47 +1,129 @@
 export const navItems = [
-    { name: "Crear Menú", href: "/crear-menu-digital" },
-    { name: "Pedidos WhatsApp", href: "/pedidos-whatsapp" },
-    { name: "Generador QR", href: "/generador-qr" },
-    { name: "Precios", href: "/precios" },
     { name: "Menús", href: "/menus" },
     { name: "Blog", href: "/blog" },
+    { name: "Precios", href: "/precios" },
+    { name: "Software para Restaurantes", href: "/software-para-restaurantes" },
+    { name: "Punto de Venta", href: "/punto-de-venta-restaurantes" },
+    { name: "Delivery", href: "/delivery-para-restaurantes" },
+    { name: "Comidas Rápidas", href: "/software-comida-rapida" },
+    { name: "Sistema de Comandas", href: "/sistema-comandas-restaurantes" },
+    { name: "Generador QR", href: "/generador-qr" },
+    { name: "Pedidos WhatsApp", href: "/pedidos-whatsapp" },
     { name: "Moteles", href: "/moteles" },
     { name: "Contacto", href: "/contact" },
-    { name: "Ingresa", href: "/admin/login" }, 
+];
+
+export const platformLinks = [
+    { 
+        name: "Software para Restaurantes", 
+        href: "/software-para-restaurantes",
+        description: "Gestión integral: inventarios, ventas y personal.",
+        icon: "Utensils"
+    },
+    { 
+        name: "Punto de Venta (POS)", 
+        href: "/punto-de-venta-restaurantes",
+        description: "Cobros rápidos y facturación electrónica.",
+        icon: "Receipt"
+    },
+    { 
+        name: "Sistema de Delivery", 
+        href: "/delivery-para-restaurantes",
+        description: "Gestiona tus propios repartidores y pedidos.",
+        icon: "Truck"
+    },
+    { 
+        name: "Sistema de Comandas", 
+        href: "/sistema-comandas-restaurantes",
+        description: "Monitor de cocina (KDS) y comandas digitales.",
+        icon: "ChefHat"
+    },
+];
+
+export const nicheLinks = [
+    { 
+        name: "Comida Rápida", 
+        href: "/software-comida-rapida",
+        description: "Pizzerías, hamburgueserías y dark kitchens.",
+        icon: "Zap"
+    },
+    { 
+        name: "Bares y Cantinas", 
+        href: "/bares",
+        description: "Control de botellas, copeo y cuentas abiertas.",
+        icon: "Wine"
+    },
+    { 
+        name: "Cafeterías", 
+        href: "/cafeterias",
+        description: "Atención rápida y gestión de mesa/barra.",
+        icon: "Coffee"
+    },
+    { 
+        name: "Restaurante de Espadas", 
+        href: "/espadas",
+        description: "Servicio de buffet y rotación de personal.",
+        icon: "Flame"
+    },
+    { 
+        name: "Pizzerías y Burgers", 
+        href: "/software-comida-rapida",
+        description: "Venta rápida y gestión de combos.",
+        icon: "Pizza"
+    },
+    { 
+        name: "Sushi y Comida Asiática", 
+        href: "/software-para-restaurantes",
+        description: "Control de insumos frescos y pedidos.",
+        icon: "Fish"
+    },
+];
+
+export const toolLinks = [
+    { 
+        name: "Menú Digital QR", 
+        href: "/crear-menu-digital",
+        description: "Carta interactiva sin contacto para tus clientes.",
+        icon: "QrCode"
+    },
+    { 
+        name: "Pedidos por WhatsApp", 
+        href: "/pedidos-whatsapp",
+        description: "Recibe carritos de compra directo en tu chat.",
+        icon: "MessageSquare"
+    },
+    { 
+        name: "Generador de Códigos QR", 
+        href: "/generador-qr",
+        description: "Herramienta gratuita de personalización.",
+        icon: "Link"
+    },
+];
+
+export const exploreLinks = [
+    { name: "Directorio Global", href: "/menus", icon: "Search" },
+    { name: "Blog de Noticias", href: "/blog", icon: "BookOpen" },
+    { name: "Guía de Moteles", href: "/moteles", icon: "Bed" },
+    { name: "Monterrey, N.L.", href: "/moteles/estados/nuevo-leon", icon: "MapPin" },
+    { name: "Guadalajara, Jal.", href: "/moteles/estados/jalisco", icon: "MapPin" },
+    { name: "Planes y Precios", href: "/precios", icon: "CreditCard" },
 ];
 
 export const navCategories = [
     {
-        title: "Plataforma",
-        items: [
-            { name: "Software para restaurantes", href: "/software-para-restaurantes" },
-            { name: "Precios", href: "/precios" },
-            { name: "Menús", href: "/menus" },
-            { name: "Blog", href: "/blog" },
-        ]
+        title: "Soluciones de Gestión",
+        items: platformLinks
     },
     {
-        title: "Categorías",
-        items: [
-            { name: "Cafeterías", href: "/cafeterias" },
-            { name: "Espadas", href: "/espadas" },
-            { name: "Moteles", href: "/moteles" },
-        ]
+        title: "Especialidades",
+        items: nicheLinks
     },
     {
-        title: "Herramientas",
-        items: [
-            { name: "Generador de códigos QR", href: "/generador-qr" },
-            { name: "Pedidos por whatsapp", href: "/pedidos-whatsapp" },
-            {name : "Crear menu digital", href: "/crear-menu-digital"}
-        ]
+        title: "Herramientas de Venta",
+        items: toolLinks
     },
     {
-        title: "Social & Soporte",
-        items: [
-            { name: "Instagram", href: "https://www.instagram.com/larutadelostragones/" },
-            { name: "Contacto", href: "/contact" },
-            { name: "Ingresa", href: "/admin/login" },
-        ]
+        title: "Recursos",
+        items: exploreLinks
     }
 ];

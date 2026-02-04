@@ -1,0 +1,247 @@
+---
+import {
+	ShoppingCart,
+	Smartphone,
+	Monitor,
+	CreditCard,
+	Zap,
+	Check,
+	ArrowRight,
+	Star,
+	Utensils,
+	BarChart3,
+	Printer,
+} from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import { Image } from "astro:assets";
+import main_menu from "./phone_with_menu.png";
+
+const seoData = {
+	title: "Sistema Punto de Venta (POS) para Restaurantes | BySMax",
+	description:
+		"El mejor sistema punto de venta para tu restaurante. Cobros rápidos, integración con tarjetas, facturación electrónica y reportes en tiempo real.",
+	keywords:
+		"punto de venta restaurante, pos restaurantes, sistema de cobro restaurante, software tpv restaurante, mejor pos para restaurantes",
+};
+
+const features = [
+	{
+		title: "Cobros Ultra Rápidos",
+		description:
+			"Interfaz optimizada para procesar órdenes en segundos sin errores.",
+		items: [
+			"Compatibilidad con Pantallas Táctiles",
+			"Múltiples Métodos de Pago",
+			"Facturación Electrónica Instantánea",
+			"División de Cuentas (Split Bill)",
+		],
+		icon: ShoppingCart,
+		color: "text-blue-600",
+		bgColor: "bg-blue-50",
+	},
+	{
+		title: "Control Total en Caja",
+		description:
+			"Gestiona aperturas, cierres y arqueos con total transparencia.",
+		items: [
+			"Apertura y Cierre de Caja",
+			"Reporte de Ventas por Turno",
+			"Control de Entradas y Salidas",
+			"Alertas de Variaciones",
+		],
+		icon: BarChart3,
+		color: "text-emerald-600",
+		bgColor: "bg-emerald-50",
+	},
+	{
+		title: "Hardware Compatible",
+		description:
+			"BySMax funciona con el equipo que ya tienes o hardware de última generación.",
+		items: [
+			"Impresoras Térmicas",
+			"Lectores de Código de Barras",
+			"Cajones Monederos",
+			"Terminales Bancarias",
+		],
+		icon: Printer,
+		color: "text-purple-600",
+		bgColor: "bg-purple-50",
+	},
+];
+
+const advantages = [
+	{
+		title: "Multi-dispositivo",
+		desc: "Usa tu tablet, PC o celular como punto de venta sin pagar licencias extra.",
+		icon: "📱",
+	},
+	{
+		title: "Trabaja Offline",
+		desc: "Sigue vendiendo incluso si internet falla. Los datos se sincronizan al volver.",
+		icon: "⚡",
+	},
+	{
+		title: "Nube Segura",
+		desc: "Accede a tus datos de ventas desde cualquier parte del mundo en tiempo real.",
+		icon: "☁️",
+	},
+];
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<main class="flex-1">
+		<!-- Hero Section -->
+		<section class="relative py-20 lg:py-32 overflow-hidden bg-white">
+			<div
+				class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"
+			>
+			</div>
+
+			<div class="max-width-7xl mx-auto px-6 relative">
+				<div class="flex flex-col lg:flex-row items-center gap-16">
+					<div class="flex-1 text-center lg:text-left">
+						<div
+							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-6"
+						>
+							<span
+								class="text-xs font-bold text-blue-800 uppercase tracking-wider"
+								>SISTEMA POS PROFESIONAL</span
+							>
+						</div>
+
+						<h1
+							class="text-5xl lg:text-7xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight"
+						>
+							Punto de Venta <br />
+							<span
+								class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+								>para Restaurantes.</span
+							>
+						</h1>
+
+						<p
+							class="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+						>
+							Agiliza el cobro, elimina filas y mantén el control total de tu
+							dinero con el POS más intuitivo del mercado.
+						</p>
+
+						<div
+							class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+						>
+							<a
+								href="/admin/register"
+								class="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
+							>
+								Comenzar Ahora
+								<ArrowRight
+									className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform"
+								/>
+							</a>
+							<div
+								class="flex flex-col items-center lg:items-start justify-center px-4"
+							>
+								<span class="text-sm font-bold text-slate-900"
+									>Configuración en 5 min</span
+								>
+								<span class="text-xs text-slate-500"
+									>Prueba gratuita de 14 días</span
+								>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex-1 relative w-full max-w-2xl">
+						<div
+							class="absolute -inset-4 bg-gradient-to-tr from-blue-500/10 to-indigo-500/10 blur-3xl rounded-full"
+						>
+						</div>
+						<div
+							class="relative bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+						>
+							<Image
+								src={main_menu}
+								alt="POS System Interface"
+								class="w-full h-auto"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Features Grid -->
+		<section class="py-24 bg-slate-50">
+			<div class="max-w-7xl mx-auto px-6">
+				<div class="text-center max-w-3xl mx-auto mb-20">
+					<h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6">
+						Optimiza cada transacción
+					</h2>
+					<p class="text-lg text-slate-600">
+						Diseñado para soportar el alto tráfico de horas pico sin retrasos.
+					</p>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					{
+						features.map((f) => (
+							<div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 group">
+								<div
+									class={`w-14 h-14 ${f.bgColor} ${f.color} rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform`}
+								>
+									<f.icon className="w-7 h-7" />
+								</div>
+								<h3 class="text-2xl font-bold text-slate-900 mb-4">
+									{f.title}
+								</h3>
+								<p class="text-slate-600 mb-8">{f.description}</p>
+								<ul class="space-y-3">
+									{f.items.map((item) => (
+										<li class="flex items-center gap-3 text-sm font-medium text-slate-700">
+											<Check className="w-4 h-4 text-emerald-500" />
+											{item}
+										</li>
+									))}
+								</ul>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+
+		<!-- Final CTA -->
+		<section class="py-24">
+			<div class="max-w-5xl mx-auto px-6">
+				<div
+					class="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-[48px] p-12 lg:p-20 text-center relative overflow-hidden shadow-2xl"
+				>
+					<h2 class="text-3xl lg:text-6xl font-black text-white mb-8 relative">
+						Lleva tu caja al siguiente nivel
+					</h2>
+					<p
+						class="text-xl text-blue-100/70 mb-12 max-w-2xl mx-auto relative leading-relaxed"
+					>
+						Elimina el caos en el mostrador y ten claridad absoluta sobre tus
+						ingresos.
+					</p>
+					<div
+						class="flex flex-col sm:flex-row items-center justify-center gap-6 relative"
+					>
+						<a
+							href="/admin/register"
+							class="inline-flex items-center px-10 py-5 bg-white text-blue-900 font-black rounded-2xl hover:bg-blue-50 transition-all text-lg shadow-xl"
+						>
+							Probar POS Gratis
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+</DefaultLayout>

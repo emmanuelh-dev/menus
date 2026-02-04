@@ -1,0 +1,170 @@
+---
+import {
+	ChefHat,
+	Users,
+	Smartphone,
+	Monitor,
+	Zap,
+	Check,
+	ArrowRight,
+	Bell,
+	UtensilsCrossed,
+	ClipboardList,
+} from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import { Image } from "astro:assets";
+import main_menu from "./phone_with_menu.png";
+
+const seoData = {
+	title: "Sistema de Comandas Digital para Restaurantes | BySMax",
+	description:
+		"Digitaliza tu cocina con el sistema de comandas BySMax. Mejora la comunicación entre meseros y cocina, reduce tiempos y elimina errores.",
+	keywords:
+		"sistema de comandas, comandas digitales, monitor de cocina restaurante, software para comandas, comandero digital",
+};
+
+const steps = [
+	{
+		title: "Toma de Pedido",
+		desc: "El mesero toma el pedido desde su smartphone o tablet en segundos.",
+		icon: Smartphone,
+	},
+	{
+		title: "Envío Instantáneo",
+		desc: "La comanda viaja directo a la cocina o barra sin necesidad de caminar.",
+		icon: Zap,
+	},
+	{
+		title: "Gestión en Cocina",
+		desc: "El chef visualiza pedidos en el monitor, marca estados y prioriza.",
+		icon: ChefHat,
+	},
+	{
+		title: "Entrega y Pago",
+		desc: "Cocina avisa que el plato está listo y el mesero sirve al cliente.",
+		icon: UtensilsCrossed,
+	},
+];
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<main class="flex-1">
+		<!-- Hero Section -->
+		<section
+			class="relative py-20 lg:py-32 overflow-hidden bg-slate-900 text-white"
+		>
+			<div class="max-w-7xl mx-auto px-6 relative">
+				<div class="flex flex-col lg:flex-row items-center gap-16">
+					<div class="flex-1 text-center lg:text-left">
+						<div
+							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6"
+						>
+							<span
+								class="text-xs font-bold text-emerald-400 uppercase tracking-wider"
+								>ADIÓS AL PAPEL Y LÁPIZ</span
+							>
+						</div>
+
+						<h1
+							class="text-5xl lg:text-7xl font-black mb-6 leading-[1.1] tracking-tight text-white"
+						>
+							Sistema de <br />
+							<span class="text-emerald-500">Comandas Digital.</span>
+						</h1>
+
+						<p
+							class="text-xl text-slate-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+						>
+							Sincroniza tu sala y tu cocina en tiempo real. Mejora la
+							experiencia del cliente y la eficiencia de tu personal.
+						</p>
+
+						<div
+							class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+						>
+							<a
+								href="/admin/register"
+								class="inline-flex items-center justify-center px-8 py-4 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 group"
+							>
+								Probar Monitor Gratis
+								<ArrowRight
+									className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform"
+								/>
+							</a>
+						</div>
+					</div>
+
+					<div class="flex-1 relative w-full max-w-2xl">
+						<div
+							class="relative bg-slate-800 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden p-4"
+						>
+							<div class="grid grid-cols-2 gap-4 h-64">
+								<div
+									class="bg-slate-700/50 rounded-xl p-4 border border-emerald-500/30"
+								>
+									<div class="text-[10px] font-bold text-emerald-400 mb-2">
+										MESA 05 - ACTIVA
+									</div>
+									<div class="space-y-2">
+										<div class="h-2 w-full bg-slate-600 rounded"></div>
+										<div class="h-2 w-3/4 bg-slate-600 rounded"></div>
+									</div>
+								</div>
+								<div
+									class="bg-slate-700/50 rounded-xl p-4 border border-slate-600"
+								>
+									<div class="text-[10px] font-bold text-slate-400 mb-2">
+										MESA 12 - EN PREPARACIÓN
+									</div>
+									<div class="space-y-2">
+										<div class="h-2 w-2/3 bg-slate-600 rounded"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Workflow -->
+		<section class="py-24 bg-white">
+			<div class="max-w-7xl mx-auto px-6">
+				<div class="text-center mb-20">
+					<h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6">
+						¿Cómo funciona?
+					</h2>
+					<p class="text-lg text-slate-600">
+						El flujo perfecto para que nada se pierda en el camino.
+					</p>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+					{
+						steps.map((step, idx) => (
+							<div class="relative group">
+								{idx < steps.length - 1 && (
+									<div class="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-slate-100 -z-10" />
+								)}
+								<div class="bg-white p-8 rounded-3xl border border-slate-200 text-center hover:border-emerald-500/50 transition-colors">
+									<div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+										<step.icon className="w-8 h-8" />
+									</div>
+									<h3 class="text-xl font-bold text-slate-900 mb-4">
+										{step.title}
+									</h3>
+									<p class="text-sm text-slate-500">{step.desc}</p>
+								</div>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+	</main>
+</DefaultLayout>

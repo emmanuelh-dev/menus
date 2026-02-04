@@ -1,0 +1,185 @@
+---
+import {
+	FastForward,
+	Smartphone,
+	Monitor,
+	Clock,
+	Zap,
+	Check,
+	ArrowRight,
+	ChefHat,
+	PieChart,
+	Store,
+} from "lucide-react";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import { Image } from "astro:assets";
+import main_menu from "./phone_with_menu.png";
+
+const seoData = {
+	title: "Software para Negocios de Comida Rápida | BySMax",
+	description:
+		"Optimiza tu negocio de comida rápida con BySMax. Pedidos rápidos, monitor de cocina, gestión de inventarios y ventas por WhatsApp.",
+	keywords:
+		"software comida rapida, sistema para pizzerias, software para hamburgueserias, punto de venta comida rapida, sistema de pedidos comida rapida",
+};
+
+const features = [
+	{
+		title: "Velocidad de Escándalo",
+		description:
+			"Cada segundo cuenta. Nuestra interfaz permite tomar pedidos en tiempo récord.",
+		items: [
+			"Modo Fast-Food de un toque",
+			"Combos y Modificadores automáticos",
+			"Integración con Kioscos de Auto-pedido",
+			"Pago rápido pre-configurado",
+		],
+		icon: FastForward,
+		color: "text-orange-600",
+		bgColor: "bg-orange-50",
+	},
+	{
+		title: "Monitor de Cocina (KDS)",
+		description:
+			"Elimina los tickets de papel y coordina tu cocina digitalmente.",
+		items: [
+			"Tiempos de preparación en vivo",
+			"Priorización inteligente de órdenes",
+			"Notificación de 'Pedido Listo'",
+			"Histórico de eficiencia por chef",
+		],
+		icon: ChefHat,
+		color: "text-emerald-600",
+		bgColor: "bg-emerald-50",
+	},
+	{
+		title: "Dominios y Delivery",
+		description:
+			"Controla tus pedidos a domicilio sin depender 100% de apps externas.",
+		items: [
+			"Base de datos de clientes",
+			"Gestión de repartidores propios",
+			"Integración con WhatsApp Business",
+			"Zonas de entrega programables",
+		],
+		icon: Clock,
+		color: "text-blue-600",
+		bgColor: "bg-blue-50",
+	},
+];
+---
+
+<DefaultLayout
+	title={seoData.title}
+	description={seoData.description}
+	keywords={seoData.keywords}
+	showAds={false}
+>
+	<main class="flex-1">
+		<!-- Hero Section -->
+		<section class="relative py-20 lg:py-32 overflow-hidden bg-white">
+			<div
+				class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"
+			>
+			</div>
+
+			<div class="max-w-7xl mx-auto px-6 relative">
+				<div class="flex flex-col lg:flex-row items-center gap-16">
+					<div class="flex-1 text-center lg:text-left">
+						<div
+							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 mb-6"
+						>
+							<span
+								class="text-xs font-bold text-orange-800 uppercase tracking-wider"
+								>ESPECIAL PARA FAST FOOD</span
+							>
+						</div>
+
+						<h1
+							class="text-5xl lg:text-7xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight"
+						>
+							Software para <br />
+							<span
+								class="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"
+								>Comida Rápida.</span
+							>
+						</h1>
+
+						<p
+							class="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+						>
+							Diseñado para Pizzerías, Hamburgueserías, Taquerías y más. Menos
+							espera, más ventas.
+						</p>
+
+						<div
+							class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+						>
+							<a
+								href="/admin/register"
+								class="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
+							>
+								¡Empezar Ya!
+								<ArrowRight
+									className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform"
+								/>
+							</a>
+						</div>
+					</div>
+
+					<div class="flex-1 relative w-full max-w-2xl">
+						<div
+							class="absolute -inset-4 bg-gradient-to-tr from-orange-500/10 to-red-500/10 blur-3xl rounded-full"
+						>
+						</div>
+						<div
+							class="relative bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+						>
+							<Image
+								src={main_menu}
+								alt="Fast Food POS System"
+								class="w-full h-auto"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Solutions -->
+		<section class="py-24 bg-slate-50">
+			<div class="max-w-7xl mx-auto px-6">
+				<h2
+					class="text-3xl lg:text-5xl font-black text-slate-900 mb-16 text-center"
+				>
+					Todo lo que tu negocio necesita
+				</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					{
+						features.map((f) => (
+							<div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+								<div
+									class={`w-14 h-14 ${f.bgColor} ${f.color} rounded-2xl flex items-center justify-center mb-8`}
+								>
+									<f.icon className="w-7 h-7" />
+								</div>
+								<h3 class="text-2xl font-bold text-slate-900 mb-4">
+									{f.title}
+								</h3>
+								<p class="text-slate-600 mb-8">{f.description}</p>
+								<ul class="space-y-3">
+									{f.items.map((item) => (
+										<li class="flex items-center gap-3 text-sm font-medium text-slate-700">
+											<Check className="w-4 h-4 text-orange-500" />
+											{item}
+										</li>
+									))}
+								</ul>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+	</main>
+</DefaultLayout>
