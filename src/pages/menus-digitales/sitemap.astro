@@ -1,0 +1,124 @@
+---
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+import { getStates } from "../../lib/supabase";
+import { MapPin, ChevronRight, Globe, Utensils } from "lucide-react";
+
+const states = await getStates();
+
+const pageData = {
+	title: "Mapa del Sitio - Menús Digitales | BySMax",
+	description:
+		"Encuentra todos los menús digitales y cartas QR organizados por estado en nuestro directorio nacional.",
+};
+---
+
+<DefaultLayout title={pageData.title} description={pageData.description}>
+	<main class="bg-slate-50 min-h-screen py-20">
+		<div class="max-w-4xl mx-auto px-6">
+			<div
+				class="bg-white rounded-[48px] p-12 border border-slate-100 shadow-sm"
+			>
+				<div class="flex items-center gap-4 mb-10">
+					<div
+						class="w-16 h-16 bg-emerald-50 rounded-[24px] flex items-center justify-center text-emerald-600"
+					>
+						<Globe className="w-8 h-8" />
+					</div>
+					<div>
+						<h1
+							class="text-3xl font-black text-slate-900 uppercase tracking-tighter"
+						>
+							Sitemap Menús Digitales
+						</h1>
+						<p class="text-slate-500 font-medium italic">
+							Directorio completo de estados y regiones
+						</p>
+					</div>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+					<div>
+						<h2
+							class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"
+						>
+							<span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+							Páginas Principales
+						</h2>
+						<ul class="space-y-4">
+							<li>
+								<a
+									href="/menus-digitales"
+									class="group flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all duration-300"
+								>
+									<span class="font-bold flex items-center gap-3">
+										<Utensils className="w-4 h-4" />
+										Inicio Menús Digitales
+									</span>
+									<ChevronRight
+										className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all"
+									/>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/register"
+									class="group flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-900 hover:text-white transition-all duration-300"
+								>
+									<span class="font-bold flex items-center gap-3">
+										<svg
+											class="w-4 h-4"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 4v16m8-8H4"></path></svg
+										>
+										Crea tu Menú Gratis
+									</span>
+									<ChevronRight
+										className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all"
+									/>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h2
+							class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"
+						>
+							<span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+							Estados en México
+						</h2>
+						<div class="grid grid-cols-2 gap-4">
+							{
+								states.map((state) => (
+									<a
+										href={`/menus-digitales/${state.slug}`}
+										class="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-emerald-600 transition-colors py-1"
+									>
+										<MapPin className="w-3 h-3 text-emerald-500/50" />
+										{state.name}
+									</a>
+								))
+							}
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-20 pt-10 border-t border-slate-50">
+					<p
+						class="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center"
+					>
+						Diseñado para máxima indexación en Google &bull; {
+							new Date().getFullYear()
+						} BySMax
+					</p>
+				</div>
+			</div>
+		</div>
+	</main>
+</DefaultLayout>

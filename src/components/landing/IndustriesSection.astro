@@ -1,0 +1,45 @@
+---
+const industries = [
+	{ emoji: "🍣", label: "Sushi Bar" },
+	{ emoji: "🍔", label: "Burgers" },
+	{ emoji: "👕", label: "Clothing" },
+	{ emoji: "📦", label: "E-commerce" },
+];
+
+interface Props {
+	stateName?: string;
+}
+
+const { stateName } = Astro.props;
+---
+
+<section class="py-24 bg-white overflow-hidden">
+	<div class="max-w-7xl mx-auto px-6">
+		<div class="text-center mb-16">
+			<h2
+				class="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tighter uppercase"
+			>
+				Un <span class="text-emerald-600">Creador de Menú Digital</span> para cada
+				negocio {stateName ? `en ${stateName}` : ""}
+			</h2>
+			<p class="text-slate-500 font-medium">
+				Desde restaurantes premium hasta tiendas de ropa y comercio local.
+			</p>
+		</div>
+
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+			{
+				industries.map((industry) => (
+					<div class="bg-slate-50 rounded-[40px] p-10 text-center hover:bg-emerald-50 transition-all group">
+						<div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform">
+							<span class="text-4xl">{industry.emoji}</span>
+						</div>
+						<p class="font-black text-slate-900 uppercase tracking-widest text-xs">
+							{industry.label}
+						</p>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</section>

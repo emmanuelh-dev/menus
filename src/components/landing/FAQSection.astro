@@ -1,0 +1,81 @@
+---
+import { ChevronDown } from "lucide-react";
+
+const faqs = [
+	{
+		q: "¿Cómo hacen mis clientes sus pedidos?",
+		a: "Tus clientes entran a tu menú digital, seleccionan sus productos y al finalizar el pedido se envía automáticamente un resumen estructurado a tu WhatsApp para que lo confirmes.",
+	},
+	{
+		q: "¿Necesitan descargar una app?",
+		a: "No. BySMax funciona como una página web optimizada para móviles. Solo necesitan el link o escanear el código QR.",
+	},
+	{
+		q: "¿Qué necesito para empezar?",
+		a: "Solo tu nombre de negocio, una lista de productos con fotos y un número de WhatsApp donde quieras recibir los pedidos.",
+	},
+	{
+		q: "¿A qué tipo de negocios les sirve?",
+		a: "Restaurantes, cafeterías, tiendas de ropa, ferreterías, dark kitchens y cualquier negocio que venda por catálogo.",
+	},
+	{
+		q: "¿Qué pasa si recibo muchos pedidos?",
+		a: "BySMax está diseñado para manejar alto volumen. Los pedidos llegan organizados, evitando errores humanos y saturación del chat.",
+	},
+	{
+		q: "¿Tengo soporte si tengo dudas?",
+		a: "Sí, siempre. Nuestro equipo te atiende directo por WhatsApp para cualquier duda o configuración que necesites.",
+		highlight: true,
+	},
+	{
+		q: "¿Puedo cancelar cuando quiera?",
+		a: "Totalmente. Sin contratos forzosos ni letras chiquitas. Eres dueño de tu tiempo y tu negocio.",
+	},
+];
+
+interface Props {
+	stateName?: string;
+}
+
+const { stateName } = Astro.props;
+---
+
+<section class="py-32 bg-white">
+	<div class="max-w-4xl mx-auto px-6">
+		<h2
+			class="text-4xl md:text-6xl font-black text-slate-900 mb-20 tracking-tighter uppercase text-center"
+		>
+			Preguntas Frecuentes {stateName ? `en ${stateName}` : ""}
+		</h2>
+
+		<div class="space-y-4">
+			{
+				faqs.map((faq) => (
+					<div
+						class={`group border border-slate-100 rounded-[32px] overflow-hidden transition-all hover:shadow-xl hover:shadow-slate-100 ${faq.highlight ? "bg-emerald-50 border-emerald-100" : "bg-white"}`}
+					>
+						<details class="p-8">
+							<summary class="flex items-center justify-between font-black text-xl uppercase tracking-tight cursor-pointer list-none">
+								<span
+									class={faq.highlight ? "text-emerald-700" : "text-slate-900"}
+								>
+									{faq.q}
+								</span>
+								<ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" />
+							</summary>
+							<div class="mt-6 text-slate-500 font-medium leading-relaxed">
+								{faq.a}
+							</div>
+						</details>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	summary::-webkit-details-marker {
+		display: none;
+	}
+</style>

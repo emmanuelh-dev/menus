@@ -1,0 +1,57 @@
+# Estrategia SEO y Palabras Clave - BySMax Menús
+
+## 🎯 Palabras Clave Principales (Google Ads Insights)
+Basado en datos del Planificador de Palabras Clave de Google (Feb 2026):
+
+| Palabra Clave | Volumen Mensual | Competencia | CPC Sugerido (MXN) |
+|---------------|-----------------|-------------|--------------------|
+| menu digital | 100 - 1k | Media | $9.37 - $29.07 |
+| menu digital para restaurantes | 10 - 100 | Media | $9.39 - $28.88 |
+| creador de menu digital | 10 - 100 | Alta | $11.03 - $44.01 |
+| crea tu menu digital | 10 - 100 | Alta | $12.00 - $33.10 |
+| menu digital qr | 10 - 100 | Alta | $10.09 - $22.96 |
+| app para menu digital | 10 - 100 | Media | $14.18 - $57.21 |
+| whatsapp por whatsapp | 10 - 100 | Baja | — |
+| pedidos por whatsapp | 10 - 100 | Media | — |
+
+---
+
+## 🚀 Propuesta de Valor y Estructura de Landing (Inspiración Mennu)
+
+### Títulos Hook (H1/H2):
+- "Inicia hoy GRATIS con tu link de negocio"
+- "La mejor manera de recibir pedidos y gestionar tu negocio"
+- "Recibe pedidos y atiende a tus clientes por WhatsApp más rápido y sin pagar comisiones"
+
+### Beneficios Clave:
+1. **WhatsApp Directo**: Recibir pedidos a tu WhatsApp sin apps ni descargas.
+2. **Administración Fácil**: Cambia productos, revisa estadísticas y administra mensajes en un solo lugar.
+3. **Link Único / Portafolio**: Crea tu propia página web con catálogo de productos y redes sociales.
+4. **POS/Gestión de Orden**: Crear pedidos rápidamente desde una misma laptop/tablet.
+5. **Control de Inventario**: Gestiona productos y SKUs sin necesidad de Excel o apps externas.
+
+---
+
+## ❓ Preguntas Frecuentes (FAQ) Estratégicas:
+- **¿Cómo hacen mis clientes sus pedidos?** (Explicar flujo de link -> carrito -> whatsapp)
+- **¿Necesitan descargar una app?** (Enfatizar que es WEB, sin descargas)
+- **¿Qué necesito para empezar?** (Solo registro y subir productos)
+- **¿A qué tipo de negocios les sirve?** (Restaurantes, ropa, sushi, burgers, etc.)
+- **¿Qué pasa si recibo muchos pedidos?** (Resaltar escalabilidad)
+- **¿Tengo soporte si tengo dudas?** (Soporte directo por WhatsApp)
+- **¿Puedo cancelar cuando quiera?** (Sin plazos forzosos)
+
+---
+
+## 🏗️ Estructura del Mapa del Sitio (Sitemap):
+- Inicio (Landing Principal)
+- Precios
+- Blog
+- Ver Ejemplos / Demo
+- Iniciar Sesión / Registro
+- Términos y Condiciones
+- Aviso de Privacidad
+
+## 📧 Contacto SEO:
+Email: hola@bysmax.com (Inspirado en hola@mennu.mx)
+Copyright: BySMax Mx 2026

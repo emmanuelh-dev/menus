@@ -1,0 +1,82 @@
+---
+export const prerender = false;
+
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+import {
+	getStates,
+	getRestaurants,
+	getAllPlaceRatings,
+} from "../../lib/supabase";
+
+// Modular Landing Components
+import HeroSection from "../../components/landing/HeroSection.astro";
+import TrustShowcase from "../../components/landing/TrustShowcase.astro";
+import HowItWorks from "../../components/landing/HowItWorks.astro";
+import FeaturesGrid from "../../components/landing/FeaturesGrid.astro";
+import IndustriesSection from "../../components/landing/IndustriesSection.astro";
+import FAQSection from "../../components/landing/FAQSection.astro";
+import FinalCTA from "../../components/landing/FinalCTA.astro";
+import StateRestaurants from "../../components/landing/StateRestaurants.astro";
+
+const { state: stateSlug } = Astro.params;
+
+const [states, allRatings] = await Promise.all([
+	getStates(),
+	getAllPlaceRatings(),
+]);
+
+const currentState = states.find((s) => s.slug === stateSlug);
+
+if (!currentState) {
+	return Astro.redirect("/menus-digitales");
+}
+
+// Obtener restaurantes de tipo "restaurante" para este estado
+const restaurantsData = await getRestaurants({
+	type: "restaurante",
+	state_id: currentState.id,
+});
+
+const restaurants = restaurantsData.map((res) => ({
+	...res,
+	rating: allRatings[res.id]?.rating || res.rating || 4.5,
+	reviewCount: allRatings[res.id]?.count || res.reviewCount || 0,
+}));
+
+const pageData = {
+	title: `Menús Digitales y Cartas QR en ${currentState.name} | Crea el tuyo GRATIS`,
+	description: `Impulsa tu restaurante en ${currentState.name} con un Menú Digital QR. Recibe pedidos por WhatsApp, sin comisiones. Mira ejemplos y regístrate hoy.`,
+	keywords: `menú digital ${currentState.name}, carta qr ${currentState.name}, crear menú digital ${currentState.name}, restaurantes ${currentState.name} qr`,
+};
+
+const customTitle = `Vende más en <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">${currentState.name}</span> <br/> con un Menú Digital`;
+const customSubtitle = `Únete a los negocios de <strong>${currentState.name}</strong> que ya reciben pedidos directamente a WhatsApp sin pagar comisiones por apps de delivery.`;
+---
+
+<DefaultLayout
+	title={pageData.title}
+	description={pageData.description}
+	keywords={pageData.keywords}
+>
+	<main class="overflow-x-hidden">
+		<HeroSection
+			title={customTitle}
+			subtitle={customSubtitle}
+			stateName={currentState.name}
+		/>
+
+		<TrustShowcase stateName={currentState.name} />
+
+		<IndustriesSection stateName={currentState.name} />
+
+		<HowItWorks stateName={currentState.name} />
+
+		<StateRestaurants stateName={currentState.name} restaurants={restaurants} />
+
+		<FeaturesGrid stateName={currentState.name} />
+
+		<FAQSection stateName={currentState.name} />
+
+		<FinalCTA stateName={currentState.name} />
+	</main>
+</DefaultLayout>

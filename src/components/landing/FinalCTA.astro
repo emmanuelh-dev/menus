@@ -1,0 +1,41 @@
+---
+interface Props {
+	stateName?: string;
+}
+
+const { stateName } = Astro.props;
+---
+
+<section class="py-24 bg-emerald-500 text-white">
+	<div class="max-w-4xl mx-auto px-6 text-center">
+		<h2
+			class="text-4xl md:text-7xl font-black mb-8 tracking-tighter leading-[0.9] uppercase"
+		>
+			{
+				stateName ? (
+					<>
+						No te quedes atrás en <br />{" "}
+						<span class="text-slate-900">{stateName}</span>
+					</>
+				) : (
+					<>
+						¿Listo para <br /> vender más?
+					</>
+				)
+			}
+		</h2>
+		<p class="text-xl text-white/90 mb-12 font-medium">
+			{
+				stateName
+					? `Tus clientes en ${stateName} ya están buscando tu menú en digital.`
+					: "Únete a la mejor plataforma de gestión para WhatsApp en México."
+			}
+		</p>
+		<a
+			href="/admin/register"
+			class="inline-block px-12 py-6 bg-slate-900 text-white font-black rounded-[32px] hover:bg-black transition-all shadow-2xl shadow-emerald-900/20 uppercase tracking-[0.2em] text-xs active:scale-95"
+		>
+			Empezar GRATIS
+		</a>
+	</div>
+</section>

@@ -1,0 +1,42 @@
+---
+const trustLogos = [
+	"Dacaurbanfood",
+	"Las Manchadas del Oso",
+	"Sushingone",
+	"Tacos Santiago",
+	"Tacos El Vado",
+	"Vainsport",
+	"La Santa",
+];
+
+interface Props {
+	stateName?: string;
+}
+
+const { stateName } = Astro.props;
+---
+
+<section class="py-20 bg-slate-50/50 border-y border-slate-100 overflow-hidden">
+	<div class="max-w-7xl mx-auto px-6">
+		<p
+			class="text-center text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-12"
+		>
+			{
+				stateName
+					? `Ya más de 100 negocios en ${stateName} y México confían en BySMax`
+					: "Ya más de 100 negocios confían en BySMax"
+			}
+		</p>
+		<div
+			class="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700"
+		>
+			{
+				trustLogos.map((logo) => (
+					<span class="text-xl md:text-2xl font-black text-slate-900 tracking-tighter uppercase transform hover:scale-110 transition-transform cursor-default">
+						{logo}
+					</span>
+				))
+			}
+		</div>
+	</div>
+</section>
