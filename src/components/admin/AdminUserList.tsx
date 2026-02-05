@@ -445,6 +445,33 @@ const AdminUserList = () => {
                     )}
                   </div>
 
+                  {/* Impersonate Button */}
+                  <button
+                    onClick={async () => {
+                      if (confirm(`¿Estás seguro de que quieres iniciar sesión como ${user.name || user.email}?`)) {
+                        try {
+                          const res = await fetch('/api/admin/impersonate', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: user.id })
+                          });
+                          if (res.ok) {
+                            window.location.href = '/admin/dashboard';
+                          } else {
+                            alert('Error al impersonar');
+                          }
+                        } catch (e) {
+                          alert('Error de conexión');
+                        }
+                      }
+                    }}
+                    className="px-4 py-2.5 bg-purple-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-purple-700 transition-all active:scale-95 shadow-purple-500/10"
+                    title="Simular Usuario"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    Simular
+                  </button>
+
                   {/* Email Button Cluster */}
                   <div className="relative">
                     <button

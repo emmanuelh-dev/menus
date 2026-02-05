@@ -20,20 +20,32 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 		const search = url.searchParams.get("search") || "";
 		const sortBy = url.searchParams.get("sortBy") || "newest";
 
-		const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-		const {
-			data: { user },
-			error: userError,
-		} = await supabase.auth.getUser();
+		const { getEffectiveUser } = await import("../../../middleware/auth");
+		const authResult = await getEffectiveUser(request, cookies);
 
-		if (userError || !user) {
+		if (!authResult) {
 			return new Response(JSON.stringify({ error: "Unauthorized" }), {
 				status: 401,
 			});
 		}
 
-		const { isAdmin: checkAdmin } = await import("../../../lib/admin");
-		const isAdmin = checkAdmin(user.email);
+		const { realUser: user, effectiveUser, isAdmin: isRealAdmin } = authResult;
+		const userId = effectiveUser.id;
+		const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
+		const isAdminForUI = isImpersonating ? false : isRealAdmin;
+
+		// Si estamos impersonando, usamos el client de servicio para poder ver data de otros
+		let supabase;
+		if (isImpersonating) {
+			const { createClient } = await import("@supabase/supabase-js");
+			supabase = createClient(
+				import.meta.env.PUBLIC_SUPABASE_URL,
+				import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+				{ auth: { persistSession: false } }
+			);
+		} else {
+			supabase = await createAuthenticatedClient(accessToken, refreshToken);
+		}
 
 		let query = supabase.from("places").select(
 			`
@@ -47,8 +59,9 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 			{ count: "exact" },
 		);
 
-		if (!isAdmin) {
-			query = query.eq("user_id", user?.id);
+		// Si no es admin real O si es admin pero está impersonando a alguien específico
+		if (!isRealAdmin || isImpersonating) {
+			query = query.eq("user_id", userId);
 		}
 
 		if (search) {
@@ -79,7 +92,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 			`,
 		);
 
-		if (!isAdmin) {
+		if (!isRealAdmin || isImpersonating) {
 			commentsQuery.in(
 				"place_id",
 				(places || []).map((p: any) => p.id),
@@ -90,9 +103,9 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 			.order("created_at", { ascending: false })
 			.limit(20);
 
-		// Only fetch history if admin
+		// Only fetch history if admin real and NOT impersonating
 		let history: any[] = [];
-		if (isAdmin) {
+		if (isRealAdmin && !isImpersonating) {
 			const { data: historyData } = await supabase
 				.from("place_content_history")
 				.select(
@@ -111,7 +124,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 		return new Response(
 			JSON.stringify({
 				user,
-				isAdmin,
+				isAdmin: isAdminForUI,
 				places: places || [],
 				totalPlaces: totalPlaces || 0,
 				recentComments: recentComments || [],

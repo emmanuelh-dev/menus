@@ -57,9 +57,7 @@ export async function isAuthenticated(request: Request, cookies: any) {
       return true;
     }
 
-    console.log('✅ Token válido, verificando rol de usuario');
-
-    // Verificar si el usuario es administrador
+    // 1. Verificar si el usuario es administrador
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
@@ -67,9 +65,58 @@ export async function isAuthenticated(request: Request, cookies: any) {
       .single();
 
     console.log('✅ Usuario autenticado correctamente');
+
+    // 2. Manejo de Impersonación (Solo para Admins)
+    const { isAdmin } = await import("../lib/admin");
+    if (isAdmin(data.user.email)) {
+      const impersonateId = cookies.get('sb-impersonate-id')?.value;
+      if (impersonateId) {
+        console.log(`👤 MODO IMPERSONACIÓN ACTIVO: Simulando usuario ${impersonateId}`);
+      }
+    }
+
     return true;
   } catch (e) {
     console.error('🚨 Error inesperado en autenticación:', e);
     return false;
+  }
+}
+
+/**
+ * Obtiene el usuario real y el usuario efectivo (impersonado) si aplica.
+ * Útil para APIs que necesitan saber actuar en nombre de otro.
+ */
+export async function getEffectiveUser(request: Request, cookies: any) {
+  const accessToken = cookies.get('sb-access-token')?.value;
+  const refreshToken = cookies.get('sb-refresh-token')?.value;
+
+  if (!accessToken || !refreshToken) return null;
+
+  try {
+    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return null;
+
+    const impersonateId = cookies.get('sb-impersonate-id')?.value;
+    
+    const { isAdmin } = await import("../lib/admin");
+    const isRealAdmin = isAdmin(user.email);
+
+    if (isRealAdmin && impersonateId) {
+      return {
+        realUser: user,
+        effectiveUser: { id: impersonateId, isImpersonated: true },
+        isAdmin: true
+      };
+    }
+
+    return {
+      realUser: user,
+      effectiveUser: user,
+      isAdmin: isRealAdmin
+    };
+  } catch (e) {
+    return null;
   }
 }

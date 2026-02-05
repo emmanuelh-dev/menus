@@ -1,35 +1,41 @@
 import type { APIRoute } from "astro";
 import { createAuthenticatedClient } from "../../../lib/supabase";
+import { isAdmin as checkAdmin } from "../../../lib/admin";
+import { getEffectiveUser } from "../../../middleware/auth";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ cookies }) => {
-  const accessToken = cookies.get("sb-access-token");
-  const refreshToken = cookies.get("sb-refresh-token");
+export const GET: APIRoute = async ({ cookies, request }) => {
+  const authResult = await getEffectiveUser(request, cookies);
 
-  if (!accessToken || !refreshToken) {
+  if (!authResult) {
     return new Response(JSON.stringify({ error: "No autorizado" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
-  const { data: { user } } = await supabase.auth.getUser();
+  const { effectiveUser, isAdmin: isRealAdmin } = authResult;
+  const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
 
-  if (!user) {
-    return new Response(JSON.stringify({ error: "No autorizado" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
+  let supabase;
+  if (isImpersonating) {
+    const { createClient } = await import("@supabase/supabase-js");
+    supabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false } }
+    );
+  } else {
+    supabase = await createAuthenticatedClient(
+      cookies.get("sb-access-token")!.value,
+      cookies.get("sb-refresh-token")!.value
+    );
   }
 
   try {
-    const isAdmin = [
-      "emmanuelh.dev@gmail.com",
-      "admin@bysmax.com",
-      "e805177@gmail.com",
-    ].includes(user.email || "");
+    // Si estamos impersonando, tratamos al usuario como cliente normal (no admin) para ver lo suyo
+    const viewAsAdmin = isRealAdmin && !isImpersonating;
 
     // Obtener menús
     let menusQuery = supabase
@@ -42,8 +48,8 @@ export const GET: APIRoute = async ({ cookies }) => {
         )
       `);
 
-    if (!isAdmin) {
-      menusQuery = menusQuery.eq("user_id", user.id);
+    if (!viewAsAdmin) {
+      menusQuery = menusQuery.eq("user_id", effectiveUser.id);
     }
     
     const { data: menus, error: menusError } = await menusQuery.order("created_at", { ascending: false });
@@ -55,8 +61,8 @@ export const GET: APIRoute = async ({ cookies }) => {
       .from("places")
       .select("id, name");
 
-    if (!isAdmin) {
-      placesQuery = placesQuery.eq("user_id", user.id);
+    if (!viewAsAdmin) {
+      placesQuery = placesQuery.eq("user_id", effectiveUser.id);
     }
 
     const { data: restaurants, error: placesError } = await placesQuery.order("name");
@@ -76,25 +82,31 @@ export const GET: APIRoute = async ({ cookies }) => {
 };
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  const accessToken = cookies.get("sb-access-token");
-  const refreshToken = cookies.get("sb-refresh-token");
+  const authResult = await getEffectiveUser(request, cookies);
 
-  if (!accessToken || !refreshToken) {
+  if (!authResult) {
     return new Response(JSON.stringify({ error: "No autorizado" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const supabase = await createAuthenticatedClient(accessToken.value, refreshToken.value);
+  const { effectiveUser } = authResult;
+  const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return new Response(JSON.stringify({ error: "No autorizado" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
+  let supabase;
+  if (isImpersonating) {
+    const { createClient } = await import("@supabase/supabase-js");
+    supabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false } }
+    );
+  } else {
+    supabase = await createAuthenticatedClient(
+      cookies.get("sb-access-token")!.value,
+      cookies.get("sb-refresh-token")!.value
+    );
   }
 
   try {
@@ -128,7 +140,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         availability_end,
         display_order,
         availability_days,
-        user_id: user.id,
+        user_id: effectiveUser.id,
       }])
       .select(`
         *,

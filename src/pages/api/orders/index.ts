@@ -32,17 +32,65 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, cookies, request }) => {
+  const { getEffectiveUser } = await import("../../../middleware/auth");
+  const authResult = await getEffectiveUser(request, cookies);
+
+  if (!authResult) {
+    return new Response(JSON.stringify({ error: "No autorizado" }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const { effectiveUser, isAdmin: isRealAdmin } = authResult;
+  const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
+
   const placeId = url.searchParams.get('place_id');
   const status = url.searchParams.get('status');
   const page = parseInt(url.searchParams.get('page') || '1');
   const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
 
-  let query = supabase
+  // Si estamos impersonando o no es admin, usamos Service Role para filtrar correctamente
+  let querySupabase = supabase;
+  if (isImpersonating) {
+    const { createClient } = await import("@supabase/supabase-js");
+    querySupabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false } }
+    );
+  }
+
+  let query = querySupabase
     .from('orders')
     .select('*', { count: 'exact' });
 
-  if (placeId) {
+  // Seguridad: Si no es admin real o está impersonando, filtrar por sus propios lugares
+  if (!isRealAdmin || isImpersonating) {
+    const { data: myPlaces } = await querySupabase
+      .from('places')
+      .select('id')
+      .eq('user_id', effectiveUser.id);
+    
+    if (!myPlaces || myPlaces.length === 0) {
+      return new Response(JSON.stringify({ orders: [], totalOrders: 0 }), { status: 200 });
+    }
+
+    const placeIds = myPlaces.map(p => p.id);
+    
+    // Si especificó un placeId, verificar que le pertenezca
+    if (placeId) {
+      if (!placeIds.includes(placeId)) {
+        return new Response(JSON.stringify({ error: "No tienes permiso para ver este lugar" }), { status: 403 });
+      }
+      query = query.eq('place_id', placeId);
+    } else {
+      // Si no especificó, ver todos sus lugares
+      query = query.in('place_id', placeIds);
+    }
+  } else if (placeId) {
+    // Admin real viendo un lugar específico
     query = query.eq('place_id', placeId);
   }
 

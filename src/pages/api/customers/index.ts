@@ -94,18 +94,61 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ request }) => {
+export const PUT: APIRoute = async ({ request, cookies }) => {
   try {
+    const { getEffectiveUser } = await import("../../../middleware/auth");
+    const authResult = await getEffectiveUser(request, cookies);
+
+    if (!authResult) {
+      return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401 });
+    }
+
+    const { effectiveUser, isAdmin: isRealAdmin } = authResult;
+    const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
+
     const body = await request.json();
 
     if (!body.id) {
-      return new Response(JSON.stringify({ error: 'id is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({ error: 'id is required' }), { status: 400 });
     }
 
-    const { data: customer, error } = await supabase
+    let querySupabase = supabase;
+    if (isImpersonating) {
+      const { createClient } = await import("@supabase/supabase-js");
+      querySupabase = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { persistSession: false } }
+      );
+    }
+
+    // Verificar si el usuario tiene permiso para este cliente antes de actualizar
+    if (!isRealAdmin || isImpersonating) {
+      // Obtener el cliente actual para saber su teléfono
+      const { data: targetCustomer } = await querySupabase
+        .from('customers')
+        .select('phone')
+        .eq('id', body.id)
+        .single();
+      
+      if (!targetCustomer) {
+        return new Response(JSON.stringify({ error: 'Cliente no encontrado' }), { status: 404 });
+      }
+
+      const { data: hasOrder } = await querySupabase
+        .from('orders')
+        .select('id, places(user_id)')
+        .eq('customer_phone', targetCustomer.phone)
+        .eq('places.user_id', effectiveUser.id)
+        .limit(1)
+        .maybeSingle();
+      
+      if (!hasOrder) {
+        return new Response(JSON.stringify({ error: 'No tienes permiso para actualizar este cliente' }), { status: 403 });
+      }
+    }
+
+    const { data: customer, error } = await querySupabase
       .from('customers')
       .update(body)
       .eq('id', body.id)
@@ -113,33 +156,81 @@ export const PUT: APIRoute = async ({ request }) => {
       .single();
 
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
 
-    return new Response(JSON.stringify({ customer }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(JSON.stringify({ customer }), { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Invalid request body' }), {
-      status: 400,
+    return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
+  }
+};
+export const GET: APIRoute = async ({ url, cookies, request }) => {
+  const { getEffectiveUser } = await import("../../../middleware/auth");
+  const authResult = await getEffectiveUser(request, cookies);
+
+  if (!authResult) {
+    return new Response(JSON.stringify({ error: "No autorizado" }), {
+      status: 401,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-};
-export const GET: APIRoute = async ({ url }) => {
+
+  const { effectiveUser, isAdmin: isRealAdmin } = authResult;
+  const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
+
   const phone = url.searchParams.get('phone');
   const placeId = url.searchParams.get('place_id');
   const page = parseInt(url.searchParams.get('page') || '1');
   const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
   const search = url.searchParams.get('search') || '';
   
-  let query = supabase
+  // Si estamos impersonando o no es admin, usamos Service Role para filtrar correctamente
+  let querySupabase = supabase;
+  if (isImpersonating) {
+    const { createClient } = await import("@supabase/supabase-js");
+    querySupabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false } }
+    );
+  }
+
+  let query = querySupabase
     .from('customers')
     .select('*', { count: 'exact' });
+
+  // Seguridad: Si no es admin real o está impersonando, filtrar por sus propios lugares
+  if (!isRealAdmin || isImpersonating) {
+    // 1. Obtener los IDs de los lugares del usuario
+    const { data: myPlaces } = await querySupabase
+      .from('places')
+      .select('id')
+      .eq('user_id', effectiveUser.id);
+    
+    if (!myPlaces || myPlaces.length === 0) {
+      return new Response(JSON.stringify({ customers: [], totalCustomers: 0 }), { status: 200 });
+    }
+
+    const placeIds = myPlaces.map(p => p.id);
+
+    // 2. Obtener los teléfonos de clientes que han pedido en esos lugares
+    const { data: orders } = await querySupabase
+      .from('orders')
+      .select('customer_phone')
+      .in('place_id', placeIds);
+    
+    if (!orders || orders.length === 0) {
+      return new Response(JSON.stringify({ customers: [], totalCustomers: 0 }), { status: 200 });
+    }
+
+    const customerPhones = Array.from(new Set(orders.map(o => o.customer_phone).filter(Boolean)));
+    
+    if (customerPhones.length === 0) {
+      return new Response(JSON.stringify({ customers: [], totalCustomers: 0 }), { status: 200 });
+    }
+
+    query = query.in('phone', customerPhones);
+  }
 
   if (phone) {
     query = query.eq('phone', phone);
@@ -149,9 +240,9 @@ export const GET: APIRoute = async ({ url }) => {
     query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
   }
 
-  // Si hay placeId, filtramos por clientes que hayan pedido en ese local
+  // Si hay un placeId específico en el query (filtro adicional)
   if (placeId) {
-    const { data: orders } = await supabase
+    const { data: orders } = await querySupabase
       .from('orders')
       .select('customer_phone')
       .eq('place_id', placeId);
@@ -160,11 +251,7 @@ export const GET: APIRoute = async ({ url }) => {
       const phones = Array.from(new Set(orders.map(o => o.customer_phone)));
       query = query.in('phone', phones);
     } else {
-      // Si no hay órdenes, no hay clientes para este local
-      return new Response(JSON.stringify({ customers: [], totalCustomers: 0 }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({ customers: [], totalCustomers: 0 }), { status: 200 });
     }
   }
 

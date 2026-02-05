@@ -3,23 +3,24 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { createAuthenticatedClient } from "../../../lib/supabase";
 
-export const GET: APIRoute = async ({ cookies }) => {
+export const GET: APIRoute = async ({ cookies, request }) => {
   try {
-    const accessToken = cookies.get("sb-access-token")?.value;
-    const refreshToken = cookies.get("sb-refresh-token")?.value;
+    const { getEffectiveUser } = await import("../../../middleware/auth");
+    const result = await getEffectiveUser(request, cookies);
 
-    if (!accessToken || !refreshToken) {
+    if (!result) {
       return new Response(JSON.stringify({ user: null }), { status: 200 });
     }
 
-    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    const { data: { user } } = await supabase.auth.getUser();
+    const { realUser, effectiveUser, isAdmin } = result;
 
-    const { isAdmin } = await import("../../../lib/admin");
-    const isUserAdmin = isAdmin(user?.email);
-
-    return new Response(JSON.stringify({ user, isAdmin: isUserAdmin }), { status: 200 });
+    return new Response(JSON.stringify({ 
+      user: realUser, 
+      isAdmin,
+      impersonating: effectiveUser.id !== realUser.id ? effectiveUser : null
+    }), { status: 200 });
   } catch (error) {
+    console.error("Error in /api/auth/me:", error);
     return new Response(JSON.stringify({ user: null }), { status: 200 });
   }
 };

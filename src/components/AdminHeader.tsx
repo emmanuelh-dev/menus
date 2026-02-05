@@ -8,6 +8,8 @@ function AdminHeader() {
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
+  const [impersonating, setImpersonating] = useState<any>(null);
+
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
@@ -47,6 +49,9 @@ function AdminHeader() {
         if (data.isAdmin) {
           setIsAdminUser(true);
         }
+        if (data.impersonating) {
+          setImpersonating(data.impersonating);
+        }
       } catch (e) {
         console.error("Error fetching user", e);
       }
@@ -60,6 +65,21 @@ function AdminHeader() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  const handleStopImpersonation = async () => {
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: null })
+      });
+      if (res.ok) {
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error("Error stopping impersonation", e);
+    }
+  };
 
   const handleInstall = async () => {
     if (deferredPrompt) {
@@ -85,7 +105,26 @@ function AdminHeader() {
 
   return (
     <>
-      <div className="fixed top-1 left-3 z-50">
+      {/* Banner de Impersonación */}
+      {impersonating && (
+        <div className="fixed top-0 left-0 right-0 bg-purple-600 text-white px-4 py-2 z-[300] flex items-center justify-center gap-4 shadow-lg animate-in fade-in slide-in-from-top duration-300">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            Modo Simulación: <span className="underline decoration-purple-300 underline-offset-2">{impersonating.id}</span>
+          </div>
+          <button
+            onClick={handleStopImpersonation}
+            className="bg-white text-purple-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-purple-50 transition-all active:scale-95"
+          >
+            Detener
+          </button>
+        </div>
+      )}
+
+      <div className={`fixed ${impersonating ? 'top-12' : 'top-1'} left-3 z-50 transition-all duration-300`}>
         <button
           onClick={() => {
             const newState = !isOpen;
