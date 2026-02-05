@@ -101,12 +101,13 @@ export const toolLinks = [
 ];
 
 export const exploreLinks = [
-    { name: "Directorio Global", href: "/menus", icon: "Search" },
-    { name: "Blog de Noticias", href: "/blog", icon: "BookOpen" },
+    { name: "Directorio Nacional", href: "/menus-digitales", icon: "Search" },
+    { name: "Menús en Nuevo León", href: "/menus-digitales/nuevo-leon", icon: "MapPin" },
+    { name: "Menús en Chihuahua", href: "/menus-digitales/chihuahua", icon: "MapPin" },
+    { name: "Menús en Jalisco", href: "/menus-digitales/jalisco", icon: "MapPin" },
+    { name: "Menús en CDMX", href: "/menus-digitales/ciudad-de-mexico", icon: "MapPin" },
+    { name: "Mapa del Sitio", href: "/menus-digitales/sitemap", icon: "Map" },
     { name: "Guía de Moteles", href: "/moteles", icon: "Bed" },
-    { name: "Monterrey, N.L.", href: "/moteles/estados/nuevo-leon", icon: "MapPin" },
-    { name: "Guadalajara, Jal.", href: "/moteles/estados/jalisco", icon: "MapPin" },
-    { name: "Planes y Precios", href: "/precios", icon: "CreditCard" },
 ];
 
 export const navCategories = [

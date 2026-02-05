@@ -181,6 +181,42 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 					</div>
 				</div>
 
+				{/* Dropdown: Directorio */}
+				<div class="relative group">
+					<button
+						class={`flex items-center space-x-1 py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
+					>
+						<span>Directorio</span>
+						<ChevronDown
+							className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform"
+						/>
+					</button>
+
+					<div
+						class="absolute top-full left-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50 transition-delay-100"
+					>
+						<div
+							class="w-64 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden p-2 ring-1 ring-black/5"
+						>
+							{
+								exploreLinks.map((item) => (
+									<a
+										href={item.href}
+										class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-50 group/tool transition-all"
+									>
+										<div class="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover/tool:text-emerald-600 group-hover/tool:bg-white transition-all border border-transparent group-hover/tool:border-emerald-100">
+											<Zap className="w-3.5 h-3.5" />
+										</div>
+										<p class="text-xs font-bold text-slate-900 group-hover/tool:text-emerald-800">
+											{item.name}
+										</p>
+									</a>
+								))
+							}
+						</div>
+					</div>
+				</div>
+
 				{/* Standalone: Precios */}
 				<a
 					href="/precios"

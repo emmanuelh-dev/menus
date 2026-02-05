@@ -13,95 +13,99 @@ const pageData = {
 ---
 
 <DefaultLayout title={pageData.title} description={pageData.description}>
-	<main class="bg-slate-50 min-h-screen py-20">
-		<div class="max-w-4xl mx-auto px-6">
+	<main class="bg-white min-h-screen">
+		<!-- Premium Header -->
+		<section class="py-24 bg-slate-900 relative overflow-hidden text-center">
 			<div
-				class="bg-white rounded-[48px] p-12 border border-slate-100 shadow-sm"
+				class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"
 			>
-				<div class="flex items-center gap-4 mb-10">
-					<div
-						class="w-16 h-16 bg-emerald-50 rounded-[24px] flex items-center justify-center text-emerald-600"
-					>
-						<Globe className="w-8 h-8" />
-					</div>
-					<div>
-						<h1
-							class="text-3xl font-black text-slate-900 uppercase tracking-tighter"
-						>
-							Sitemap Menús Digitales
-						</h1>
-						<p class="text-slate-500 font-medium italic">
-							Directorio completo de estados y regiones
-						</p>
-					</div>
-				</div>
+			</div>
+			<div class="max-w-4xl mx-auto px-6 relative z-10">
+				<h1
+					class="text-5xl md:text-7xl font-black text-white mb-6 uppercase tracking-tighter leading-none"
+				>
+					Mapa del <span class="text-emerald-400">Sitio Regional</span>
+				</h1>
+				<p class="text-xl text-slate-400 font-medium max-w-2xl mx-auto">
+					Explora nuestra red nacional de menús digitales y cartas QR. <br
+						class="hidden md:block"
+					/>
+					La digitalización de México, estado por estado.
+				</p>
+			</div>
+		</section>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-					<div>
+		<section class="py-24">
+			<div class="max-w-6xl mx-auto px-6">
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
+					<!-- Column: Main Navigation -->
+					<div class="lg:col-span-1">
 						<h2
-							class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"
+							class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em] mb-10 border-b border-emerald-50 pb-4"
 						>
-							<span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-							Páginas Principales
+							Páginas de Venta
 						</h2>
-						<ul class="space-y-4">
-							<li>
-								<a
-									href="/menus-digitales"
-									class="group flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all duration-300"
-								>
-									<span class="font-bold flex items-center gap-3">
-										<Utensils className="w-4 h-4" />
-										Inicio Menús Digitales
-									</span>
-									<ChevronRight
-										className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all"
-									/>
-								</a>
-							</li>
-							<li>
-								<a
-									href="/admin/register"
-									class="group flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-900 hover:text-white transition-all duration-300"
-								>
-									<span class="font-bold flex items-center gap-3">
-										<svg
-											class="w-4 h-4"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M12 4v16m8-8H4"></path></svg
-										>
-										Crea tu Menú Gratis
-									</span>
-									<ChevronRight
-										className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all"
-									/>
-								</a>
-							</li>
-						</ul>
+						<div class="space-y-4">
+							{
+								[
+									{ name: "Inicio BySMax", href: "/", icon: Globe },
+									{ name: "Ver un menú demo", href: "/menus", icon: Utensils },
+									{
+										name: "Directorio Nacional",
+										href: "/menus-digitales",
+										icon: MapPin,
+									},
+									{
+										name: "Cerrar venta - Registro",
+										href: "/admin/register",
+										icon: ChevronRight,
+										highlight: true,
+									},
+								].map((link) => (
+									<a
+										href={link.href}
+										class={`flex items-center justify-between p-6 rounded-[24px] border transition-all group ${link.highlight ? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-200" : "bg-white border-slate-100 text-slate-900 hover:border-emerald-200 hover:bg-emerald-50/50"}`}
+									>
+										<span class="font-black uppercase tracking-tight text-sm flex items-center gap-3">
+											<link.icon
+												className={`w-4 h-4 ${link.highlight ? "text-emerald-400" : "text-emerald-500"}`}
+											/>
+											{link.name}
+										</span>
+										<ChevronRight
+											className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${link.highlight ? "text-emerald-400" : "text-slate-300"}`}
+										/>
+									</a>
+								))
+							}
+						</div>
 					</div>
 
-					<div>
+					<!-- Column: States (The Core Sitemap) -->
+					<div class="lg:col-span-2">
 						<h2
-							class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"
+							class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em] mb-10 border-b border-emerald-50 pb-4"
 						>
-							<span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-							Estados en México
+							Directorios Estratégicos por Estado
 						</h2>
-						<div class="grid grid-cols-2 gap-4">
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4">
 							{
 								states.map((state) => (
 									<a
 										href={`/menus-digitales/${state.slug}`}
-										class="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-emerald-600 transition-colors py-1"
+										class="flex items-center justify-between group py-3 border-b border-slate-50 hover:border-emerald-100 transition-all"
 									>
-										<MapPin className="w-3 h-3 text-emerald-500/50" />
-										{state.name}
+										<div class="flex items-center gap-4">
+											<div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+												<MapPin className="w-4 h-4" />
+											</div>
+											<span class="font-bold text-slate-600 group-hover:text-emerald-600 transition-colors">
+												Menús en {state.name}
+											</span>
+										</div>
+										<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-emerald-400">
+											Ir a landing
+										</span>
 									</a>
 								))
 							}
@@ -109,16 +113,17 @@ const pageData = {
 					</div>
 				</div>
 
-				<div class="mt-20 pt-10 border-t border-slate-50">
+				<!-- Footer Note for SEO -->
+				<div class="mt-32 pt-10 border-t border-slate-100 text-center">
 					<p
-						class="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center"
+						class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em]"
 					>
-						Diseñado para máxima indexación en Google &bull; {
+						Estructura optimizada para rastreo de buscadores &bull; BySMax {
 							new Date().getFullYear()
-						} BySMax
+						}
 					</p>
 				</div>
 			</div>
-		</div>
+		</section>
 	</main>
 </DefaultLayout>
