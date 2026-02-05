@@ -24,6 +24,10 @@ if (alreadyAuth) {
 	title="Crea tu cuenta para crear tu menu digital"
 	description="Tu éxito comienza aquí"
 >
+	<script
+		src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+		async
+		defer></script>
 	<div
 		class="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden py-12"
 	>
@@ -275,6 +279,14 @@ if (alreadyAuth) {
 						</div>
 					</div>
 
+					<div class="flex justify-center my-4">
+						<div
+							class="cf-turnstile"
+							data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+						>
+						</div>
+					</div>
+
 					<button
 						type="submit"
 						class="w-full flex justify-center items-center py-4 px-6 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all duration-300 shadow-xl shadow-slate-900/20 group active:scale-[0.98] mt-4"
@@ -342,6 +354,7 @@ if (alreadyAuth) {
 						name,
 						whatsapp,
 						business_name,
+						token: formData.get("cf-turnstile-response") as string,
 					}),
 				});
 

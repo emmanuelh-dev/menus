@@ -6,7 +6,7 @@ import { supabase } from '../../../lib/supabase';
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, token } = body;
 
     if (!email || !password) {
       return new Response(
@@ -16,6 +16,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           headers: { 'Content-Type': 'application/json' }
         }
       );
+    }
+
+    // Verificar Turnstile token
+    const { verifyTurnstileToken } = await import("../../../lib/turnstile");
+    const verifyData = await verifyTurnstileToken(token);
+    
+    if (!verifyData.success) {
+      return new Response(JSON.stringify({ error: "Verificación de CAPTCHA fallida" }), { status: 400 });
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({

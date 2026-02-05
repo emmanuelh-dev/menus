@@ -17,6 +17,10 @@ if (alreadyAuth) {
 	title="Inicia sesión para gestionar tu menú digital"
 	description="El futuro de tu restaurante comienza aquí"
 >
+	<script
+		src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+		async
+		defer></script>
 	<div
 		class="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden"
 	>
@@ -125,6 +129,14 @@ if (alreadyAuth) {
 						</div>
 					</div>
 
+					<div class="flex justify-center my-4">
+						<div
+							class="cf-turnstile"
+							data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+						>
+						</div>
+					</div>
+
 					<button
 						type="submit"
 						id="login-button"
@@ -207,7 +219,19 @@ if (alreadyAuth) {
 						headers: {
 							"Content-Type": "application/json",
 						},
-						body: JSON.stringify({ email, password }),
+						body: JSON.stringify({
+							email,
+							password,
+							token: (form as HTMLFormElement).elements.namedItem(
+								"cf-turnstile-response",
+							)
+								? (
+										(form as HTMLFormElement).elements.namedItem(
+											"cf-turnstile-response",
+										) as HTMLInputElement
+									).value
+								: "",
+						}),
 					});
 
 					const data = await response.json();

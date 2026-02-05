@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { supabase } from "../lib/supabase";
 import { type Contact, type ContactFormStatus } from "../types/contact";
 
@@ -6,16 +7,24 @@ export default function ContactForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<ContactFormStatus | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus(null);
 
     try {
+      if (!token) {
+        throw new Error("Por favor, completa el CAPTCHA.");
+      }
+
       const response = await fetch('/api/contacts/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, message })
+        body: JSON.stringify({ email, message, token })
       });
 
       const result = await response.json();
@@ -25,6 +34,8 @@ export default function ContactForm() {
       setStatus({ success: true, message: "¡Mensaje enviado con éxito! Revisa tu correo." });
       setEmail("");
       setMessage("");
+      setToken(null);
+      turnstileRef.current?.reset();
 
       // Ocultar mensaje después de 3 segundos
       setTimeout(() => setStatus(null), 3000);
@@ -76,7 +87,17 @@ export default function ContactForm() {
           />
         </div>
 
-        <button type="submit" className="bg-black text-white px-4 font-semibold rounded hover:bg-black/80 w-full py-3">
+        <div className="flex justify-center my-4">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={SITE_KEY}
+            onSuccess={(token) => setToken(token)}
+            onExpire={() => setToken(null)}
+            onError={() => setToken(null)}
+          />
+        </div>
+
+        <button type="submit" disabled={!token} className="bg-black text-white px-4 font-semibold rounded hover:bg-black/80 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed">
           Enviar mensaje
         </button>
       </form>

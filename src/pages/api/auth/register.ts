@@ -5,13 +5,21 @@ import { supabase } from "../../../lib/supabase";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const { email, password, name, whatsapp, business_name } = await request.json();
+    const { email, password, name, whatsapp, business_name, token } = await request.json();
 
     if (!email || !password) {
       return new Response(
         JSON.stringify({ error: "Email y contraseña son requeridos" }),
         { status: 400 }
       );
+    }
+
+    // Verificar Turnstile token
+    const { verifyTurnstileToken } = await import("../../../lib/turnstile");
+    const verifyData = await verifyTurnstileToken(token);
+    
+    if (!verifyData.success) {
+      return new Response(JSON.stringify({ error: "Verificación de CAPTCHA fallida" }), { status: 400 });
     }
 
     if (password.length < 6) {

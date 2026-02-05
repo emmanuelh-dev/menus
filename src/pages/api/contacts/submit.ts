@@ -6,10 +6,18 @@ import { resend } from "../../../lib/resend";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { email, message } = await request.json();
+    const { email, message, token } = await request.json();
 
-    if (!email || !message) {
-      return new Response(JSON.stringify({ error: "Faltan datos (email, mensaje)" }), { status: 400 });
+    if (!email || !message || !token) {
+      return new Response(JSON.stringify({ error: "Faltan datos (email, mensaje, captcha)" }), { status: 400 });
+    }
+
+    // Verificar Turnstile token
+    const { verifyTurnstileToken } = await import("../../../lib/turnstile");
+    const verifyData = await verifyTurnstileToken(token);
+    
+    if (!verifyData.success) {
+      return new Response(JSON.stringify({ error: "Verificación de CAPTCHA fallida" }), { status: 400 });
     }
 
     const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
