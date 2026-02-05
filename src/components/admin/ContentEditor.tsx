@@ -1946,7 +1946,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                           </div>
 
                           {/* Gallery Selector */}
-                          <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
+                          {/* <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Galería de Fotos</p>
 
                             <button
@@ -1971,7 +1971,7 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                                 onUpload={onUploadToLibrary}
                               />
                             )}
-                          </div>
+                          </div> */}
                         </div>
 
                         {item.gallery && item.gallery.length > 0 && (

@@ -12,10 +12,20 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Empty body' }), { status: 400 });
     }
     const body = JSON.parse(textBody);
-    let { placeId, instruction, image, images, currentContent: providedContent, preview, saveOnly } = body;
+    let { placeId, instruction, image, images, currentContent: providedContent, preview, saveOnly, token } = body;
 
     if (!placeId) {
       return new Response(JSON.stringify({ error: 'placeId is required' }), { status: 400 });
+    }
+
+    // Verificar Turnstile token (si no es saveOnly, que es para admin)
+    if (!saveOnly) {
+      const { verifyTurnstileToken } = await import("../../../lib/turnstile");
+      const verifyData = await verifyTurnstileToken(token);
+      
+      if (!verifyData.success) {
+        return new Response(JSON.stringify({ error: "Verificación de CAPTCHA fallida" }), { status: 400 });
+      }
     }
 
     if (saveOnly && providedContent) {

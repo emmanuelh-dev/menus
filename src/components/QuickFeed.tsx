@@ -1,5 +1,6 @@
 
 import React, { useState, useRef } from 'react';
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { Sparkles, Upload, CheckCircle2, X, Camera, Info } from 'lucide-react';
 
 interface QuickFeedProps {
@@ -12,7 +13,11 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
   const [isProcessing, setIsProcessing] = useState(false);
   const [text, setText] = useState('');
   const [images, setImages] = useState<File[]>([]);
+  const [token, setToken] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
   const handlePaste = async (e: React.ClipboardEvent) => {
     const items = e.clipboardData?.items;
@@ -35,6 +40,11 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
     const filesToUpload = files || images;
     if (filesToUpload.length === 0 && text.trim() === '') {
       alert('Por favor selecciona al menos una foto o escribe qué cambió.');
+      return;
+    }
+
+    if (!token) {
+      alert('Por favor completa el CAPTCHA.');
       return;
     }
 
@@ -83,7 +93,8 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
           placeId,
           images: resizedImages,
           instruction: text || 'Actualizar precios y platillos según las fotos.',
-          preview: false
+          preview: false,
+          token
         })
       });
 
@@ -92,6 +103,8 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
       if (result.success) {
         setImages([]);
         setText('');
+        setToken(null);
+        turnstileRef.current?.reset();
         alert('✓ ¡Gracias! Tu aporte ha sido recibido y se está procesando.');
         window.location.reload();
       } else {
@@ -152,6 +165,18 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
               accept="image/*"
               multiple
             />
+
+            <div className="flex justify-center my-2 transform scale-75 origin-center">
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={SITE_KEY}
+                onSuccess={(token) => setToken(token)}
+                onExpire={() => setToken(null)}
+                onError={() => setToken(null)}
+                options={{ theme: 'dark' }}
+              />
+            </div>
+
             <button
               onClick={() => {
                 if (images.length > 0 || text.trim() !== '') {
@@ -160,8 +185,8 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                   fileInputRef.current?.click();
                 }
               }}
-              disabled={isProcessing}
-              className="w-full bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3 active:scale-95 border-b-4 border-emerald-700"
+              disabled={isProcessing || !token}
+              className="w-full bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3 active:scale-95 border-b-4 border-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="flex items-center justify-center gap-2">
                 {isProcessing ? (
@@ -248,10 +273,21 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                   {images.length > 0 ? `${images.length} archivos añadidos` : 'Añadir o Pegar Fotos'}
                 </span>
               </div>
+
+              <div className="flex justify-center my-2 transform scale-90 origin-center">
+                <Turnstile
+                  siteKey={SITE_KEY}
+                  onSuccess={(token) => setToken(token)}
+                  onExpire={() => setToken(null)}
+                  onError={() => setToken(null)}
+                  options={{ theme: 'dark' }}
+                />
+              </div>
+
               <button
                 onClick={() => handleSubmit()}
-                disabled={isProcessing || (images.length === 0 && text.trim() === '')}
-                className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isProcessing || !token || (images.length === 0 && text.trim() === '')}
+                className="w-full bg-white text-black py-4 rounded-xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? 'Subiendo...' : images.length > 0 ? `Enviar ${images.length} fotos` : 'Enviar actualización de texto'}
               </button>
