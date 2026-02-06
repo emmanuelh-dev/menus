@@ -41,11 +41,12 @@ const { stateName } = Astro.props;
 					<MessageCircle className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
-					Recibir pedidos a tu WhatsApp
+					Pedidos por WhatsApp en {stateName || "tu zona"}
 				</h3>
 				<p class="text-slate-400 font-medium leading-relaxed">
-					Sin apps ni descargas. Comparte el enlace de tu menú y te llegan tus
-					pedidos a tu WhatsApp {stateName ? `en ${stateName}` : ""}.
+					Sin apps ni descargas. Los clientes de <strong
+						>{stateName || "tu localidad"}</strong
+					> escanean tu QR y te envían su pedido directo a tu chat.
 				</p>
 			</div>
 
@@ -59,11 +60,11 @@ const { stateName } = Astro.props;
 					<BarChart3 className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
-					Administrar tu negocio más fácil
+					Gestión Local {stateName ? `en ${stateName}` : ""}
 				</h3>
 				<p class="text-slate-400 font-medium leading-relaxed">
-					Cambia productos {stateName ? `en tu local de ${stateName}` : ""},
-					revisa estadísticas de ventas y administra mensajes.
+					Actualiza precios de <strong>{stateName || "tu negocio"}</strong> al instante,
+					revisa qué es lo más vendido en tu zona y optimiza tu operación.
 				</p>
 			</div>
 
@@ -77,11 +78,12 @@ const { stateName } = Astro.props;
 					<Globe className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
-					Link único para tu negocio
+					Presencia Web en {stateName || "México"}
 				</h3>
 				<p class="text-slate-400 font-medium leading-relaxed">
-					Crea tu propia página web con el catálogo de productos y redes
-					sociales de tu negocio.
+					Tener un Menú Digital QR te da visibilidad en Google cuando busquen
+					comida <strong>{stateName ? `en ${stateName}` : "cerca de ti"}</strong
+					>.
 				</p>
 			</div>
 
@@ -95,11 +97,12 @@ const { stateName } = Astro.props;
 					<Monitor className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
-					Crear pedidos con tu POS
+					Punto de Venta (POS)
 				</h3>
 				<p class="text-slate-400 font-medium leading-relaxed">
-					Haz ordenes y gestiona pedidos de manera rápido en un mismo lugar,
-					ideal para atención en local.
+					Ideal para meseros y atención en mesa en <strong
+						>{stateName || "tu establecimiento"}</strong
+					>. Toma órdenes 3 veces más rápido.
 				</p>
 			</div>
 
@@ -113,11 +116,13 @@ const { stateName } = Astro.props;
 					<ShoppingBag className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
-					Controlar tu inventario
+					Inventario Digital
 				</h3>
 				<p class="text-slate-400 font-medium leading-relaxed">
-					Gestiona tus productos y SKUs en un mismo lugar sin Excel, ni papel o
-					apps.
+					Lleva el control de tus insumos y productos sin complicaciones,
+					directamente desde tu panel de BySMax <strong
+						>{stateName ? `en ${stateName}` : ""}</strong
+					>.
 				</p>
 			</div>
 

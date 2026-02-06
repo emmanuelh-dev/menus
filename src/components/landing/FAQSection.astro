@@ -1,18 +1,24 @@
 ---
 import { ChevronDown } from "lucide-react";
 
+interface Props {
+	stateName?: string;
+}
+
+const { stateName } = Astro.props;
+
 const faqs = [
 	{
 		q: "¿Cómo hacen mis clientes sus pedidos?",
-		a: "Tus clientes entran a tu menú digital, seleccionan sus productos y al finalizar el pedido se envía automáticamente un resumen estructurado a tu WhatsApp para que lo confirmes.",
+		a: `Tus clientes en <strong>${stateName || "tu ciudad"}</strong> entran a tu menú digital, seleccionan sus productos y al finalizar el pedido se envía automáticamente un resumen estructurado a tu WhatsApp para que lo confirmes.`,
 	},
 	{
 		q: "¿Necesitan descargar una app?",
-		a: "No. BySMax funciona como una página web optimizada para móviles. Solo necesitan el link o escanear el código QR.",
+		a: `No. BySMax funciona como una página web optimizada para móviles. Los comensales de <strong>${stateName || "tu zona"}</strong> solo necesitan el link o escanear el código QR.`,
 	},
 	{
 		q: "¿Qué necesito para empezar?",
-		a: "Solo tu nombre de negocio, una lista de productos con fotos y un número de WhatsApp donde quieras recibir los pedidos.",
+		a: `Solo tu nombre de negocio, una lista de productos con fotos y un número de WhatsApp donde quieras recibir los pedidos en <strong>México</strong>.`,
 	},
 	{
 		q: "¿A qué tipo de negocios les sirve?",
@@ -20,11 +26,11 @@ const faqs = [
 	},
 	{
 		q: "¿Qué pasa si recibo muchos pedidos?",
-		a: "BySMax está diseñado para manejar alto volumen. Los pedidos llegan organizados, evitando errores humanos y saturación del chat.",
+		a: `BySMax está diseñado para manejar alto volumen. Los pedidos desde <strong>${stateName || "cualquier punto"}</strong> llegan organizados, evitando errores humanos y saturación del chat.`,
 	},
 	{
 		q: "¿Tengo soporte si tengo dudas?",
-		a: "Sí, siempre. Nuestro equipo te atiende directo por WhatsApp para cualquier duda o configuración que necesites.",
+		a: `Sí, siempre. Nuestro equipo te atiende directo por WhatsApp para cualquier duda o configuración de tu menú en <strong>${stateName || "tu localidad"}</strong>.`,
 		highlight: true,
 	},
 	{
@@ -32,12 +38,6 @@ const faqs = [
 		a: "Totalmente. Sin contratos forzosos ni letras chiquitas. Eres dueño de tu tiempo y tu negocio.",
 	},
 ];
-
-interface Props {
-	stateName?: string;
-}
-
-const { stateName } = Astro.props;
 ---
 
 <section class="py-32 bg-white">
@@ -63,9 +63,10 @@ const { stateName } = Astro.props;
 								</span>
 								<ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" />
 							</summary>
-							<div class="mt-6 text-slate-500 font-medium leading-relaxed">
-								{faq.a}
-							</div>
+							<div
+								class="mt-6 text-slate-500 font-medium leading-relaxed"
+								set:html={faq.a}
+							/>
 						</details>
 					</div>
 				))

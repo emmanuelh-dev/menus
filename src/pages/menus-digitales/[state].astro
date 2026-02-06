@@ -31,9 +31,9 @@ if (!currentState) {
 	return Astro.redirect("/menus-digitales");
 }
 
-// Obtener restaurantes de tipo "restaurante" para este estado
+// Obtener todos los negocios para este estado (sin filtrar por tipo)
 const restaurantsData = await getRestaurants({
-	type: "restaurante",
+	type: null,
 	state_id: currentState.id,
 });
 
@@ -51,6 +51,11 @@ const pageData = {
 
 const customTitle = `Menú Digital QR en <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">${currentState.name}</span> <br/> para Restaurantes`;
 const customSubtitle = `Únete a los negocios de <strong>${currentState.name}</strong> que ya reciben pedidos directamente a WhatsApp sin pagar comisiones por apps de delivery.`;
+
+const localPitch =
+	restaurants.length > 5
+		? `Actualmente contamos con <strong>${restaurants.length} restaurantes</strong> destacados en ${currentState.name} que han transformado su operación. Desde la capital hasta las zonas más concurridas, la digitalización con códigos QR es la tendencia líder.`
+		: `Estamos impulsando la digitalización en <strong>${currentState.name}</strong>. Únete como pionero y posiciona tu restaurante en las primeras búsquedas de Google dentro de tu zona.`;
 ---
 
 <DefaultLayout
@@ -64,6 +69,15 @@ const customSubtitle = `Únete a los negocios de <strong>${currentState.name}</s
 			subtitle={customSubtitle}
 			stateName={currentState.name}
 		/>
+
+		<!-- Dynamic SEO Block -->
+		<section class="py-12 bg-emerald-50/30">
+			<div class="max-w-4xl mx-auto px-6 text-center">
+				<p class="text-slate-600 font-medium leading-relaxed italic">
+					<Fragment set:html={localPitch} />
+				</p>
+			</div>
+		</section>
 
 		<TrustShowcase stateName={currentState.name} />
 

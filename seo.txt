@@ -52,6 +52,37 @@ Basado en datos del Planificador de Palabras Clave de Google (Feb 2026):
 - Términos y Condiciones
 - Aviso de Privacidad
 
+---
+
+## 🔍 Estrategia de Intención de Búsqueda (Search Intent)
+*Actualización Feb 2026*
+
+### Principio Fundamental:
+Priorizar la **Intención de Búsqueda** sobre la **Marca**. Las landings deben titularse y estructurarse para resolver lo que el usuario busca en Google (e.g., "Menú Digital QR", "Carta Digital para Restaurantes") antes de presentar el nombre del software.
+
+### Directrices de Contenido:
+1. **Títulos SEO (Title Tags)**: Siempre empezar con la Keyword principal + Localidad (si aplica).
+   - Ejemplo: `Menú Digital QR en Nuevo León | Carta Digital para Restaurantes`
+2. **Encabezados H1**: Atacar directamente el problema/solución. 
+   - Evitar: "Con BySMax podrás..."
+   - Preferir: "Crea tu Menú Digital QR y recibe pedidos por WhatsApp"
+3. **Localidad**: Crear landings dinámicas por Estado/Ciudad que importen los mismos componentes de venta de la Home pero con contexto geográfico.
+
+### Estructura Modular (Componentes):
+Para mantener la consistencia y la "fuerza de venta" en todas las landings, usar los siguientes módulos:
+- `HeroSection`: H1 con Keyword principal + Beneficio + Mockup.
+- `TrustShowcase`: Prueba social (Logos de negocios).
+- `IndustriesSection`: Segmentación por nichos (Sushi, Burgers, Retail).
+- `HowItWorks`: Video/Demo corto (60s).
+- `FeaturesGrid`: 5 beneficios técnicos (WhatsApp, POS, Inventario).
+- `FAQSection`: Resolución de objeciones.
+- `FinalCTA`: Cierre de venta directo.
+
+### Sitemap Estratégico:
+Mantener un `Sitemap HTML` premium que actúe como un hub de autoridad regional, facilitando el "crawling" de Google hacia las landings estatales con alta intención de compra.
+
+---
+
 ## 📧 Contacto SEO:
-Email: hola@bysmax.com (Inspirado en hola@mennu.mx)
+Email: hola@bysmax.com
 Copyright: BySMax Mx 2026
