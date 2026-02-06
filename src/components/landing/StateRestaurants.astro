@@ -52,7 +52,7 @@ const { stateName, restaurants } = Astro.props;
 										<span class="text-[10px] font-black">{res.rating}</span>
 									</div>
 									<div class="bg-emerald-500 px-3 py-1 rounded-full text-white text-[9px] font-black uppercase tracking-widest">
-										Menú Digital
+										{res.type === "motel" ? "Guía Local" : "Menú Digital"}
 									</div>
 								</div>
 							</div>
@@ -65,14 +65,23 @@ const { stateName, restaurants } = Astro.props;
 									{res.address || stateName}
 								</p>
 
-								<a
-									href={res.menu || `/menus/${res.short_name}`}
-									target="_blank"
-									class="inline-flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-500 transition-all active:scale-95"
-								>
-									Ver menú ejemplo
-									<ArrowRight className="w-3.5 h-3.5" />
-								</a>
+								{(() => {
+									const isMotel = res.type === "motel";
+									const href = isMotel
+										? `/moteles/${res.state_slug}/${res.short_name}`
+										: res.menu || `/menus/${res.short_name}`;
+
+									return (
+										<a
+											href={href}
+											target={isMotel ? "_self" : "_blank"}
+											class="inline-flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-500 transition-all active:scale-95"
+										>
+											{isMotel ? "Ver guía completa" : "Ver menú ejemplo"}
+											<ArrowRight className="w-3.5 h-3.5" />
+										</a>
+									);
+								})()}
 							</div>
 						</div>
 					))}
