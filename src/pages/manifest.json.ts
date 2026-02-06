@@ -22,11 +22,12 @@ export const GET: APIRoute = async ({ url }) => {
 		themeColor = "#10b981";
 	} else if (slug) {
 		// Búsqueda en la tabla places para obtener metadatos reales
-		const { data: place, error } = await supabase
+		const { data: places, error } = await supabase
 			.from("places")
 			.select("name, type, image, menu, short_name, states(slug)")
-			.eq("short_name", slug)
-			.maybeSingle();
+			.eq("short_name", slug);
+
+		const place = places?.[0];
 
 		if (!error && place) {
 			name = place.name;

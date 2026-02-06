@@ -24,11 +24,12 @@ if (!name) {
 
 const isAdmin = await isAuthenticated(Astro.request, Astro.cookies);
 
-const { data: place } = await supabase
+const { data: places } = await supabase
 	.from("places")
 	.select("*, states(*)")
-	.eq("short_name", name)
-	.single();
+	.eq("short_name", name);
+
+const place = places?.find((p) => p.states?.slug === state) || places?.[0];
 
 if (!place) {
 	return Astro.redirect("/404");
