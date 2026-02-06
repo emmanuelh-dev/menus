@@ -10,7 +10,10 @@ Allow: /cafeterias?zona=*
 Allow: /cafeterias?tipo=*
 
 # Sitemap
-Sitemap: ${baseUrl}/sitemap.xml
+Sitemap: ${baseUrl}/sitemap-index.xml
+Sitemap: ${baseUrl}/sitemap-moteles.xml
+Sitemap: ${baseUrl}/sitemap-moteles-all.xml
+Sitemap: ${baseUrl}/sitemap-menus-digitales.xml
 Sitemap: ${baseUrl}/sitemap-cafeterias.xml
 
 # Crawl-delay para bots agresivos

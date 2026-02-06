@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ url }) => {
 		// Búsqueda en la tabla places para obtener metadatos reales
 		const { data: place, error } = await supabase
 			.from("places")
-			.select("name, type, image, menu, short_name")
+			.select("name, type, image, menu, short_name, states(slug)")
 			.eq("short_name", slug)
 			.maybeSingle();
 
@@ -34,7 +34,8 @@ export const GET: APIRoute = async ({ url }) => {
 			
 			// Si no nos pasaron un path exacto por param, usamos la lógica de fallback
 			if (!pathParam) {
-				startUrl = place.menu || (place.type === "motel" ? `/moteles/${slug}` : `/menus/${slug}`);
+				const stateSlug = (place.states as any)?.slug || 'nuevo-leon';
+				startUrl = place.menu || (place.type === "motel" ? `/moteles/estados/${stateSlug}/${slug}` : `/menus/${slug}`);
 			}
 			
 			if (place.image) icon = place.image;

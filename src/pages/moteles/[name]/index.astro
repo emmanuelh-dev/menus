@@ -1,84 +1,21 @@
 ---
 export const prerender = false;
 
-Astro.response.headers.set(
-  'Cache-Control', 
-  'public, s-maxage=300, stale-while-revalidate=60'
-);
-
-const { name, state } = Astro.params;
-
-import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
-import Gallery from "../../../components/Gallery.astro";
-import WhatsappButton from "../../../components/WhatsappButton";
-import CopyClabe from "../../../components/CopyClabe";
-import Breadcrumbs from "../../../components/Breadcrumbs.astro";
-import { getRestaurantByName, supabase, getStates } from "../../../lib/supabase";
-import MotelLayout from "../../../layouts/MotelLayout.astro";
-import QuickFeed from "../../../components/QuickFeed";
-import MotelPageRenderer from "../../../components/MotelPageRenderer";
+const { name } = Astro.params;
+import { getRestaurantByName } from "../../../lib/supabase";
 
 if (!name) {
-	throw new Error("No se ha especificado el nombre del restaurante");
+	return Astro.redirect("/moteles");
 }
+
 const restaurantData = await getRestaurantByName({ name });
 const place = restaurantData[0];
 
 if (!place) {
-	throw new Error("No se ha encontrado el restaurante");
+	return Astro.redirect("/moteles");
 }
 
-const { data: initialReviews } = await supabase
-	.from("reviews")
-	.select("*")
-	.eq("place_id", place.id)
-	.order("created_at", { ascending: false })
-	.limit(10);
-
-const states = await getStates();
-const currentState = states.find(s => s.slug === state);
+// Redirigir siempre a la nueva estructura con estados
+const stateSlug = place.state_slug || "nuevo-leon";
+return Astro.redirect(`/moteles/estados/${stateSlug}/${name}`, 301);
 ---
-
-<MotelLayout
-  place={place}
-	image={place.image ? place.image : "/placeholder.svg"}
-	backgroundColor="bg-[#0A0A0A]"
->
-	<div
-		class="min-h-screen bg-[#0A0A0A] text-stone-300 selection:bg-red-900 selection:text-white"
-	>
-     <div class="max-w-3xl mx-auto p-4">
-			
-			<Breadcrumbs 
-				items={[
-					{ label: 'Inicio', href: '/' },
-					{ label: 'Moteles', href: '/moteles' },
-					{ label: 'Estados', href: '/moteles/estados' },
-					...(currentState ? [{ label: currentState.name, href: `/moteles/estados/${state}` }] : []),
-					{ label: place.name }
-				]}
-				theme="dark"
-			/>
-		</div>
-
-		<MotelPageRenderer 
-			place={place} 
-			initialReviews={initialReviews || []}
-			client:load 
-		/>
-
-
-    <ins class="adsbygoogle h-48"
-     style="display:block"
-     data-ad-client="ca-pub-3646138644530578"
-     data-ad-slot="5585876237"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-	</div>
-
-	<!-- <QuickFeed placeId={place.id} client:load /> -->
-</MotelLayout>
-

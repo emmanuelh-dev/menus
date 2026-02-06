@@ -34,6 +34,12 @@ if (!place) {
 	return Astro.redirect("/404");
 }
 
+// Validar que el slug del estado coincida con el del lugar encontrado
+// Si no coincide (ej: intentan entrar con /moteles/incorrecto/nombre-correcto), redirigimos al correcto
+if (place.states?.slug && place.states.slug !== state) {
+	return Astro.redirect(`/moteles/estados/${place.states.slug}/${name}`);
+}
+
 const stats = await getPlaceRating(place.id);
 const { data: initialReviews } = await supabase
 	.from("reviews")
@@ -63,7 +69,12 @@ const currentState = states.find((s) => s.slug === state);
 					{ label: "Moteles", href: "/moteles" },
 					{ label: "Estados", href: "/moteles/estados" },
 					...(currentState
-						? [{ label: currentState.name, href: `/moteles/estados/${state}` }]
+						? [
+								{
+									label: currentState.name,
+									href: `/moteles/estados/${currentState.slug}`,
+								},
+							]
 						: []),
 					{ label: place.name },
 				]}

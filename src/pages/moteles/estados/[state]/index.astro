@@ -33,7 +33,6 @@ import {
 import type { SupabasePlace } from "../../../../types/app";
 
 const { state } = Astro.params;
-
 const [states, allRatings] = await Promise.all([
 	getStates(),
 	getAllPlaceRatings(),
@@ -111,10 +110,10 @@ const schemaEnrichment = {
 			>
 				<div class="mb-6">
 					<a
-						href="/moteles/estados"
+						href="/moteles"
 						class="inline-flex items-center text-pink-300 hover:text-pink-200 transition-colors text-sm"
 					>
-						← Volver a Estados
+						← Volver a Directorio
 					</a>
 				</div>
 				<span

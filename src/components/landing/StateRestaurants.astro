@@ -68,7 +68,7 @@ const { stateName, restaurants } = Astro.props;
 								{(() => {
 									const isMotel = res.type === "motel";
 									const href = isMotel
-										? `/moteles/${res.state_slug}/${res.short_name}`
+										? `/moteles/estados/${res.state_slug}/${res.short_name}`
 										: res.menu || `/menus/${res.short_name}`;
 
 									return (

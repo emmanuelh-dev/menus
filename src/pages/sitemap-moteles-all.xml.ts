@@ -11,12 +11,8 @@ export async function GET() {
     '/moteles/estados',
     ...states.map(state => `/moteles/estados/${state.slug}`),
     ...moteles
-      .filter(motel => motel.short_name && motel.state_id)
-      .map(motel => {
-        const state = states.find(s => s.id === motel.state_id);
-        return state ? `/moteles/estados/${state.slug}/${motel.short_name}` : null;
-      })
-      .filter((url): url is string => url !== null)
+      .filter(motel => motel.short_name)
+      .map(motel => `/moteles/estados/${motel.state_slug || 'nuevo-leon'}/${motel.short_name}`)
   ];
   
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

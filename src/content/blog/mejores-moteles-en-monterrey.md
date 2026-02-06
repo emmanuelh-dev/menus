@@ -132,7 +132,7 @@ Una joya en **Escobedo** que vale la pena visitar:
 - Precios justos
 - Fácil acceso desde la zona metropolitana
 
-[**Ver más detalles del Sunset Marquis**](https://menus.bysmax.com/moteles/sunset-marquis)
+[**Ver más detalles del Sunset Marquis**](https://menus.bysmax.com/moteles/estados/nuevo-leon/sunset-marquis)
 
 ### 13. Motel Aqua - Experiencia Única
 
