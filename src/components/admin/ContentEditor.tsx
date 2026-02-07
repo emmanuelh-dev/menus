@@ -194,6 +194,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>('editor');
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [showMobileNav, setShowMobileNav] = useState(false);
@@ -208,6 +209,39 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   });
   const [showViewSettings, setShowViewSettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (activeTab !== 'editor') return;
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '-10% 0px -70% 0px', // Detectar cuando está cerca de la parte superior
+      threshold: 0
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSectionId(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Esperar un momento a que los elementos estén en el DOM
+    const timer = setTimeout(() => {
+      blocks.forEach(block => {
+        const element = document.getElementById(block.id);
+        if (element) observer.observe(element);
+      });
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [activeTab, blocks]);
 
   const scrollToBlock = (id: string) => {
     const element = document.getElementById(id);
@@ -533,6 +567,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </>
         }
       />
+
+      {activeTab === 'editor' && (
+        <SectionNav
+          blocks={blocks}
+          activeSectionId={activeSectionId}
+          onScrollTo={scrollToBlock}
+        />
+      )}
 
       {/* Floating Quick Nav for Mobile */}
       <div className="fixed bottom-6 right-6 z-40 sm:hidden">
@@ -2137,6 +2179,48 @@ function CarruselBlock({ data, onChange, existingImages, onUploadToLibrary }: { 
             onUpload={onUploadToLibrary}
           />
         )}
+      </div>
+    </div>
+  );
+}
+
+function SectionNav({ blocks, activeSectionId, onScrollTo }: { blocks: Block[], activeSectionId: string | null, onScrollTo: (id: string) => void }) {
+  const sections = blocks.filter(b => b.type === 'section');
+  if (sections.length === 0) return null;
+
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (activeSectionId && navRef.current) {
+      const activeBtn = navRef.current.querySelector(`[data-section-id="${activeSectionId}"]`);
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [activeSectionId]);
+
+  return (
+    <div className="sticky top-[100px] md:top-[116px] z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 py-3 shadow-sm transition-all overflow-hidden shrink-0">
+      <div
+        ref={navRef}
+        className="max-w-[1600px] mx-auto px-4 overflow-x-auto hide-scrollbar flex gap-2 scroll-smooth items-center"
+      >
+        <div className="flex-shrink-0 mr-2 text-gray-400">
+          <span className="text-[9px] font-black uppercase tracking-widest bg-gray-50 px-2 py-1 rounded-md">Categorías:</span>
+        </div>
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            data-section-id={section.id}
+            onClick={() => onScrollTo(section.id)}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${activeSectionId === section.id
+              ? 'bg-gray-900 text-white shadow-lg shadow-gray-200 scale-105'
+              : 'bg-white text-gray-400 hover:text-gray-900 border border-gray-100 hover:border-gray-300'
+              }`}
+          >
+            {section.data.title || 'Sección'}
+          </button>
+        ))}
       </div>
     </div>
   );

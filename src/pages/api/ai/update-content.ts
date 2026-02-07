@@ -37,27 +37,32 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       isOwner = true;
     }
 
-    // --- LÍMITES POR USUARIO (2 por mes) ---
+    // --- LÍMITES POR USUARIO ($20 MXN por mes) ---
     if (user && !saveOnly) {
       const now = new Date();
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
       
-      // Contar peticiones de IA en el mes actual para este usuario
-      // Como no tenemos user_id en history, buscamos por los places del usuario
       const { data: userPlaces } = await supabase.from('places').select('id').eq('user_id', user.id);
       const placeIds = userPlaces?.map(p => p.id) || [];
       
       if (placeIds.length > 0) {
-        const { count, error: countError } = await supabase
+        const { data: history } = await supabase
           .from('place_content_history')
-          .select('*', { count: 'exact', head: true })
+          .select('version_label')
           .in('place_id', placeIds)
           .gte('created_at', firstDayOfMonth)
-          .like('version_label', 'AI_GEN:%'); // Las de la IA empiezan así
+          .like('version_label', 'AI_GEN:%');
           
-        if (!countError && count !== null && count >= 2) {
+        // Extraer y sumar costos de las etiquetas guardadas
+        let totalMonthCost = 0;
+        history?.forEach(h => {
+          const match = h.version_label.match(/cost:([0-9.]+)/);
+          if (match) totalMonthCost += parseFloat(match[1]);
+        });
+
+        if (totalMonthCost >= 20) {
           return new Response(JSON.stringify({ 
-            error: 'Has alcanzado el límite de 2 solicitudes de IA por mes para tu cuenta.' 
+            error: `Has alcanzado tu límite mensual de $20 MXN en consultas de IA (Consumido: $${totalMonthCost.toFixed(2)}).` 
           }), { status: 429 });
         }
       }
@@ -261,7 +266,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         });
     }
     
-    // GUARDAR HISTORIAL CON EL RESUMEN DE LA IA
+    // CÁLCULO DE COSTO EN MXN (Basado en Gemini 2.0 Flash Lite / Flash)
+    // Precios aprox USD: Input $0.10/1M, Output $0.40/1M. Exchange: $20 MXN/USD
+    const inputCostMx = (aiResponse.usageMetadata?.promptTokenCount || 0) * (0.10 / 1000000) * 20;
+    const outputCostMx = (aiResponse.usageMetadata?.candidatesTokenCount || 0) * (0.40 / 1000000) * 20;
+    const totalCostMx = inputCostMx + outputCostMx;
+
+    // GUARDAR HISTORIAL CON EL RESUMEN DE LA IA Y COSTO
     await supabase
       .from('place_content_history')
       .insert({
@@ -269,7 +280,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         content: currentContent, // El contenido anterior para poder hacer rollback
         source: providedContent ? 'admin_editor' : 'quick_feed_request',
         agent_reasoning: aiResponse.change_summary || instruction || 'Update request',
-        version_label: `AI_GEN: ${aiResponse.change_summary?.substring(0, 40) || instruction?.substring(0, 30) || 'AI Scan'}`
+        version_label: `AI_GEN: cost:${totalCostMx.toFixed(4)} | ${aiResponse.change_summary?.substring(0, 30) || instruction?.substring(0, 30) || 'AI Scan'}`
       });
 
     const stats = {
