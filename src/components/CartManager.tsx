@@ -190,6 +190,18 @@ export default function CartManager({
   }, [placeSlug]);
 
   useEffect(() => {
+    const shouldLock = showCart || showFavorites || showCheckout || !!configuringItem;
+    if (shouldLock) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showCart, showFavorites, showCheckout, configuringItem]);
+
+  useEffect(() => {
     if (deliveryColony && wantsDelivery) {
       updateShippingPrice();
     }
