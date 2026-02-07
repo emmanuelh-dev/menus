@@ -1005,20 +1005,20 @@ export default function CartManager({
       )}
       {configuringItem && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
-          <div className="bg-white w-full sm:max-w-md rounded-t-[2.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
-            <div className="relative aspect-video sm:aspect-[16/10] overflow-hidden">
+          <div className="bg-white w-full sm:max-w-md max-h-[85dvh] flex flex-col rounded-t-[2.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
+            <div className="relative h-40 sm:h-64 overflow-hidden shrink-0">
               {configuringItem.image ? (
                 <img src={configuringItem.image} className="w-full h-full object-cover" alt="" />
               ) : (
                 <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
-                  <ShoppingCart size={48} />
+                  <ShoppingCart size={40} />
                 </div>
               )}
               <button
                 onClick={() => setConfiguringItem(null)}
-                className="absolute top-4 right-4 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all z-50 shadow-lg"
+                className="absolute top-3 right-3 w-9 h-9 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all z-50 shadow-xl"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
