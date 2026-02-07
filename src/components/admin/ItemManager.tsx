@@ -76,12 +76,12 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    
+
     try {
 
       const ingredientsText = formData.get("ingredients") as string;
       const allergensText = formData.get("allergens") as string;
-      
+
       const ingredients = ingredientsText ? ingredientsText.split(',').map(i => i.trim()).filter(i => i) : [];
       const allergens = allergensText ? allergensText.split(',').map(a => a.trim()).filter(a => a) : [];
 
@@ -189,13 +189,13 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                     className="w-full h-48 object-cover"
                   />
                 )}
-                
+
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-medium text-gray-900">{item.name}</h3>
                     <span className="text-lg font-bold text-green-600">${item.base_price}</span>
                   </div>
-                  
+
                   {item.description && (
                     <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                       {item.description}
@@ -243,14 +243,13 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      item.is_active 
-                        ? 'bg-green-100 text-green-800' 
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.is_active
+                        ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
-                    }`}>
+                      }`}>
                       {item.is_active ? 'Activo' : 'Inactivo'}
                     </span>
-                    
+
                     <div className="flex space-x-2">
                       <button
                         onClick={() => openEditModal(item)}
@@ -295,7 +294,7 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[calc(100dvh-200px)] overflow-y-auto">
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                   {error}
@@ -445,56 +444,56 @@ export default function ItemManager({ menuId, categoryId, restaurantId, initialI
 
               <div className="space-y-2">
                 <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="is_active" 
-                    defaultChecked={editingItem?.is_active ?? true} 
-                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
+                  <input
+                    type="checkbox"
+                    name="is_active"
+                    defaultChecked={editingItem?.is_active ?? true}
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2"
                   />
                   <span className="text-sm">Activo</span>
                 </label>
                 <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="is_featured" 
-                    defaultChecked={editingItem?.is_featured || false} 
-                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
+                  <input
+                    type="checkbox"
+                    name="is_featured"
+                    defaultChecked={editingItem?.is_featured || false}
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2"
                   />
                   <span className="text-sm">Destacado</span>
                 </label>
                 <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="is_vegetarian" 
-                    defaultChecked={editingItem?.is_vegetarian || false} 
-                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
+                  <input
+                    type="checkbox"
+                    name="is_vegetarian"
+                    defaultChecked={editingItem?.is_vegetarian || false}
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2"
                   />
                   <span className="text-sm">Vegetariano</span>
                 </label>
                 <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="is_vegan" 
-                    defaultChecked={editingItem?.is_vegan || false} 
-                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
+                  <input
+                    type="checkbox"
+                    name="is_vegan"
+                    defaultChecked={editingItem?.is_vegan || false}
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2"
                   />
                   <span className="text-sm">Vegano</span>
                 </label>
                 <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="is_gluten_free" 
-                    defaultChecked={editingItem?.is_gluten_free || false} 
-                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
+                  <input
+                    type="checkbox"
+                    name="is_gluten_free"
+                    defaultChecked={editingItem?.is_gluten_free || false}
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2"
                   />
                   <span className="text-sm">Sin gluten</span>
                 </label>
                 <label className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="is_spicy" 
-                    defaultChecked={editingItem?.is_spicy || false} 
-                    className="rounded border-gray-300 focus:ring-black -500 mr-2" 
+                  <input
+                    type="checkbox"
+                    name="is_spicy"
+                    defaultChecked={editingItem?.is_spicy || false}
+                    className="rounded border-gray-300 focus:ring-black -500 mr-2"
                   />
                   <span className="text-sm">Picante</span>
                 </label>

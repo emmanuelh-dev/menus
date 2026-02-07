@@ -373,7 +373,7 @@ export default function WaiterMode({
         />
       )}
 
-      <div className={`flex-1 flex flex-col md:flex-row w-full max-w-[1600px] mx-auto overflow-hidden ${isPage ? 'h-full' : 'sm:h-[90vh] sm:rounded-3xl shadow-2xl bg-white'}`}>
+      <div className={`flex-1 flex flex-col md:flex-row w-full max-w-[1600px] mx-auto overflow-hidden ${isPage ? 'h-full' : 'sm:h-[90dvh] sm:rounded-3xl shadow-2xl bg-white'}`}>
 
         {/* Left: Menu Side - Scrollable independently */}
         <div className={`flex-1 flex flex-col min-w-0 bg-white overflow-hidden border-r border-gray-200 ${step === 2 ? 'hidden md:flex' : 'flex'}`}>
@@ -704,7 +704,7 @@ export default function WaiterMode({
       {/* Item Configuration Modal */}
       {configuringItem && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-white w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90dvh]">
             <div className="relative h-48 shrink-0">
               {configuringItem.image ? (
                 <img src={configuringItem.image} className="w-full h-full object-cover" />

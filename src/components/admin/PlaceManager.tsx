@@ -520,7 +520,7 @@ export default function PlaceManager({
       {
         isModalOpen && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-xl max-h-[90vh] rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col">
+            <div className="bg-white w-full max-w-xl max-h-[90dvh] rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col">
               {/* Steps Header */}
               <div className="bg-white px-8 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-6">

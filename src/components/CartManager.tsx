@@ -585,7 +585,7 @@ export default function CartManager({
             if (e.target === e.currentTarget) setShowFavorites(false);
           }}
         >
-          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
+          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80dvh] flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Heart className="w-6 h-6 text-pink-500" fill="currentColor" />
@@ -668,7 +668,7 @@ export default function CartManager({
             if (e.target === e.currentTarget) setShowCart(false);
           }}
         >
-          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[90vh] flex flex-col shadow-2xl">
+          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[90dvh] flex flex-col shadow-2xl">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10 rounded-t-2xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600">
@@ -1029,7 +1029,7 @@ export default function CartManager({
                 <p className="text-2xl font-black text-emerald-600 mt-4">${configuringItem.price}</p>
               </div>
 
-              <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar p-1">
+              <div className="space-y-6 max-h-[50dvh] overflow-y-auto pr-2 custom-scrollbar p-1">
 
 
                 {configuringItem.options?.length > 0 && (

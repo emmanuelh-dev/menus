@@ -1,139 +1,146 @@
 ---
 interface Props {
-  id?: string;
-  className?: string;
+	id?: string;
+	className?: string;
 }
 
-const { id = 'imageModal', className = '' } = Astro.props;
+const { id = "imageModal", className = "" } = Astro.props;
 ---
 
 <!-- Modal -->
-<div 
-  id={id} 
-  class={`hidden fixed inset-0 z-50 p-5 bg-black/90 items-center justify-center ${className}`}
+<div
+	id={id}
+	class={`hidden fixed inset-0 z-50 p-5 bg-black/90 items-center justify-center ${className}`}
 >
-  <button 
-    class="absolute top-4 right-6 text-white text-4xl font-bold cursor-pointer hover:text-gray-300 z-50"
-    aria-label="Cerrar modal"
-    data-close-modal
-  >
-    &times;
-  </button>
-  <div class="flex flex-col items-center justify-center">
-    <img 
-      data-modal-image 
-      src="" 
-      alt="" 
-      class="max-w-[90%] max-h-[90vh] mx-auto object-contain" 
-    />
-    <p 
-      data-modal-title 
-      class="text-center text-white mt-3"
-    ></p>
-  </div>
+	<button
+		class="absolute top-4 right-6 text-white text-4xl font-bold cursor-pointer hover:text-gray-300 z-50"
+		aria-label="Cerrar modal"
+		data-close-modal
+	>
+		&times;
+	</button>
+	<div class="flex flex-col items-center justify-center">
+		<img
+			data-modal-image
+			src=""
+			alt=""
+			class="max-w-[90%] max-h-[90dvh] mx-auto object-contain"
+		/>
+		<p data-modal-title class="text-center text-white mt-3"></p>
+	</div>
 </div>
 
 <script>
-  interface ImageModalOptions {
-    modalId?: string;
-    onOpen?: () => void;
-    onClose?: () => void;
-  }
+	interface ImageModalOptions {
+		modalId?: string;
+		onOpen?: () => void;
+		onClose?: () => void;
+	}
 
-  class ImageModal {
-    private modal: HTMLElement | null;
-    private modalImg: HTMLImageElement | null;
-    private modalTitle: HTMLElement | null;
-    private closeButton: HTMLElement | null;
-    private options: ImageModalOptions;
+	class ImageModal {
+		private modal: HTMLElement | null;
+		private modalImg: HTMLImageElement | null;
+		private modalTitle: HTMLElement | null;
+		private closeButton: HTMLElement | null;
+		private options: ImageModalOptions;
 
-    constructor(options: ImageModalOptions = {}) {
-      this.options = options;
-      const modalId = options.modalId || 'imageModal';
-      
-      this.modal = document.getElementById(modalId);
-      this.modalImg = this.modal?.querySelector('[data-modal-image]') as HTMLImageElement;
-      this.modalTitle = this.modal?.querySelector('[data-modal-title]') as HTMLElement;
-      this.closeButton = this.modal?.querySelector('[data-close-modal]') as HTMLElement;
-      
-      this.init();
-    }
+		constructor(options: ImageModalOptions = {}) {
+			this.options = options;
+			const modalId = options.modalId || "imageModal";
 
-    private init(): void {
-      if (!this.modal) return;
+			this.modal = document.getElementById(modalId);
+			this.modalImg = this.modal?.querySelector(
+				"[data-modal-image]",
+			) as HTMLImageElement;
+			this.modalTitle = this.modal?.querySelector(
+				"[data-modal-title]",
+			) as HTMLElement;
+			this.closeButton = this.modal?.querySelector(
+				"[data-close-modal]",
+			) as HTMLElement;
 
-      // Close button event
-      this.closeButton?.addEventListener('click', () => this.close());
+			this.init();
+		}
 
-      // Click outside to close
-      this.modal.addEventListener('click', (e: Event) => {
-        if (e.target === this.modal) {
-          this.close();
-        }
-      });
+		private init(): void {
+			if (!this.modal) return;
 
-      // Escape key to close
-      document.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && this.modal?.classList.contains('flex')) {
-          this.close();
-        }
-      });
-    }
+			// Close button event
+			this.closeButton?.addEventListener("click", () => this.close());
 
-    public open(imageSrc: string, imageAlt: string = '', title: string = ''): void {
-      if (!this.modal || !this.modalImg || !this.modalTitle) return;
+			// Click outside to close
+			this.modal.addEventListener("click", (e: Event) => {
+				if (e.target === this.modal) {
+					this.close();
+				}
+			});
 
-      this.modal.classList.remove('hidden');
-      this.modal.classList.add('flex');
-      
-      this.modalImg.src = imageSrc;
-      this.modalImg.alt = imageAlt;
-      
-      if (title) {
-        this.modalTitle.textContent = title;
-        this.modalTitle.classList.remove('hidden');
-      } else {
-        this.modalTitle.classList.add('hidden');
-      }
+			// Escape key to close
+			document.addEventListener("keydown", (e: KeyboardEvent) => {
+				if (e.key === "Escape" && this.modal?.classList.contains("flex")) {
+					this.close();
+				}
+			});
+		}
 
-      this.options.onOpen?.();
-    }
+		public open(
+			imageSrc: string,
+			imageAlt: string = "",
+			title: string = "",
+		): void {
+			if (!this.modal || !this.modalImg || !this.modalTitle) return;
 
-    public close(): void {
-      if (!this.modal) return;
+			this.modal.classList.remove("hidden");
+			this.modal.classList.add("flex");
 
-      this.modal.classList.add('hidden');
-      this.modal.classList.remove('flex');
-      
-      this.options.onClose?.();
-    }
+			this.modalImg.src = imageSrc;
+			this.modalImg.alt = imageAlt;
 
-    public attachToElements(selector: string): void {
-      document.querySelectorAll<HTMLElement>(selector).forEach(element => {
-        element.addEventListener('click', () => {
-          const img = element.querySelector('img');
-          const titleElement = element.querySelector('[data-image-title], p');
-          
-          if (img) {
-            const title = titleElement?.textContent || '';
-            this.open(img.src, img.alt, title);
-          }
-        });
-      });
-    }
+			if (title) {
+				this.modalTitle.textContent = title;
+				this.modalTitle.classList.remove("hidden");
+			} else {
+				this.modalTitle.classList.add("hidden");
+			}
 
-    public destroy(): void {
-      // Cleanup event listeners if needed
-      this.closeButton?.removeEventListener('click', () => this.close());
-    }
-  }
+			this.options.onOpen?.();
+		}
 
-  // Global function to create image modal instances
-  function createImageModal(options: ImageModalOptions = {}): ImageModal {
-    return new ImageModal(options);
-  }
+		public close(): void {
+			if (!this.modal) return;
 
-  // Make it globally available
-  (window as any).createImageModal = createImageModal;
-  (window as any).ImageModal = ImageModal;
+			this.modal.classList.add("hidden");
+			this.modal.classList.remove("flex");
+
+			this.options.onClose?.();
+		}
+
+		public attachToElements(selector: string): void {
+			document.querySelectorAll<HTMLElement>(selector).forEach((element) => {
+				element.addEventListener("click", () => {
+					const img = element.querySelector("img");
+					const titleElement = element.querySelector("[data-image-title], p");
+
+					if (img) {
+						const title = titleElement?.textContent || "";
+						this.open(img.src, img.alt, title);
+					}
+				});
+			});
+		}
+
+		public destroy(): void {
+			// Cleanup event listeners if needed
+			this.closeButton?.removeEventListener("click", () => this.close());
+		}
+	}
+
+	// Global function to create image modal instances
+	function createImageModal(options: ImageModalOptions = {}): ImageModal {
+		return new ImageModal(options);
+	}
+
+	// Make it globally available
+	(window as any).createImageModal = createImageModal;
+	(window as any).ImageModal = ImageModal;
 </script>

@@ -6,6 +6,7 @@ import CartManager from "../CartManager.tsx";
 import FavoritesManager from "../FavoritesManager.tsx";
 import Carousel from "../Carousel.tsx";
 import CategoryNav from "../CategoryNav.tsx";
+import MenuItem from "./restaurant/MenuItem.astro";
 
 interface Props {
 	place: any;
@@ -86,10 +87,27 @@ const templateConfigs: Record<string, any> = {
 			"text-5xl md:text-7xl font-black uppercase tracking-tighter text-green-700 drop-shadow-sm",
 		sectionTitleClass:
 			"text-xl font-black uppercase tracking-widest text-white bg-green-600 px-8 py-3 rounded-2xl inline-block shadow-lg group-open:bg-orange-500 transition-all",
-		itemTitleClass: "text-lg font-black tracking-tight",
-		priceClass: "text-[#FF4D00] font-black italic",
 		fontImport: "family=Outfit:wght@400;700;900",
 		fontFamily: "'Outfit', sans-serif",
+	},
+	uber: {
+		bg: "bg-[#121212]",
+		text: "text-white",
+		headerClass:
+			"text-left py-12 px-6 bg-gradient-to-b from-[#1a1a1a] to-[#121212]",
+		titleClass: "text-4xl font-bold tracking-tight",
+		sectionTitleClass: "text-2xl font-bold border-b border-white/10 pb-4 mb-4",
+		fontImport: "family=Inter:wght@400;700;900",
+		fontFamily: "'Inter', sans-serif",
+	},
+	didi: {
+		bg: "bg-[#F8F8F8]",
+		text: "text-gray-900",
+		headerClass: "text-center py-12 bg-white shadow-sm mb-6",
+		titleClass: "text-4xl font-black italic text-[#FF5B00]",
+		sectionTitleClass:
+			"text-xl font-bold text-gray-800 mb-6 bg-gray-100/50 px-6 py-3 rounded-2xl",
+		fontImport: "family=Outfit:wght@400;700;900",
 	},
 };
 
@@ -104,7 +122,7 @@ const config = templateConfigs[template] || templateConfigs.default;
 	place={place}
 	backgroundColor={config.bg}
 >
-	<div class:list={["min-h-screen", config.bg, config.text]}>
+	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
 		{/* Hero Section with Carousel or Image */}
 		<div>
 			{
@@ -120,7 +138,7 @@ const config = templateConfigs[template] || templateConfigs.default;
 						alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
 						width={400}
 						height={400}
-						class="w-full h-auto object-cover max-h-[60vh]"
+						class="w-full h-auto object-cover max-h-[60dvh]"
 						loading="eager"
 						format="webp"
 					/>
@@ -324,8 +342,8 @@ const config = templateConfigs[template] || templateConfigs.default;
 				)
 			}
 
-			{/* Menú con Acordeón Nativo y Lógica de Apertura */}
-			<div class="space-y-12">
+			{/* Menú Dinámico basado en Bloques */}
+			<div class="space-y-16">
 				{
 					(() => {
 						let sectionCounter = 0;
@@ -335,47 +353,29 @@ const config = templateConfigs[template] || templateConfigs.default;
 								sectionCounter++;
 
 								return (
-									<details
-										id={block.id}
-										class="group border-b border-stone-100 pb-8 scroll-mt-20"
-										open={isOpen}
-									>
-										<summary
-											class:list={[
-												"flex justify-between items-center cursor-pointer list-none sticky top-0 backdrop-blur-md z-10 py-6 outline-none",
-												config.bg + "/95",
-											]}
-										>
-											<h2 class={config.sectionTitleClass}>
-												{block.data.title}
-											</h2>
-											<div class="text-stone-400 transition-transform duration-300 group-open:rotate-180">
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													class="h-5 w-5"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M19 9l-7 7-7-7"
-													/>
-												</svg>
+									<section id={block.id} class="scroll-mt-24">
+										<div class="sticky top-0 z-10 py-4 mb-8">
+											<div
+												class:list={[
+													"flex justify-between items-center px-4 rounded-2xl backdrop-blur-md",
+													config.bg + "/80",
+												]}
+											>
+												<h2 class={config.sectionTitleClass}>
+													{block.data.title}
+												</h2>
 											</div>
-										</summary>
+										</div>
 
-										<div class="space-y-12 pt-8 animate-in fade-in slide-in-from-top-2 duration-500 overflow-hidden">
+										<div class="px-2">
 											{block.data.image && (
-												<div class="mb-8 overflow-hidden rounded-2xl  -mx-6 sm:mx-0">
+												<div class="mb-10 overflow-hidden rounded-[2.5rem] shadow-xl border-8 border-white">
 													<Image
 														src={block.data.image}
 														alt={block.data.title}
 														width={800}
 														height={400}
-														class="w-full h-48 sm:h-64 object-cover transition-transform duration-700 hover:scale-105"
+														class="w-full h-56 sm:h-72 object-cover transition-transform duration-700 hover:scale-105"
 														loading="lazy"
 														format="webp"
 													/>
@@ -383,146 +383,39 @@ const config = templateConfigs[template] || templateConfigs.default;
 											)}
 
 											{block.data.description && (
-												<p class="text-stone-400 text-sm font-light italic mb-8 border-l-2 border-stone-200 px-4">
+												<p class="text-stone-400 text-sm font-light italic mb-10 px-4 py-2 bg-emerald-50/5 rounded-r-xl">
 													{block.data.description}
 												</p>
 											)}
 
-											{block.data.items?.map((item: any) => (
-												<div
-													class:list={[
-														"space-y-4",
-														template === "vibrant"
-															? "bg-white p-6 rounded-[32px] shadow-sm border border-emerald-50 mb-6 relative overflow-hidden"
-															: "mb-12",
-													]}
-													data-item-id={item.id}
-												>
-													<div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item">
-														<div class="order-2 sm:order-1">
-															<div class="flex justify-between items-baseline mb-1">
-																<h3 class={config.itemTitleClass}>
-																	{item.name}
-																</h3>
-																{template !== "vibrant" && (
-																	<span class="text-sm font-bold text-stone-500 ml-4">
-																		{view_settings.show_prices &&
-																			(() => {
-																				let minExtra = Infinity;
-																				let maxExtra = -Infinity;
-																				let hasExtraPrices = false;
-
-																				item.options?.forEach((opt: any) => {
-																					if (opt.prices) {
-																						Object.values(opt.prices).forEach(
-																							(p: any) => {
-																								minExtra = Math.min(
-																									minExtra,
-																									p,
-																								);
-																								maxExtra = Math.max(
-																									maxExtra,
-																									p,
-																								);
-																								hasExtraPrices = true;
-																							},
-																						);
-																					}
-																				});
-
-																				if (!hasExtraPrices) {
-																					return item.price > 0
-																						? `$${item.price}`
-																						: "";
-																				}
-
-																				// Si el precio base es > 0, asumimos que es el precio inicial
-																				if (item.price > 0) {
-																					return `Desde $${item.price}`;
-																				}
-
-																				// Si el precio base es 0, el mínimo es el menor extra
-																				return `Desde $${minExtra}`;
-																			})()}
-																	</span>
-																)}
-															</div>
-															{item.description && (
-																<p class="text-stone-400 text-sm font-light leading-relaxed mb-4">
-																	{item.description}
-																</p>
-															)}
-
-															{template === "vibrant" &&
-																view_settings.show_prices &&
-																item.price > 0 && (
-																	<div class="mb-4">
-																		<span class="inline-block bg-[#FF4D00] text-white px-5 py-2 rounded-2xl font-black text-xl shadow-lg italic">
-																			${item.price}
-																		</span>
-																	</div>
-																)}
-															{(enableCart || enableDelivery) &&
-																whatsappNumber &&
-																item.price > 0 && (
-																	<div class="flex gap-2 mt-3">
-																		<button
-																			class="cart-add-btn px-6 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm"
-																			data-item={JSON.stringify({
-																				id: item.id,
-																				name: item.name,
-																				price: item.price,
-																				image: item.image,
-																				options: item.options,
-																			})}
-																		>
-																			Agregar al Pedido
-																		</button>
-																	</div>
-																)}
-														</div>
-
-														{item.image && item.image.trim() !== "" && (
-															<div class="order-1 sm:order-2 mb-4 sm:mb-0 overflow-hidden rounded-xl ">
-																<Image
-																	src={item.image}
-																	alt={item.name}
-																	width={120}
-																	height={120}
-																	class="w-full sm:w-32 h-48 sm:h-32 object-cover transition-all duration-700 hover:scale-110"
-																	loading="lazy"
-																	format="webp"
-																/>
-															</div>
-														)}
-													</div>
-
-													{item.gallery && item.gallery.length > 0 && (
-														<div class="mt-4">
-															<Gallery images={item.gallery} />
-														</div>
-													)}
-												</div>
-											))}
+											<div class="grid grid-cols-1 gap-4">
+												{block.data.items?.map((item: any) => (
+													<MenuItem
+														item={item}
+														template={template}
+														showPrices={view_settings.show_prices}
+														enableCart={enableCart || enableDelivery}
+														whatsappNumber={whatsappNumber}
+													/>
+												))}
+											</div>
 										</div>
-									</details>
+									</section>
 								);
 							}
 
 							if (block.type === "gallery") {
 								return (
-									<div class="py-12">
+									<div class="py-12 px-4 bg-white/5 rounded-3xl">
 										<Gallery images={block.data.images || []} />
 									</div>
 								);
 							}
 
 							if (block.type === "carrusel") {
-								if (heroCarousel && block === heroCarousel) {
-									return null;
-								}
+								if (heroCarousel && block === heroCarousel) return null;
 								return (
-									<div class="py-8">
+									<div class="py-12">
 										<Carousel
 											client:load
 											items={block.data.items || []}

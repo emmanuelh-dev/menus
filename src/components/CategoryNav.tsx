@@ -14,7 +14,7 @@ export default function CategoryNav({ blocks }: Props) {
     const sectionIds = sections.map(s => s.id);
     const observerOptions = {
       root: null,
-      rootMargin: '-100px 0px -60% 0px', // Adjust to trigger when section is near top
+      rootMargin: '-100px 0px -60% 0px',
       threshold: 0
     };
 

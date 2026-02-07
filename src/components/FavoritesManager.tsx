@@ -144,7 +144,7 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
             if (e.target === e.currentTarget) setShowFavorites(false);
           }}
         >
-          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
+          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80dvh] flex flex-col">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Heart className="w-6 h-6 text-pink-500" fill="currentColor" />

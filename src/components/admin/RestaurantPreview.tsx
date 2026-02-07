@@ -1,5 +1,6 @@
 import React from 'react';
 import { PiPhone, PiMapPin, PiClock, PiWhatsappLogo } from 'react-icons/pi';
+import MenuItemPreview from './MenuItemPreview';
 
 interface Props {
   place: any;
@@ -44,8 +45,21 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
       titleClass: "text-4xl font-black uppercase tracking-tighter text-green-700",
       sectionTitleClass: "text-lg font-black uppercase tracking-widest text-white bg-green-600 px-6 py-2 rounded-2xl inline-block shadow-lg",
       itemTitleClass: "text-md font-black tracking-tight text-gray-800",
-      priceClass: "text-[#FF4D00] font-black italic text-lg",
       itemCardClass: "bg-white p-4 rounded-3xl shadow-sm border border-green-50/50 mb-3",
+    },
+    uber: {
+      bg: "bg-[#121212]",
+      text: "text-white",
+      headerClass: "text-left py-10 px-6 bg-gradient-to-b from-[#1a1a1a] to-[#121212]",
+      titleClass: "text-3xl font-bold",
+      sectionTitleClass: "text-xl font-bold border-b border-white/10 pb-4 mb-4",
+    },
+    didi: {
+      bg: "bg-[#F8F8F8]",
+      text: "text-gray-900",
+      headerClass: "text-center py-10 bg-white shadow-sm mb-6",
+      titleClass: "text-3xl font-black italic text-[#FF5B00]",
+      sectionTitleClass: "text-lg font-bold text-gray-800 mb-4 bg-gray-100/50 px-4 py-2 rounded-lg",
     }
   };
 
@@ -68,10 +82,10 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
       <div className={`p-6 ${config.headerClass}`}>
         <h1 className={`${config.titleClass} mb-4`}>{place.name}</h1>
 
-        <div className="flex flex-wrap justify-center gap-2">
-          {semantic_data.phone && <span className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-full text-[10px] font-bold uppercase"><PiPhone /> Llamar</span>}
-          {semantic_data.whatsapp && <span className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white rounded-full text-[10px] font-bold uppercase"><PiWhatsappLogo /> WhatsApp</span>}
-          <span className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-full text-[10px] font-bold uppercase"><PiMapPin /> Ubicación</span>
+        <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+          {semantic_data.phone && <span className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"><PiPhone /> Llamar</span>}
+          {semantic_data.whatsapp && <span className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"><PiWhatsappLogo /> WhatsApp</span>}
+          <span className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"><PiMapPin /> Ubicación</span>
         </div>
       </div>
 
@@ -81,43 +95,26 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
           if (block.type === 'section') {
             const isVibrant = template === 'vibrant';
             return (
-              <div key={block.id || bIdx} className="space-y-6">
+              <div key={block.id || bIdx} className="space-y-4">
                 <div className={isVibrant ? 'text-center' : ''}>
                   <div className={`${config.sectionTitleClass} flex items-center justify-between gap-4 w-full`}>
                     <span>{block.data.title}</span>
-                    {isVibrant && <span className="text-[10px] opacity-70 font-normal normal-case">Deliciosos</span>}
+                    {isVibrant && <span className="text-[10px] opacity-70 font-normal normal-case">Menú del Día</span>}
                   </div>
                 </div>
 
                 {block.data.description && (
-                  <p className="text-gray-500 text-xs italic border-l-2 border-gray-200 px-4">{block.data.description}</p>
+                  <p className="text-gray-500 text-xs italic opacity-70 px-2 line-clamp-2">{block.data.description}</p>
                 )}
 
-                <div className="space-y-4">
+                <div className="pt-2">
                   {block.data.items?.map((item: any, iIdx: number) => (
-                    <div key={item.id || iIdx} className={`group ${config.itemCardClass || ''} relative overflow-hidden`}>
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
-                          <div className="flex justify-between items-baseline mb-1">
-                            <h3 className={config.itemTitleClass}>{item.name}</h3>
-                            {item.price > 0 && !isVibrant && <span className={config.priceClass}>${item.price}</span>}
-                          </div>
-                          {item.description && <p className="text-gray-500 text-[11px] leading-relaxed mb-2">{item.description}</p>}
-
-                          {/* Vibrant Style Price Badge */}
-                          {item.price > 0 && isVibrant && (
-                            <div className="inline-block bg-[#FF4D00] text-white px-4 py-1.5 rounded-xl font-black text-lg shadow-md italic">
-                              ${item.price}
-                            </div>
-                          )}
-                        </div>
-                        {item.image && (
-                          <div className="w-24 h-24 rounded-3xl overflow-hidden shrink-0 shadow-sm border-4 border-white">
-                            <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <MenuItemPreview
+                      key={item.id || iIdx}
+                      item={item}
+                      config={config}
+                      template={template}
+                    />
                   ))}
                 </div>
               </div>
@@ -127,8 +124,8 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
         })}
       </div>
 
-      <footer className="p-10 text-center border-t border-gray-100 mt-20">
-        <p className="text-[10px] text-gray-300 font-black uppercase tracking-widest">Potenciado por BYSMAX</p>
+      <footer className="p-10 text-center border-t border-gray-100/10 mt-20 opacity-40 hover:opacity-100 transition-opacity">
+        <p className="text-[10px] font-black uppercase tracking-[0.4em]">Potenciado por BYSMAX</p>
       </footer>
     </div>
   );
