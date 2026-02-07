@@ -11,6 +11,11 @@ interface AIMessage {
     newImages: number;
     change_summary?: string;
   };
+  usage?: {
+    promptTokenCount: number;
+    candidatesTokenCount: number;
+    totalTokenCount: number;
+  };
 }
 
 interface AIFile {
@@ -81,12 +86,14 @@ export function useAIChat({ placeId, currentBlocks, currentSemanticData, onConte
           setChatMessages(prev => [...prev, {
             role: 'assistant',
             content: result.conversational_response || result.stats?.change_summary || 'He analizado tu solicitud y preparado los cambios.',
-            stats: result.stats
+            stats: result.stats,
+            usage: result.usage
           }]);
         } else {
           setChatMessages(prev => [...prev, {
             role: 'assistant',
-            content: result.conversational_response || '✓ Operación completada.'
+            content: result.conversational_response || '✓ Operación completada.',
+            usage: result.usage
           }]);
 
           if (result.content && JSON.stringify(result.content.blocks) !== JSON.stringify(currentBlocks)) {

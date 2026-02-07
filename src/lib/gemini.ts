@@ -13,6 +13,11 @@ export interface GeminiResponse {
   new_gallery_images?: any[];
   change_summary?: string;
   conversational_response?: string;
+  usageMetadata?: {
+    promptTokenCount: number;
+    candidatesTokenCount: number;
+    totalTokenCount: number;
+  };
 }
 
 export const SYSTEM_PROMPT = (placeType: 'motel' | 'restaurant', currentContent?: any) => {
@@ -81,7 +86,26 @@ ${contentForPrompt ? JSON.stringify(contentForPrompt, null, 2) : 'No hay conteni
    { id, type: "gallery", data: { images: [{ src, title?, description? }] } }
 
 ### ITEMS (platillos/habitaciones):
-{ id, name, price (número), description, image, gallery?: [{ src, title?, description? }] }
+{ 
+  id, 
+  name, 
+  price, 
+  description, 
+  image, 
+  gallery?: [{ src, title?, description? }],
+  options?: [
+    { 
+      name: "Sabor" | "Extra" | "Término", 
+      values: ["Pollo", "Churrasco"], 
+      prices?: { "Pollo": 0, "Churrasco": 20 },
+      required: boolean 
+    }
+  ]
+}
+
+## OPCIONES Y EXTRAS:
+- Si el menú dice "Extra huevo +$15", agrégalo en options con name "Extras", values ["Huevo"] y prices { "Huevo": 15 }.
+- Si hay sabores/variantes, agrégalo con prices si tienen costo adicional.
 
 ## REGLAS CRÍTICAS:
 
@@ -245,7 +269,11 @@ export async function callGemini(
 
       const parsed = JSON.parse(cleanJson.trim());
       console.log('✓ Gemini response parsed successfully. Change summary:', parsed.change_summary || 'None');
-      return parsed;
+      
+      return {
+        ...parsed,
+        usageMetadata: result.usageMetadata
+      };
     } catch (err) {
       console.error('Error parsing Gemini JSON. Raw response:', textResponse);
       console.error('Parse error:', err);

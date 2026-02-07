@@ -74,6 +74,20 @@ export default function AIChat({
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
 
+                    {msg.role === 'assistant' && !msg.stats && msg.usage && (
+                      <div className="mt-2 pt-2 border-t border-gray-50 flex justify-end gap-3">
+                        <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                          In: {msg.usage.promptTokenCount.toLocaleString()}
+                        </p>
+                        <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                          Out: {msg.usage.candidatesTokenCount.toLocaleString()}
+                        </p>
+                        <p className="text-[8px] text-purple-600 font-bold uppercase tracking-widest flex items-center gap-1">
+                          <PiSparkle className="w-2 h-2" />
+                          Total: {msg.usage.totalTokenCount.toLocaleString()}
+                        </p>
+                      </div>
+                    )}
                     {/* AI Stats / Pending Changes Card */}
                     {msg.role === 'assistant' && msg.stats && (
                       <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
@@ -99,6 +113,23 @@ export default function AIChat({
                             <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Productos</p>
                             <p className="text-lg font-black text-gray-900">{msg.stats.items}</p>
                           </div>
+                          {msg.usage && (
+                            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 col-span-2 text-[10px] space-y-1">
+                              <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Detalle de Tokens</p>
+                              <div className="flex justify-between items-center text-gray-500 font-medium">
+                                <span>Input (Prompt):</span>
+                                <span className="font-bold">{msg.usage.promptTokenCount.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-gray-500 font-medium">
+                                <span>Output (IA):</span>
+                                <span className="font-bold">{msg.usage.candidatesTokenCount.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-purple-600 font-black pt-1 border-t border-purple-100">
+                                <span>TOTAL:</span>
+                                <span>{msg.usage.totalTokenCount.toLocaleString()}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <button

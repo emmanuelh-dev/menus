@@ -5,7 +5,7 @@ import { supabase } from '../../../lib/supabase';
 import { callGemini } from '../../../lib/gemini';
 import { uploadToCloudinary } from '../../../lib/cloudinary';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const textBody = await request.text();
     if (!textBody) {
@@ -18,8 +18,54 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'placeId is required' }), { status: 400 });
     }
 
-    // Verificar Turnstile token (si no es saveOnly, que es para admin)
-    if (!saveOnly) {
+    // --- AUTENTICACIÓN ---
+    const accessToken = cookies.get('sb-access-token')?.value;
+    const refreshToken = cookies.get('sb-refresh-token')?.value;
+    let user: any = null;
+    let isOwner = false;
+
+    if (accessToken && refreshToken) {
+      const { createAuthenticatedClient } = await import('../../../lib/supabase');
+      const authSupabase = await createAuthenticatedClient(accessToken, refreshToken);
+      const { data: { user: authUser } } = await authSupabase.auth.getUser();
+      user = authUser;
+    }
+
+    // Verificar si es dueño
+    const { data: placeData } = await supabase.from('places').select('user_id, content').eq('id', placeId).single();
+    if (user && placeData && placeData.user_id === user.id) {
+      isOwner = true;
+    }
+
+    // --- LÍMITES POR USUARIO (2 por mes) ---
+    if (user && !saveOnly) {
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      
+      // Contar peticiones de IA en el mes actual para este usuario
+      // Como no tenemos user_id en history, buscamos por los places del usuario
+      const { data: userPlaces } = await supabase.from('places').select('id').eq('user_id', user.id);
+      const placeIds = userPlaces?.map(p => p.id) || [];
+      
+      if (placeIds.length > 0) {
+        const { count, error: countError } = await supabase
+          .from('place_content_history')
+          .select('*', { count: 'exact', head: true })
+          .in('place_id', placeIds)
+          .gte('created_at', firstDayOfMonth)
+          .like('version_label', 'AI_GEN:%'); // Las de la IA empiezan así
+          
+        if (!countError && count !== null && count >= 2) {
+          return new Response(JSON.stringify({ 
+            error: 'Has alcanzado el límite de 2 solicitudes de IA por mes para tu cuenta.' 
+          }), { status: 429 });
+        }
+      }
+    }
+
+    // --- CAPTCHA ---
+    // Skip CAPTCHA if owner or saveOnly
+    if (!saveOnly && !isOwner) {
       const { verifyTurnstileToken } = await import("../../../lib/turnstile");
       const verifyData = await verifyTurnstileToken(token);
       
@@ -28,13 +74,12 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
+    // --- MODO SAVE ONLY ---
     if (saveOnly && providedContent) {
-      // Guardar historial antes de actualizar
-      const { data: oldPlace } = await supabase.from('places').select('content').eq('id', placeId).single();
-      if (oldPlace) {
+      if (placeData) {
         await supabase.from('place_content_history').insert({
           place_id: placeId,
-          content: oldPlace.content,
+          content: placeData.content,
           source: 'admin_editor',
           agent_reasoning: instruction || 'Edición manual desde el panel',
           version_label: 'Manual'
@@ -163,6 +208,12 @@ export const POST: APIRoute = async ({ request }) => {
               } else if (!newItem.gallery && originalItem?.gallery) {
                 newItem.gallery = originalItem.gallery;
               }
+
+              // Restaurar opciones si la IA no las devolvió para un item existente
+              if (!newItem.options && originalItem?.options) {
+                newItem.options = originalItem.options;
+              }
+
               return newItem;
             });
           }
@@ -218,7 +269,7 @@ export const POST: APIRoute = async ({ request }) => {
         content: currentContent, // El contenido anterior para poder hacer rollback
         source: providedContent ? 'admin_editor' : 'quick_feed_request',
         agent_reasoning: aiResponse.change_summary || instruction || 'Update request',
-        version_label: aiResponse.change_summary?.substring(0, 50) || `Revision: ${instruction?.substring(0, 30) || 'AI Scan'}`
+        version_label: `AI_GEN: ${aiResponse.change_summary?.substring(0, 40) || instruction?.substring(0, 30) || 'AI Scan'}`
       });
 
     const stats = {
@@ -245,31 +296,33 @@ export const POST: APIRoute = async ({ request }) => {
       
       console.log('  - isPurelyConversational:', isPurelyConversational);
 
-      return new Response(JSON.stringify({ 
-        success: true, 
-        preview: !isPurelyConversational,
-        stats: isPurelyConversational ? null : {
-          ...stats,
-          change_summary: aiResponse.change_summary
-        },
-        conversational_response: aiResponse.conversational_response,
-        content: isPurelyConversational ? currentContent : newContent
-      }), { status: 200 });
-    }
-
-    const { error: updateError } = await supabase
-      .from('places')
-      .update({ content: newContent })
-      .eq('id', placeId);
-
-    if (updateError) throw updateError;
-
     return new Response(JSON.stringify({ 
       success: true, 
-      stats,
+      preview: !isPurelyConversational,
+      stats: isPurelyConversational ? null : {
+        ...stats,
+        change_summary: aiResponse.change_summary
+      },
       conversational_response: aiResponse.conversational_response,
-      content: newContent 
+      content: isPurelyConversational ? currentContent : newContent,
+      usage: aiResponse.usageMetadata
     }), { status: 200 });
+  }
+
+  const { error: updateError } = await supabase
+    .from('places')
+    .update({ content: newContent })
+    .eq('id', placeId);
+
+  if (updateError) throw updateError;
+
+  return new Response(JSON.stringify({ 
+    success: true, 
+    stats,
+    conversational_response: aiResponse.conversational_response,
+    content: newContent,
+    usage: aiResponse.usageMetadata
+  }), { status: 200 });
 
   } catch (err: any) {
     console.error('Error in AI update endpoint:', err);
