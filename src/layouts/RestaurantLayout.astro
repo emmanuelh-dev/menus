@@ -88,7 +88,10 @@ const streetAddress =
 	schemaEnrichment.address?.streetAddress ||
 	place?.content?.semantic_data?.address ||
 	"";
-const city = schemaEnrichment.address?.addressLocality || "Monterrey";
+const city =
+	schemaEnrichment.address?.addressLocality ||
+	place?.states?.name ||
+	"Monterrey";
 
 function generateSEOTitle(): string {
 	const location = city ? ` en ${city}` : "";
@@ -202,8 +205,8 @@ if (schemaEnrichment.address) {
 	schema.address = {
 		"@type": "PostalAddress",
 		streetAddress: place.content.semantic_data.address,
-		addressLocality: "Monterrey",
-		addressRegion: "Nuevo León",
+		addressLocality: city,
+		addressRegion: place.states?.name || "Nuevo León",
 		addressCountry: "MX",
 	};
 }

@@ -16,7 +16,7 @@ if (!name) {
 }
 const { data: place } = await supabase
 	.from("places")
-	.select("*")
+	.select("*, states(*)")
 	.eq("short_name", name)
 	.single();
 
