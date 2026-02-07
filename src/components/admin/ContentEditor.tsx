@@ -43,6 +43,7 @@ import MotelPageRenderer from '../MotelPageRenderer';
 import AIChat from './AIChat';
 import GalleryManager from './GalleryManager';
 import AdminPageHeader from './AdminPageHeader';
+import RestaurantPreview from './RestaurantPreview';
 import {
   PiPlus,
   PiTrash,
@@ -513,6 +514,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   return (
     <div className=" pb-32">
       <AdminPageHeader
+        sticky={activeTab !== 'editor'}
         leftContent={
           <div className="flex bg-white/50 rounded-xl gap-0.5 border border-gray-200 shadow-sm w-full items-center justify-center">
             <button
@@ -567,14 +569,6 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </>
         }
       />
-
-      {activeTab === 'editor' && (
-        <SectionNav
-          blocks={blocks}
-          activeSectionId={activeSectionId}
-          onScrollTo={scrollToBlock}
-        />
-      )}
 
       {/* Floating Quick Nav for Mobile */}
       <div className="fixed bottom-6 right-6 z-40 sm:hidden">
@@ -926,6 +920,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         { id: 'default', name: 'Tradicional', desc: 'Limpio y elegante', icon: '📖' },
                         { id: 'modern', name: 'Moderno', desc: 'Aire de revista', icon: '✨' },
                         { id: 'elegant', name: 'Gourmet', desc: 'Estilo Premium', icon: '🍷' },
+                        { id: 'vibrant', name: 'Vibrant (Lalo\'s)', desc: 'Tarjetas y color', icon: '🎨' },
                       ]
                       : [
                         { id: 'default', name: 'Urbano App', desc: 'Oscuro y moderno', icon: '📱' },
@@ -1178,12 +1173,11 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               isPreview={true}
             />
           ) : (
-            <div className="p-20 text-center bg-gray-50">
-              <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center text-gray-200 mx-auto mb-6">
-                <PiEye className="w-10 h-10" />
-              </div>
-              <h2 className="text-2xl font-bold uppercase mb-4">Vista Previa</h2>
-              <p className="text-gray-500 text-sm">Próximamente disponible para Restaurantes. Use el editor para realizar cambios.</p>
+            <div className="py-10 bg-gray-50/50 min-h-screen">
+              <RestaurantPreview
+                place={{ name: initialContent?.name, content: { blocks, semantic_data: semanticData }, image: initialContent?.image }}
+                template={viewSettings.template}
+              />
             </div>
           )}
         </div>
@@ -2200,7 +2194,7 @@ function SectionNav({ blocks, activeSectionId, onScrollTo }: { blocks: Block[], 
   }, [activeSectionId]);
 
   return (
-    <div className="sticky top-[100px] md:top-[116px] z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 py-3 shadow-sm transition-all overflow-hidden shrink-0">
+    <div className="sticky top-0 md:top-14 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 py-3 shadow-sm transition-all overflow-hidden shrink-0">
       <div
         ref={navRef}
         className="max-w-[1600px] mx-auto px-4 overflow-x-auto hide-scrollbar flex gap-2 scroll-smooth items-center"

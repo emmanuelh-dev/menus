@@ -98,14 +98,41 @@ ${contentForPrompt ? JSON.stringify(contentForPrompt, null, 2) : 'No hay conteni
       name: "Sabor" | "Extra" | "Término", 
       values: ["Pollo", "Churrasco"], 
       prices?: { "Pollo": 0, "Churrasco": 20 },
-      required: boolean 
+      required: boolean,
+      max_choices?: number
     }
   ]
 }
 
-## OPCIONES Y EXTRAS:
+## OPCIONES E INGREDIENTES:
+- **IMPORTANTÍSIMO**: Si ves ingredientes entre paréntesis como "(Jamón, Queso, Piña)" o frases como "(2 ingredientes)", NO los pongas solo en la descripción. DEBES convertirlos a la estructura de \`options\`.
+- **OPCIONES GLOBALES/CATEGORÍA**: Si al final de una sección dice "Ingrediente extra: $24", esto aplica a TODOS los items de esa sección. Debes agregar esa opción a cada item individualmente.
+- **LISTAS DE ELECCIÓN**: Si una categoría dice "Ingredientes a elegir: Jamón, Piña..." y los items dicen "(2 ingredientes)", crea la opción de "Ingredientes" con esa lista de valores y \`max_choices: 2\` en CADA item.
+- Si el menú dice "Individual (2 ingredientes)", crea una opción con name: "Ingredientes", values: ["Jamón", "Piña", ...], max_choices: 2.
+- Si los ingredientes ya vienen fijos pero son configurables (ej: puedes quitar cebolla), ponlos en \`options\` para que el usuario pueda verlos como selecciones.
 - Si el menú dice "Extra huevo +$15", agrégalo en options con name "Extras", values ["Huevo"] y prices { "Huevo": 15 }.
 - Si hay sabores/variantes, agrégalo con prices si tienen costo adicional.
+
+## EJEMPLO DE ESTRUCTURA CORRECTA (JSON):
+{
+  "name": "Chilaquiles con huevo",
+  "price": 85,
+  "description": "Chilaquiles verdes con queso gratinado. Agrégale huevo por $15 extra.",
+  "options": [
+    {
+      "name": "Extras",
+      "values": ["Sin huevo", "1 pza huevo", "2 pzas huevos"],
+      "prices": { "Sin huevo": 0, "1 pza huevo": 15, "2 pzas huevos": 30 },
+      "required": true
+    },
+    {
+      "name": "Ingredientes a quitar",
+      "values": ["Cebolla", "Crema"],
+      "required": false,
+      "max_choices": 2
+    }
+  ]
+}
 
 ## REGLAS CRÍTICAS:
 

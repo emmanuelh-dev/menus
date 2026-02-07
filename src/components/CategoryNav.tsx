@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Tag } from 'lucide-react';
-
-interface Section {
-  id: string;
-  data: {
-    title: string;
-    category?: string;
-  }
-}
+import { PiTag } from 'react-icons/pi';
 
 interface Props {
   blocks: any[];
@@ -15,124 +7,95 @@ interface Props {
 
 export default function CategoryNav({ blocks }: Props) {
   const [activeId, setActiveId] = useState<string>('');
-  const [isSticky, setIsSticky] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
-
-  const sections = blocks.filter(b => b.type === 'section') as Section[];
-
-  // Group sections by category
-  const groups: { [key: string]: Section[] } = {};
-  const topLevelSections: Section[] = [];
-
-  sections.forEach(s => {
-    if (s.data.category) {
-      if (!groups[s.data.category]) groups[s.data.category] = [];
-      groups[s.data.category].push(s);
-    } else {
-      topLevelSections.push(s);
-    }
-  });
-
-  const categories = Object.keys(groups);
+  const sections = blocks.filter(b => b.type === 'section');
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!navRef.current) return;
-      const offset = navRef.current.offsetTop;
-      setIsSticky(window.scrollY > offset - 10);
-
-      // Find active section
-      for (const section of sections) {
-        const el = document.getElementById(section.id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top >= 0 && rect.top <= 200) {
-            setActiveId(section.id);
-            break;
-          }
-        }
-      }
+    const sectionIds = sections.map(s => s.id);
+    const observerOptions = {
+      root: null,
+      rootMargin: '-100px 0px -60% 0px', // Adjust to trigger when section is near top
+      threshold: 0
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveId(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      sectionIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.unobserve(el);
+      });
+    };
   }, [sections]);
+
+  // Center active item in nav
+  useEffect(() => {
+    if (activeId && navRef.current) {
+      const activeBtn = navRef.current.querySelector(`[data-section-id="${activeId}"]`);
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [activeId]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
+      // Si es un <details>, lo abrimos
+      if (el.tagName === 'DETAILS') {
+        (el as HTMLDetailsElement).open = true;
+      }
+
+      const offset = 80;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
       window.scrollTo({
-        top: el.offsetTop - 120,
+        top: offsetPosition,
         behavior: 'smooth'
       });
     }
-    setOpenDropdown(null);
   };
 
-  if (sections.length < 3) return null;
+  if (sections.length < 2) return null;
 
   return (
-    <div
-      ref={navRef}
-      className={`z-40 transition-all duration-300 ${isSticky
-        ? 'fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md  border-b border-gray-100 py-2'
-        : 'relative py-4'
-        }`}
-    >
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          {categories.map(cat => {
-            const groupSections = groups[cat];
-            const isGroupActive = groupSections.some(s => s.id === activeId);
-
-            return (
-              <div key={cat} className="relative shrink-0">
-                <button
-                  onClick={() => setOpenDropdown(openDropdown === cat ? null : cat)}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${isGroupActive
-                    ? 'bg-gray-900 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    }`}
-                >
-                  <Tag size={12} className={isGroupActive ? 'text-emerald-400' : 'text-gray-300'} />
-                  {cat}
-                  <ChevronDown size={10} className={`transition-transform ${openDropdown === cat ? 'rotate-180' : ''}`} />
-                </button>
-
-                {openDropdown === cat && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-100 shadow-2xl rounded-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    {groupSections.map(s => (
-                      <button
-                        key={s.id}
-                        onClick={() => scrollTo(s.id)}
-                        className={`w-full text-left p-3 rounded-xl text-[10px] font-bold uppercase tracking-tight transition-all ${activeId === s.id
-                          ? 'bg-blue-50 text-blue-700'
-                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                          }`}
-                      >
-                        {s.data.title}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {topLevelSections.map(s => (
-            <button
-              key={s.id}
-              onClick={() => scrollTo(s.id)}
-              className={`shrink-0 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeId === s.id
-                ? 'bg-gray-900 text-white shadow-md'
-                : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
-                }`}
-            >
-              {s.data.title}
-            </button>
-          ))}
+    <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 py-3 mb-8 shadow-sm">
+      <div
+        ref={navRef}
+        className="max-w-7xl mx-auto px-4 overflow-x-auto no-scrollbar flex items-center gap-2"
+      >
+        <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full text-[9px] font-black uppercase tracking-widest text-gray-400">
+          <PiTag className="w-3 h-3" />
+          Categorías
         </div>
+
+        {sections.map(section => (
+          <button
+            key={section.id}
+            data-section-id={section.id}
+            onClick={() => scrollTo(section.id)}
+            className={`shrink-0 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeId === section.id
+              ? 'bg-gray-900 text-white shadow-lg shadow-gray-200 scale-105'
+              : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-100'
+              }`}
+          >
+            {section.data.title}
+          </button>
+        ))}
       </div>
     </div>
   );
