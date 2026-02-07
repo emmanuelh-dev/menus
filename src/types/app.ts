@@ -66,9 +66,10 @@ export interface ItemData {
   name: string;
   price: number;
   description?: string;
-  image?: string;     
+  image?: string;
   features?: string[];
   gallery?: { src: string; alt?: string; title?: string }[];
+  available?: boolean;
 }
 
 export interface GalleryData {

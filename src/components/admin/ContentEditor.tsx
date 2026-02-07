@@ -72,7 +72,9 @@ import {
   PiSlideshow,
   PiTray,
   PiMonitor,
-  PiFolderSimple
+  PiFolderSimple,
+  PiEyeSlash,
+  PiTable
 } from 'react-icons/pi';
 
 type BlockType = 'section' | 'gallery' | 'image' | 'carrusel';
@@ -131,6 +133,7 @@ interface ItemData {
   features?: string[];
   gallery?: { src: string; alt?: string; title?: string }[];
   options?: ItemOption[];
+  available?: boolean;
 }
 
 interface SectionData {
@@ -195,6 +198,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>('editor');
+  const [editorMode, setEditorMode] = useState<'blocks' | 'table'>('blocks');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -551,7 +555,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           <>
             <button
               onClick={() => setForceCollapse(!forceCollapse)}
-              className="flex-1 flex items-center px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 items-center justify-center gap-2 transition-all shadow-sm"
+              className="flex-1 flex items-center px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 justify-center gap-2 transition-all shadow-sm"
               title={forceCollapse ? 'Expandir Todo' : 'Colapsar Todo'}
             >
               {forceCollapse ? <PiPlus className="w-3.5 h-3.5" /> : <PiX className="w-3.5 h-3.5" />}
@@ -922,6 +926,21 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </div>
 
           <div className="">
+            <div className="flex bg-gray-100 p-1 rounded-2xl mb-6">
+              <button
+                onClick={() => setEditorMode('blocks')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'blocks' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <PiLayout className="w-4 h-4" /> Bloques
+              </button>
+              <button
+                onClick={() => setEditorMode('table')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'table' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <PiTable className="w-4 h-4" /> Vista Tablas
+              </button>
+            </div>
+
             <button
               onClick={() => setShowViewSettings(!showViewSettings)}
               className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
@@ -1039,103 +1058,107 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Arrastra fotos o archivos</span>
           </div>
 
-          <div className="space-y-4 lg:px-4 sm:px-0">
-            {blocks.map((block, index) => (
-              <div key={block.id} id={block.id} className="relative scroll-mt-24">
+          {editorMode === 'blocks' ? (
+            <div className="space-y-4 lg:px-4 sm:px-0">
+              {blocks.map((block, index) => (
+                <div key={block.id} id={block.id} className="relative scroll-mt-24">
 
-                <div className="flex justify-end gap-2 mb-3 ">
-                  <button
-                    onClick={() => moveBlock(index, 'up')}
-                    disabled={index === 0}
-                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
-                    title="Subir"
-                  >
-                    <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
-                  </button>
-                  <button
-                    onClick={() => moveBlock(index, 'down')}
-                    disabled={index === blocks.length - 1}
-                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
-                    title="Bajar"
-                  >
-                    <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
-                  </button>
-                  <button
-                    onClick={() => duplicateBlock(index)}
-                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
-                    title="Duplicar"
-                  >
-                    <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                  </button>
-                  <button
-                    onClick={() => removeBlock(index)}
-                    className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
-                    title="Eliminar"
-                  >
-                    <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
-                  </button>
-                </div>
-
-                {renderBlock(block, index, forceCollapse)}
-
-                <div className="flex justify-center my-4">
-                  <button
-                    onClick={() => setShowBlockMenu(`after-${index}`)}
-                    className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
-                  >
-                    <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
-                  </button>
-                </div>
-
-                {showBlockMenu === `after-${index}` && (
-                  <div className="mt-3 p-4 bg-white border rounded-xl ">
-                    <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
-                      <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
-                      <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
-                      <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
-                    </div>
+                  <div className="flex justify-end gap-2 mb-3 ">
                     <button
-                      onClick={() => setShowBlockMenu(false)}
-                      className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                      onClick={() => moveBlock(index, 'up')}
+                      disabled={index === 0}
+                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                      title="Subir"
                     >
-                      Cancelar
+                      <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                    </button>
+                    <button
+                      onClick={() => moveBlock(index, 'down')}
+                      disabled={index === blocks.length - 1}
+                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                      title="Bajar"
+                    >
+                      <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                    </button>
+                    <button
+                      onClick={() => duplicateBlock(index)}
+                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
+                      title="Duplicar"
+                    >
+                      <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+                    </button>
+                    <button
+                      onClick={() => removeBlock(index)}
+                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
+                      title="Eliminar"
+                    >
+                      <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
                     </button>
                   </div>
-                )}
-              </div>
-            ))}
 
-            {blocks.length === 0 && (
-              <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
-                <div className="mb-4 flex justify-center">
-                  <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
-                    <PiTray className="w-8 h-8" />
+                  {renderBlock(block, index, forceCollapse)}
+
+                  <div className="flex justify-center my-4">
+                    <button
+                      onClick={() => setShowBlockMenu(`after-${index}`)}
+                      className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
+                    >
+                      <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
+                    </button>
                   </div>
-                </div>
-                <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
-                <button
-                  onClick={() => setShowBlockMenu(true)}
-                  className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
-                >
-                  <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
-                </button>
 
-                {showBlockMenu === true && (
-                  <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
-                    <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section')} />
-                      <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
-                      <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
-                      <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
+                  {showBlockMenu === `after-${index}` && (
+                    <div className="mt-3 p-4 bg-white border rounded-xl ">
+                      <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
+                        <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
+                        <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
+                        <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
+                      </div>
+                      <button
+                        onClick={() => setShowBlockMenu(false)}
+                        className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {blocks.length === 0 && (
+                <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
+                  <div className="mb-4 flex justify-center">
+                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
+                      <PiTray className="w-8 h-8" />
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+                  <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
+                  <button
+                    onClick={() => setShowBlockMenu(true)}
+                    className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
+                  >
+                    <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
+                  </button>
+
+                  {showBlockMenu === true && (
+                    <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
+                      <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section')} />
+                        <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
+                        <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
+                        <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <TableView blocks={blocks} onChange={setBlocks} />
+          )}
         </>
       ) : activeTab === 'media' ? (
         <div className="bg-white md:rounded-2xl border-y md:border shadow-xl p-6 sm:p-12">
@@ -1589,6 +1612,16 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
                         </div>
                       </div>
                       <div className="flex gap-2">
+                        <button
+                          onClick={() => updateItem(itemIndex, { available: !(item.available ?? true) })}
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${(item.available ?? true)
+                            ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white'
+                            : 'bg-stone-100 text-stone-400 hover:bg-stone-600 hover:text-white'
+                            }`}
+                          title={(item.available ?? true) ? 'Disponible' : 'Agotado / Oculto'}
+                        >
+                          {(item.available ?? true) ? <PiEye className="w-5 h-5" /> : <PiEyeSlash className="w-5 h-5" />}
+                        </button>
                         <button
                           onClick={() => moveItem(itemIndex, 'up')}
                           disabled={itemIndex === 0}
@@ -2257,6 +2290,111 @@ function SectionNav({ blocks, activeSectionId, onScrollTo }: { blocks: Block[], 
             {section.data.title || 'Sección'}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function TableView({ blocks, onChange }: { blocks: Block[], onChange: (blocks: Block[]) => void }) {
+  const updateItem = (blockId: string, itemIndex: number, newItemData: Partial<ItemData>) => {
+    const newBlocks = blocks.map(block => {
+      if (block.id === blockId && block.type === 'section') {
+        const newItems = [...block.data.items];
+        newItems[itemIndex] = { ...newItems[itemIndex], ...newItemData };
+        return { ...block, data: { ...block.data, items: newItems } };
+      }
+      return block;
+    });
+    onChange(newBlocks);
+  };
+
+  const sections = blocks.filter(b => b.type === 'section');
+
+  return (
+    <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm lg:mx-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Imagen</th>
+              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Producto</th>
+              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Sección</th>
+              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Precio</th>
+              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {sections.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-20 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">
+                  No hay productos para mostrar.
+                </td>
+              </tr>
+            ) : sections.map(block =>
+              block.data.items.map((item: ItemData, idx: number) => (
+                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
+                  <td className="p-5">
+                    <div className="w-14 h-14 rounded-2xl bg-gray-50 overflow-hidden border border-gray-100 shadow-sm relative group/img">
+                      {item.image ? (
+                        <img src={item.image} className="w-full h-full object-cover transition-transform group-hover/img:scale-110" alt="" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-300">
+                          <PiImage className="w-6 h-6" />
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-5 min-w-[280px]">
+                    <input
+                      className="w-full bg-transparent font-black text-sm outline-none focus:text-indigo-600 transition-colors uppercase tracking-tight"
+                      value={item.name}
+                      onChange={(e) => updateItem(block.id, idx, { name: e.target.value })}
+                    />
+                    <input
+                      className="w-full bg-transparent text-[10px] text-gray-400 outline-none block mt-1 font-medium italic"
+                      value={item.description}
+                      onChange={(e) => updateItem(block.id, idx, { description: e.target.value })}
+                    />
+                  </td>
+                  <td className="p-5 whitespace-nowrap">
+                    <span className="text-[9px] font-black bg-gray-100/80 text-gray-500 px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                      {block.data.title || 'General'}
+                    </span>
+                  </td>
+                  <td className="p-5">
+                    <div className="flex items-center gap-1 font-mono text-base font-black text-emerald-600 bg-emerald-50/50 px-4 py-2 rounded-2xl border border-emerald-100/50 w-fit">
+                      <span className="opacity-30">$</span>
+                      <input
+                        className="w-20 bg-transparent outline-none"
+                        type="number"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => updateItem(block.id, idx, { price: parseFloat(e.target.value) })}
+                      />
+                    </div>
+                  </td>
+                  <td className="p-5">
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => updateItem(block.id, idx, { available: !(item.available ?? true) })}
+                        className={`group relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 ${(item.available ?? true)
+                          ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white shadow-sm hover:shadow-emerald-200'
+                          : 'bg-stone-100 text-stone-400 hover:bg-stone-800 hover:text-white'
+                          }`}
+                      >
+                        {(item.available ?? true) ? (
+                          <><PiEye className="w-4 h-4" /> Activo</>
+                        ) : (
+                          <><PiEyeSlash className="w-4 h-4" /> Apagado</>
+                        )}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
