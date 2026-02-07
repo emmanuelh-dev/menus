@@ -114,6 +114,7 @@ export interface SemanticData {
   variety?: string;
   additional_features?: string[];
   clabe?: string;
+  has_admin?: boolean;
 }
 
 export interface ShippingZone {

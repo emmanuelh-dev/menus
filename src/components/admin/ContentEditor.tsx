@@ -643,6 +643,33 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     className="w-full text-sm p-4 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-gray-50/30"
                   />
                 </div>
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 mt-2">
+                  <div className="flex-1 flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <input
+                      type="checkbox"
+                      id="show_prices_gen"
+                      checked={viewSettings.show_prices}
+                      onChange={(e) => setViewSettings({ ...viewSettings, show_prices: e.target.checked })}
+                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                    />
+                    <label htmlFor="show_prices_gen" className="text-sm font-bold text-gray-700 cursor-pointer">
+                      Mostrar precios al público
+                    </label>
+                  </div>
+
+                  <div className="flex-1 flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <input
+                      type="checkbox"
+                      id="has_admin_gen"
+                      checked={semanticData.has_admin || false}
+                      onChange={(e) => setSemanticData({ ...semanticData, has_admin: e.target.checked })}
+                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                    />
+                    <label htmlFor="has_admin_gen" className="text-sm font-bold text-gray-700 cursor-pointer">
+                      Este negocio tiene administrador
+                    </label>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -974,6 +1001,19 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     />
                     <label htmlFor="show_prices" className="text-sm font-bold text-gray-700 cursor-pointer">
                       Mostrar precios al público
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <input
+                      type="checkbox"
+                      id="has_admin"
+                      checked={semanticData.has_admin || false}
+                      onChange={(e) => setSemanticData({ ...semanticData, has_admin: e.target.checked })}
+                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                    />
+                    <label htmlFor="has_admin" className="text-sm font-bold text-gray-700 cursor-pointer">
+                      Este negocio tiene administrador
                     </label>
                   </div>
                 </div>
