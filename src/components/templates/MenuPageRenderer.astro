@@ -86,7 +86,7 @@ const templateConfigs: Record<string, any> = {
 		titleClass:
 			"text-5xl md:text-7xl font-black uppercase tracking-tighter text-green-700 drop-shadow-sm",
 		sectionTitleClass:
-			"text-xl font-black uppercase tracking-widest text-white bg-green-600 px-8 py-3 rounded-2xl inline-block shadow-lg group-open:bg-orange-500 transition-all",
+			"text-xl font-black uppercase tracking-widest text-white bg-green-600 px-8 py-3 rounded-2xl inline-block shadow-lg group-open:bg-orange-500 transition-all w-full",
 		fontImport: "family=Outfit:wght@400;700;900",
 		fontFamily: "'Outfit', sans-serif",
 	},
@@ -354,7 +354,7 @@ const config = templateConfigs[template] || templateConfigs.default;
 
 								return (
 									<section id={block.id} class="scroll-mt-24">
-										<div class="sticky top-0 z-10 py-4 mb-8">
+										<div class="py-4 mb-8">
 											<div
 												class:list={[
 													"flex justify-between items-center px-4 rounded-2xl backdrop-blur-md",
@@ -383,7 +383,7 @@ const config = templateConfigs[template] || templateConfigs.default;
 											)}
 
 											{block.data.description && (
-												<p class="text-stone-400 text-sm font-light italic mb-10 px-4 py-2 bg-emerald-50/5 rounded-r-xl">
+												<p class="text-stone-400 text-sm font-normal italic mb-8 px-4 opacity-80 leading-relaxed">
 													{block.data.description}
 												</p>
 											)}

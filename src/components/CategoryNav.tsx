@@ -76,7 +76,7 @@ export default function CategoryNav({ blocks }: Props) {
     <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 py-3 mb-8 shadow-sm">
       <div
         ref={navRef}
-        className="max-w-7xl mx-auto px-4 overflow-x-auto no-scrollbar flex items-center gap-2"
+        className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar flex items-center gap-2"
       >
         <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full text-[9px] font-black uppercase tracking-widest text-gray-400">
           <PiTag className="w-3 h-3" />

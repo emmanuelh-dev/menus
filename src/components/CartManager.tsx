@@ -683,7 +683,7 @@ export default function CartManager({
               </div>
               <button
                 onClick={() => setShowCart(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-gray-100 transition-colors"
+                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1016,7 +1016,7 @@ export default function CartManager({
               )}
               <button
                 onClick={() => setConfiguringItem(null)}
-                className="absolute top-4 right-4 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all"
+                className="absolute top-4 right-4 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all z-50 shadow-lg"
               >
                 <X size={20} />
               </button>

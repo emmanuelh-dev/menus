@@ -15,10 +15,10 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
       bg: "bg-[#FCFCFC]",
       text: "text-[#1A1A1A]",
       headerClass: "text-center",
-      titleClass: "text-4xl font-bold italic",
-      sectionTitleClass: "text-xl uppercase tracking-widest font-black text-stone-800",
+      titleClass: "text-4xl md:text-6xl font-bold italic drop-shadow-2xl",
+      sectionTitleClass: "text-xl uppercase tracking-[0.3em] font-black text-stone-800",
       itemTitleClass: "text-lg font-medium tracking-tight",
-      priceClass: "text-stone-600 font-bold",
+      priceClass: "text-stone-500 font-bold",
     },
     modern: {
       bg: "bg-white",
@@ -41,11 +41,9 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
     vibrant: {
       bg: "bg-[#f4f7f4]",
       text: "text-slate-900",
-      headerClass: "text-center py-8 bg-white/50 rounded-b-[40px] shadow-sm mb-6",
-      titleClass: "text-4xl font-black uppercase tracking-tighter text-green-700",
-      sectionTitleClass: "text-lg font-black uppercase tracking-widest text-white bg-green-600 px-6 py-2 rounded-2xl inline-block shadow-lg",
-      itemTitleClass: "text-md font-black tracking-tight text-gray-800",
-      itemCardClass: "bg-white p-4 rounded-3xl shadow-sm border border-green-50/50 mb-3",
+      headerClass: "text-center py-10",
+      titleClass: "text-5xl md:text-7xl font-black uppercase tracking-tighter text-green-700 drop-shadow-sm",
+      sectionTitleClass: "text-xl font-black uppercase tracking-widest text-white bg-green-600 px-8 py-3 rounded-2xl inline-block shadow-lg",
     },
     uber: {
       bg: "bg-[#121212]",
@@ -104,7 +102,7 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
                 </div>
 
                 {block.data.description && (
-                  <p className="text-gray-500 text-xs italic opacity-70 px-2 line-clamp-2">{block.data.description}</p>
+                  <p className="text-stone-400 text-sm font-normal italic mb-8 px-4 opacity-80 leading-relaxed">{block.data.description}</p>
                 )}
 
                 <div className="pt-2">
