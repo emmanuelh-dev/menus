@@ -59,6 +59,7 @@ export interface SectionData {
   description?: string;
   image?: string;
   items: ItemData[];
+  featured?: boolean;
 }
 
 export interface ItemData {

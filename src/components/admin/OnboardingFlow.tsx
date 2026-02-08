@@ -36,6 +36,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     lng: undefined as number | undefined,
     category: 'restaurant',
     type: 'restaurant',
+    template: 'default',
     image: '',
     state_id: null as number | null,
     municipality_id: null as number | null,
@@ -85,13 +86,27 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const finishOnboarding = async () => {
     setLoading(true);
     try {
+      // Exclude template from the main payload - it only goes in content.view_settings
+      const { template, ...restFormData } = formData;
+
       const payload = {
-        ...formData,
+        ...restFormData,
         short_name: formData.short_name || slugify(formData.name),
         rating: 4.5,
         priceRange: '$$',
         hours: 'Lun-Dom 9:00 - 22:00',
-        featured: false
+        featured: false,
+        // Include the selected template in Content
+        content: {
+          blocks: [],
+          view_settings: {
+            template: template,
+            show_prices: true,
+          },
+          semantic_data: {
+            category: formData.category,
+          }
+        }
       };
 
       const response = await fetch('/api/restaurants', {
@@ -163,22 +178,34 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
               <h2 className="text-3xl font-black tracking-tight text-slate-900">¿Qué tipo de lugar es?</h2>
               <p className="text-slate-500">Esto nos ayuda a personalizar tu configuración.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[
-                { id: 'restaurant', label: 'Restaurante', icon: '🍔' },
-                { id: 'cafe', label: 'Cafetería', icon: '☕' },
-                { id: 'motel', label: 'Motel', icon: '🌙' },
+                { id: 'restaurant', label: 'Restaurante', icon: '🍔', template: 'default' },
+                { id: 'cafe', label: 'Cafetería', icon: '☕', template: 'default' },
+                { id: 'tienda', label: 'Tienda', icon: '🏪', template: 'tienda', description: 'Categorías visuales' },
+                { id: 'catalogo', label: 'Catálogo', icon: '📋', template: 'tienda', description: 'Listado de productos' },
+                { id: 'motel', label: 'Motel', icon: '🌙', template: 'default' },
               ].map((type) => (
                 <button
                   key={type.id}
                   onClick={() => {
-                    setFormData({ ...formData, type: type.id });
+                    setFormData({
+                      ...formData,
+                      type: type.id === 'catalogo' || type.id === 'tienda' ? 'restaurant' : type.id,
+                      category: type.id,
+                      template: type.template
+                    });
                     setTimeout(handleNext, 300);
                   }}
-                  className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 ${formData.type === type.id ? 'border-black bg-black text-white shadow-xl' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
+                  className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center gap-2 ${formData.category === type.id ? 'border-black bg-black text-white shadow-xl' : 'border-slate-100 hover:border-slate-200 text-slate-600'}`}
                 >
-                  <span className="text-4xl">{type.icon}</span>
-                  <span className="font-bold">{type.label}</span>
+                  <span className="text-3xl">{type.icon}</span>
+                  <span className="font-bold text-sm">{type.label}</span>
+                  {type.description && (
+                    <span className={`text-[9px] uppercase tracking-wider ${formData.category === type.id ? 'text-white/60' : 'text-slate-400'}`}>
+                      {type.description}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

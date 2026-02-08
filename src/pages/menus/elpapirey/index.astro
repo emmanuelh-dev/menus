@@ -9,6 +9,7 @@ import RecommendationButton from "../../../components/RecommendationButton";
 import { supabase } from "../../../lib/supabase";
 import Gallery from "../../../components/Gallery.astro";
 import CartManager from "../../../components/CartManager.tsx";
+import CategoryNav from "../../../components/CategoryNav.tsx";
 
 const { data: place } = await supabase
 	.from("places")
@@ -115,12 +116,14 @@ const enableCart = true;
 				)
 			}
 
+			<CategoryNav client:load blocks={blocks} variant="pills" />
+
 			<div class="space-y-6 mb-8">
 				{
 					blocks.map((menuBlock: any, menuBlockIdx: number) => {
 						if (menuBlock.type === "section") {
 							return (
-								<div class="mt-6">
+								<div id={menuBlock.id} class="mt-6">
 									<h2
 										class={`${categoryColors[menuBlockIdx % categoryColors.length]} text-xl font-bold tracking-wide mb-4`}
 									>

@@ -2,19 +2,20 @@
 export const prerender = false;
 
 Astro.response.headers.set(
-  'Cache-Control', 
-  'public, s-maxage=300, stale-while-revalidate=60'
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
 );
 
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../components/Gallery.astro";
+import CategoryNav from "../../../components/CategoryNav.tsx";
 import { supabase } from "../../../lib/supabase";
 
 const { data: place } = await supabase
-  .from("places")
-  .select("*")
-  .eq("short_name", 'campomar')
-  .single();
+	.from("places")
+	.select("*")
+	.eq("short_name", "campomar")
+	.single();
 
 if (!place) {
 	throw new Error("No se encontró el restaurante: campomar");
@@ -38,7 +39,6 @@ const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
 
-
 <RestaurantLayout
 	description={place?.content?.semantic_data?.description ||
 		place?.description ||
@@ -47,10 +47,9 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 	place={place}
 	backgroundColor="bg-[#E5E7EB]"
 >
-
 	<div class="min-h-screen bg-[#E5E7EB] text-[#1A1A1A]">
 		<div class="max-w-2xl mx-auto px-6 py-20">
-      <header class="mb-24 flex flex-col items-center">
+			<header class="mb-24 flex flex-col items-center">
 				<div class="relative mb-8">
 					<img
 						src={place.image}
@@ -72,7 +71,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 							place.name
 					}
 				</p>
-        {
+				{
 					address && (
 						<div class="space-y-1">
 							<p class="text-[10px] uppercase tracking-[0.3em] text-stone-400 font-bold text-center">
@@ -168,6 +167,8 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 				<div class="h-[1px] w-12 bg-stone-200"></div>
 			</header>
 
+			<CategoryNav client:load blocks={blocks} variant="icons" />
+
 			<div class="space-y-8">
 				{
 					(() => {
@@ -178,7 +179,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 								sectionCounter++;
 
 								return (
-									<details class="group  pb-4" open={isOpen}>
+									<details id={block.id} class="group  pb-4" open={isOpen}>
 										<summary class="flex justify-between items-center cursor-pointer list-none sticky top-0 bg-[#FCFCFC]/95 backdrop-blur-md z-10 py-6 outline-none">
 											<h2 class="text-4xl uppercase font-black text-stone-800 transition-all group-open:text-red-900">
 												{block.data.title}
@@ -274,47 +275,46 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 </RestaurantLayout>
 
 <style>
-
-@font-face { 
-     font-family: 'LTC-Regular';
-     src:    url('../fonts/LTC-Forum-Title-W00-Regular.ttf') format('truetype');
-     font-style:  normal;
-     font-weight: 400;
-     font-display: auto;
-     font-display: swap;
-}
-@font-face { 
-     font-family: 'Butler_Regular';
-     src:    url('../fonts/Butler_Regular.otf') format('opentype');
-     font-style:  normal;
-     font-weight: 400;
-     font-display: auto;
-     font-display: swap;
-}
-@font-face { 
-     font-family: 'Chopper-Regular';
-     src:    url('../fonts/Chopper-Regular.otf') format('opentype');
-     font-style:  normal;
-     font-weight: 400;
-     font-display: auto;
-     font-display: swap;
-}
-@font-face { 
-     font-family: 'Stem-Medium';
-     src:    url('../fonts/Stem-Medium.otf') format('opentype');
-     font-style:  normal;
-     font-weight: 400;
-     font-display: auto;
-     font-display: swap;
-}
-@font-face { 
-     font-family: 'Stem-ExtraLight';
-     src:    url('../fonts/Stem-ExtraLight.otf') format('opentype');
-     font-style:  normal;
-     font-weight: 400;
-     font-display: auto;
-     font-display: swap;
-}
+	@font-face {
+		font-family: "LTC-Regular";
+		src: url("../fonts/LTC-Forum-Title-W00-Regular.ttf") format("truetype");
+		font-style: normal;
+		font-weight: 400;
+		font-display: auto;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Butler_Regular";
+		src: url("../fonts/Butler_Regular.otf") format("opentype");
+		font-style: normal;
+		font-weight: 400;
+		font-display: auto;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Chopper-Regular";
+		src: url("../fonts/Chopper-Regular.otf") format("opentype");
+		font-style: normal;
+		font-weight: 400;
+		font-display: auto;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Stem-Medium";
+		src: url("../fonts/Stem-Medium.otf") format("opentype");
+		font-style: normal;
+		font-weight: 400;
+		font-display: auto;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Stem-ExtraLight";
+		src: url("../fonts/Stem-ExtraLight.otf") format("opentype");
+		font-style: normal;
+		font-weight: 400;
+		font-display: auto;
+		font-display: swap;
+	}
 	@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap");
 	.serif {
 		font-family: "Playfair Display", serif;
@@ -323,28 +323,29 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 	summary::-webkit-details-marker {
 		display: none;
 	}
-  * {
-    background-color: #E5E7EB;
-  }
+	* {
+		background-color: #e5e7eb;
+	}
 
-  
-  h1,h2 { 
-        color: #EE4B03 !important;
-  }
+	h1,
+	h2 {
+		color: #ee4b03 !important;
+	}
 
-  h1, h2, h3, h4 {
-    font-family: Stem-Medium, serif !important;
-    
-  }
-  .campom_prod{ 
-  font-size: 65px !important;
-  color: #EE4B03 !important;
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: Stem-Medium, serif !important;
+	}
+	.campom_prod {
+		font-size: 65px !important;
+		color: #ee4b03 !important;
 
-  font-family: LTC-Regular, serif !important;
-  line-height: 1;
-  padding-bottom: 5px !important;
-  z-index: 10 !important;
-  position: relative;
-
-}
+		font-family: LTC-Regular, serif !important;
+		line-height: 1;
+		padding-bottom: 5px !important;
+		z-index: 10 !important;
+		position: relative;
+	}
 </style>

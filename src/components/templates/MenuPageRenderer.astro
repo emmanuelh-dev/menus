@@ -6,6 +6,7 @@ import CartManager from "../CartManager.tsx";
 import FavoritesManager from "../FavoritesManager.tsx";
 import Carousel from "../Carousel.tsx";
 import CategoryNav from "../CategoryNav.tsx";
+import CategoryCards from "../CategoryCards.tsx";
 import MenuItem from "./restaurant/MenuItem.astro";
 
 interface Props {
@@ -109,6 +110,20 @@ const templateConfigs: Record<string, any> = {
 			"text-xl font-bold text-gray-800 mb-6 bg-gray-100/50 px-6 py-3 rounded-2xl",
 		fontImport: "family=Outfit:wght@400;700;900",
 	},
+	tienda: {
+		bg: "bg-[#1a1a1a]",
+		text: "text-white",
+		headerClass: "text-center py-10",
+		titleClass:
+			"text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-xl",
+		sectionTitleClass:
+			"text-xl font-black uppercase tracking-widest text-white mb-6",
+		itemTitleClass:
+			"text-lg font-bold tracking-tight text-white group-hover/item:text-red-400 transition-colors",
+		fontImport: "family=Outfit:wght@400;700;900",
+		fontFamily: "'Outfit', sans-serif",
+		showCategoryCards: true,
+	},
 };
 
 const config = templateConfigs[template] || templateConfigs.default;
@@ -148,7 +163,10 @@ const config = templateConfigs[template] || templateConfigs.default;
 			}
 		</div>
 
-		<CategoryNav client:load blocks={blocks} />
+		<CategoryNav client:load blocks={blocks} variant="icons" />
+
+		{/* Category Cards for Tienda template */}
+		{config.showCategoryCards && <CategoryCards client:load blocks={blocks} />}
 
 		<div class:list={["max-w-2xl mx-auto px-6 mt-8", config.headerClass]}>
 			<h1 class={config.titleClass}>

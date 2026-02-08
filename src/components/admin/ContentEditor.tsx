@@ -142,6 +142,7 @@ interface SectionData {
   description?: string;
   image?: string;
   items: ItemData[];
+  featured?: boolean;
 }
 
 interface GalleryData {
@@ -969,6 +970,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         { id: 'vibrant', name: 'Vibrant (Lalo\'s)', desc: 'Tarjetas y color', icon: '🎨' },
                         { id: 'uber', name: 'Uber (Dark)', desc: 'Elegante oscuro', icon: '⚫' },
                         { id: 'didi', name: 'DiDi (Light)', desc: 'Limpio y naranja', icon: '🟠' },
+                        { id: 'tienda', name: 'Tienda', desc: 'Categorías visuales', icon: '🏪' },
                       ]
                       : [
                         { id: 'default', name: 'Urbano App', desc: 'Oscuro y moderno', icon: '📱' },
@@ -1513,6 +1515,16 @@ function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse,
 
           {!isCollapsed && (
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => onChange({ ...data, featured: !(data.featured ?? false) })}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${data.featured
+                  ? 'bg-amber-500 text-white shadow-lg shadow-amber-200'
+                  : 'bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600'
+                  }`}
+                title={data.featured ? 'Quitar destacado' : 'Marcar como destacada'}
+              >
+                ⭐ {data.featured ? 'Destacada' : 'Destacar'}
+              </button>
               <span className="hidden sm:inline-block text-[10px] font-bold bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full">
                 {data.items.length} PLATILLOS
               </span>

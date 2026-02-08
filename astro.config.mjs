@@ -24,5 +24,31 @@ export default defineConfig({
   },
   redirects:{
     "/menus/campomar/san-pedro/": "/menus/campomar",
-  }
+  },
+  image: {
+    // Dominios permitidos para optimización de imágenes externas
+    domains: [
+      'res.cloudinary.com',
+      'images.unsplash.com',
+      'cdn.sanity.io',
+      'fmngpfyzqgfttmpiwdmm.supabase.co',
+      'lh3.googleusercontent.com',
+      'firebasestorage.googleapis.com',
+      'storage.googleapis.com',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.fbcdn.net',
+      },
+    ],
+  },
 });
