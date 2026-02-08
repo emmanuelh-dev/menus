@@ -89,6 +89,42 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
       // Exclude template from the main payload - it only goes in content.view_settings
       const { template, ...restFormData } = formData;
 
+      // Create starter content based on business type
+      const starterSections: Record<string, { title: string; items: { name: string; description: string; price: number }[] }> = {
+        restaurant: {
+          title: 'Platillos Principales',
+          items: [
+            { name: 'Platillo de Ejemplo', description: 'Edita este producto o agrégale una imagen', price: 99 },
+          ]
+        },
+        cafe: {
+          title: 'Bebidas',
+          items: [
+            { name: 'Café Americano', description: 'Café recién molido, servido caliente o frío', price: 45 },
+          ]
+        },
+        tienda: {
+          title: 'Categoría Principal',
+          items: [
+            { name: 'Producto de Ejemplo', description: 'Añade una descripción y foto atractiva', price: 199 },
+          ]
+        },
+        catalogo: {
+          title: 'Productos Destacados',
+          items: [
+            { name: 'Producto de Ejemplo', description: 'Describe las características de tu producto', price: 299 },
+          ]
+        },
+        motel: {
+          title: 'Habitaciones',
+          items: [
+            { name: 'Habitación Sencilla', description: 'Comodidad y privacidad garantizada', price: 350 },
+          ]
+        },
+      };
+
+      const starter = starterSections[formData.category] || starterSections.restaurant;
+
       const payload = {
         ...restFormData,
         short_name: formData.short_name || slugify(formData.name),
@@ -98,7 +134,20 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
         featured: false,
         // Include the selected template in Content
         content: {
-          blocks: [],
+          blocks: [
+            {
+              id: `section-${Date.now()}`,
+              type: 'section',
+              data: {
+                title: starter.title,
+                description: '¡Bienvenido! Esta es tu primera sección. Puedes editarla o crear nuevas.',
+                items: starter.items.map((item, idx) => ({
+                  id: `item-${Date.now()}-${idx}`,
+                  ...item,
+                })),
+              }
+            }
+          ],
           view_settings: {
             template: template,
             show_prices: true,
