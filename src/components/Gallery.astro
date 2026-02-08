@@ -1,94 +1,123 @@
 ---
-import { Image } from 'astro:assets';
-import ImageModal from './ImageModal.astro';
+import { Image } from "astro:assets";
+import ImageModal from "./ImageModal.astro";
 
 // Quitamos ImageMetadata para que acepte tanto assets locales como URLs de Cloudinary (strings)
 interface ImageData {
-  src: any; 
-  alt?: string;
-  title?: string;
+	src: any;
+	alt?: string;
+	title?: string;
 }
 
 interface Props {
-  images: ImageData[];
-  buttonClasses?: string;
-  modalId?: string;
-  altPrefix?: string;
+	images: ImageData[];
+	buttonClasses?: string;
+	modalId?: string;
+	altPrefix?: string;
 }
 
-const { images, buttonClasses, modalId = 'galleryModal', altPrefix = 'Imagen' } = Astro.props;
+const {
+	images,
+	buttonClasses,
+	modalId = "galleryModal",
+	altPrefix = "Imagen",
+} = Astro.props;
 ---
 
 <div>
-  {/* Grid Asimétrico: El primer item es grande, los demás siguen un ritmo */}
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[150px] md:auto-rows-[200px]">
-    {
-      images.map((image, index) => {
-        // Lógica de "Bento": La 1ra y la 6ta foto son destacadas
-        const isFeatured = index === 0 || index === 5;
-        
-        return (
-          <div 
-            class={`relative overflow-hidden rounded-sm cursor-pointer group transition-all duration-700 ease-out shadow-sm
-                   ${isFeatured ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}
-                   ${index >= 10 ? 'hidden' : 'flex'}`}
-            data-gallery-item
-            data-index={index}
-          >
-            <img
-              src={image.src?.src || image.src}
-              alt={image.alt || `${altPrefix} Galería ${String(index + 1).padStart(2, '0')}`}
-              class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-              loading="lazy"
-            />
-            
-            {/* Overlay minimalista: Solo aparece en hover */}
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
-              {image.title && (
-                <span class="text-[10px] uppercase tracking-[0.2em] text-white font-light">
-                  {image.title}
-                </span>
-              )}
-            </div>
-          </div>
-        )
-      })
-    }
-  </div>
+	{/* Grid Asimétrico: El primer item es grande, los demás siguen un ritmo */}
+	<div
+		class="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[150px] md:auto-rows-[200px]"
+	>
+		{
+			images.map((image, index) => {
+				// Lógica de "Bento": La 1ra y la 6ta foto son destacadas
+				const isFeatured = index === 0 || index === 5;
 
-  {images.length > 10 && (
-    <div class="flex justify-center mt-12">
-      <button
-        id="loadMoreBtn"
-        class="group flex flex-col items-center gap-2 outline-none"
-      >
-        <span class="text-[10px] uppercase tracking-[0.4em] text-black group-hover:text-black transition-colors text-lg">Ver Galería Completa</span>
-        <div class="h-[1px] w-8 bg-stone-200 group-hover:w-16 group-hover:bg-black transition-all duration-500"></div>
-      </button>
-    </div>
-  )}
+				return (
+					<div
+						class={`relative overflow-hidden rounded-sm cursor-pointer group transition-all duration-700 ease-out shadow-sm
+                   ${isFeatured ? "col-span-2 row-span-2" : "col-span-1 row-span-1"}
+                   ${index >= 10 ? "hidden" : "flex"}`}
+						data-gallery-item
+						data-index={index}
+					>
+						<Image
+							src={image.src?.src || image.src}
+							alt={
+								image.alt ||
+								`${altPrefix} Galería ${String(index + 1).padStart(2, "0")}`
+							}
+							width={800}
+							height={600}
+							class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
+							loading="lazy"
+						/>
+
+						{/* Overlay minimalista: Solo aparece en hover */}
+						<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+							{image.title && (
+								<span
+									data-image-title
+									class="text-[10px] uppercase tracking-[0.2em] text-white font-light"
+								>
+									{image.title}
+								</span>
+							)}
+						</div>
+					</div>
+				);
+			})
+		}
+	</div>
+
+	{
+		images.length > 10 && (
+			<div class="flex justify-center mt-12">
+				<button
+					id="loadMoreBtn"
+					class="group flex flex-col items-center gap-2 outline-none"
+				>
+					<span class="text-[10px] uppercase tracking-[0.4em] text-black group-hover:text-black transition-colors text-lg">
+						Ver Galería Completa
+					</span>
+					<div class="h-[1px] w-8 bg-stone-200 group-hover:w-16 group-hover:bg-black transition-all duration-500" />
+				</button>
+			</div>
+		)
+	}
 </div>
 
 <ImageModal id={modalId} />
 
 <script>
-  function initGallery() {
-    const modalId = document.querySelector('[id$="Modal"]')?.id || 'galleryModal';
-    if ((window as any).createImageModal) {
-       const imageModal = (window as any).createImageModal({ modalId });
-       imageModal.attachToElements('[data-gallery-item]');
-    }
+	function initGallery() {
+		const modalId =
+			document.querySelector('[id$="Modal"]')?.id || "galleryModal";
 
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener('click', () => {
-        const hiddenItems = document.querySelectorAll('[data-gallery-item].hidden');
-        hiddenItems.forEach(item => item.classList.remove('hidden'));
-        loadMoreBtn.style.display = 'none';
-      });
-    }
-  }
+		const tryInit = (retries = 0) => {
+			if ((window as any).createImageModal) {
+				const imageModal = (window as any).createImageModal({ modalId });
+				imageModal.attachToElements("[data-gallery-item]");
+			} else if (retries < 10) {
+				setTimeout(() => tryInit(retries + 1), 100);
+			}
+		};
 
-  document.addEventListener('DOMContentLoaded', initGallery);
-  document.addEventListener('astro:page-load', initGallery);
+		tryInit();
+
+		const loadMoreBtn = document.getElementById("loadMoreBtn");
+		if (loadMoreBtn) {
+			loadMoreBtn.addEventListener("click", () => {
+				const hiddenItems = document.querySelectorAll(
+					"[data-gallery-item].hidden",
+				);
+				hiddenItems.forEach((item) => item.classList.remove("hidden"));
+				loadMoreBtn.style.display = "none";
+			});
+		}
+	}
+
+	document.addEventListener("DOMContentLoaded", initGallery);
+	document.addEventListener("astro:page-load", initGallery);
 </script>

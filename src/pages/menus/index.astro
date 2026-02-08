@@ -10,6 +10,7 @@ import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight } from "lucide-react";
 import { getRestaurants } from "../../lib/supabase";
 import { formater } from "../../types/app";
+import { Image } from "astro:assets";
 
 type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
 type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
@@ -84,16 +85,20 @@ const seoData = {
 								<div class="aspect-square relative overflow-hidden rounded-lg mb-6">
 									{restaurant.short_name ? (
 										<a href={restaurantUrl}>
-											<img
+											<Image
 												src={restaurant.image}
 												alt={restaurant.name}
+												width={400}
+												height={400}
 												class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300 cursor-pointer"
 											/>
 										</a>
 									) : (
-										<img
+										<Image
 											src={restaurant.image}
 											alt={restaurant.name}
+											width={400}
+											height={400}
 											class="object-cover object-bottom w-full h-full transform group-hover:scale-105 transition-transform duration-300"
 										/>
 									)}
@@ -110,7 +115,7 @@ const seoData = {
 									</span>
 								</div>
 								<p class="text-gray-600 text-sm">{restaurant.address}</p>
-								<div class="mt-4 flex flex-wrap gap-2"></div>
+								<div class="mt-4 flex flex-wrap gap-2" />
 								{restaurant.short_name && (
 									<a href={restaurantUrl} class="group mt-4 block">
 										<span class="flex items-center justify-between">

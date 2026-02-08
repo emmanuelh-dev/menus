@@ -5,72 +5,144 @@ import { supabase } from "../../../lib/supabase";
 import { Image } from "astro:assets";
 
 const { data: place } = await supabase
-  .from("places")
-  .select("*")
-  .eq("short_name", 'quesabirrias.laregia.mty')
-  .single();
+	.from("places")
+	.select("*")
+	.eq("short_name", "quesabirrias.laregia.mty")
+	.single();
+const {
+	blocks: rawBlocks = [],
+	sections: oldSections = [],
+	gallery: oldGallery = [],
+} = place?.content || {};
 
-const { sections = [], gallery: gallery = [] } = place?.content || {};
+// Migración de estructura plana a anidada si es necesario
+let blocks = rawBlocks;
+const hasOldStructure = rawBlocks.some((block: any) => block.type === "item");
+
+if (hasOldStructure) {
+	const nestedBlocks: any[] = [];
+	let currentSection: any = null;
+
+	rawBlocks.forEach((block: any) => {
+		if (block.type === "section") {
+			currentSection = { ...block, data: { ...block.data, items: [] } };
+			nestedBlocks.push(currentSection);
+		} else if (block.type === "item") {
+			if (!currentSection) {
+				currentSection = {
+					id: "default-section",
+					type: "section",
+					data: { title: "Menú", items: [] },
+				};
+				nestedBlocks.push(currentSection);
+			}
+			currentSection.data.items.push({
+				id: block.id,
+				...block.data,
+			});
+		} else {
+			nestedBlocks.push(block);
+		}
+	});
+	blocks = nestedBlocks;
+}
+
+const sections =
+	blocks.length > 0
+		? blocks.filter((b) => b.type === "section").map((b) => b.data)
+		: oldSections;
+
+const gallery =
+	blocks.length > 0
+		? blocks
+				.filter((b) => b.type === "gallery")
+				.flatMap((b) => b.data.images || [])
+		: oldGallery;
 ---
 
-<RestaurantLayout 
-  title={place.name} 
-  description={place.name} 
-  backgroundColor="bg-[#f6f6f6]"
-  image={place.image}
+<RestaurantLayout
+	title={place.name}
+	description={place.name}
+	backgroundColor="bg-[#f6f6f6]"
+	image={place.image}
 >
-  <div class="bg-[#f6f6f6] min-h-screen">
-    <div class="max-w-4xl mx-auto px-10 lg:px-4">
-      <header class="text-center mb-12">
-        <img src={place.image} alt={place.name} class="max-w-[300px] mx-auto py-4" />
-        <h1 class="text-sm font-oswald uppercase">{place.name}</h1>
-      </header>
+	<div class="bg-[#f6f6f6] min-h-screen">
+		<div class="max-w-4xl mx-auto px-10 lg:px-4">
+			<header class="text-center mb-12">
+				<Image
+					src={place.image}
+					alt={place.name}
+					width={600}
+					height={400}
+					class="max-w-[300px] mx-auto py-4"
+				/>
+				<h1 class="text-sm font-oswald uppercase">{place.name}</h1>
+			</header>
 
-      <div class="grid md:grid-cols-2 gap-8">
-        {sections.map((section, index) => (
-          /* Mantenemos el span de dos columnas para la primera sección (Menú Principal) */
-          <div class={index === 0 ? "md:col-span-2" : ""}>
-            
-            {/* Título con el efecto de skew (inclinación) rojo */}
-            {index !== 0 && (
-              <h2 class="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10">
-                {section.title}
-              </h2>
-            )}
+			<div class="grid md:grid-cols-2 gap-8">
+				{
+					sections.map((section, index) => (
+						/* Mantenemos el span de dos columnas para la primera sección (Menú Principal) */
+						<div class={index === 0 ? "md:col-span-2" : ""}>
+							{/* Título con el efecto de skew (inclinación) rojo */}
+							{index !== 0 && (
+								<h2 class="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10">
+									{section.title}
+								</h2>
+							)}
 
-            {/* Grid interno: si es la primera sección, se divide en dos columnas */}
-            <div class={index === 0 ? "grid md:grid-cols-2 gap-8" : "space-y-6"}>
-              {section.items.map((item) => (
-                <div class="border-b border-gray-300 pb-4">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                      <h3 class="font-oswald font-bold text-xl uppercase">{item.name}</h3>
-                      <p class="text-gray-600 text-sm leading-tight mt-1">{item.description}</p>
-                      {item.note && <p class="text-xs italic text-gray-400 mt-1">{item.note}</p>}
-                    </div>
-                    <div class="text-[#f61519] font-oswald font-black text-xl ml-4 whitespace-nowrap">
-                      {item.price 
-                        ? `$${item.price}` 
-                        : item.variants?.map(v => `${v.label}: $${v.price}`).join(" / ")
-                      }
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    <div class="text-center max-w-4xl mx-auto px-10">
-      {/* Image gallery */}
-      <h2 class="text-4xl py-6 font-oswald text-[#f61519] mb-2 font-bold">Galeria</h2>
-      <Gallery images={gallery} buttonClasses="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10" />
-  </div>
-  </div>
+							{/* Grid interno: si es la primera sección, se divide en dos columnas */}
+							<div
+								class={index === 0 ? "grid md:grid-cols-2 gap-8" : "space-y-6"}
+							>
+								{section.items.map((item) => (
+									<div class="border-b border-gray-300 pb-4">
+										<div class="flex justify-between items-start">
+											<div class="flex-1">
+												<h3 class="font-oswald font-bold text-xl uppercase">
+													{item.name}
+												</h3>
+												<p class="text-gray-600 text-sm leading-tight mt-1">
+													{item.description}
+												</p>
+												{item.note && (
+													<p class="text-xs italic text-gray-400 mt-1">
+														{item.note}
+													</p>
+												)}
+											</div>
+											<div class="text-[#f61519] font-oswald font-black text-xl ml-4 whitespace-nowrap">
+												{item.price
+													? `$${item.price}`
+													: item.variants
+															?.map((v) => `${v.label}: $${v.price}`)
+															.join(" / ")}
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					))
+				}
+			</div>
+		</div>
+		<div class="text-center max-w-4xl mx-auto px-10">
+			{/* Image gallery */}
+			<h2 class="text-4xl py-6 font-oswald text-[#f61519] mb-2 font-bold">
+				Galeria
+			</h2>
+			<Gallery
+				images={gallery}
+				buttonClasses="inline-block font-oswald bg-[#f61519] text-white text-3xl font-black uppercase py-2 px-8 mb-6 relative after:content-[''] after:absolute after:right-[-15px] after:top-0 after:bottom-0 after:w-[30px] after:bg-[#f61519] after:skew-x-[20deg] after:-z-10"
+			/>
+		</div>
+	</div>
 </RestaurantLayout>
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
-  .font-oswald { font-family: "Oswald", sans-serif; }
+	@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
+	.font-oswald {
+		font-family: "Oswald", sans-serif;
+	}
 </style>

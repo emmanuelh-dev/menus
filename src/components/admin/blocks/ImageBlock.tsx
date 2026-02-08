@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { PiImage, PiTrash, PiX } from 'react-icons/pi';
+import { PiX, PiImage, PiTrash } from 'react-icons/pi';
 import { ManualUploader } from '../../ManualUploader';
-import { ImageSelector } from '../ImageSelector';
-import type { ImageData } from '../../../types/app';
+import type { ImageData } from './types';
 
 interface ImageBlockProps {
   data: ImageData;
@@ -31,7 +30,7 @@ export function ImageBlock({ data, onChange, existingImages }: ImageBlockProps) 
               {data.src ? (
                 <>
                   <img src={data.src} alt={data.alt || ''} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/20 opacity-100 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button onClick={() => onChange({ ...data, src: '' })} className="bg-red-600 text-white p-2 rounded-xl">
                       <PiTrash className="w-5 h-5" />
                     </button>

@@ -4,80 +4,109 @@ export const prerender = false;
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { Image } from "astro:assets";
 
 // Fetching simplificado: Solo lo que necesitamos
 const { data: cafeterias } = await supabase
-  .from("places")
-  .select("*")
-  .eq("type", 'cafeteria')
-  .order('rating', { ascending: false });
+	.from("places")
+	.select("*")
+	.eq("type", "cafeteria")
+	.order("rating", { ascending: false });
 
 const seoData = {
-  title: "Mejores Cafeterías en Monterrey 2026 | Menús y Ubicaciones",
-  description: "Guía de café de especialidad y cafeterías tradicionales en Monterrey, San Pedro y Linda Vista con menús digitales."
+	title: "Mejores Cafeterías en Monterrey 2026 | Menús y Ubicaciones",
+	description:
+		"Guía de café de especialidad y cafeterías tradicionales en Monterrey, San Pedro y Linda Vista con menús digitales.",
 };
 ---
 
-<RestaurantLayout title={seoData.title} description={seoData.description} backgroundColor="bg-[#F8F3E9]">
-  <div class="min-h-screen bg-[#F8F3E9] py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <header class="text-center mb-16">
-        <h1 class="text-5xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight">Cafeterías en Monterrey</h1>
-        <p class="text-xl text-[#5F4B3B] max-w-2xl mx-auto italic">Donde el grano de especialidad se encuentra con la utilidad real.</p>
-      </header>
+<RestaurantLayout
+	title={seoData.title}
+	description={seoData.description}
+	backgroundColor="bg-[#F8F3E9]"
+>
+	<div class="min-h-screen bg-[#F8F3E9] py-12">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<header class="text-center mb-16">
+				<h1
+					class="text-5xl font-serif font-bold text-[#3A2E27] mb-4 tracking-tight"
+				>
+					Cafeterías en Monterrey
+				</h1>
+				<p class="text-xl text-[#5F4B3B] max-w-2xl mx-auto italic">
+					Donde el grano de especialidad se encuentra con la utilidad real.
+				</p>
+			</header>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {cafeterias?.map((cafe) => {
-          const address = cafe.content?.semantic_data?.address || cafe.address;
-          const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cafe.name} ${address}`)}`;
-          
-          return (
-            <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden border border-stone-200">
-              <div class="relative aspect-video">
-                <img src={cafe.image} alt={cafe.name} class="w-full h-full object-cover" />
-                <div class="absolute bottom-3 left-3 flex gap-2">
-                  <div class="bg-white/95 backdrop-blur px-2 py-1 rounded text-xs font-bold flex items-center">
-                    <Star className="w-3 h-3 text-yellow-500 mr-1 fill-yellow-500" />
-                    {cafe.rating}
-                  </div>
-                </div>
-              </div>
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+				{
+					cafeterias?.map((cafe) => {
+						const address =
+							cafe.content?.semantic_data?.address || cafe.address;
+						const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cafe.name} ${address}`)}`;
 
-              <div class="p-5">
-                <h3 class="font-serif text-xl font-bold text-[#3A2E27] mb-2">{cafe.name}</h3>
-                
-                <div class="space-y-2 mb-6">
-                  <div class="flex items-start text-sm text-stone-600">
-                    <MapPin className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-[#A67C52]" />
-                    <a href={mapsUrl} target="_blank" class="hover:underline">{address}</a>
-                  </div>
-                  <div class="flex items-center text-sm text-stone-600">
-                    <Clock className="w-4 h-4 mr-2 shrink-0 text-[#A67C52]" />
-                    <span>{cafe.content?.semantic_data?.hours || "Horario no disponible"}</span>
-                  </div>
-                </div>
+						return (
+							<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden border border-stone-200">
+								<div class="relative aspect-video">
+									<Image
+										src={cafe.image}
+										alt={cafe.name}
+										width={600}
+										height={400}
+										class="w-full h-full object-cover"
+									/>
+									<div class="absolute bottom-3 left-3 flex gap-2">
+										<div class="bg-white/95 backdrop-blur px-2 py-1 rounded text-xs font-bold flex items-center">
+											<Star className="w-3 h-3 text-yellow-500 mr-1 fill-yellow-500" />
+											{cafe.rating}
+										</div>
+									</div>
+								</div>
 
-                <div class="flex flex-wrap gap-2 mb-6">
-                   {cafe.content?.semantic_data?.features?.slice(0, 3).map((f) => (
-                    <span class="text-[10px] uppercase tracking-wider bg-stone-100 text-stone-500 px-2 py-0.5 rounded font-bold">
-                      {f}
-                    </span>
-                  ))}
-                </div>
+								<div class="p-5">
+									<h3 class="font-serif text-xl font-bold text-[#3A2E27] mb-2">
+										{cafe.name}
+									</h3>
 
-                <a 
-                  href={`/menus/${cafe.short_name}`} 
-                  class="flex items-center justify-center w-full py-3 bg-[#3A2E27] text-white rounded-lg font-bold hover:bg-[#A67C52] transition-colors gap-2"
-                >
-                  Ver Menú Digital
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
+									<div class="space-y-2 mb-6">
+										<div class="flex items-start text-sm text-stone-600">
+											<MapPin className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-[#A67C52]" />
+											<a href={mapsUrl} target="_blank" class="hover:underline">
+												{address}
+											</a>
+										</div>
+										<div class="flex items-center text-sm text-stone-600">
+											<Clock className="w-4 h-4 mr-2 shrink-0 text-[#A67C52]" />
+											<span>
+												{cafe.content?.semantic_data?.hours ||
+													"Horario no disponible"}
+											</span>
+										</div>
+									</div>
+
+									<div class="flex flex-wrap gap-2 mb-6">
+										{cafe.content?.semantic_data?.features
+											?.slice(0, 3)
+											.map((f) => (
+												<span class="text-[10px] uppercase tracking-wider bg-stone-100 text-stone-500 px-2 py-0.5 rounded font-bold">
+													{f}
+												</span>
+											))}
+									</div>
+
+									<a
+										href={`/menus/${cafe.short_name}`}
+										class="flex items-center justify-center w-full py-3 bg-[#3A2E27] text-white rounded-lg font-bold hover:bg-[#A67C52] transition-colors gap-2"
+									>
+										Ver Menú Digital
+										<ArrowRight className="w-4 h-4" />
+									</a>
+								</div>
+							</div>
+						);
+					})
+				}
+			</div>
+		</div>
+	</div>
 </RestaurantLayout>

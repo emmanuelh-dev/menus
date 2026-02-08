@@ -144,7 +144,7 @@ export default function CategoryNav({ blocks, variant = 'icons' }: Props) {
   // Icons variant - like DiDi/Uber with emoji icons
   if (variant === 'icons') {
     return (
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+      <div className="sticky top-0 z-40  backdrop-blur-xl border-b  shadow-sm">
         <div
           ref={navRef}
           className="max-w-7xl mx-auto px-4 py-4 overflow-x-auto hide-scrollbar flex items-center gap-3"

@@ -1,5 +1,6 @@
 ---
 import DefaultLayout from "../layouts/DefaultLayout.astro";
+import { Image } from "astro:assets";
 import {
 	Zap,
 	QrCode,
@@ -137,9 +138,11 @@ const faqs = [
 						class="absolute inset-0 bg-emerald-500/10 blur-[80px] rounded-full group-hover:bg-emerald-500/20 transition-all duration-700"
 					>
 					</div>
-					<img
+					<Image
 						src="/images/landing/hero-free.png"
 						alt="Mockup Menú Digital"
+						width={600}
+						height={800}
 						class="relative z-10 w-full max-w-lg mx-auto transform hover:rotate-2 hover:scale-105 transition-all duration-700 drop-shadow-2xl"
 					/>
 				</div>

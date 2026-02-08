@@ -281,7 +281,7 @@ const schemaEnrichment = {
               {motelesList.filter(motel => motel.featured === true).map(motel => (
                 <div class="bg-[#1E1E1E] rounded-xl overflow-hidden  flex flex-col md:flex-row">
                   <div class="md:w-2/5 relative">
-                    <img
+                    <Image
                       src={motel.image || '/motel.png'} 
                       alt={motel.name}
                       width={400}
@@ -372,7 +372,7 @@ const schemaEnrichment = {
               >
                 <!-- Imagen con overlay -->
                 <div class="relative h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={motel.image || '/motel.png'} 
                     alt={motel.name}
                     width={500}

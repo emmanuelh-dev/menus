@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { PiSparkle, PiPlus, PiX } from 'react-icons/pi';
-import { ImageSelector } from '../ImageSelector';
-import type { GalleryData } from '../../../types/app';
+import { PiX, PiSparkle, PiImage } from 'react-icons/pi';
+import { ManualUploader } from '../../ManualUploader';
+import { ImageSelector } from './ImageSelector';
+import type { GalleryData } from './types';
 
 interface GalleryBlockProps {
   data: GalleryData;
   onChange: (data: GalleryData) => void;
   existingImages?: string[];
+  onUploadToLibrary?: (urls: string[]) => void;
 }
 
-export function GalleryBlock({ data, onChange, existingImages }: GalleryBlockProps) {
+export function GalleryBlock({ data, onChange, existingImages, onUploadToLibrary }: GalleryBlockProps) {
   const [showImageSelector, setShowImageSelector] = useState(false);
 
   const addImageToGallery = (urls: string[]) => {
@@ -45,27 +47,34 @@ export function GalleryBlock({ data, onChange, existingImages }: GalleryBlockPro
               <img src={img.src} alt={img.alt || ''} className="w-full h-full object-cover" />
               <button
                 onClick={() => removeImageFromGallery(gIdx)}
-                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-700"
+                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-600/80 text-white rounded-lg opacity-100 sm:opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
               >
                 <PiX className="w-3 h-3" />
               </button>
             </div>
           ))}
 
-          <button
-            onClick={() => setShowImageSelector(true)}
-            className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 text-gray-600"
-          >
-            <PiPlus className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-semibold uppercase tracking-wide px-2 text-center">Agregar</span>
-          </button>
+          <div className="col-span-2 md:col-span-2 space-y-2">
+            <ManualUploader
+              onFilesUploaded={addImageToGallery}
+              multiple={true}
+            />
+            <button
+              onClick={() => setShowImageSelector(true)}
+              className="w-full py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 border border-blue-100"
+            >
+              <PiImage className="w-3 h-3" />  Biblioteca Existente
+            </button>
+          </div>
         </div>
 
         {showImageSelector && existingImages && (
           <ImageSelector
             existingImages={existingImages}
-            onSelect={(url) => addImageToGallery([url])}
+            multiple={true}
+            onSelectMultiple={(urls) => addImageToGallery(urls)}
             onClose={() => setShowImageSelector(false)}
+            onUpload={onUploadToLibrary}
           />
         )}
       </div>

@@ -41,9 +41,22 @@ import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 import MotelPageRenderer from '../MotelPageRenderer';
 import AIChat from './AIChat';
-import GalleryManager from './GalleryManager';
 import AdminPageHeader from './AdminPageHeader';
 import RestaurantPreview from './RestaurantPreview';
+import {
+  SectionBlock,
+  GalleryBlock,
+  ImageBlock,
+  CarruselBlock,
+  SectionNav,
+  TableView,
+  BlockTypeButton,
+  type Block,
+  type BlockType,
+  type ItemData,
+  type SectionData,
+  type GalleryData
+} from './blocks';
 import {
   PiPlus,
   PiTrash,
@@ -77,14 +90,6 @@ import {
   PiTable
 } from 'react-icons/pi';
 
-type BlockType = 'section' | 'gallery' | 'image' | 'carrusel';
-
-interface Block {
-  id: string;
-  type: BlockType;
-  data: any;
-}
-
 const migrateFlatToNested = (content: any): Block[] => {
   if (!content?.blocks) return [];
 
@@ -116,38 +121,6 @@ const migrateFlatToNested = (content: any): Block[] => {
 
   return nestedBlocks;
 };
-
-interface ItemOption {
-  name: string;
-  values: string[];
-  prices?: { [key: string]: number };
-  required?: boolean;
-}
-
-interface ItemData {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  image: string;
-  features?: string[];
-  gallery?: { src: string; alt?: string; title?: string }[];
-  options?: ItemOption[];
-  available?: boolean;
-}
-
-interface SectionData {
-  title: string;
-  category?: string;
-  description?: string;
-  image?: string;
-  items: ItemData[];
-  featured?: boolean;
-}
-
-interface GalleryData {
-  images: { src: string; alt?: string; title?: string; description?: string }[];
-}
 
 
 export default function ContentEditor({ placeId, initialContent, placeType = 'restaurant', placeData }: { placeId: number; initialContent: any; placeType?: 'restaurant' | 'motel'; placeData?: any }) {
@@ -501,19 +474,15 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       case 'section':
         return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       case 'gallery':
-        return (
-          <GalleryManager
-            images={block.data.images || []}
-            onChange={(images) => updateBlock(index, { ...block.data, images })}
-            existingImages={existingImages}
-            onUploadToLibrary={onUploadToLibrary}
-          />
-        );
+        return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
+      case 'image':
+        return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
       case 'carrusel':
         return <CarruselBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       default:
         return null;
     }
+
   }
 
   return (
@@ -1061,103 +1030,110 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           </div>
 
           {editorMode === 'blocks' ? (
-            <div className="space-y-4 lg:px-4 sm:px-0">
-              {blocks.map((block, index) => (
-                <div key={block.id} id={block.id} className="relative scroll-mt-24">
+            <>
+              {/* <SectionNav
+                blocks={blocks}
+                activeSectionId={activeSectionId}
+                onScrollTo={scrollToBlock}
+              /> */}
+              <div className="space-y-4 lg:px-4 sm:px-0">
+                {blocks.map((block, index) => (
+                  <div key={block.id} id={block.id} className="relative scroll-mt-24">
 
-                  <div className="flex justify-end gap-2 mb-3 ">
-                    <button
-                      onClick={() => moveBlock(index, 'up')}
-                      disabled={index === 0}
-                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
-                      title="Subir"
-                    >
-                      <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
-                    </button>
-                    <button
-                      onClick={() => moveBlock(index, 'down')}
-                      disabled={index === blocks.length - 1}
-                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
-                      title="Bajar"
-                    >
-                      <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
-                    </button>
-                    <button
-                      onClick={() => duplicateBlock(index)}
-                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
-                      title="Duplicar"
-                    >
-                      <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                    </button>
-                    <button
-                      onClick={() => removeBlock(index)}
-                      className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
-                      title="Eliminar"
-                    >
-                      <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
-                    </button>
-                  </div>
-
-                  {renderBlock(block, index, forceCollapse)}
-
-                  <div className="flex justify-center my-4">
-                    <button
-                      onClick={() => setShowBlockMenu(`after-${index}`)}
-                      className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
-                    >
-                      <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
-                    </button>
-                  </div>
-
-                  {showBlockMenu === `after-${index}` && (
-                    <div className="mt-3 p-4 bg-white border rounded-xl ">
-                      <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
-                        <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
-                        <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
-                        <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
-                      </div>
+                    <div className="flex justify-end gap-2 mb-3 ">
                       <button
-                        onClick={() => setShowBlockMenu(false)}
-                        className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                        onClick={() => moveBlock(index, 'up')}
+                        disabled={index === 0}
+                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                        title="Subir"
                       >
-                        Cancelar
+                        <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                      </button>
+                      <button
+                        onClick={() => moveBlock(index, 'down')}
+                        disabled={index === blocks.length - 1}
+                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                        title="Bajar"
+                      >
+                        <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                      </button>
+                      <button
+                        onClick={() => duplicateBlock(index)}
+                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
+                        title="Duplicar"
+                      >
+                        <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+                      </button>
+                      <button
+                        onClick={() => removeBlock(index)}
+                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
+                        title="Eliminar"
+                      >
+                        <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
                       </button>
                     </div>
-                  )}
-                </div>
-              ))}
 
-              {blocks.length === 0 && (
-                <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
-                  <div className="mb-4 flex justify-center">
-                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
-                      <PiTray className="w-8 h-8" />
+                    {renderBlock(block, index, forceCollapse)}
+
+                    <div className="flex justify-center my-4">
+                      <button
+                        onClick={() => setShowBlockMenu(`after-${index}`)}
+                        className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
+                      >
+                        <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
+                      </button>
                     </div>
-                  </div>
-                  <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
-                  <button
-                    onClick={() => setShowBlockMenu(true)}
-                    className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
-                  >
-                    <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
-                  </button>
 
-                  {showBlockMenu === true && (
-                    <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
-                      <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
-                      <div className="grid grid-cols-2 gap-3">
-                        <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section')} />
-                        <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
-                        <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
-                        <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
+                    {showBlockMenu === `after-${index}` && (
+                      <div className="mt-3 p-4 bg-white border rounded-xl ">
+                        <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
+                          <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
+                          <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
+                          <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
+                        </div>
+                        <button
+                          onClick={() => setShowBlockMenu(false)}
+                          className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {blocks.length === 0 && (
+                  <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
+                    <div className="mb-4 flex justify-center">
+                      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
+                        <PiTray className="w-8 h-8" />
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
+                    <button
+                      onClick={() => setShowBlockMenu(true)}
+                      className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
+                    >
+                      <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
+                    </button>
+
+                    {showBlockMenu === true && (
+                      <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
+                        <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section')} />
+                          <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
+                          <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
+                          <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <TableView blocks={blocks} onChange={setBlocks} />
           )}
@@ -1271,1142 +1247,6 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         >
           <PiSparkle className="w-6 h-6" />
         </button>
-      </div>
-    </div >
-  );
-}
-
-function BlockTypeButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-2 p-3 bg-white hover:bg-blue-50 rounded-xl border-2 border-gray-200 hover:border-blue-400 transition-colors group"
-    >
-      <div className="text-blue-600 group-hover:text-blue-700">{icon}</div>
-      <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wide">{label}</span>
-    </button>
-  );
-}
-
-function ImageSelector({ existingImages, onSelect, onClose, onUpload, multiple = false, onSelectMultiple }: { existingImages: string[]; onSelect?: (url: string) => void; onClose: () => void; onUpload?: (urls: string[]) => void; multiple?: boolean; onSelectMultiple?: (urls: string[]) => void }) {
-  const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
-
-  const handleToggleSelect = (url: string) => {
-    if (!multiple) {
-      onSelect?.(url);
-      onClose();
-      return;
-    }
-
-    if (selectedUrls.includes(url)) {
-      setSelectedUrls(prev => prev.filter(u => u !== url));
-    } else {
-      setSelectedUrls(prev => [...prev, url]);
-    }
-  };
-
-  const handleConfirm = () => {
-    if (multiple && onSelectMultiple) {
-      onSelectMultiple(selectedUrls);
-    }
-    onClose();
-  };
-
-  if (existingImages.length === 0 && !onUpload) {
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full animate-in zoom-in duration-300">
-          <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 mx-auto mb-6">
-            <PiImages className="w-10 h-10" />
-          </div>
-          <h3 className="text-lg font-bold text-gray-800 mb-2">Biblioteca vacía</h3>
-          <p className="text-sm text-gray-500 mb-6">Usa los botones de "Subir" en cada bloque para agregar contenido nuevo.</p>
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-3 bg-gray-900 text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-black transition-all"
-          >
-            Entendido
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center z-10">
-          <h3 className="text-sm font-bold uppercase text-gray-800 tracking-wide">Biblioteca de Medios</h3>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600"
-          >
-            <PiX className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] space-y-8">
-          {onUpload && (
-            <section className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Subir nuevas imágenes a la biblioteca:</h4>
-              <ManualUploader
-                onFilesUploaded={(urls) => {
-                  onUpload(urls);
-                }}
-                multiple={true}
-              />
-            </section>
-          )}
-
-          <section>
-            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Seleccionar de la biblioteca:</h4>
-            {existingImages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-4xl mb-2">📸</div>
-                <p className="text-sm text-gray-400">No hay imágenes en la biblioteca. ¡Sube algunas arriba!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {existingImages.map((url, idx) => {
-                  const isSelected = selectedUrls.includes(url);
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleToggleSelect(url)}
-                      className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all group ${isSelected
-                        ? 'border-blue-600 shadow-md ring-2 ring-blue-100'
-                        : 'border-gray-200 hover:border-blue-400'
-                        }`}
-                    >
-                      <img src={url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-
-                      {/* Selection Overlay (Only shown if selected) */}
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-blue-600/20 flex items-center justify-center animate-in fade-in zoom-in duration-200">
-                          <div className="bg-blue-600 text-white p-1.5 rounded-full  transform scale-110">
-                            <PiCheckCircle className="w-6 h-6" />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Hover Indicator (Only for non-selected items) */}
-                      {!isSelected && (
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                          <div className="bg-white/90 text-gray-900 p-2 rounded-xl  opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200">
-                            <PiPlus className="w-5 h-5" />
-                          </div>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        </div>
-
-        {multiple && (
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex justify-between items-center shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)]">
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-none">
-              {selectedUrls.length} seleccionadas
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                disabled={selectedUrls.length === 0}
-                onClick={handleConfirm}
-                className="px-8 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-700  shadow-blue-200 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-95"
-              >
-                Insertar Imágenes
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-
-function SectionBlock({ data, onChange, placeType = 'restaurant', forceCollapse, existingImages, onUploadToLibrary }: { data: SectionData; onChange: (data: SectionData) => void; placeType?: 'restaurant' | 'motel'; forceCollapse?: boolean; existingImages?: string[]; onUploadToLibrary?: (urls: string[]) => void }) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [showImageSelector, setShowImageSelector] = useState(false);
-  const [showItemImageSelector, setShowItemImageSelector] = useState<{ [key: number]: boolean }>({});
-  const [showItemGallerySelector, setShowItemGallerySelector] = useState<{ [key: number]: boolean }>({});
-
-  useEffect(() => {
-    if (forceCollapse !== undefined) {
-      setIsCollapsed(forceCollapse);
-    }
-  }, [forceCollapse]);
-
-  const addItem = () => {
-    const newItem: ItemData = {
-      id: `item-${Date.now()}-${Math.random()}`,
-      name: '',
-      price: 0,
-      description: '',
-      image: '',
-      features: [],
-      options: []
-    };
-    onChange({ ...data, items: [...data.items, newItem] });
-    setIsCollapsed(false);
-  };
-
-  const updateItem = (itemIndex: number, itemData: Partial<ItemData>) => {
-    const newItems = [...data.items];
-    newItems[itemIndex] = { ...newItems[itemIndex], ...itemData };
-    onChange({ ...data, items: newItems });
-  };
-
-  const removeItem = (itemIndex: number) => {
-    onChange({ ...data, items: data.items.filter((_, i) => i !== itemIndex) });
-  };
-
-  const moveItem = (itemIndex: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
-    if (targetIndex < 0 || targetIndex >= data.items.length) return;
-
-    const newItems = [...data.items];
-    [newItems[itemIndex], newItems[targetIndex]] = [newItems[targetIndex], newItems[itemIndex]];
-    onChange({ ...data, items: newItems });
-  };
-
-  return (
-    <div className={`xl:bg-white rounded-2xl  duration-500 overflow-hidden ${isCollapsed ? 'border-gray-50 shadow-sm' : 'border-gray-200 shadow-xl'}`}>
-      <div className={`${isCollapsed ? 'bg-white' : 'xl:bg-gray-50'} xl:p-4 transition-all uppercase tracking-wide`}>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl shadow-sm font-bold transition-all ${isCollapsed ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' : 'bg-gray-700 text-white shadow-gray-200'}`}
-          >
-            <PiPlus className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? '' : 'rotate-45'}`} />
-          </button>
-
-          <div className="flex-1">
-            <input
-              value={data.title}
-              onChange={(e) => onChange({ ...data, title: e.target.value })}
-              placeholder="Ej: PLATILLOS FUERTES"
-              className={`w-full font-bold uppercase bg-transparent outline-none transition-all tracking-wider ${isCollapsed ? 'text-xs text-gray-800' : 'text-xl sm:text-2xl text-gray-800 px-1 border-b-2 border-gray-300'
-                }`}
-            />
-            <div className="flex items-center gap-1 mt-1 opacity-60">
-              <input
-                value={data.category || ''}
-                onChange={(e) => onChange({ ...data, category: e.target.value })}
-                placeholder="Añadir a un Submenú / Grupo (opcional)..."
-                className="text-[10px] font-bold text-blue-600 bg-blue-50/50 px-2 py-0.5 rounded outline-none w-full max-w-[200px] placeholder:text-gray-300"
-              />
-            </div>
-            {isCollapsed && (
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1 leading-none">
-                Sección Dinámica • {data.items.length} Elementos
-              </p>
-            )}
-          </div>
-
-          {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => onChange({ ...data, featured: !(data.featured ?? false) })}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${data.featured
-                  ? 'bg-amber-500 text-white shadow-lg shadow-amber-200'
-                  : 'bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600'
-                  }`}
-                title={data.featured ? 'Quitar destacado' : 'Marcar como destacada'}
-              >
-                ⭐ {data.featured ? 'Destacada' : 'Destacar'}
-              </button>
-              <span className="hidden sm:inline-block text-[10px] font-bold bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full">
-                {data.items.length} PLATILLOS
-              </span>
-            </div>
-          )}
-        </div>
-
-        {!isCollapsed && (
-          <div className="mt-4 space-y-4">
-            <div className="bg-white/50 p-4 rounded-xl border border-emerald-100/50">
-              <label className="text-[10px] font-bold text-emerald-800/40 uppercase mb-2 block tracking-widest px-1">Concepto de la Sección:</label>
-              <textarea
-                value={data.description || ''}
-                onChange={(e) => onChange({ ...data, description: e.target.value })}
-                placeholder="Breve historia o descripción de esta categoría..."
-                rows={2}
-                className="w-full text-sm bg-white p-3 rounded-xl border border-emerald-100 outline-none focus:border-emerald-600 shadow-sm"
-              />
-            </div>
-
-            <div className='px-4'>
-              <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Imagen de fondo:</label>
-
-              <div className="bg-white p-4 rounded-2xl border border-gray-100 space-y-4">
-                {data.image ? (
-                  <div className="space-y-3">
-                    <div className="relative aspect-[21/9] rounded-xl overflow-hidden shadow-sm border border-gray-100">
-                      <img src={data.image} alt={data.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setShowImageSelector(true)}
-                        className="flex-1 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 active:scale-95 transition-all flex items-center justify-center gap-2"
-                      >
-                        <PiArrowCounterClockwise size={14} className="text-blue-500" /> Cambiar Imagen
-                      </button>
-                      <button
-                        onClick={() => onChange({ ...data, image: '' })}
-                        className="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-100 active:scale-95 transition-all flex items-center justify-center"
-                      >
-                        <PiTrash size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setShowImageSelector(true)}
-                    className="w-full aspect-[21/9] border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group bg-slate-50/50"
-                  >
-                    <PiImage size={24} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Elegir Imagen de Fondo</span>
-                  </button>
-                )}
-              </div>
-
-              {showImageSelector && (
-                <ImageSelector
-                  existingImages={existingImages || []}
-                  onSelect={(url) => {
-                    onChange({ ...data, image: url });
-                    setShowImageSelector(false);
-                  }}
-                  onClose={() => setShowImageSelector(false)}
-                  onUpload={onUploadToLibrary}
-                />
-              )}
-            </div>
-
-            <div className="mt-8">
-              <div className="flex justify-between items-center border-t border-purple-50 pt-4 px-1">
-                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Listado de Productos</h4>
-                <button
-                  onClick={addItem}
-                  className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all  flex items-center gap-2"
-                >
-                  <PiPlus className="w-3 h-3" /> Agregar Ítem
-                </button>
-              </div>
-
-              {data.items.length === 0 && (
-                <div className="text-center py-10 bg-white/30 rounded-xl border-2 border-dashed border-purple-200">
-                  <p className="text-purple-400 text-xs font-bold uppercase">No hay items en esta sección</p>
-                </div>
-              )}
-
-              {data.items.map((item, itemIndex) => (
-                <div key={item.id} className="group relative bg-white rounded-[2rem] border border-gray-100 hover:border-gray-200 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md my-4">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gray-100" />
-
-                  <div className="p-4 sm:p-6">
-                    <div className="flex items-center justify-between gap-4 mb-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-xs font-black ">{itemIndex + 1}</div>
-                        <div>
-                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block leading-none mb-1">Producto</span>
-                          <span className="text-[9px] font-mono text-gray-300 uppercase leading-none">{item.id.split('-').pop()}</span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateItem(itemIndex, { available: !(item.available ?? true) })}
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${(item.available ?? true)
-                            ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white'
-                            : 'bg-stone-100 text-stone-400 hover:bg-stone-600 hover:text-white'
-                            }`}
-                          title={(item.available ?? true) ? 'Disponible' : 'Agotado / Oculto'}
-                        >
-                          {(item.available ?? true) ? <PiEye className="w-5 h-5" /> : <PiEyeSlash className="w-5 h-5" />}
-                        </button>
-                        <button
-                          onClick={() => moveItem(itemIndex, 'up')}
-                          disabled={itemIndex === 0}
-                          className="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white disabled:opacity-30 flex items-center justify-center transition-all"
-                        >
-                          <PiCaretUp className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => moveItem(itemIndex, 'down')}
-                          disabled={itemIndex === data.items.length - 1}
-                          className="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white disabled:opacity-30 flex items-center justify-center transition-all"
-                        >
-                          <PiCaretDown className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => { if (confirm('¿Eliminar este producto?')) removeItem(itemIndex); }}
-                          className="w-10 h-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white flex items-center justify-center transition-all"
-                        >
-                          <PiTrash className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <div className="flex-1">
-                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 block">Nombre del Producto</label>
-                          <input
-                            value={item.name}
-                            onChange={(e) => updateItem(itemIndex, { name: e.target.value })}
-                            placeholder="Ej: Gordita de Chicharrón"
-                            className="w-full text-sm font-bold bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 shadow-sm transition-all"
-                          />
-                        </div>
-                        <div className="w-full sm:w-32">
-                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 block">Precio ($)</label>
-                          <input
-                            type="number"
-                            value={item.price}
-                            onChange={(e) => updateItem(itemIndex, { price: parseFloat(e.target.value) })}
-                            placeholder="0.00"
-                            className="w-full text-left sm:text-right text-sm sm:text-base font-bold text-emerald-600 bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-purple-600 shadow-sm"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1 block">Descripción</label>
-                        <textarea
-                          value={item.description}
-                          onChange={(e) => updateItem(itemIndex, { description: e.target.value })}
-                          placeholder="Describe los ingredientes, tamaño o lo que incluye..."
-                          rows={2}
-                          className="w-full text-sm text-gray-700 p-3 rounded-xl bg-white border border-gray-200 outline-none focus:border-purple-600 resize-none shadow-sm transition-all"
-                        />
-                      </div>
-
-                      <div className="space-y-6 pt-2">
-                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 px-1">
-                            <PiSparkle className="w-4 h-4 text-emerald-500" />
-                            Variantes (Sabores o Tamaños)
-                          </label>
-
-                          <div className="space-y-4">
-                            {item.options?.map((option, optIdx) => (
-                              <div key={optIdx} className="space-y-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 relative group/opt">
-                                <button
-                                  onClick={() => {
-                                    const newOptions = item.options?.filter((_, i) => i !== optIdx);
-                                    updateItem(itemIndex, { options: newOptions });
-                                  }}
-                                  className="absolute -top-2 -right-2 w-8 h-8 bg-white text-slate-400 hover:text-red-500 rounded-full shadow-sm border border-slate-100 flex items-center justify-center transition-all opacity-0 group-hover/opt:opacity-100"
-                                >
-                                  <PiTrash className="w-4 h-4" />
-                                </button>
-
-                                <div className="flex flex-col gap-2">
-                                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block ml-1">Nombre del grupo (ej: Sabor, Tamaño):</label>
-                                  <input
-                                    value={option.name}
-                                    onChange={(e) => {
-                                      const newOptions = [...(item.options || [])];
-                                      newOptions[optIdx].name = e.target.value;
-                                      updateItem(itemIndex, { options: newOptions });
-                                    }}
-                                    placeholder="Ej: Sabor de la masa..."
-                                    className="w-full text-sm font-bold bg-white border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-emerald-500 transition-all"
-                                  />
-                                </div>
-
-                                <div className="flex flex-wrap gap-2">
-                                  {option.values.map((val, vIdx) => (
-                                    <span key={vIdx} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-bold flex flex-col gap-1 border border-emerald-100 group transition-all hover:border-emerald-300">
-                                      <div className="flex items-center gap-2">
-                                        <span className="flex-1 whitespace-nowrap">{val}</span>
-                                        <button
-                                          onClick={() => {
-                                            const newOptions = [...(item.options || [])];
-                                            newOptions[optIdx].values = newOptions[optIdx].values.filter((_, i) => i !== vIdx);
-                                            // Limpiar el precio si existe
-                                            if (newOptions[optIdx].prices) {
-                                              const newPrices = { ...newOptions[optIdx].prices };
-                                              delete newPrices[val];
-                                              newOptions[optIdx].prices = newPrices;
-                                            }
-                                            updateItem(itemIndex, { options: newOptions });
-                                          }}
-                                          className="text-emerald-300 hover:text-red-500 transition-colors"
-                                        >×</button>
-                                      </div>
-                                      <div className="flex items-center gap-1 bg-white/50 rounded-lg px-2 py-0.5 border border-emerald-100/50">
-                                        <span className="text-[8px] text-emerald-400 font-black">+$</span>
-                                        <input
-                                          type="number"
-                                          placeholder="0"
-                                          className="w-12 bg-transparent border-none p-0 text-[10px] font-black text-emerald-600 focus:ring-0 outline-none placeholder:text-emerald-200"
-                                          value={option.prices?.[val] || ''}
-                                          onChange={(e) => {
-                                            const newOptions = [...(item.options || [])];
-                                            const newPrices = { ...(newOptions[optIdx].prices || {}) };
-                                            if (e.target.value) {
-                                              newPrices[val] = parseFloat(e.target.value);
-                                            } else {
-                                              delete newPrices[val];
-                                            }
-                                            newOptions[optIdx].prices = newPrices;
-                                            updateItem(itemIndex, { options: newOptions });
-                                          }}
-                                        />
-                                      </div>
-                                    </span>
-                                  ))}
-                                  <input
-                                    placeholder="Escribe sabores separados por comas..."
-                                    className="text-xs bg-white px-4 py-2 rounded-xl outline-none flex-1 min-w-[200px] border border-slate-200 focus:border-emerald-500"
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      if (val.includes(',')) {
-                                        const parts = val.split(',').map(p => p.trim()).filter(p => p);
-                                        const newOptions = [...(item.options || [])];
-                                        newOptions[optIdx].values = [...newOptions[optIdx].values, ...parts];
-                                        updateItem(itemIndex, { options: newOptions });
-                                        e.target.value = '';
-                                      }
-                                    }}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        if (e.currentTarget.value.trim()) {
-                                          const newOptions = [...(item.options || [])];
-                                          newOptions[optIdx].values.push(e.currentTarget.value.trim());
-                                          updateItem(itemIndex, { options: newOptions });
-                                          e.currentTarget.value = '';
-                                        }
-                                      }
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            ))}
-
-                            <button onClick={() => {
-                              const newOptions = [...(item.options || []), { name: '', values: [], required: true }];
-                              updateItem(itemIndex, { options: newOptions });
-                            }} className="w-full py-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center gap-2">
-                              <PiPlus className="w-4 h-4" /> Añadir Nueva Variante
-                            </button>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block px-1">Etiquetas (Picante, Veggie, etc)</label>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {item.features?.map((feature, fIdx) => (
-                              <span key={fIdx} className="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-2 border border-gray-200">
-                                {feature}
-                                <button
-                                  onClick={() => {
-                                    const newFeatures = item.features?.filter((_, i) => i !== fIdx);
-                                    updateItem(itemIndex, { features: newFeatures });
-                                  }}
-                                  className="text-gray-400 hover:text-red-600"
-                                >×</button>
-                              </span>
-                            ))}
-                          </div>
-                          <input
-                            type="text"
-                            placeholder="Escribe etiquetas separadas por comas..."
-                            className="w-full text-xs p-4 rounded-xl bg-gray-50 border border-transparent focus:border-gray-200 outline-none transition-all"
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (val.includes(',')) {
-                                const parts = val.split(',').map(p => p.trim()).filter(p => p);
-                                const currentFeatures = item.features || [];
-                                updateItem(itemIndex, { features: [...currentFeatures, ...parts] });
-                                e.target.value = '';
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                                const newFeature = e.currentTarget.value.trim();
-                                const currentFeatures = item.features || [];
-                                updateItem(itemIndex, { features: [...currentFeatures, newFeature] });
-                                e.currentTarget.value = '';
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 pt-4 border-t border-gray-50">
-                        <label className="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 px-1">
-                          <PiImage className="w-4 h-4 text-emerald-500" />
-                          Fotos del Producto
-                        </label>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {/* Main Image Selector */}
-                          <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Imagen Principal</p>
-
-                            {item.image ? (
-                              <div className="space-y-3">
-                                <div className="relative aspect-video rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: true })}
-                                    className="flex-1 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm"
-                                  >
-                                    <PiArrowCounterClockwise size={14} className="text-blue-500" /> Cambiar
-                                  </button>
-                                  <button
-                                    onClick={() => updateItem(itemIndex, { image: '' })}
-                                    className="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-100 active:scale-95 transition-all flex items-center justify-center shadow-sm"
-                                  >
-                                    <PiTrash size={14} />
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: true })}
-                                className="w-full aspect-video border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group bg-white"
-                              >
-                                <PiImage size={24} className="group-hover:scale-110 transition-transform" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Añadir Foto</span>
-                              </button>
-                            )}
-
-                            {showItemImageSelector[itemIndex] && (
-                              <ImageSelector
-                                existingImages={existingImages || []}
-                                onSelect={(url) => {
-                                  updateItem(itemIndex, { image: url });
-                                  setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false });
-                                }}
-                                onClose={() => setShowItemImageSelector({ ...showItemImageSelector, [itemIndex]: false })}
-                                onUpload={onUploadToLibrary}
-                              />
-                            )}
-                          </div>
-
-                          {/* Gallery Selector */}
-                          {/* <div className="bg-gray-50 p-4 rounded-2xl space-y-4">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Galería de Fotos</p>
-
-                            <button
-                              onClick={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: true })}
-                              className="w-full aspect-video border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-500 hover:text-emerald-500 transition-all group bg-white"
-                            >
-                              <PiPlus className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                              <span className="text-[10px] font-black uppercase tracking-widest text-center px-4">Subir o Elegir<br />de la Galería</span>
-                            </button>
-
-                            {showItemGallerySelector[itemIndex] && (
-                              <ImageSelector
-                                existingImages={existingImages || []}
-                                multiple={true}
-                                onSelectMultiple={(urls) => {
-                                  const newGalleryItems = urls.map(url => ({ src: url, alt: item.name, title: '' }));
-                                  const currentGallery = item.gallery || [];
-                                  updateItem(itemIndex, { gallery: [...currentGallery, ...newGalleryItems] });
-                                  setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: false });
-                                }}
-                                onClose={() => setShowItemGallerySelector({ ...showItemGallerySelector, [itemIndex]: false })}
-                                onUpload={onUploadToLibrary}
-                              />
-                            )}
-                          </div> */}
-                        </div>
-
-                        {item.gallery && item.gallery.length > 0 && (
-                          <div className="mt-3 grid grid-cols-4 gap-2">
-                            {item.gallery.map((img, gIdx) => (
-                              <div key={gIdx} className="relative group">
-                                <img src={img.src} alt={img.alt || ''} className="w-full h-20 object-cover rounded" />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const newGallery = item.gallery?.filter((_, i) => i !== gIdx);
-                                    updateItem(itemIndex, { gallery: newGallery });
-                                  }}
-                                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-100 transition-opacity"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function GalleryBlock({ data, onChange, existingImages, onUploadToLibrary }: { data: GalleryData; onChange: (data: GalleryData) => void; existingImages?: string[]; onUploadToLibrary?: (urls: string[]) => void }) {
-  const [showImageSelector, setShowImageSelector] = useState(false);
-
-  const addImageToGallery = (urls: string[]) => {
-    const newImages = urls.map(url => ({ src: url, alt: '', title: '' }));
-    onChange({
-      ...data,
-      images: [...(data.images || []), ...newImages]
-    });
-  };
-
-  const removeImageFromGallery = (index: number) => {
-    onChange({
-      ...data,
-      images: data.images.filter((_, i) => i !== index)
-    });
-  };
-
-  return (
-    <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-      <div className="bg-gray-50 p-2 border-b-2 border-gray-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white ">
-            <PiSparkle className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Galería de Imágenes</h3>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {data.images?.map((img, gIdx) => (
-            <div key={gIdx} className="relative aspect-square group overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
-              <img src={img.src} alt={img.alt || ''} className="w-full h-full object-cover" />
-              <button
-                onClick={() => removeImageFromGallery(gIdx)}
-                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-600/80 text-white rounded-lg opacity-100 sm:opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
-              >
-                <PiX className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
-
-          <div className="col-span-2 md:col-span-2 space-y-2">
-            <ManualUploader
-              onFilesUploaded={addImageToGallery}
-              multiple={true}
-            />
-            <button
-              onClick={() => setShowImageSelector(true)}
-              className="w-full py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 border border-blue-100"
-            >
-              <PiImage className="w-3 h-3" />  Biblioteca Existente
-            </button>
-          </div>
-        </div>
-
-        {showImageSelector && existingImages && (
-          <ImageSelector
-            existingImages={existingImages}
-            multiple={true}
-            onSelectMultiple={(urls) => addImageToGallery(urls)}
-            onClose={() => setShowImageSelector(false)}
-            onUpload={onUploadToLibrary}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-interface ImageData {
-  src: string;
-  alt?: string;
-  caption?: string;
-}
-
-function ImageBlock({ data, onChange, existingImages }: { data: ImageData; onChange: (data: ImageData) => void; existingImages?: string[] }) {
-  const [showImageSelector, setShowImageSelector] = useState(false);
-
-  return (
-    <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-      <div className="bg-gray-50 p-4 border-b-2 border-gray-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white ">
-            <PiImage className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Bloque de Imagen</h3>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-1/3 space-y-4">
-            <div className="relative group rounded-2xl overflow-hidden border border-emerald-100 bg-emerald-50 aspect-square">
-              {data.src ? (
-                <>
-                  <img src={data.src} alt={data.alt || ''} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/20 opacity-100 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button onClick={() => onChange({ ...data, src: '' })} className="bg-red-600 text-white p-2 rounded-xl">
-                      <PiTrash className="w-5 h-5" />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-emerald-200">
-                  <PiImage className="w-16 h-16" />
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={() => setShowImageSelector(true)}
-              className="w-full py-2 bg-emerald-50 text-emerald-700 rounded-xl font-semibold uppercase text-[10px] tracking-wide border border-emerald-100 hover:bg-emerald-100"
-            >
-              Seleccionar Foto
-            </button>
-          </div>
-
-          <div className="flex-1 space-y-4">
-            <div>
-              <label className="text-[10px] font-bold text-emerald-800/40 uppercase mb-2 block tracking-widest px-1">Texto Alternativo:</label>
-              <input
-                value={data.alt || ''}
-                onChange={(e) => onChange({ ...data, alt: e.target.value })}
-                placeholder="Describe la imagen para accesibilidad..."
-                className="w-full text-sm bg-white p-3 rounded-xl border border-emerald-100 outline-none focus:border-emerald-600 shadow-sm"
-              />
-            </div>
-
-            <div>
-              <label className="text-[10px] font-bold text-emerald-800/40 uppercase mb-2 block tracking-widest px-1">Pie de Foto:</label>
-              <textarea
-                value={data.caption || ''}
-                onChange={(e) => onChange({ ...data, caption: e.target.value })}
-                placeholder="Texto que aparecerá debajo de la imagen..."
-                rows={3}
-                className="w-full text-sm bg-white p-3 rounded-xl border border-emerald-100 outline-none focus:border-emerald-600 shadow-sm resize-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {showImageSelector && existingImages && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowImageSelector(false)} />
-            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-xl">
-              <div className="p-6 border-b flex items-center justify-between">
-                <h3 className="font-bold uppercase tracking-widest">Seleccionar Imagen</h3>
-                <button onClick={() => setShowImageSelector(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <PiX className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="overflow-y-auto p-6 max-h-[calc(90vh-140px)]">
-                <div className="space-y-8">
-                  <section>
-                    <ManualUploader
-                      currentImage={data.src}
-                      onFilesUploaded={(url) => {
-                        onChange({ ...data, src: url[0] });
-                        setShowImageSelector(false);
-                      }}
-                      onImageRemove={() => onChange({ ...data, src: '' })}
-                    />
-                  </section>
-
-                  {existingImages.length > 0 && (
-                    <section>
-                      <h4 className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">Imágenes Existentes:</h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {existingImages.map((url, i) => (
-                          <button
-                            key={i}
-                            onClick={() => {
-                              onChange({ ...data, src: url });
-                              setShowImageSelector(false);
-                            }}
-                            className="aspect-square rounded-xl overflow-hidden border-2 border-transparent hover:border-emerald-500 transition-all"
-                          >
-                            <img src={url} className="w-full h-full object-cover" alt="" />
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-interface CarruselItem {
-  src: string;
-  alt?: string;
-  link?: string;
-  caption?: string;
-}
-
-interface CarruselData {
-  items: CarruselItem[];
-}
-
-function CarruselBlock({ data, onChange, existingImages, onUploadToLibrary }: { data: CarruselData; onChange: (data: CarruselData) => void; existingImages?: string[]; onUploadToLibrary?: (urls: string[]) => void }) {
-  const [showImageSelector, setShowImageSelector] = useState(false);
-
-  const addItem = (urls: string[]) => {
-    const newItems = urls.map(url => ({ src: url, alt: '', link: '', caption: '' }));
-    onChange({ ...data, items: [...(data.items || []), ...newItems] });
-  };
-
-  const removeItem = (index: number) => {
-    const newItems = [...data.items];
-    newItems.splice(index, 1);
-    onChange({ ...data, items: newItems });
-  };
-
-  const moveItem = (index: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= data.items.length) return;
-    const newItems = [...data.items];
-    [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];
-    onChange({ ...data, items: newItems });
-  };
-
-  const updateItem = (index: number, itemData: Partial<CarruselItem>) => {
-    const newItems = [...data.items];
-    newItems[index] = { ...newItems[index], ...itemData };
-    onChange({ ...data, items: newItems });
-  };
-
-  return (
-    <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-      <div className="bg-gray-50 p-4 border-b-2 border-gray-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gray-700 rounded-xl text-white ">
-            <PiLayout className="w-5 h-5" />
-          </div>
-          <h3 className="font-bold text-gray-800 uppercase tracking-wider text-sm">Carrusel de Promociones</h3>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.items?.map((item, idx) => (
-            <div key={idx} className="group relative bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover: transition-all">
-              <div className="aspect-video relative overflow-hidden bg-gray-200">
-                {item.src ? (
-                  <img src={item.src} className="w-full h-full object-cover" alt={item.alt} />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <PiImage className="w-10 h-10 opacity-20" />
-                  </div>
-                )}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-100 transition-opacity">
-                  <button onClick={() => moveItem(idx, 'up')} className="p-1.5 bg-white shadow-md rounded-lg hover:bg-gray-50 text-gray-700 border border-gray-100">↑</button>
-                  <button onClick={() => moveItem(idx, 'down')} className="p-1.5 bg-white shadow-md rounded-lg hover:bg-gray-50 text-gray-700 border border-gray-100">↓</button>
-                  <button onClick={() => removeItem(idx)} className="p-1.5 bg-white shadow-md rounded-lg hover:bg-red-50 text-red-600 border border-red-100">✕</button>
-                </div>
-              </div>
-
-              <div className="p-3 space-y-2">
-                <input
-                  value={item.caption || ''}
-                  onChange={(e) => updateItem(idx, { caption: e.target.value })}
-                  placeholder="Título / Promo"
-                  className="w-full text-xs font-bold bg-white p-2 rounded-lg border border-gray-200 outline-none focus:border-emerald-500"
-                />
-                <input
-                  value={item.link || ''}
-                  onChange={(e) => updateItem(idx, { link: e.target.value })}
-                  placeholder="Enlace (opcional)"
-                  className="w-full text-[10px] bg-white p-2 rounded-lg border border-gray-200 outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-          ))}
-
-          <button
-            onClick={() => setShowImageSelector(true)}
-            className="aspect-video flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl hover:bg-gray-50 hover:border-gray-400 transition-all text-gray-600 group"
-          >
-            <PiPlus className="w-8 h-8 mb-2 group transition-transform" />
-            <span className="text-xs font-bold uppercase tracking-widest">Agregar Foto</span>
-          </button>
-        </div>
-
-        {showImageSelector && (
-          <ImageSelector
-            existingImages={existingImages || []}
-            multiple={true}
-            onSelectMultiple={(urls) => addItem(urls)}
-            onClose={() => setShowImageSelector(false)}
-            onUpload={onUploadToLibrary}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function SectionNav({ blocks, activeSectionId, onScrollTo }: { blocks: Block[], activeSectionId: string | null, onScrollTo: (id: string) => void }) {
-  const sections = blocks.filter(b => b.type === 'section');
-  if (sections.length === 0) return null;
-
-  const navRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (activeSectionId && navRef.current) {
-      const activeBtn = navRef.current.querySelector(`[data-section-id="${activeSectionId}"]`);
-      if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    }
-  }, [activeSectionId]);
-
-  return (
-    <div className="sticky top-0 md:top-14 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 py-3 shadow-sm transition-all overflow-hidden shrink-0">
-      <div
-        ref={navRef}
-        className="max-w-[1600px] mx-auto px-4 overflow-x-auto hide-scrollbar flex gap-2 scroll-smooth items-center"
-      >
-        <div className="flex-shrink-0 mr-2 text-gray-400">
-          <span className="text-[9px] font-black uppercase tracking-widest bg-gray-50 px-2 py-1 rounded-md">Categorías:</span>
-        </div>
-        {sections.map((section) => (
-          <button
-            key={section.id}
-            data-section-id={section.id}
-            onClick={() => onScrollTo(section.id)}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${activeSectionId === section.id
-              ? 'bg-gray-900 text-white shadow-lg shadow-gray-200 scale-105'
-              : 'bg-white text-gray-400 hover:text-gray-900 border border-gray-100 hover:border-gray-300'
-              }`}
-          >
-            {section.data.title || 'Sección'}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TableView({ blocks, onChange }: { blocks: Block[], onChange: (blocks: Block[]) => void }) {
-  const updateItem = (blockId: string, itemIndex: number, newItemData: Partial<ItemData>) => {
-    const newBlocks = blocks.map(block => {
-      if (block.id === blockId && block.type === 'section') {
-        const newItems = [...block.data.items];
-        newItems[itemIndex] = { ...newItems[itemIndex], ...newItemData };
-        return { ...block, data: { ...block.data, items: newItems } };
-      }
-      return block;
-    });
-    onChange(newBlocks);
-  };
-
-  const sections = blocks.filter(b => b.type === 'section');
-
-  return (
-    <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm lg:mx-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Imagen</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Producto</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Sección</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Precio</th>
-              <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Estado</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {sections.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="p-20 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">
-                  No hay productos para mostrar.
-                </td>
-              </tr>
-            ) : sections.map(block =>
-              block.data.items.map((item: ItemData, idx: number) => (
-                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="p-5">
-                    <div className="w-14 h-14 rounded-2xl bg-gray-50 overflow-hidden border border-gray-100 shadow-sm relative group/img">
-                      {item.image ? (
-                        <img src={item.image} className="w-full h-full object-cover transition-transform group-hover/img:scale-110" alt="" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300">
-                          <PiImage className="w-6 h-6" />
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-5 min-w-[280px]">
-                    <input
-                      className="w-full bg-transparent font-black text-sm outline-none focus:text-indigo-600 transition-colors uppercase tracking-tight"
-                      value={item.name}
-                      onChange={(e) => updateItem(block.id, idx, { name: e.target.value })}
-                    />
-                    <input
-                      className="w-full bg-transparent text-[10px] text-gray-400 outline-none block mt-1 font-medium italic"
-                      value={item.description}
-                      onChange={(e) => updateItem(block.id, idx, { description: e.target.value })}
-                    />
-                  </td>
-                  <td className="p-5 whitespace-nowrap">
-                    <span className="text-[9px] font-black bg-gray-100/80 text-gray-500 px-3 py-1.5 rounded-xl uppercase tracking-widest">
-                      {block.data.title || 'General'}
-                    </span>
-                  </td>
-                  <td className="p-5">
-                    <div className="flex items-center gap-1 font-mono text-base font-black text-emerald-600 bg-emerald-50/50 px-4 py-2 rounded-2xl border border-emerald-100/50 w-fit">
-                      <span className="opacity-30">$</span>
-                      <input
-                        className="w-20 bg-transparent outline-none"
-                        type="number"
-                        step="0.01"
-                        value={item.price}
-                        onChange={(e) => updateItem(block.id, idx, { price: parseFloat(e.target.value) })}
-                      />
-                    </div>
-                  </td>
-                  <td className="p-5">
-                    <div className="flex justify-center">
-                      <button
-                        onClick={() => updateItem(block.id, idx, { available: !(item.available ?? true) })}
-                        className={`group relative flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 ${(item.available ?? true)
-                          ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white shadow-sm hover:shadow-emerald-200'
-                          : 'bg-stone-100 text-stone-400 hover:bg-stone-800 hover:text-white'
-                          }`}
-                      >
-                        {(item.available ?? true) ? (
-                          <><PiEye className="w-4 h-4" /> Activo</>
-                        ) : (
-                          <><PiEyeSlash className="w-4 h-4" /> Apagado</>
-                        )}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
       </div>
     </div>
   );
