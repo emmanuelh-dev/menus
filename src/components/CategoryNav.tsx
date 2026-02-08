@@ -78,11 +78,6 @@ export default function CategoryNav({ blocks }: Props) {
         ref={navRef}
         className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar flex items-center gap-2"
       >
-        <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full text-[9px] font-black uppercase tracking-widest text-gray-400">
-          <PiTag className="w-3 h-3" />
-          Categorías
-        </div>
-
         {sections.map(section => (
           <button
             key={section.id}

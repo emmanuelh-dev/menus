@@ -104,6 +104,7 @@ export default function CartManager({
   const [tempCounts, setTempCounts] = useState<{ [value: string]: number }>({});
   const [tempQuantity, setTempQuantity] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [orderNotes, setOrderNotes] = useState('');
 
   // Helper to detect package size from name or description
   const detectLimit = (item: any) => {
@@ -550,6 +551,9 @@ export default function CartManager({
       paymentMethod === 'card' ? 'Tarjeta ' + icons.card :
         'Transferencia ' + icons.bank;
     message += `• *Método de Pago:* ${paymentLabel}\n`;
+    if (orderNotes.trim()) {
+      message += `\n✏️ *NOTA DEL CLIENTE:*\n${orderNotes}\n`;
+    }
     message += `--------------------------\n`;
 
     try {
@@ -576,10 +580,20 @@ export default function CartManager({
 
   return (
     <div className="cart-manager-container">
+      {/* Floating Toast Notification */}
+      {showSuccess && (
+        <div className="fixed bottom-20 right-6 z-50 animate-in slide-in-from-right fade-in duration-300">
+          <div className="bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl shadow-emerald-200 flex items-center gap-3 font-bold text-sm">
+            <Check className="w-5 h-5" />
+            <span>¡Agregado al carrito!</span>
+          </div>
+        </div>
+      )}
+
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setShowCart(!showCart)}
-          className="relative bg-red-600 hover:bg-red-700 text-white p-3 rounded-full  transition-all hover:scale-105"
+          className={`relative text-white p-3 rounded-full transition-all hover:scale-105 ${totalItems > 0 ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-red-600 hover:bg-red-700'}`}
         >
           <ShoppingCart className="w-5 h-5" />
           {totalItems > 0 && (
@@ -995,6 +1009,16 @@ export default function CartManager({
                       <span className="text-2xl font-black text-red-600">${totalPrice + (wantsDelivery && shippingZone ? shippingZone.price : 0)}</span>
                     </div>
                   </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Comentario / Nota al pedido (opcional)</label>
+                    <textarea
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      placeholder="Ej: Sin cebolla, alergia a mariscos, timbre no funciona..."
+                      className="w-full px-4 py-3 text-sm bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none resize-none h-20"
+                    />
+                  </div>
                   <button
                     onClick={sendToWhatsApp}
                     disabled={creatingOrder || (wantsDelivery && !shippingZone) || !customerName || !customerPhone || cart.length === 0}
@@ -1160,48 +1184,60 @@ export default function CartManager({
                 <button
                   onClick={() => {
                     const limit = detectLimit(configuringItem);
-                    const totalSelected = Object.values(tempCounts).reduce((a, b) => a + (b as number), 0);
-
-                    // ALWAYS BUNDLE: Whether it has a limit or not, we bundle to avoid the multiplication bug
                     const combinations = Object.entries(tempCounts).filter(([_, count]) => (count as number) > 0);
-                    const detail = combinations.map(([key, count]) => {
-                      const { options, flavor } = parseCombinationKey(key);
-                      const optsString = Object.values(options).join(', ');
-                      return `${count}x ${optsString} ${flavor}`;
-                    }).join(', ');
 
-                    // Base price including prefix options (Size, etc.)
-                    let baseAndPrefixPrice = configuringItem.price;
+                    // Get prefix options (size, etc.) for calculating price
+                    const prefixOptions: { [key: string]: string } = {};
                     configuringItem.options?.slice(0, -1).forEach((opt: any) => {
-                      const selectedVal = tempOptions[opt.name];
-                      if (selectedVal && opt.prices?.[selectedVal]) baseAndPrefixPrice += opt.prices[selectedVal];
-                    });
-
-                    // Extras price (sum of specific choices * their extra price)
-                    let extrasTotal = 0;
-                    combinations.forEach(([key, count]) => {
-                      const { flavor } = parseCombinationKey(key);
-                      const lastOpt = configuringItem.options[configuringItem.options.length - 1];
-                      if (lastOpt.prices?.[flavor]) extrasTotal += lastOpt.prices[flavor] * (count as number);
+                      if (tempOptions[opt.name]) {
+                        prefixOptions[opt.name] = tempOptions[opt.name];
+                      }
                     });
 
                     if (limit) {
-                      // PACKAGE: Everything is one bundle, quantity 1
-                      addToCart(configuringItem, { Surtido: detail }, 1, baseAndPrefixPrice + extrasTotal);
+                      // PACKAGE MODE: All flavors bundled as one item
+                      const detail = combinations.map(([key, count]) => {
+                        const { flavor } = parseCombinationKey(key);
+                        return `${count}x ${flavor}`;
+                      }).join(', ');
+
+                      let packagePrice = configuringItem.price;
+                      configuringItem.options?.slice(0, -1).forEach((opt: any) => {
+                        const selectedVal = tempOptions[opt.name];
+                        if (selectedVal && opt.prices?.[selectedVal]) packagePrice += opt.prices[selectedVal];
+                      });
+
+                      addToCart(configuringItem, { ...prefixOptions, Surtido: detail }, 1, packagePrice);
                     } else {
-                      // INDIVIDUAL/PLATE: Base applies per tempQuantity, extras are added to total
-                      // Final Price = (BaseAndPrefix * tempQuantity) + extrasTotal
-                      // For consistency with addToCart(..., quantity), we pass the averaged price per unit
-                      const totalBundlePrice = (baseAndPrefixPrice * tempQuantity) + extrasTotal;
-                      const averagePrice = totalBundlePrice / tempQuantity;
+                      // INDIVIDUAL MODE: Each flavor becomes a separate cart item
+                      combinations.forEach(([key, count]) => {
+                        const { options, flavor } = parseCombinationKey(key);
 
-                      const finalOpts = { ...tempOptions };
-                      if (detail) finalOpts["Opciones"] = detail;
+                        // Calculate price for this specific combination
+                        let itemPrice = configuringItem.price;
 
-                      addToCart(configuringItem, finalOpts, tempQuantity, averagePrice);
+                        // Add prefix option prices (size, etc.)
+                        Object.entries(prefixOptions).forEach(([optName, val]) => {
+                          const opt = configuringItem.options.find((o: any) => o.name === optName);
+                          if (opt && opt.prices?.[val as string]) itemPrice += opt.prices[val as string];
+                        });
+
+                        // Add flavor price if exists
+                        const lastOpt = configuringItem.options[configuringItem.options.length - 1];
+                        if (lastOpt.prices?.[flavor]) itemPrice += lastOpt.prices[flavor];
+
+                        // Create options object for this specific item
+                        const itemOptions = { ...prefixOptions };
+                        if (flavor) itemOptions[lastOpt.name || 'Sabor'] = flavor;
+
+                        // Add as separate cart item
+                        addToCart(configuringItem, itemOptions, count as number, itemPrice);
+                      });
                     }
+
                     setConfiguringItem(null);
-                    if (!showCart) setShowCart(true);
+                    // Don't auto-open cart - let user keep selecting
+                    // if (!showCart) setShowCart(true); // REMOVED
                   }}
                   disabled={(() => {
                     const limit = detectLimit(configuringItem);
