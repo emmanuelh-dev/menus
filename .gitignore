@@ -23,3 +23,11 @@ build/
 
 # jetbrains setting folder
 .idea/
+
+# Scripts data and logs
+scripts/data/*.json
+*.json
+*.txt
+!package.json
+!tsconfig.json
+!package-lock.json
