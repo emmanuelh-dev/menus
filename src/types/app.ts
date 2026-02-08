@@ -33,6 +33,7 @@ export interface Place {
     slug: string;
   };
   content?: Content;
+  created_at?: string;
 }
 
 export interface SupabasePlace extends Place {

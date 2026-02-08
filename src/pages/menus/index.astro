@@ -26,9 +26,9 @@ const types: BusinessType[] = [
 ];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const restaurants = (await getRestaurants({ type: null }))
-	.filter((r) => r.type !== "motel")
-	.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+const restaurants = (await getRestaurants({ type: null })).filter(
+	(r) => r.type !== "motel",
+);
 
 const seoData = {
 	title: "Ejemplos de Menús Digitales y Cartas QR Reales | BySMax",
@@ -70,6 +70,15 @@ const seoData = {
 				>
 					{types.map((type) => <option value={type}>{type}</option>)}
 				</select>
+
+				<select
+					id="sort-filter"
+					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+				>
+					<option value="popular">Más populares</option>
+					<option value="recent">Más recientes</option>
+					<option value="rating">Mejor calificados</option>
+				</select>
 			</div>
 
 			<div
@@ -85,7 +94,14 @@ const seoData = {
 								: "https://menus.bysmax.com/images/landing/hero-free.png"; // Fallback a una imagen interna válida
 
 						return (
-							<div class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md">
+							<div
+								class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
+								data-industry={restaurant.category || "Restaurante"}
+								data-type={restaurant.type || "Casual"}
+								data-rating={restaurant.rating || 0}
+								data-reviews={restaurant.reviewCount || 0}
+								data-created={restaurant.created_at || ""}
+							>
 								<div class="aspect-square relative overflow-hidden rounded-lg mb-6">
 									{restaurant.short_name ? (
 										<a href={restaurantUrl}>
@@ -153,80 +169,97 @@ const seoData = {
 	class RestaurantFilter {
 		private industryFilter: HTMLSelectElement;
 		private typeFilter: HTMLSelectElement;
-		private capacityFilter: HTMLSelectElement;
+		private sortFilter: HTMLSelectElement;
+		private grid: HTMLElement;
 
 		constructor() {
-			// Initialize with null checks
 			const industryElement = document.getElementById("industry-filter");
 			const typeElement = document.getElementById("type-filter");
-			const capacityElement = document.getElementById("capacity-filter");
+			const sortElement = document.getElementById("sort-filter");
+			const gridElement = document.getElementById("restaurants-grid");
 
-			if (!industryElement || !typeElement || !capacityElement) {
-				throw new Error("Required filter elements not found");
+			if (!industryElement || !typeElement || !sortElement || !gridElement) {
+				return;
 			}
 
 			this.industryFilter = industryElement as HTMLSelectElement;
 			this.typeFilter = typeElement as HTMLSelectElement;
-			this.capacityFilter = capacityElement as HTMLSelectElement;
+			this.sortFilter = sortElement as HTMLSelectElement;
+			this.grid = gridElement;
 
 			this.initializeEventListeners();
+			// Initial sort
+			this.filterAndSort();
 		}
 
 		private initializeEventListeners(): void {
-			this.industryFilter.addEventListener("change", () =>
-				this.filterRestaurants(),
-			);
-			this.typeFilter.addEventListener("change", () =>
-				this.filterRestaurants(),
-			);
-			this.capacityFilter.addEventListener("change", () =>
-				this.filterRestaurants(),
-			);
-		}
-
-		private getFilterValue(element: HTMLSelectElement): FilterValue {
-			return element.value || null;
-		}
-
-		private filterRestaurants(): void {
-			const industryValue = this.getFilterValue(this.industryFilter);
-			const typeValue = this.getFilterValue(this.typeFilter);
-			const capacityValue = this.getFilterValue(this.capacityFilter);
-
-			const restaurants = document.querySelectorAll(".restaurant-card");
-
-			restaurants.forEach((restaurant) => {
-				try {
-					const element = restaurant as HTMLElementWithDataset;
-					const industry = element.dataset.industry;
-					const type = element.dataset.type;
-					const capacity = element.dataset.capacity;
-
-					if (!industry || !type || !capacity) {
-						console.error("Missing data attributes on restaurant card");
-						return;
-					}
-
-					const matchIndustry =
-						industryValue === "Todos" || industry === industryValue;
-					const matchType = typeValue === "Todos" || type === typeValue;
-					const matchCapacity =
-						capacityValue === "Todos" || capacity === capacityValue;
-
-					element.style.display =
-						matchIndustry && matchType && matchCapacity ? "block" : "none";
-				} catch (error) {
-					console.error("Error filtering restaurant:", error);
-				}
+			const filters = [this.industryFilter, this.typeFilter, this.sortFilter];
+			filters.forEach((filter) => {
+				filter.addEventListener("change", () => this.filterAndSort());
 			});
+		}
+
+		private filterAndSort(): void {
+			const industryValue = this.industryFilter.value;
+			const typeValue = this.typeFilter.value;
+			const sortValue = this.sortFilter.value;
+
+			const cards = Array.from(
+				document.querySelectorAll(".restaurant-card"),
+			) as HTMLElement[];
+
+			// Filter
+			cards.forEach((card) => {
+				const industry = card.dataset.industry || "Restaurante";
+				const type = card.dataset.type || "Casual";
+
+				const matchIndustry =
+					industryValue === "Todos" || industry === industryValue;
+				const matchType =
+					typeValue === "Todos" ||
+					(typeValue === "Casual" && type === "restaurant") ||
+					type === typeValue;
+
+				card.style.display = matchIndustry && matchType ? "block" : "none";
+			});
+
+			// Sort
+			const visibleCards = cards.filter(
+				(card) => card.style.display !== "none",
+			);
+			const hiddenCards = cards.filter((card) => card.style.display === "none");
+
+			visibleCards.sort((a, b) => {
+				if (sortValue === "recent") {
+					const dateA = new Date(a.dataset.created || 0).getTime();
+					const dateB = new Date(b.dataset.created || 0).getTime();
+					return dateB - dateA;
+				}
+				if (sortValue === "rating") {
+					return (
+						parseFloat(b.dataset.rating || "0") -
+						parseFloat(a.dataset.rating || "0")
+					);
+				}
+				if (sortValue === "popular") {
+					const scoreA =
+						parseFloat(a.dataset.rating || "0") *
+						parseInt(a.dataset.reviews || "0");
+					const scoreB =
+						parseFloat(b.dataset.rating || "0") *
+						parseInt(b.dataset.reviews || "0");
+					return scoreB - scoreA;
+				}
+				return 0;
+			});
+
+			// Re-append in order
+			const allCardsInOrder = [...visibleCards, ...hiddenCards];
+			allCardsInOrder.forEach((card) => this.grid.appendChild(card));
 		}
 	}
 
 	document.addEventListener("DOMContentLoaded", () => {
-		try {
-			new RestaurantFilter();
-		} catch (error) {
-			console.error("Failed to initialize restaurant filter:", error);
-		}
+		new RestaurantFilter();
 	});
 </script>
