@@ -79,6 +79,10 @@ const seoData = {
 				{
 					restaurants.map((restaurant) => {
 						const restaurantUrl = `/menus/${restaurant.short_name}`;
+						const restaurantImage =
+							restaurant.image && restaurant.image.trim() !== ""
+								? restaurant.image
+								: "https://menus.bysmax.com/images/landing/hero-free.png"; // Fallback a una imagen interna válida
 
 						return (
 							<div class="restaurant-card p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 bg-white shadow-sm hover:shadow-md">
@@ -86,7 +90,7 @@ const seoData = {
 									{restaurant.short_name ? (
 										<a href={restaurantUrl}>
 											<Image
-												src={restaurant.image}
+												src={restaurantImage}
 												alt={restaurant.name}
 												width={400}
 												height={400}
@@ -95,7 +99,7 @@ const seoData = {
 										</a>
 									) : (
 										<Image
-											src={restaurant.image}
+											src={restaurantImage}
 											alt={restaurant.name}
 											width={400}
 											height={400}

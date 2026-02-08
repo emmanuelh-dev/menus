@@ -179,7 +179,7 @@ export default function CategoryNav({ blocks, variant = 'icons' }: Props) {
   // Pills variant - compact pills
   if (variant === 'pills') {
     return (
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-100 py-3 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white/95 border-gray-100 py-3 shadow-sm">
         <div
           ref={navRef}
           className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar flex items-center gap-2"

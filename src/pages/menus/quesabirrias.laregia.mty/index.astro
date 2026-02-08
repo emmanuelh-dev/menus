@@ -1,6 +1,14 @@
 ---
+export const prerender = false;
+
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
+);
+
 import Gallery from "../../../components/Gallery.astro";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
+import InfoChips from "../../../components/InfoChips.astro";
 import { supabase } from "../../../lib/supabase";
 import { Image } from "astro:assets";
 
@@ -77,6 +85,7 @@ const gallery =
 					class="max-w-[300px] mx-auto py-4"
 				/>
 				<h1 class="text-sm font-oswald uppercase">{place.name}</h1>
+				<InfoChips place={place} className="mt-8" />
 			</header>
 
 			<div class="grid md:grid-cols-2 gap-8">
