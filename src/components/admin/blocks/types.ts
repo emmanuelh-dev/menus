@@ -2,12 +2,20 @@
  * Tipos compartidos para los bloques del ContentEditor
  */
 
-export type BlockType = 'section' | 'gallery' | 'image' | 'carrusel';
+export type BlockType = 'section' | 'gallery' | 'image' | 'carrusel' | 'markdown' | 'text';
 
 export interface Block {
   id: string;
   type: BlockType;
   data: any;
+}
+
+export interface MarkdownData {
+  content: string;
+}
+
+export interface TextData {
+  content: string;
 }
 
 export interface ItemOption {

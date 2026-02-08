@@ -48,6 +48,7 @@ import {
   GalleryBlock,
   ImageBlock,
   CarruselBlock,
+  MarkdownBlock,
   SectionNav,
   TableView,
   BlockTypeButton,
@@ -293,6 +294,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         return { items: [] };
       case 'image':
         return { src: '', alt: '', caption: '' };
+      case 'markdown':
+      case 'text':
+        return { content: '' };
       default:
         return {};
     }
@@ -479,6 +483,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         return <ImageBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} />;
       case 'carrusel':
         return <CarruselBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
+      case 'markdown':
+      case 'text':
+        return <MarkdownBlock data={block.data} onChange={(data) => updateBlock(index, data)} />;
       default:
         return null;
     }
@@ -1092,6 +1099,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
                           <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
                           <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
+                          <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown', index)} />
                         </div>
                         <button
                           onClick={() => setShowBlockMenu(false)}
@@ -1127,6 +1135,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
                           <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
                           <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
+                          <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown')} />
                         </div>
                       </div>
                     )}

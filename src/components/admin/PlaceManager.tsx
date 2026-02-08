@@ -3,7 +3,7 @@ import { ManualUploader } from '../ManualUploader';
 import { FaEye } from 'react-icons/fa';
 import { getStates } from '../../lib/supabase';
 import { formater } from '../../types/app';
-import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus, Copy } from 'lucide-react';
+import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus, Copy, Trash2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select as UISelect } from '../ui/Select';
@@ -275,6 +275,31 @@ export default function PlaceManager({
     }
   };
 
+  const handleDelete = async (id: number, name: string) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar "${name}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/restaurants/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setRestaurants(prev => prev.filter(r => r.id !== id));
+      } else {
+        const error = await response.json();
+        alert(`Error al eliminar: ${error.error}`);
+      }
+    } catch (err) {
+      console.error('Error al eliminar restaurante:', err);
+      alert('Error inesperado al intentar eliminar.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAIMenuExtraction = async () => {
     if (menuImages.length === 0) return;
 
@@ -481,6 +506,15 @@ export default function PlaceManager({
                     restaurantName={r.name}
                     size="sm"
                   />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleDelete(r.id, r.name)}
+                    className="px-2 text-red-500 hover:bg-red-50"
+                    title="Eliminar permanentemente"
+                  >
+                    <Trash2 size={14} />
+                  </Button>
                   <a href={`/admin/place/${r.id}`} className="col-span-2">
                     <Button size="sm" className="w-full">
                       Gestionar Menú

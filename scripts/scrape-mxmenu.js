@@ -29,107 +29,183 @@ export async function scrapeMxMenu(url, shortNameArg = null) {
     
     // Extraer nombre del restaurante
     let restaurantName = $('h1.entry-title').text()
-      .split('Menú')[0]
-      .split('Menu')[0]
-      .replace(/Precios México.*/i, '')
-      .replace(/Precio México.*/i, '')
-      .replace(/Precio.*/i, '')
+      .split(/Menú/i)[0]
+      .split(/Menu/i)[0]
+      .split(/Precios/i)[0]
+      .split(/Precio/i)[0]
+      .replace(/México.*/i, '')
+      .replace(/202[4-5].*/i, '')
       .replace(/Actualizado.*/i, '')
       .replace(/Tarifas.*/i, '')
+      .replace(/Menú De Precio En.*/i, '')
       .trim();
 
     if (!restaurantName) {
         // Fallback al OG title
-        restaurantName = ($('meta[property="og:title"]').attr('content') || '').split('Menú')[0].split('Menu')[0].trim();
+        const ogTitle = $('meta[property="og:title"]').attr('content') || '';
+        restaurantName = ogTitle.split('Menú')[0].split('Menu')[0].split('Precios')[0].trim();
     }
 
-    if (!restaurantName) return null;
+    if (!restaurantName || restaurantName.length < 2) return null;
 
     const shortName = shortNameArg || restaurantName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 
-    if (shortName.length < 3) return null;
+    if (shortName.length < 2) return null;
 
     // Extraer imagen destacada
     const featuredImage = $('meta[property="og:image"]').attr('content') || $('img.wp-post-image').attr('src') || '';
 
-    // Buscamos todos los H3 que suelen ser las categorías
-    const h3s = $('h3.wp-block-heading');
+    // Buscamos categorías (h3 o h2 si h3 falla)
+    let categorySelectors = ['h3.wp-block-heading', 'h3', 'h2.wp-block-heading', 'h2'];
+    let headersFound = false;
 
-    h3s.each((i, el) => {
-      const title = $(el).text().trim();
+    for (const selector of categorySelectors) {
+      if (blocks.length > 0) break;
       
-      const skipKeywords = ['historia', 'faq', 'sobre nosotros', 'ubicación', 'contacto', 'comentarios', 'preguntas', 'populares', 'relacionados', 'navegación', 'blog', 'privacidad'];
-      if (skipKeywords.some(k => title.toLowerCase().includes(k))) return;
+      const headers = $(selector);
+      headers.each((i, el) => {
+        const title = $(el).text().trim();
+        
+        // Categorías que preferimos como Markdown en lugar de secciones de menú
+        const textOnlyKeywords = ['ubicación', 'horario', 'sucursal', 'contacto', 'sobre nosotros', 'historia', 'faq', 'preguntas'];
+        const isTextOnly = textOnlyKeywords.some(k => title.toLowerCase().includes(k));
 
-      const items = [];
-      const images = [];
-      
-      let current = $(el).next();
-      let limit = 0;
-      while (current.length && current[0].tagName !== 'h3' && limit < 20) {
-        limit++;
-        const table = current[0].tagName === 'table' ? current : current.find('table');
-        if (table.length) {
-          table.find('tr').each((j, tr) => {
-            const cells = $(tr).find('td');
-            if (cells.length >= 2) {
-              const name = $(cells[0]).text().trim();
-              const priceStr = $(cells[1]).text().trim().replace('$', '').replace(',', '');
-              const price = parseFloat(priceStr);
+        const skipKeywords = ['comentarios', 'relacionados', 'navegación', 'blog', 'privacidad', 'menú reciente', 'categoría de restaurante'];
+        if (!title || title.length < 3 || skipKeywords.some(k => title.toLowerCase().includes(k))) return;
 
-              if (name && !isNaN(price) && !name.toLowerCase().includes('menú') && !name.toLowerCase().includes('producto')) {
-                items.push({
-                  id: uuidv4(),
-                  name: name,
-                  price: price,
-                  description: "",
-                  image: "",
-                  available: true
+        const items = [];
+        const images = [];
+        let markdownContent = "";
+        
+        let current = $(el).next();
+        let limit = 0;
+        // Navegar por hermanos hasta el siguiente header del mismo nivel
+        while (current.length && current[0].tagName !== el.tagName && limit < 20) {
+          limit++;
+          
+          // Si es una categoría de texto, acumulamos el contenido
+          if (isTextOnly) {
+              const text = current.text().trim();
+              if (text) markdownContent += text + "\n\n";
+          } else {
+              // Comportamiento normal para Menús (Tablas)
+              const table = current[0].tagName === 'table' ? current : current.find('table');
+              if (table.length) {
+                table.find('tr').each((j, tr) => {
+                  const cells = $(tr).find('td');
+                  if (cells.length >= 2) {
+                    const name = $(cells[0]).text().trim();
+                    const priceStr = $(cells[1]).text().trim().replace(/[^0-9.]/g, '');
+                    const price = parseFloat(priceStr);
+
+                    if (name && !isNaN(price) && !name.toLowerCase().includes('menú') && !name.toLowerCase().includes('producto')) {
+                      items.push({
+                        id: uuidv4(),
+                        name: name,
+                        price: price,
+                        description: "",
+                        image: "",
+                        available: true
+                      });
+                    }
+                  }
                 });
               }
+          }
+
+          const imgTags = current[0].tagName === 'img' ? [current[0]] : current.find('img').toArray();
+          imgTags.forEach(img => {
+            const src = $(img).attr('src') || $(img).attr('data-src');
+            const alt = $(img).attr('alt') || title;
+            if (src && src.startsWith('http') && !src.includes('avatar') && !src.includes('logo') && !src.includes('ads') && (src.includes('.webp') || src.includes('.jpg') || src.includes('.png'))) {
+              images.push({ src, alt });
+            }
+          });
+
+          current = current.next();
+        }
+
+        if (images.length > 0) {
+          blocks.push({
+            id: uuidv4(),
+            type: 'gallery',
+            data: {
+              images: images.slice(0, 8).map(img => ({
+                src: img.src,
+                alt: img.alt,
+                title: ""
+              }))
             }
           });
         }
 
-        const imgTags = current[0].tagName === 'img' ? [current[0]] : current.find('img').toArray();
-        imgTags.forEach(img => {
-          const src = $(img).attr('src') || $(img).attr('data-src');
-          const alt = $(img).attr('alt') || title;
-          if (src && src.startsWith('http') && !src.includes('avatar') && !src.includes('logo') && !src.includes('ads') && (src.includes('.webp') || src.includes('.jpg') || src.includes('.png'))) {
-            images.push({ src, alt });
+        if (isTextOnly && markdownContent.trim()) {
+            blocks.push({
+              id: uuidv4(),
+              type: 'markdown',
+              data: {
+                content: `### ${title}\n\n${markdownContent.trim()}`
+              }
+            });
+        } else if (items.length > 0) {
+          // Si el "menú" detectado parece ser solo metadata (ej. ubicaciones, horarios)
+          // lo convertimos a un bloque de texto/markdown más legible
+          const poorKeywords = ['ubicación', 'horario', 'dirección', 'contacto', 'entrega', 'teléfono', 'sucursal', 'ciudad'];
+          const isPoorData = poorKeywords.some(k => title.toLowerCase().includes(k)) || 
+                            (items.length < 3 && items.every(it => it.price > 1000 || it.price < 5));
+
+          if (isPoorData) {
+            let markdown = `### ${title}\n\n`;
+            items.forEach(it => {
+              markdown += `* **${it.name}**: ${it.price > 0 ? '$' + it.price : ''}\n`;
+            });
+            blocks.push({
+              id: uuidv4(),
+              type: 'markdown',
+              data: {
+                content: markdown
+              }
+            });
+          } else {
+            blocks.push({
+              id: uuidv4(),
+              type: 'section',
+              data: {
+                title: title.toUpperCase(),
+                items: items
+              }
+            });
           }
-        });
+        } else {
+            // Extraer texto descriptivo después del header si no hay tabla ni es texto explícito
+            let text = "";
+            let textScanner = $(el).next();
+            let textLimit = 0;
+            while (textScanner.length && !['h1', 'h2', 'h3', 'table'].includes(textScanner[0].tagName) && textLimit < 5) {
+                const pText = textScanner.text().trim();
+                if (pText && pText.length > 20 && !pText.toLowerCase().includes('read also')) {
+                    text += pText + "\n\n";
+                }
+                textScanner = textScanner.next();
+                textLimit++;
+            }
+            if (text.trim().length > 50) {
+                blocks.push({
+                  id: uuidv4(),
+                  type: 'markdown',
+                  data: {
+                    content: `### ${title}\n\n${text.trim()}`
+                  }
+                });
+            }
+        }
+      });
+    }
 
-        current = current.next();
-      }
-
-      if (images.length > 0) {
-        blocks.push({
-          id: uuidv4(),
-          type: 'gallery',
-          data: {
-            images: images.slice(0, 8).map(img => ({
-              src: img.src,
-              alt: img.alt,
-              title: ""
-            }))
-          }
-        });
-      }
-
-      if (items.length > 0) {
-        blocks.push({
-          id: uuidv4(),
-          type: 'section',
-          data: {
-            title: title,
-            items: items
-          }
-        });
-      }
-    });
-
-    if (blocks.length === 0) return null;
+    if (blocks.length === 0) {
+        console.log(`[SKIP] No se encontraron bloques de menú en: ${url}`);
+        return null;
+    }
 
     const semantic_data = {
       description: `Menú de ${restaurantName} en México. Precios actualizados.`,
@@ -150,7 +226,7 @@ export async function scrapeMxMenu(url, shortNameArg = null) {
     const placeData = {
       name: restaurantName,
       short_name: shortName,
-      type: 'restaurant',
+      type: url.includes('/category/blog/') || url.includes('dieta-keto') || blocks.every(b => b.type !== 'section') ? 'post' : 'restaurant',
       content: content,
       featured: false,
       rating: 4.5,

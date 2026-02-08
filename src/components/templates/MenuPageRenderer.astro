@@ -9,6 +9,7 @@ import CategoryNav from "../CategoryNav.tsx";
 import CategoryCards from "../CategoryCards.tsx";
 import MenuItem from "./restaurant/MenuItem.astro";
 import InfoChips from "../InfoChips.astro";
+import MarkdownBlock from "../MarkdownBlock.tsx";
 
 interface Props {
 	place: any;
@@ -286,6 +287,14 @@ const justifyClass = config.headerClass?.includes("text-left")
 											items={block.data.items || []}
 											className="w-full"
 										/>
+									</div>
+								);
+							}
+
+							if (block.type === "markdown" || block.type === "text") {
+								return (
+									<div class="py-8 px-4">
+										<MarkdownBlock client:load content={block.data.content} />
 									</div>
 								);
 							}

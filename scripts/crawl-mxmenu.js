@@ -7,43 +7,92 @@ import { scrapeMxMenu } from './scrape-mxmenu.js';
  */
 
 async function getUrlsFromSitemap(url) {
-  const { data: xml } = await axios.get(url);
-  const $ = cheerio.load(xml, { xmlMode: true });
-  const urls = [];
-  $('loc').each((i, el) => {
-    const loc = $(el).text();
-    const skipKeywords = ['casino', 'blog', 'category', 'author', 'tag', '/page/'];
-    if (!skipKeywords.some(k => loc.includes(k))) {
-      urls.push(loc);
+  try {
+    const { data: xml } = await axios.get(url);
+    const $ = cheerio.load(xml, { xmlMode: true });
+    const urls = [];
+    
+    // Si es un Sitemap Index, procesar sub-sitemaps
+    if (xml.includes('<sitemapindex')) {
+      const sitemaps = [];
+      $('sitemap loc').each((i, el) => {
+        const loc = $(el).text();
+        if (loc.includes('post-sitemap') || loc.includes('page-sitemap')) {
+            sitemaps.push(loc);
+        }
+      });
+      
+      console.log(`Detectado Sitemap Index con ${sitemaps.length} sub-sitemaps.`);
+      for (const sm of sitemaps) {
+        const subUrls = await getUrlsFromSitemap(sm);
+        urls.push(...subUrls);
+      }
+      return Array.from(new Set(urls));
     }
-  });
-  return urls;
+
+    $('url loc').each((i, el) => {
+      const loc = $(el).text();
+      // Filtros más agresivos para evitar spam y archivos estáticos
+      const skipKeywords = [
+        'casino', 'author', 'tag', '/page/', 'wp-content', '.jpg', '.png', '.webp', '.pdf', '.xml', 
+        'login', 'register', 'signin', 'bet', 'slot', 'gaming', 'vavada', 'pin-up', '1xbet', 'mostbet', 
+        'bonus', 'poker', 'gambling', 'crypto', 'replica-watches', 'carousel-manufacturer', 'fertilizer'
+      ];
+      
+      // Permitir posts de blog que parezcan contenido útil de comida/dieta
+      const goodKeywords = ['diet', 'keto', 'nutri', 'salud', 'receta', 'food', 'comida', 'healthy'];
+      const isGoodBlog = loc.includes('/category/blog/') && goodKeywords.some(k => loc.toLowerCase().includes(k));
+
+      // En mxmenu.net, los menús reales suelen tener "-menu" en la URL o ser de categorías de comida
+      const isLikelyMenu = loc.includes('-menu') || loc.includes('/category/') || loc.includes('precio') || isGoodBlog;
+      
+      if (!skipKeywords.some(k => loc.toLowerCase().includes(k))) {
+        urls.push(loc);
+      }
+    });
+    return urls;
+  } catch (error) {
+    console.error(`Error procesando sitemap ${url}:`, error.message);
+    return [];
+  }
 }
 
 async function getUrlsFromCategory(url) {
-  const { data: html } = await axios.get(url);
-  const $ = cheerio.load(html);
-  const urls = [];
-  
-  // En mxmenu.net, los links de restaurantes en categorías suelen estar en h2 o h3
-  $('h2.entry-title a, h3.entry-title a').each((i, el) => {
-    const href = $(el).attr('href');
-    if (href && !urls.includes(href)) {
-      urls.push(href);
-    }
-  });
+  let allUrls = [];
+  let currentPage = 1;
+  let hasNext = true;
 
-  // Si no encuentra nada, intentar con selectores genéricos de posts
-  if (urls.length === 0) {
-    $('article a').each((i, el) => {
-      const href = $(el).attr('href');
-      if (href && href.includes('-menu') && !urls.includes(href)) {
-        urls.push(href);
+  while (hasNext && currentPage <= 10) { // Límite de 10 páginas por categoría para evitar loops
+    const targetUrl = currentPage === 1 ? url : `${url.replace(/\/$/, '')}/page/${currentPage}/`;
+    console.log(`Buscando URLs en categoría: ${targetUrl}...`);
+    
+    try {
+      const { data: html } = await axios.get(targetUrl);
+      const $ = cheerio.load(html);
+      const pageUrls = [];
+      
+      $('h2.entry-title a, h3.entry-title a, article a').each((i, el) => {
+        const href = $(el).attr('href');
+        if (href && !allUrls.includes(href) && !pageUrls.includes(href)) {
+          // Filtrar links obvios de navegación
+          if (href.includes('mxmenu.net') && !href.includes('/category/') && !href.includes('/tag/') && !href.includes('/author/')) {
+            pageUrls.push(href);
+          }
+        }
+      });
+
+      if (pageUrls.length === 0) {
+        hasNext = false;
+      } else {
+        allUrls.push(...pageUrls);
+        currentPage++;
       }
-    });
+    } catch (error) {
+      hasNext = false;
+    }
   }
 
-  return urls;
+  return Array.from(new Set(allUrls));
 }
 
 async function processUrls(urls, limit = 0) {
