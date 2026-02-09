@@ -52,15 +52,17 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 	<div class="min-h-screen bg-[#E5E7EB] text-[#1A1A1A]">
 		<div class="max-w-2xl mx-auto px-6 py-20">
 			<header class="mb-24 flex flex-col items-center">
-				<div class="relative mb-8">
-					<Image
-						src={place.image}
-						alt={place.name}
-						width={200}
-						height={200}
-						class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
-					/>
-				</div>
+				{place.image && (
+					<div class="relative mb-8">
+						<Image
+							src={place.image}
+							alt={place.name}
+							width={200}
+							height={200}
+							class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
+						/>
+					</div>
+				)}
 				<h1
 					class="text-5xl text-center font-light tracking-tighter serif italic mb-2 text-balance"
 				>

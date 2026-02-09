@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 		const pageSize = parseInt(url.searchParams.get("pageSize") || "50");
 		const search = url.searchParams.get("search") || "";
 		const sortBy = url.searchParams.get("sortBy") || "newest";
+		const filterType = url.searchParams.get("type") || "";
 
 		const { getEffectiveUser } = await import("../../../middleware/auth");
 		const authResult = await getEffectiveUser(request, cookies);
@@ -66,6 +67,10 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 
 		if (search) {
 			query = query.ilike("name", `%${search}%`);
+		}
+
+		if (filterType) {
+			query = query.eq("type", filterType);
 		}
 
 		// Sorting

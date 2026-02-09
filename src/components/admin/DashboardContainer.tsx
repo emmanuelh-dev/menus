@@ -23,6 +23,7 @@ export default function DashboardContainer() {
   const [pageSize] = useState(50);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
+  const [filterType, setFilterType] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +33,8 @@ export default function DashboardContainer() {
           page: page.toString(),
           pageSize: pageSize.toString(),
           search,
-          sortBy
+          sortBy,
+          type: filterType
         });
 
         const response = await fetch(`/api/admin/dashboard-data?${params.toString()}`);
@@ -59,7 +61,7 @@ export default function DashboardContainer() {
 
     const debounce = setTimeout(fetchData, 300);
     return () => clearTimeout(debounce);
-  }, [page, search, sortBy]);
+  }, [page, search, sortBy, filterType]);
 
 
   if (error) {
@@ -96,6 +98,8 @@ export default function DashboardContainer() {
         setSearch={setSearch}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        filterType={filterType}
+        setFilterType={setFilterType}
         onStartOnboarding={() => setShowOnboarding(true)}
       />
 

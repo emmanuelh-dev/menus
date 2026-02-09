@@ -77,13 +77,15 @@ const gallery =
 	<div class="bg-[#f6f6f6] min-h-screen">
 		<div class="max-w-4xl mx-auto px-10 lg:px-4">
 			<header class="text-center mb-12">
-				<Image
-					src={place.image}
-					alt={place.name}
-					width={600}
-					height={400}
-					class="max-w-[300px] mx-auto py-4"
-				/>
+				{place.image && (
+					<Image
+						src={place.image}
+						alt={place.name}
+						width={600}
+						height={400}
+						class="max-w-[300px] mx-auto py-4"
+					/>
+				)}
 				<h1 class="text-sm font-oswald uppercase">{place.name}</h1>
 				<InfoChips place={place} className="mt-8" />
 			</header>

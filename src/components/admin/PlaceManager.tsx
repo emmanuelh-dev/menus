@@ -63,6 +63,8 @@ export default function PlaceManager({
   setSearch,
   sortBy,
   setSortBy,
+  filterType,
+  setFilterType,
   onStartOnboarding
 }: {
   initialRestaurants: Restaurant[],
@@ -74,6 +76,8 @@ export default function PlaceManager({
   setSearch: (s: string) => void,
   sortBy: 'newest' | 'oldest' | 'name',
   setSortBy: (s: 'newest' | 'oldest' | 'name') => void,
+  filterType: string,
+  setFilterType: (s: string) => void,
   onStartOnboarding?: () => void
 }) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>(initialRestaurants || []);
@@ -81,7 +85,74 @@ export default function PlaceManager({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
   const isLoading = externalLoading || loading;
+
+  const toggleSelect = (id: number, index: number, event?: React.MouseEvent | React.ChangeEvent) => {
+    const isShiftPressed = (event as any)?.nativeEvent?.shiftKey;
+
+    if (isShiftPressed && lastSelectedIndex !== null) {
+      const start = Math.min(lastSelectedIndex, index);
+      const end = Math.max(lastSelectedIndex, index);
+      const sliceIds = restaurants.slice(start, end + 1).map(r => r.id);
+      
+      setSelectedIds(prev => {
+        const otherSelected = prev.filter(i => !sliceIds.includes(i));
+        // Si el elemento donde hicimos clic ya estaba seleccionado, deseleccionamos el rango.
+        // Si no, seleccionamos el rango.
+        const isCurrentlySelected = prev.includes(id);
+        if (isCurrentlySelected) {
+          return otherSelected;
+        } else {
+          return [...new Set([...prev, ...sliceIds])];
+        }
+      });
+    } else {
+      setSelectedIds(prev =>
+        prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+      );
+    }
+    setLastSelectedIndex(index);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === restaurants.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(restaurants.map(r => r.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar ${selectedIds.length} establecimientos? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/restaurants/bulk', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds })
+      });
+
+      if (response.ok) {
+        setRestaurants(prev => prev.filter(r => !selectedIds.includes(r.id)));
+        setSelectedIds([]);
+      } else {
+        const error = await response.json();
+        alert(`Error al eliminar: ${error.error}`);
+      }
+    } catch (err) {
+      console.error('Error al eliminar:', err);
+      alert('Error inesperado al intentar eliminar.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setRestaurants(initialRestaurants || []);
@@ -355,7 +426,18 @@ export default function PlaceManager({
             </h1>
           </div>
 
-          <div>
+          <div className="flex items-center gap-2">
+            {selectedIds.length > 0 && (
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={handleBulkDelete}
+                className="bg-red-50 text-red-600 border-red-100 hover:bg-red-100"
+              >
+                <Trash2 size={16} className="mr-2" />
+                Eliminar ({selectedIds.length})
+              </Button>
+            )}
             <Button onClick={() => onStartOnboarding ? onStartOnboarding() : openModal()}>
               <Plus size={16} className="mr-2" />
               Crear
@@ -363,8 +445,18 @@ export default function PlaceManager({
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-3 bg-slate-50 p-1.5 rounded-xl">
-          <div className="relative flex-1">
+        <div className="flex flex-col md:flex-row gap-3 bg-slate-50 p-1.5 rounded-xl items-center">
+          <div className="flex items-center px-3 border-r border-slate-200 mr-1">
+            <input
+              type="checkbox"
+              checked={restaurants.length > 0 && selectedIds.length === restaurants.length}
+              onChange={toggleSelectAll}
+              className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+              title="Seleccionar todos en esta página"
+            />
+          </div>
+
+          <div className="relative flex-1 w-full">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400 z-10">
               <Search size={16} />
             </div>
@@ -398,6 +490,28 @@ export default function PlaceManager({
                 ]}
               />
             </div>
+
+            <div className="relative w-full md:w-40">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400 z-10">
+                <Plus size={14} className="rotate-45" />
+              </div>
+              <UISelect
+                value={filterType}
+                onChange={(e: any) => {
+                  setFilterType(e.target.value);
+                  setPage(1);
+                }}
+                className="pl-9 shadow-none border-none"
+                options={[
+                  { value: "", label: "Categoría" },
+                  { value: "restaurant", label: "Restaurantes" },
+                  { value: "cafe", label: "Cafeterías" },
+                  { value: "bar", label: "Bares" },
+                  { value: "motel", label: "Moteles" },
+                  { value: "post", label: "Posts / Blogs" }
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -418,12 +532,30 @@ export default function PlaceManager({
             </div>
           ))
         ) : (
-          restaurants.map((r) => (
+          restaurants.map((r, index) => (
             <div
               key={r.id}
-              className="bg-white rounded-xl overflow-hidden border border-slate-100"
+              className={`bg-white rounded-xl overflow-hidden border transition-all ${selectedIds.includes(r.id) ? 'border-slate-900 ring-1 ring-slate-900 shadow-md' : 'border-slate-100'}`}
+              onClick={(e) => {
+                // Prevenir que haga toggle si el click fue en un botón o link
+                if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('a')) return;
+                toggleSelect(r.id, index, e);
+              }}
             >
-              <div className="relative h-40 overflow-hidden bg-slate-50">
+              <div className="relative h-40 overflow-hidden bg-slate-50 cursor-pointer">
+                <div className="absolute top-2 right-2 z-20">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(r.id)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      toggleSelect(r.id, index, e);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-5 h-5 rounded-md border-white/50 bg-black/20 backdrop-blur-sm text-slate-900 focus:ring-slate-900 shadow-sm cursor-pointer"
+                  />
+                </div>
+
                 <img
                   key={r.image}
                   src={r.image || '/placeholder.svg'}

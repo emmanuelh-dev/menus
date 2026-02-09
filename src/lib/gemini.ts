@@ -1,3 +1,5 @@
+import { jsonrepair } from 'jsonrepair';
+
 export const prerender = false;
 
 const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY || import.meta.env.PUBLIC_GEMINI_API_KEY;
@@ -13,6 +15,7 @@ export interface GeminiResponse {
   new_gallery_images?: any[];
   change_summary?: string;
   conversational_response?: string;
+  repaired?: boolean;
   usageMetadata?: {
     promptTokenCount: number;
     candidatesTokenCount: number;
@@ -262,7 +265,14 @@ export async function callGemini(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents }),
+        body: JSON.stringify({ 
+          contents,
+          generationConfig: {
+            maxOutputTokens: 8192,
+            temperature: 0.1,
+            topP: 0.95,
+          }
+        }),
         signal: AbortSignal.timeout(60000)
       }
     );
@@ -294,11 +304,28 @@ export async function callGemini(
         }
       }
 
-      const parsed = JSON.parse(cleanJson.trim());
+      let parsed: any;
+      let wasRepaired = false;
+      try {
+        parsed = JSON.parse(cleanJson.trim());
+      } catch (e) {
+        console.warn('⚠️ Standard JSON.parse failed, attempting jsonrepair...');
+        try {
+          const repaired = jsonrepair(cleanJson.trim());
+          parsed = JSON.parse(repaired);
+          wasRepaired = true;
+          console.log('✅ JSON successfully repaired');
+        } catch (repairError) {
+          console.error('❌ json-repair also failed:', repairError);
+          throw e; // Rethrow original error if repair fails
+        }
+      }
+
       console.log('✓ Gemini response parsed successfully. Change summary:', parsed.change_summary || 'None');
       
       return {
         ...parsed,
+        repaired: wasRepaired,
         usageMetadata: result.usageMetadata
       };
     } catch (err) {

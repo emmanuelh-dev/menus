@@ -17,11 +17,16 @@ interface Props {
 }
 
 const {
-	images,
+	images: rawImages,
 	buttonClasses,
 	modalId = "galleryModal",
 	altPrefix = "Imagen",
 } = Astro.props;
+
+const images = rawImages?.filter(img => {
+	const src = img.src?.src || img.src;
+	return src && typeof src === 'string' ? src.trim() !== "" : !!src;
+}) || [];
 ---
 
 <div>

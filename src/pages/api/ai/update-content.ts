@@ -177,6 +177,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     console.log('  - change_summary:', aiResponse.change_summary || '(empty)');
     console.log('  - conversational_response:', aiResponse.conversational_response || '(empty)');
     console.log('  - blocks count:', aiResponse.blocks?.length || 0);
+    if (aiResponse.repaired) {
+      console.log('  - ⚠️ RESPONSE WAS REPAIRED (likely truncated)');
+      if (aiResponse.conversational_response) {
+        aiResponse.conversational_response += "\n\n⚠️ Nota: La respuesta fue muy larga y podría estar incompleta. Por favor revisa los últimos cambios.";
+      }
+    }
 
     const newContent = { ...currentContent };
     
