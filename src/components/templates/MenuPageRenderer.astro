@@ -48,6 +48,11 @@ const templateConfigs: Record<string, any> = {
 	default: {
 		bg: "bg-[#FCFCFC]",
 		text: "text-[#1A1A1A]",
+		navColors: {
+			bg: "bg-white/80",
+			text: "text-gray-900",
+			active: "bg-red-500 text-white",
+		},
 		headerClass: "text-center",
 		titleClass: "text-4xl md:text-6xl font-bold serif italic drop-shadow-2xl",
 		sectionTitleClass:
@@ -60,6 +65,11 @@ const templateConfigs: Record<string, any> = {
 	modern: {
 		bg: "bg-white",
 		text: "text-gray-900",
+		navColors: {
+			bg: "bg-white/80",
+			text: "text-gray-900",
+			active: "bg-blue-600 text-white",
+		},
 		headerClass: "text-left border-l-4 border-black pl-6",
 		titleClass:
 			"text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none",
@@ -73,6 +83,11 @@ const templateConfigs: Record<string, any> = {
 	elegant: {
 		bg: "bg-stone-50",
 		text: "text-stone-900",
+		navColors: {
+			bg: "bg-stone-50/80",
+			text: "text-stone-900",
+			active: "bg-amber-700 text-white",
+		},
 		headerClass: "text-center py-12",
 		titleClass: "text-5xl md:text-8xl font-light serif italic tracking-tight",
 		sectionTitleClass:
@@ -85,6 +100,11 @@ const templateConfigs: Record<string, any> = {
 	vibrant: {
 		bg: "bg-[#f4f7f4]",
 		text: "text-slate-900",
+		navColors: {
+			bg: "bg-[#f4f7f4]/80",
+			text: "text-slate-900",
+			active: "bg-green-600 text-white",
+		},
 		headerClass: "text-center py-10",
 		titleClass:
 			"text-5xl md:text-7xl font-black uppercase tracking-tighter text-green-700 drop-shadow-sm",
@@ -96,6 +116,11 @@ const templateConfigs: Record<string, any> = {
 	uber: {
 		bg: "bg-[#121212]",
 		text: "text-white",
+		navColors: {
+			bg: "bg-[#121212]/80",
+			text: "text-white",
+			active: "bg-white !text-black",
+		},
 		headerClass:
 			"text-left py-12 px-6 bg-gradient-to-b from-[#1a1a1a] to-[#121212]",
 		titleClass: "text-4xl font-bold tracking-tight",
@@ -106,6 +131,11 @@ const templateConfigs: Record<string, any> = {
 	didi: {
 		bg: "bg-[#F8F8F8]",
 		text: "text-gray-900",
+		navColors: {
+			bg: "bg-white/80",
+			text: "text-gray-900",
+			active: "bg-[#FF5B00] text-white",
+		},
 		headerClass: "text-center py-12 bg-white shadow-sm mb-6",
 		titleClass: "text-4xl font-black italic text-[#FF5B00]",
 		sectionTitleClass:
@@ -115,6 +145,11 @@ const templateConfigs: Record<string, any> = {
 	tienda: {
 		bg: "bg-[#1a1a1a]",
 		text: "text-white",
+		navColors: {
+			bg: "bg-[#1a1a1a]/80",
+			text: "text-white",
+			active: "bg-red-600",
+		},
 		headerClass: "text-center py-10",
 		titleClass:
 			"text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-xl",
@@ -168,7 +203,14 @@ const justifyClass = config.headerClass?.includes("text-left")
 			}
 		</div>
 
-		<CategoryNav client:load blocks={blocks} variant="icons" />
+		<CategoryNav
+			client:load
+			blocks={blocks}
+			variant="icons"
+			backgroundClass={config.navColors?.bg}
+			textClass={config.navColors?.text}
+			activeColorClass={config.navColors?.active}
+		/>
 
 		{/* Category Cards for Tienda template */}
 		{config.showCategoryCards && <CategoryCards client:load blocks={blocks} />}
@@ -235,7 +277,7 @@ const justifyClass = config.headerClass?.includes("text-left")
 
 										<div class="px-2">
 											{block.data.image && (
-												<div class="mb-10 overflow-hidden rounded-[2.5rem] shadow-xl border-8 border-white">
+												<div>
 													<Image
 														src={block.data.image}
 														alt={block.data.title}
@@ -249,9 +291,13 @@ const justifyClass = config.headerClass?.includes("text-left")
 											)}
 
 											{block.data.description && (
-												<p class="text-stone-400 text-sm font-normal italic mb-8 px-4 opacity-80 leading-relaxed">
-													{block.data.description}
-												</p>
+												<div class="mb-8 px-4 opacity-80">
+													<MarkdownBlock
+														client:load
+														content={block.data.description}
+														className="text-stone-400 text-sm font-normal italic leading-relaxed"
+													/>
+												</div>
 											)}
 
 											<div class="grid grid-cols-1 gap-4">
@@ -303,9 +349,7 @@ const justifyClass = config.headerClass?.includes("text-left")
 				}
 			</div>
 
-			<footer
-				class="mt-32 pb-16 text-center border-t border-stone-100 pt-16 px-6"
-			>
+			<footer class="mt-32 pb-16 text-center border-t border-stone-100 pt-16">
 				<p
 					class="text-[10px] text-stone-300 uppercase tracking-[0.3em] font-bold mb-4"
 				>

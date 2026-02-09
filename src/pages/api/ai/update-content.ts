@@ -23,18 +23,24 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const refreshToken = cookies.get('sb-refresh-token')?.value;
     let user: any = null;
     let isOwner = false;
+    let isUserAdmin = false;
 
     if (accessToken && refreshToken) {
       const { createAuthenticatedClient } = await import('../../../lib/supabase');
       const authSupabase = await createAuthenticatedClient(accessToken, refreshToken);
       const { data: { user: authUser } } = await authSupabase.auth.getUser();
       user = authUser;
+      
+      if (user) {
+        const { isAdmin: checkAdmin } = await import('../../../lib/admin');
+        isUserAdmin = checkAdmin(user.email);
+      }
     }
 
     // Verificar si es dueño
     const { data: placeData } = await supabase.from('places').select('user_id, content').eq('id', placeId).single();
-    if (user && placeData && placeData.user_id === user.id) {
-      isOwner = true;
+    if (user && placeData && (placeData.user_id === user.id || isUserAdmin)) {
+      isOwner = true; // Tratamos al admin como dueño para simplificar lógica posterior
     }
 
     // --- LÍMITES POR USUARIO ($20 MXN por mes) ---
@@ -292,6 +298,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const stats = {
       sections: newContent.blocks?.length || 0,
       items: newContent.blocks?.reduce((acc: number, b: any) => acc + (b.data?.items?.length || 0), 0) || 0,
+      options: newContent.blocks?.reduce((acc: number, b: any) => {
+        return acc + (b.data?.items?.reduce((iAcc: number, item: any) => iAcc + (item.options?.length || 0), 0) || 0);
+      }, 0) || 0,
       hasAddress: !!aiResponse.semantic_data?.address,
       hasPhone: !!aiResponse.semantic_data?.phone,
       newImages: aiResponse.new_gallery_images?.length || 0

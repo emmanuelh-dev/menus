@@ -9,6 +9,8 @@ interface Props {
 	whatsappNumber: string;
 }
 
+import MarkdownBlock from "../../MarkdownBlock";
+
 const { item, template, showPrices, enableCart, whatsappNumber } = Astro.props;
 
 const isVibrant = template === "vibrant";
@@ -29,9 +31,23 @@ const isTienda = template === "tienda";
 						{item.name}
 					</h3>
 					{item.description && (
-						<p class="text-slate-500 text-sm font-light leading-relaxed mb-4 line-clamp-2">
-							{item.description}
-						</p>
+						<div class="mb-4 line-clamp-2">
+							<MarkdownBlock
+								client:load
+								content={item.description}
+								className="text-slate-500 text-sm font-light leading-relaxed !m-0"
+							/>
+						</div>
+					)}
+
+					{item.options && item.options.length > 0 && (
+						<div class="mb-4 flex flex-wrap gap-1.5">
+							{item.options.map((opt: any) => (
+								<div class="bg-emerald-50 text-[10px] text-emerald-700 px-2 py-1 rounded-lg font-bold uppercase tracking-tight border border-emerald-100">
+									{opt.name}: {opt.values.join(", ")}
+								</div>
+							))}
+						</div>
 					)}
 
 					{item.image && (
@@ -78,9 +94,23 @@ const isTienda = template === "tienda";
 			<div class="flex-1 min-w-0">
 				<h3 class="font-bold text-white text-lg mb-1">{item.name}</h3>
 				{item.description && (
-					<p class="text-gray-400 text-sm line-clamp-2 flex-grow mb-3">
-						{item.description}
-					</p>
+					<div class="mb-3 line-clamp-2 flex-grow">
+						<MarkdownBlock
+							client:load
+							content={item.description}
+							className="text-gray-400 text-sm !m-0"
+						/>
+					</div>
+				)}
+				{item.options && item.options.length > 0 && (
+					<div class="mb-3 space-y-1">
+						{item.options.map((opt: any) => (
+							<div class="text-[10px] text-gray-500 uppercase tracking-wider font-medium">
+								<span class="text-white/40">{opt.name}:</span>{" "}
+								{opt.values.join(", ")}
+							</div>
+						))}
+					</div>
 				)}
 				<div class="mt-auto flex items-center gap-4">
 					{showPrices && (
@@ -133,9 +163,22 @@ const isTienda = template === "tienda";
 				<div>
 					<h3 class="font-black text-slate-800 text-lg mb-1">{item.name}</h3>
 					{item.description && (
-						<p class="text-slate-500 text-xs line-clamp-2 leading-relaxed">
-							{item.description}
-						</p>
+						<div class="line-clamp-2 leading-relaxed">
+							<MarkdownBlock
+								client:load
+								content={item.description}
+								className="text-slate-500 text-xs !m-0"
+							/>
+						</div>
+					)}
+					{item.options && item.options.length > 0 && (
+						<div class="mt-2 flex flex-wrap gap-1">
+							{item.options.map((opt: any) => (
+								<div class="bg-orange-50 text-[9px] text-[#FF5B00] px-2 py-0.5 rounded-full font-black uppercase border border-orange-100">
+									{opt.name}: {opt.values.join(", ")}
+								</div>
+							))}
+						</div>
 					)}
 				</div>
 				<div class="flex items-center gap-2 mt-4">
@@ -226,9 +269,22 @@ const isTienda = template === "tienda";
 							{item.name}
 						</h3>
 						{item.description && (
-							<p class="text-gray-400 text-xs line-clamp-2 leading-relaxed">
-								{item.description}
-							</p>
+							<div class="line-clamp-2 leading-relaxed">
+								<MarkdownBlock
+									client:load
+									content={item.description}
+									className="text-gray-400 text-xs !m-0"
+								/>
+							</div>
+						)}
+						{item.options && item.options.length > 0 && (
+							<div class="mt-2 flex flex-wrap gap-1">
+								{item.options.map((opt: any) => (
+									<div class="bg-white/10 text-[9px] text-white/70 px-2 py-0.5 rounded-lg font-bold uppercase border border-white/5">
+										{opt.name}: {opt.values.join(", ")}
+									</div>
+								))}
+							</div>
 						)}
 					</div>
 					<div class="flex items-center gap-3 mt-2">
@@ -267,9 +323,25 @@ const isTienda = template === "tienda";
 					)}
 				</div>
 				{item.description && (
-					<p class="text-stone-400 text-sm font-light leading-relaxed mb-4">
-						{item.description}
-					</p>
+					<div class="mb-4">
+						<MarkdownBlock
+							client:load
+							content={item.description}
+							className="text-stone-400 text-sm font-light leading-relaxed !m-0"
+						/>
+					</div>
+				)}
+				{item.options && item.options.length > 0 && (
+					<div class="mb-4 space-y-1">
+						{item.options.map((opt: any) => (
+							<div class="text-[11px] text-stone-500 italic">
+								<span class="font-bold not-italic text-stone-700 capitalize">
+									{opt.name}:
+								</span>{" "}
+								{opt.values.join(", ")}
+							</div>
+						))}
+					</div>
 				)}
 				{enableCart && whatsappNumber && item.price > 0 && (
 					<div class="flex gap-2 mt-3">

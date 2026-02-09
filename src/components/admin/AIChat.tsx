@@ -104,7 +104,7 @@ export default function AIChat({
                           </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
                             <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Secciones</p>
                             <p className="text-lg font-black text-gray-900">{msg.stats.sections}</p>
@@ -113,8 +113,12 @@ export default function AIChat({
                             <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Productos</p>
                             <p className="text-lg font-black text-gray-900">{msg.stats.items}</p>
                           </div>
+                          <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Variantes</p>
+                            <p className="text-lg font-black text-purple-600">{msg.stats.options || 0}</p>
+                          </div>
                           {msg.usage && (
-                            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 col-span-2 text-[10px] space-y-1">
+                            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 col-span-3 text-[10px] space-y-1">
                               <p className="text-[9px] text-gray-400 uppercase font-bold mb-1">Detalle de Tokens</p>
                               <div className="flex justify-between items-center text-gray-500 font-medium">
                                 <span>Input (Prompt):</span>

@@ -70,6 +70,13 @@ export interface ItemData {
   description?: string;
   image?: string;
   features?: string[];
+  options?: {
+    name: string;
+    values: string[];
+    prices?: Record<string, number>;
+    required?: boolean;
+    max_choices?: number;
+  }[];
   gallery?: { src: string; alt?: string; title?: string }[];
   available?: boolean;
 }

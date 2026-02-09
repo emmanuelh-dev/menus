@@ -6,6 +6,7 @@ interface AIMessage {
   stats?: {
     sections: number;
     items: number;
+    options: number;
     hasAddress: boolean;
     hasPhone: boolean;
     newImages: number;
