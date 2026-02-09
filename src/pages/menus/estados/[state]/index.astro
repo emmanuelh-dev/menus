@@ -1,0 +1,197 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
+);
+
+import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
+import { ArrowRight, MapPin, Star, Utensils, Info } from "lucide-react";
+import { getRestaurants, getStates } from "../../../../lib/supabase";
+import { Image } from "astro:assets";
+import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+
+const { state } = Astro.params;
+const states = await getStates();
+const currentState = states.find((s) => s.slug === state);
+
+if (!currentState) {
+	return Astro.redirect("/menus/estados");
+}
+
+// Obtener restaurantes por estado
+const restaurants = (
+	await getRestaurants({ type: "restaurant", state_id: currentState.id })
+).filter((r) => r.short_name);
+
+const seoData = {
+	title: `Menús Digitales y Cartas QR en ${currentState.name} 2026 | BySMax`,
+	description: `Explora ${restaurants.length} ejemplos de menús digitales y cartas QR reales en ${currentState.name}. Encuentra inspiración para tu restaurante con tecnología BySMax.`,
+	keywords: `menus digitales ${currentState.name}, carta qr ${currentState.name.toLowerCase()}, restaurantes ${currentState.name.toLowerCase()}, ejemplos menus qr`,
+};
+
+// Paginación (opcional pero bueno tener estructura)
+const itemsPerPage = 24;
+const totalPages = Math.ceil(restaurants.length / itemsPerPage);
+---
+
+<RestaurantLayout
+	title={seoData.title}
+	description={seoData.description}
+	backgroundColor="bg-gray-50"
+>
+	<div class="bg-gradient-to-b from-gray-50 to-white min-h-screen py-16">
+		<div class="max-w-[90%] mx-auto">
+			<Breadcrumbs
+				items={[
+					{ label: "Inicio", href: "/" },
+					{ label: "Menús", href: "/menus" },
+					{ label: "Estados", href: "/menus/estados" },
+					{ label: currentState.name },
+				]}
+			/>
+
+			<div class="text-center mt-12 mb-16">
+				<span
+					class="inline-block bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full text-sm font-bold mb-4"
+				>
+					📍 {currentState.name}
+				</span>
+				<h1
+					class="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter uppercase"
+				>
+					Menús Digitales en <span class="text-emerald-600"
+						>{currentState.name}</span
+					>
+				</h1>
+				<p class="text-xl text-gray-600 max-w-3xl mx-auto">
+					Explora nuestra red de {restaurants.length} restaurantes que ya han digitalizado
+					su experiencia en el estado.
+				</p>
+			</div>
+
+			<!-- Contador y Resumen -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+				<div
+					class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4"
+				>
+					<div
+						class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center"
+					>
+						<Utensils className="text-emerald-600" />
+					</div>
+					<div>
+						<p class="text-sm text-gray-400 font-bold uppercase tracking-wider">
+							Total Restaurantes
+						</p>
+						<p class="text-2xl font-black text-gray-900">
+							{restaurants.length}
+						</p>
+					</div>
+				</div>
+				<div
+					class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4"
+				>
+					<div
+						class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center"
+					>
+						<Star className="text-amber-500" />
+					</div>
+					<div>
+						<p class="text-sm text-gray-400 font-bold uppercase tracking-wider">
+							Calificación Promedio
+						</p>
+						<p class="text-2xl font-black text-gray-900">4.8</p>
+					</div>
+				</div>
+				<div
+					class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4"
+				>
+					<div
+						class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center"
+					>
+						<Info className="text-blue-500" />
+					</div>
+					<div>
+						<p class="text-sm text-gray-400 font-bold uppercase tracking-wider">
+							Actualizado
+						</p>
+						<p class="text-2xl font-black text-gray-900">Hoy</p>
+					</div>
+				</div>
+			</div>
+
+			<div
+				id="restaurants-grid"
+				class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+			>
+				{
+					restaurants.map((restaurant) => {
+						const restaurantUrl = `/menus/estados/${state}/${restaurant.short_name}`;
+						const restaurantImage =
+							restaurant.image && restaurant.image.trim() !== ""
+								? restaurant.image
+								: "https://menus.bysmax.com/images/landing/hero-free.png";
+
+						return (
+							<div class="restaurant-card group bg-white rounded-[2rem] border border-gray-100 hover:border-emerald-200 transition-all duration-300 shadow-sm hover:shadow-xl overflow-hidden flex flex-col">
+								<div class="aspect-video relative overflow-hidden">
+									<a href={restaurantUrl}>
+										<Image
+											src={restaurantImage}
+											alt={restaurant.name}
+											width={500}
+											height={300}
+											class="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
+										/>
+										<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+									</a>
+									<div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-black shadow-sm flex items-center gap-1">
+										<Star className="w-3 h-3 text-amber-500" />
+										{restaurant.rating}
+									</div>
+								</div>
+
+								<div class="p-8 flex-1 flex flex-col">
+									<h2 class="text-2xl font-black text-gray-900 mb-2 tracking-tighter leading-tight group-hover:text-emerald-600 transition-colors">
+										<a href={restaurantUrl}>{restaurant.name}</a>
+									</h2>
+
+									<div class="flex items-center gap-2 mb-4">
+										<MapPin className="w-4 h-4 text-gray-300" />
+										<span class="text-gray-400 text-sm font-medium line-clamp-1">
+											{restaurant.address}
+										</span>
+									</div>
+
+									<div class="mt-auto pt-6 flex items-center justify-between border-t border-gray-50">
+										<span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest leading-none">
+											{restaurant.category || "Restaurante"}
+										</span>
+										<a
+											href={restaurantUrl}
+											class="w-10 h-10 bg-gray-50 group-hover:bg-emerald-600 rounded-full flex items-center justify-center transition-all"
+										>
+											<ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+										</a>
+									</div>
+								</div>
+							</div>
+						);
+					})
+				}
+			</div>
+
+			{
+				restaurants.length === 0 && (
+					<div class="text-center py-20 bg-gray-100 rounded-[3rem]">
+						<p class="text-2xl font-bold text-gray-400">
+							Próximamente más restaurantes en {currentState.name}
+						</p>
+					</div>
+				)
+			}
+		</div>
+	</div>
+</RestaurantLayout>

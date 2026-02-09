@@ -7,8 +7,8 @@ Astro.response.headers.set(
 );
 
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
-import { ArrowRight } from "lucide-react";
-import { getRestaurants } from "../../lib/supabase";
+import { ArrowRight, MapPin } from "lucide-react";
+import { getRestaurants, getStates } from "../../lib/supabase";
 import { formater } from "../../types/app";
 import { Image } from "astro:assets";
 
@@ -26,9 +26,14 @@ const types: BusinessType[] = [
 ];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const restaurants = (await getRestaurants({ type: null })).filter(
-	(r) => r.type !== "motel",
-);
+const [restaurants, states] = await Promise.all([
+	getRestaurants({ type: null }).then((list) =>
+		list.filter((r) => r.type !== "motel"),
+	),
+	getStates().then((list) =>
+		list.filter((s) => s.total_places > 0 || s.slug === "nuevo-leon"),
+	),
+]);
 
 const seoData = {
 	title: "Ejemplos de Menús Digitales y Cartas QR Reales | BySMax",
@@ -149,6 +154,74 @@ const seoData = {
 							</div>
 						);
 					})
+				}
+			</div>
+
+			<!-- Nueva sección: Menús por Estado -->
+			<div class="mt-32 mb-16 px-4 md:px-0">
+				<div
+					class="flex items-end justify-between mb-10 pb-6 border-b border-gray-100 max-w-7xl mx-auto"
+				>
+					<div>
+						<h2
+							class="text-3xl font-black text-gray-900 tracking-tighter uppercase leading-none mb-2"
+						>
+							Explora por <span class="text-emerald-600">Estado</span>
+						</h2>
+						<p
+							class="text-gray-400 text-sm font-bold uppercase tracking-widest leading-none"
+						>
+							Encuentra restaurantes cerca de ti
+						</p>
+					</div>
+					<a
+						href="/menus/estados"
+						class="hidden md:flex items-center gap-2 text-emerald-600 font-bold uppercase tracking-widest text-xs hover:text-emerald-700 transition-colors"
+					>
+						Ver todos los estados
+						<ArrowRight className="w-4 h-4" />
+					</a>
+				</div>
+
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto"
+				>
+					{
+						states.slice(0, 8).map((state) => (
+							<a
+								href={`/menus/estados/${state.slug}`}
+								class="group p-6 bg-white border border-gray-100 hover:border-emerald-200 rounded-[2rem] transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/5"
+							>
+								<div class="flex items-center justify-between mb-4">
+									<div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 transition-colors duration-300">
+										<MapPin className="w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" />
+									</div>
+									<span class="text-2xl font-black text-gray-900 leading-none">
+										{state.total_places}
+									</span>
+								</div>
+								<h3 class="text-lg font-black text-gray-900 tracking-tighter uppercase group-hover:text-emerald-600 transition-colors">
+									{state.name}
+								</h3>
+								<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+									Negocios Activos
+								</p>
+							</a>
+						))
+					}
+				</div>
+
+				{
+					states.length > 8 && (
+						<div class="text-center mt-12 md:hidden">
+							<a
+								href="/menus/estados"
+								class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-full font-black uppercase tracking-widest text-xs shadow-lg shadow-emerald-900/20"
+							>
+								Ver todos los estados
+							</a>
+						</div>
+					)
 				}
 			</div>
 		</div>

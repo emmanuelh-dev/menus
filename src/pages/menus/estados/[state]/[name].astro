@@ -1,0 +1,54 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
+);
+
+const { name, state } = Astro.params;
+
+import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
+import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+import { supabase } from "../../../../lib/supabase";
+
+if (!name) {
+	throw new Error("No se ha especificado el nombre del restaurante");
+}
+
+// Buscamos el lugar asegurándonos que el estado coincida para SEO
+const { data: place } = await supabase
+	.from("places")
+	.select("*, states(*)")
+	.eq("short_name", name)
+	.single();
+
+// Validación de estado para consistencia de URL
+if (!place || !place.states || place.states.slug !== state) {
+	// Si el short_name existe pero en otro estado, redirigimos a la principal de menus
+	if (place) {
+		return Astro.redirect(`/menus/${name}`);
+	}
+	return Astro.redirect("/menus");
+}
+---
+
+---
+
+<div class="bg-[#FCFCFC] pt-6 px-6">
+	<div class="max-w-2xl mx-auto">
+		<Breadcrumbs
+			items={[
+				{ label: "Inicio", href: "/" },
+				{ label: "Menús", href: "/menus" },
+				{
+					label: place.states?.name || "Estado",
+					href: `/menus/estados/${state}`,
+				},
+				{ label: place.name },
+			]}
+		/>
+	</div>
+</div>
+
+<MenuPageRenderer place={place} name={name} />
