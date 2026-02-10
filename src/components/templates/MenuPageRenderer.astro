@@ -191,11 +191,12 @@ const justifyClass = config.headerClass?.includes("text-left")
 					<Image
 						src={place.image}
 						alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
-						width={400}
-						height={400}
+						width={1200}
+						height={800}
 						class="w-full h-auto object-cover max-h-[60dvh]"
 						loading="eager"
 						format="webp"
+						quality={90}
 					/>
 				) : (
 					<div class="h-32 bg-stone-900" />
@@ -281,11 +282,12 @@ const justifyClass = config.headerClass?.includes("text-left")
 													<Image
 														src={block.data.image}
 														alt={block.data.title}
-														width={800}
-														height={400}
+														width={1000}
+														height={600}
 														class="w-full h-56 sm:h-72 object-cover transition-transform duration-700 hover:scale-105"
 														loading="lazy"
 														format="webp"
+														quality={85}
 													/>
 												</div>
 											)}
