@@ -83,6 +83,26 @@ Mantener un `Sitemap HTML` premium que actúe como un hub de autoridad regional,
 
 ---
 
+## 📈 Rendimiento Real (Search Console)
+*Datos de rendimiento para menus.bysmax.com (Feb 2026)*
+
+| Consulta Top | Clics | Impresiones | CTR | Posición |
+| :--- | :--- | :--- | :--- | :--- |
+| menu digital campomar | 1 | 8 | 12.5% | 6.5 |
+| carta menu digital | 0 | 10 | 0% | 26.6 |
+| crear menu digital gratis | 0 | 5 | 0% | 34.2 |
+| menu digital para restaurantes | 0 | 4 | 0% | 25.5 |
+| como hacer un menu digital gratis | 0 | 4 | 0% | 52.0 |
+| precios campomar menu digital | 0 | 3 | 0% | 4.3 |
+| menu digital para tv | 0 | 1 | 0% | 2.0 |
+| campomar menu digital | 0 | 1 | 0% | 6.0 |
+| menu digital grátis | 0 | 1 | 0% | 15.0 |
+| menu digital gratis | 0 | 1 | 0% | 19.0 |
+| menu digital gratuito | 0 | 1 | 0% | 19.0 |
+| menu digitales | 0 | 1 | 0% | 46.0 |
+
+---
+
 ## 📧 Contacto SEO:
 Email: hola@bysmax.com
 Copyright: BySMax Mx 2026

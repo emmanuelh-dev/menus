@@ -35,6 +35,7 @@ export default defineConfig({
       'lh3.googleusercontent.com',
       'firebasestorage.googleapis.com',
       'storage.googleapis.com',
+      'images.letseat.mx'
     ],
     remotePatterns: [
       {
