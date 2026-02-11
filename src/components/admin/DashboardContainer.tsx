@@ -22,7 +22,7 @@ export default function DashboardContainer() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(50);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name" | "updated">("newest");
   const [filterType, setFilterType] = useState("");
 
   useEffect(() => {

@@ -78,6 +78,8 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 			query = query.order("name", { ascending: true });
 		} else if (sortBy === "oldest") {
 			query = query.order("created_at", { ascending: true });
+		} else if (sortBy === "updated") {
+			query = query.order("updated_at", { ascending: false, nullsFirst: false });
 		} else {
 			query = query.order("created_at", { ascending: false });
 		}

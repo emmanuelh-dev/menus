@@ -28,7 +28,6 @@ export default defineConfig({
   image: {
     // Dominios permitidos para optimización de imágenes externas
     domains: [
-      'res.cloudinary.com',
       'images.unsplash.com',
       'cdn.sanity.io',
       'fmngpfyzqgfttmpiwdmm.supabase.co',

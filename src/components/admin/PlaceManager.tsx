@@ -51,6 +51,8 @@ interface Restaurant {
     name: string;
     slug: string;
   };
+  created_at?: string;
+  updated_at?: string;
 }
 
 export default function PlaceManager({
@@ -74,8 +76,8 @@ export default function PlaceManager({
   setPage: (p: number) => void,
   search: string,
   setSearch: (s: string) => void,
-  sortBy: 'newest' | 'oldest' | 'name',
-  setSortBy: (s: 'newest' | 'oldest' | 'name') => void,
+  sortBy: 'newest' | 'oldest' | 'name' | 'updated',
+  setSortBy: (s: 'newest' | 'oldest' | 'name' | 'updated') => void,
   filterType: string,
   setFilterType: (s: string) => void,
   onStartOnboarding?: () => void
@@ -96,7 +98,7 @@ export default function PlaceManager({
       const start = Math.min(lastSelectedIndex, index);
       const end = Math.max(lastSelectedIndex, index);
       const sliceIds = restaurants.slice(start, end + 1).map(r => r.id);
-      
+
       setSelectedIds(prev => {
         const otherSelected = prev.filter(i => !sliceIds.includes(i));
         // Si el elemento donde hicimos clic ya estaba seleccionado, deseleccionamos el rango.
@@ -485,6 +487,7 @@ export default function PlaceManager({
                 className="pl-9 shadow-none border-none"
                 options={[
                   { value: "newest", label: "Recientes" },
+                  { value: "updated", label: "Modificados" },
                   { value: "oldest", label: "Antiguos" },
                   { value: "name", label: "Nombre" }
                 ]}
