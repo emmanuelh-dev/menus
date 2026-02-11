@@ -60,9 +60,12 @@ export default function OrderTracker({ orderId, initialOrder }: { orderId: strin
         const data = await res.json();
         if (data.user) {
           setUser(data.user);
-          // Permitir si es admin real o si es el dueño del lugar
-          const isOwner = data.user.id === order.places?.user_id;
-          setIsAdmin(data.isAdmin || isOwner);
+          // Permitir si es admin real o si es el dueño del lugar (incluyendo si está impersonando)
+          const userId = data.impersonating?.id || data.user.id;
+          const isOwner = userId === order.places?.user_id;
+          const finalIsAdmin = data.isAdmin || isOwner;
+          console.log("Auth Check:", { userId, placeOwner: order.places?.user_id, isOwner, isAdmin: finalIsAdmin });
+          setIsAdmin(finalIsAdmin);
         }
       }
     } catch (err) {
@@ -83,19 +86,26 @@ export default function OrderTracker({ orderId, initialOrder }: { orderId: strin
   };
 
   const updateStatus = async (newStatus: string) => {
+    if (loading) return;
     setLoading(true);
     try {
+      console.log("Updating status to:", newStatus, "for order:", orderId);
       const res = await fetch(`/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
+
+      const data = await res.json();
+
       if (res.ok) {
-        const data = await res.json();
         setOrder(data.order);
+      } else {
+        alert("Error al actualizar: " + (data.error || "Error desconocido"));
       }
     } catch (err) {
       console.error("Update failed:", err);
+      alert("Error de conexión al actualizar el pedido.");
     } finally {
       setLoading(false);
     }
@@ -154,57 +164,37 @@ export default function OrderTracker({ orderId, initialOrder }: { orderId: strin
         {/* Admin Controls */}
         {isAdmin && (
           <div className="bg-slate-50 rounded-2xl p-6 mb-8 border border-slate-200/50">
-            <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest flex items-center gap-2">
-              <User size={12} /> Panel de Control (Dueño)
+            <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest flex items-center justify-between">
+              <span className="flex items-center gap-2"><User size={12} /> Panel de Control (Dueño)</span>
+              {user && <span className="lowercase opacity-50">{user.email}</span>}
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {Object.entries(statusConfig).map(([val, cfg]) => (
-                <button
-                  key={val}
-                  onClick={() => updateStatus(val)}
-                  disabled={loading || order.status === val}
-                  className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${order.status === val
-                    ? `${cfg.color} border-current`
-                    : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
-                    } disabled:opacity-50`}
-                >
-                  {cfg.label}
-                </button>
-              ))}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {Object.entries(statusConfig).map(([val, cfg]) => {
+                const isCurrent = order.status === val;
+
+                return (
+                  <button
+                    key={val}
+                    onClick={() => updateStatus(val)}
+                    disabled={loading || isCurrent}
+                    className={`relative py-3.5 px-2 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border-2 flex items-center justify-center cursor-pointer ${isCurrent
+                      ? `${cfg.color} border-current shadow-md shadow-slate-100`
+                      : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300 hover:text-slate-600 active:scale-95'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isCurrent && <div className="absolute top-1 right-1 w-2 h-2 bg-current rounded-full animate-pulse" />}
+                    {loading && !isCurrent ? (
+                      <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                    ) : (
+                      cfg.label
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
 
-        <div className="space-y-6">
-          <div className="flex items-center justify-between py-4 border-b border-slate-50">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                <Receipt size={20} />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Restaurante</p>
-                <p className="font-bold text-slate-900">{order.places?.name}</p>
-              </div>
-            </div>
-            <a
-              href={`/menus/${order.places?.short_name}`}
-              className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors"
-            >
-              <ExternalLink size={18} />
-            </a>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-              <MapPin size={20} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entrega en</p>
-              <p className="font-bold text-slate-900">{order.delivery_address || 'Consumo Local'}</p>
-              {order.delivery_colony && <p className="text-xs text-slate-500">{order.delivery_colony}</p>}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Details Card */}
@@ -273,6 +263,36 @@ export default function OrderTracker({ orderId, initialOrder }: { orderId: strin
         </div>
       </div>
 
+      <div className="space-y-6">
+        <div className="flex items-center justify-between py-4 border-b border-slate-50">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
+              <Receipt size={20} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Restaurante</p>
+              <p className="font-bold text-slate-900">{order.places?.name}</p>
+            </div>
+          </div>
+          <a
+            href={`/menus/${order.places?.short_name}`}
+            className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors"
+          >
+            <ExternalLink size={18} />
+          </a>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
+            <MapPin size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entrega en</p>
+            <p className="font-bold text-slate-900">{order.delivery_address || 'Consumo Local'}</p>
+            {order.delivery_colony && <p className="text-xs text-slate-500">{order.delivery_colony}</p>}
+          </div>
+        </div>
+      </div>
       {/* Footer info/help (Admin only to contact customer) */}
       {isAdmin && (
         <div className="flex flex-col sm:flex-row gap-2">

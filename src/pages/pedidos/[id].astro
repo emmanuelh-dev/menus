@@ -39,11 +39,11 @@ if (error || !order) {
 		: "Orden no encontrada"}
 	description="Seguimiento de tu pedido en tiempo real"
 >
-	<div class="min-h-screen bg-slate-50 py-12 px-4">
+	<div class="min-h-screen bg-slate-50 pt-4 px-4">
 		<div class="max-w-xl mx-auto">
 			{
 				order ? (
-					<OrderTracker client:load orderId={Number(id)} initialOrder={order} />
+					<OrderTracker client:load orderId={id} initialOrder={order} />
 				) : (
 					<div class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl">
 						<div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
