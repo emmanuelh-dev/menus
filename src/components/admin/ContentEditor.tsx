@@ -189,6 +189,121 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   });
   const [showViewSettings, setShowViewSettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInitialLoad = useRef(true);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isLibraryPasting, setIsLibraryPasting] = useState(false);
+
+  const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvdq078aa'
+  const uploadPreset = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'
+
+  const optimizeImageUrlForLibrary = (url: string) => {
+    const params = 'f_auto,q_auto,w_1000'
+    return url.includes('/upload/') ? url.replace('/upload/', `/upload/${params}/`) : url
+  }
+
+  const compressImageForLibrary = (file: File): Promise<Blob | File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const maxDimension = 1080;
+        const fileSizeThreshold = 200 * 1024;
+        if (img.width <= maxDimension && img.height <= maxDimension && file.size <= fileSizeThreshold) {
+          resolve(file);
+          return;
+        }
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(file); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        const isPng = file.type === 'image/png';
+        const type = isPng ? 'image/png' : 'image/jpeg';
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name || 'pasted-library.jpg', {
+              type: type,
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        }, type, isPng ? undefined : 0.9);
+      };
+      img.onerror = () => resolve(file);
+    });
+  };
+
+  const handleLibraryPaste = async (e: React.ClipboardEvent) => {
+    if (activeTab !== 'media') return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const files: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) files.push(file);
+      }
+    }
+
+    if (files.length === 0) return;
+
+    setIsLibraryPasting(true);
+    try {
+      const uploadPromises = files.map(async (file) => {
+        const processedFile = await compressImageForLibrary(file);
+        const formData = new FormData();
+        formData.append('file', processedFile);
+        formData.append('upload_preset', uploadPreset);
+
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+        const data = await response.json();
+        return optimizeImageUrlForLibrary(data.secure_url);
+      });
+
+      const urls = await Promise.all(uploadPromises);
+      setMediaLibrary(prev => [...new Set([...urls, ...prev])]);
+    } catch (error) {
+      console.error('Error pasting to library:', error);
+      alert('Error al pegar en biblioteca');
+    } finally {
+      setIsLibraryPasting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      saveChanges(true);
+    }, 3000); // 3 segundos de debounce para auto-guardado
+
+    return () => clearTimeout(timer);
+  }, [blocks, semanticData, viewSettings, mediaLibrary]);
 
   useEffect(() => {
     if (activeTab !== 'editor') return;
@@ -263,7 +378,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       if (url) images.add(url);
     });
 
-    return Array.from(images).filter(Boolean);
+    // Combine and reverse to show newest first
+    const combined = [...Array.from(images)];
+    return combined.reverse();
   };
 
   const addBlock = (type: BlockType, afterIndex?: number) => {
@@ -331,7 +448,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     setBlocks(newBlocks);
   };
 
-  const saveChanges = async () => {
+  const saveChanges = async (isSilent = false) => {
+    const silent = typeof isSilent === 'boolean' ? isSilent : false;
     setIsSaving(true);
     try {
       const response = await fetch(`/api/restaurants/${placeId}`, {
@@ -347,15 +465,16 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         })
       });
       if (response.ok) {
-        alert('Contenido actualizado correctamente.');
+        setLastSaved(new Date());
+        if (!silent) alert('Contenido actualizado correctamente.');
       } else {
         const error = await response.json();
         console.error('Error al guardar:', error);
-        alert('Error al guardar el contenido.');
+        if (!silent) alert('Error al guardar el contenido.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error al guardar el contenido.');
+      if (!silent) alert('Error al guardar el contenido.');
     } finally {
       setIsSaving(false);
     }
@@ -471,7 +590,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   function renderBlock(block: Block, index: number, forceCollapse: boolean) {
     const existingImages = getAllExistingImages();
     const onUploadToLibrary = (urls: string[]) => {
-      setMediaLibrary(prev => [...new Set([...prev, ...urls])]);
+      setMediaLibrary(prev => [...new Set([...urls, ...prev])]);
     };
 
     switch (block.type) {
@@ -539,8 +658,19 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <span>{forceCollapse ? 'Abrir' : 'Cerrar'}</span>
             </button>
 
+            <div className="hidden lg:flex flex-col items-end px-4">
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado</p>
+              {isSaving ? (
+                <p className="text-[10px] font-bold text-blue-600 animate-pulse uppercase">Guardando...</p>
+              ) : lastSaved ? (
+                <p className="text-[10px] font-bold text-emerald-600 uppercase">Guardado {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              ) : (
+                <p className="text-[10px] font-bold text-gray-400 uppercase">Pendiente</p>
+              )}
+            </div>
+
             <button
-              onClick={saveChanges}
+              onClick={() => saveChanges()}
               disabled={isSaving}
               className="flex-[2] sm:flex-none bg-gray-900 text-white px-6 py-2 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] sm:text-xs  shadow-gray-200 flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:bg-black active:scale-95 whitespace-nowrap"
             >
@@ -1149,19 +1279,31 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           )}
         </>
       ) : activeTab === 'media' ? (
-        <div className="bg-white md:rounded-2xl border-y md:border shadow-xl p-6 sm:p-12">
+        <div
+          className="bg-white md:rounded-2xl border-y md:border shadow-xl p-6 sm:p-12 focus:outline-none transition-all"
+          onPaste={handleLibraryPaste}
+          tabIndex={0}
+        >
           <div className="max-w-4xl mx-auto space-y-12">
-            <header className="text-center">
+            <header className="text-center relative">
               <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900 mb-2">Biblioteca de Medios</h2>
               <p className="text-gray-500 text-sm font-medium">Gestiona todas las imágenes de tu establecimiento en un solo lugar.</p>
+              {isLibraryPasting && (
+                <div className="absolute top-0 right-0 animate-pulse flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full border border-blue-100">
+                  <PiSparkle className="w-4 h-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">¡PEGANDO!</span>
+                </div>
+              )}
             </header>
 
-            <section className="bg-gray-50 p-8 rounded-[2.5rem] border-2 border-dashed border-gray-200">
+            <section className={`bg-gray-50 p-8 rounded-[2.5rem] border-2 border-dashed transition-all ${isLibraryPasting ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
               <div className="text-center mb-6">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400">Subir nuevas imágenes a la biblioteca:</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  {isLibraryPasting ? 'Procesando imágenes pegadas...' : 'Subir nuevas imágenes o Ctrl+V para pegar:'}
+                </h3>
               </div>
               <ManualUploader
-                onFilesUploaded={(urls) => setMediaLibrary(prev => [...new Set([...prev, ...urls])])}
+                onFilesUploaded={(urls) => setMediaLibrary(prev => [...new Set([...urls, ...prev])])}
                 multiple={true}
               />
             </section>
