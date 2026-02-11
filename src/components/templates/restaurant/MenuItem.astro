@@ -79,7 +79,7 @@ const isMariscos = template === "mariscos";
 					{enableCart && whatsappNumber && item.price > 0 && (
 						<div class="flex justify-end pt-4">
 							<button
-								class="cart-add-btn group/btn px-8 py-3 bg-[#004AAD] text-white text-xs font-black uppercase tracking-[0.2em] transition-all hover:bg-[#FF6F00] active:scale-95 shadow-xl shadow-blue-100 hover:shadow-orange-100 flex items-center gap-3"
+								class="cart-add-btn group/btn px-8 py-3 bg-[#004AAD] text-white text-xs font-black uppercase tracking-[0.2em] transition-all hover:bg-[#FF6F00] active:scale-95 shadow-xl shadow-blue-100 hover:shadow-orange-100 flex items-center gap-3 rounded-[2rem]"
 								data-item={JSON.stringify(item)}
 							>
 								<span class="w-5 h-5 bg-white/20 flex items-center justify-center group-hover/btn:bg-white/40 font-mono text-lg">
@@ -152,7 +152,7 @@ const isMariscos = template === "mariscos";
 							${item.price}
 						</div>
 					)}
-					{enableCart && whatsappNumber && item.price > 0 && (
+					{enableCart && item.price > 0 && (
 						<button
 							class="cart-add-btn px-6 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-200"
 							data-item={JSON.stringify(item)}
@@ -197,7 +197,7 @@ const isMariscos = template === "mariscos";
 					{showPrices && (
 						<span class="text-white font-bold text-lg">${item.price}</span>
 					)}
-					{enableCart && whatsappNumber && item.price > 0 && (
+					{enableCart && item.price > 0 && (
 						<button
 							class="cart-add-btn text-[10px] uppercase font-black tracking-widest text-emerald-400 hover:text-emerald-300"
 							data-item={JSON.stringify(item)}
@@ -427,7 +427,7 @@ const isMariscos = template === "mariscos";
 						))}
 					</div>
 				)}
-				{enableCart && whatsappNumber && item.price > 0 && (
+				{enableCart && item.price > 0 && (
 					<div class="flex gap-2 mt-3">
 						<button
 							class="cart-add-btn px-6 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm"

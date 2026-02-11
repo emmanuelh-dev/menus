@@ -19,9 +19,10 @@ interface Props {
 const { place, name } = Astro.props;
 
 let { blocks = [], view_settings = {} } = place.content || {};
-const enableCart = place.content?.semantic_data?.enable_cart || false;
-const enableDelivery = place.content?.semantic_data?.enable_delivery || false;
-const whatsappNumber = place.content?.semantic_data?.whatsapp || "";
+const sd = place.content?.semantic_data || {};
+const enableCart = sd.enable_cart || sd.enableCart || false;
+const enableDelivery = sd.enable_delivery || sd.enableDelivery || false;
+const whatsappNumber = sd.whatsapp || sd.whatsappNumber || "";
 
 // Limpieza de bloques
 blocks = blocks.map((block: any) => {
@@ -253,13 +254,13 @@ const justifyClass = config.headerClass?.includes("text-left")
 
 			{/* Cart Manager - Only when enabled */}
 			{
-				(enableCart || enableDelivery) && whatsappNumber && (
+				(enableCart || enableDelivery) && (
 					<CartManager
 						client:load
 						placeName={place.name}
 						placeSlug={name}
 						placeId={place.id}
-						whatsappNumber={whatsappNumber}
+						whatsappNumber={whatsappNumber || ""}
 						deliveryEnabled={enableDelivery}
 						blocks={blocks}
 						clabe={place.content?.semantic_data?.clabe}
