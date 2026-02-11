@@ -514,7 +514,7 @@ export default function CartManager({
       check: '\u2705'          // ✅
     };
 
-    let message = `${icons.order} *ORDEN #${order.id}*\n`;
+    let message = `${icons.order} *ORDEN #${order.tracking_id || order.id}*\n`;
     message += `--------------------------\n`;
     message += `${icons.customer} *CLIENTE*\n`;
     message += `• *Nombre:* ${customerName}\n`;
@@ -554,6 +554,10 @@ export default function CartManager({
     if (orderNotes.trim()) {
       message += `\n✏️ *NOTA DEL CLIENTE:*\n${orderNotes}\n`;
     }
+    message += `\n--------------------------\n`;
+    message += `\u2705 *CONFIRMAR Y SEGUIMIENTO*\n`;
+    message += `Para ver el estatus de tu pedido:\n`;
+    message += `${window.location.origin}/pedidos/${order.uuid || order.id}\n`;
     message += `--------------------------\n`;
 
     try {

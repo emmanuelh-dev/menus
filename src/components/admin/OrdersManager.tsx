@@ -5,6 +5,8 @@ import AdminPageHeader from './AdminPageHeader';
 
 interface Order {
   id: number;
+  tracking_id?: number;
+  uuid?: string;
   customer_name: string;
   customer_phone: string;
   delivery_address: string;
@@ -137,7 +139,7 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                         </div>
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-base sm:text-lg font-bold text-slate-900">Pedido #{order.id}</h3>
+                            <h3 className="text-base sm:text-lg font-bold text-slate-900">Pedido #{order.tracking_id || order.id}</h3>
                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${config.color}`}>
                               {config.label}
                             </span>
@@ -193,6 +195,14 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
                                 title="Enviar WhatsApp"
                               >
                                 <MessageCircle size={14} />
+                              </a>
+                              <a
+                                href={`/pedidos/${order.uuid || order.id}`}
+                                target="_blank"
+                                className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                title="Ver Seguimiento (Público)"
+                              >
+                                <ExternalLink size={14} />
                               </a>
                             </div>
                           </div>

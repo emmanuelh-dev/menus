@@ -1,0 +1,86 @@
+---
+export const prerender = false;
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+import OrderTracker from "../../components/OrderTracker";
+import { supabase } from "../../lib/supabase";
+
+const { id } = Astro.params;
+
+if (!id) {
+	return Astro.redirect("/");
+}
+
+// Verificar si es un UUID o un ID numérico
+const isUUID =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+// Obtener el pedido para verificar que existe
+let query = supabase
+	.from("orders")
+	.select("*, places(name, short_name, user_id)");
+
+if (isUUID) {
+	query = query.eq("uuid", id);
+} else {
+	query = query.eq("id", id);
+}
+
+const { data: order, error } = await query.single();
+
+if (error || !order) {
+	// Si no se encuentra el pedido, redirigir o mostrar error
+	console.error("Order not found:", error);
+}
+---
+
+<DefaultLayout
+	title={order
+		? `Orden #${order.id} - ${order.places?.name}`
+		: "Orden no encontrada"}
+	description="Seguimiento de tu pedido en tiempo real"
+>
+	<div class="min-h-screen bg-slate-50 py-12 px-4">
+		<div class="max-w-xl mx-auto">
+			{
+				order ? (
+					<OrderTracker client:load orderId={Number(id)} initialOrder={order} />
+				) : (
+					<div class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl">
+						<div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="40"
+								height="40"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<>
+									<circle cx="12" cy="12" r="10" />
+									<line x1="12" y1="8" x2="12" y2="12" />
+									<line x1="12" y1="16" x2="12.01" y2="16" />
+								</>
+							</svg>
+						</div>
+						<h1 class="text-2xl font-black text-slate-900 mb-2">
+							Orden no encontrada
+						</h1>
+						<p class="text-slate-500 mb-8 px-6">
+							El enlace que intentas abrir no existe o el pedido ha sido
+							eliminado.
+						</p>
+						<a
+							href="/"
+							class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
+						>
+							Ir al inicio
+						</a>
+					</div>
+				)
+			}
+		</div>
+	</div>
+</DefaultLayout>

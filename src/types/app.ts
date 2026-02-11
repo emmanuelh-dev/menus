@@ -141,6 +141,8 @@ export interface ShippingZone {
 
 export interface Order {
   id: number;
+  tracking_id?: number;
+  uuid?: string;
   place_id: number;
   customer_name: string;
   customer_phone: string;

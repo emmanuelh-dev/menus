@@ -273,6 +273,7 @@ export default function WaiterMode({
       });
 
       if (response.ok) {
+        const result = await response.json();
         if (customerPhone && customerPhone !== '0000000000') {
           saveCustomer();
         }
@@ -291,6 +292,9 @@ export default function WaiterMode({
             cart.map(i => `• ${i.quantity}x ${i.name} - *$${i.price * i.quantity}*`).join('\n') +
             `\n\n--------------------------\n` +
             `*TOTAL: $${total}*\n` +
+            `--------------------------\n` +
+            `✅ *SEGUIMIENTO DE ORDEN:*\n` +
+            `${window.location.origin}/pedidos/${result.order.uuid || result.order.id}\n` +
             `--------------------------\n` +
             `_¡Gracias por tu preferencia!_`;
 
