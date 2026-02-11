@@ -1,6 +1,7 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
 import { createAuthenticatedClient } from '../../../lib/supabase';
+import { getEffectiveUser } from '../../../middleware/auth';
 
 const ADMIN_EMAILS = [
   "emmanuelh.dev@gmail.com",
@@ -8,18 +9,7 @@ const ADMIN_EMAILS = [
   "e805177@gmail.com",
 ];
 
-export const GET: APIRoute = async ({ params, cookies }) => {
-  // Verificar autenticación
-  const accessToken = cookies.get('sb-access-token')?.value;
-  const refreshToken = cookies.get('sb-refresh-token')?.value;
-
-  if (!accessToken || !refreshToken) {
-    return new Response(
-      JSON.stringify({ error: 'No autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
+export const GET: APIRoute = async ({ params, cookies, request }) => {
   const { id } = params;
   if (!id) {
     return new Response(
@@ -29,18 +19,30 @@ export const GET: APIRoute = async ({ params, cookies }) => {
   }
 
   try {
-    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'No autorizado' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+    const authResult = await getEffectiveUser(request, cookies);
+    if (!authResult) {
+       return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+    const { effectiveUser, isAdmin } = authResult;
     
+    // Decidir qué cliente usar
+    const accessToken = cookies.get('sb-access-token')?.value;
+    const refreshToken = cookies.get('sb-refresh-token')?.value;
+    const isMagicOrImpersonating = !accessToken || !refreshToken || (effectiveUser as any).isImpersonated;
+
+    let supabase;
+    if (isMagicOrImpersonating) {
+      const { createClient } = await import("@supabase/supabase-js");
+      supabase = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { persistSession: false } }
+      );
+    } else {
+      supabase = await createAuthenticatedClient(accessToken!, refreshToken!);
+    }
+
     // Obtener el restaurante por ID
     const { data, error } = await supabase
       .from('places')
@@ -56,7 +58,7 @@ export const GET: APIRoute = async ({ params, cookies }) => {
     }
 
     // Verificar propiedad o admin
-    if (data.user_id !== user.id && !isAdmin) {
+    if (data.user_id !== effectiveUser.id && !isAdmin) {
       return new Response(
         JSON.stringify({ error: 'No tienes permisos para ver este establecimiento' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
@@ -77,17 +79,6 @@ export const GET: APIRoute = async ({ params, cookies }) => {
 };
 
 export const PUT: APIRoute = async ({ request, params, cookies }) => {
-  // Verificar autenticación
-  const accessToken = cookies.get('sb-access-token')?.value;
-  const refreshToken = cookies.get('sb-refresh-token')?.value;
-
-  if (!accessToken || !refreshToken) {
-    return new Response(
-      JSON.stringify({ error: 'No autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
   const { id } = params;
   if (!id) {
     return new Response(
@@ -97,17 +88,29 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
   }
 
   try {
-    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'No autorizado' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+    const authResult = await getEffectiveUser(request, cookies);
+    if (!authResult) {
+       return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+    const { effectiveUser, isAdmin } = authResult;
+
+    // Decidir qué cliente usar
+    const accessToken = cookies.get('sb-access-token')?.value;
+    const refreshToken = cookies.get('sb-refresh-token')?.value;
+    const isMagicOrImpersonating = !accessToken || !refreshToken || (effectiveUser as any).isImpersonated;
+
+    let supabase;
+    if (isMagicOrImpersonating) {
+      const { createClient } = await import("@supabase/supabase-js");
+      supabase = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { persistSession: false } }
+      );
+    } else {
+      supabase = await createAuthenticatedClient(accessToken!, refreshToken!);
+    }
 
     // Verificar que el restaurante pertenezca al usuario (o sea admin)
     const { data: existingPlace } = await supabase
@@ -123,7 +126,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
 
-    if (existingPlace.user_id !== user.id && !isAdmin) {
+    if (existingPlace.user_id !== effectiveUser.id && !isAdmin) {
       return new Response(
         JSON.stringify({ error: 'No tienes permiso para editar este establecimiento' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
@@ -178,18 +181,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params, cookies }) => {
-  // Verificar autenticación
-  const accessToken = cookies.get('sb-access-token')?.value;
-  const refreshToken = cookies.get('sb-refresh-token')?.value;
-
-  if (!accessToken || !refreshToken) {
-    return new Response(
-      JSON.stringify({ error: 'No autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
+export const DELETE: APIRoute = async ({ params, cookies, request }) => {
   const { id } = params;
   if (!id) {
     return new Response(
@@ -199,17 +191,29 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
   }
 
   try {
-    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'No autorizado' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+    const authResult = await getEffectiveUser(request, cookies);
+    if (!authResult) {
+       return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+    const { effectiveUser, isAdmin } = authResult;
+
+    // Decidir qué cliente usar
+    const accessToken = cookies.get('sb-access-token')?.value;
+    const refreshToken = cookies.get('sb-refresh-token')?.value;
+    const isMagicOrImpersonating = !accessToken || !refreshToken || (effectiveUser as any).isImpersonated;
+
+    let supabase;
+    if (isMagicOrImpersonating) {
+      const { createClient } = await import("@supabase/supabase-js");
+      supabase = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { persistSession: false } }
+      );
+    } else {
+      supabase = await createAuthenticatedClient(accessToken!, refreshToken!);
+    }
 
     // Verificar propiedad o admin
     const { data: existingPlace } = await supabase
@@ -225,7 +229,7 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
       );
     }
 
-    if (existingPlace.user_id !== user.id && !isAdmin) {
+    if (existingPlace.user_id !== effectiveUser.id && !isAdmin) {
       return new Response(
         JSON.stringify({ error: 'No tienes permiso para eliminar este establecimiento' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }

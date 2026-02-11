@@ -3,7 +3,7 @@ import { ManualUploader } from '../ManualUploader';
 import { FaEye } from 'react-icons/fa';
 import { getStates } from '../../lib/supabase';
 import { formater } from '../../types/app';
-import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus, Copy, Trash2 } from 'lucide-react';
+import { Sparkles, CheckCircle2, Upload, ArrowRight, X, Search, Filter, Plus, Copy, Trash2, Zap } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select as UISelect } from '../ui/Select';
@@ -43,6 +43,7 @@ interface Restaurant {
   image?: string;
   type: string;
   short_name?: string;
+  user_id?: string;
   content?: any;
   state_id?: number | null;
   municipality_id?: number | null;
@@ -56,6 +57,8 @@ interface Restaurant {
 }
 
 export default function PlaceManager({
+  user,
+  isAdmin,
   initialRestaurants,
   totalPlaces = 0,
   loading: externalLoading,
@@ -69,6 +72,8 @@ export default function PlaceManager({
   setFilterType,
   onStartOnboarding
 }: {
+  user?: any,
+  isAdmin?: boolean,
   initialRestaurants: Restaurant[],
   totalPlaces?: number,
   loading?: boolean,
@@ -90,6 +95,41 @@ export default function PlaceManager({
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
   const isLoading = externalLoading || loading;
+
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      const fetchUsers = async () => {
+        try {
+          const res = await fetch('/api/admin/list-users');
+          const data = await res.json();
+          if (data.users) setAllUsers(data.users);
+        } catch (err) {
+          console.error('Error loading users:', err);
+        }
+      };
+      fetchUsers();
+    }
+  }, [isAdmin]);
+
+  const copyMagicLink = async (placeId?: number) => {
+    try {
+      const response = await fetch(`/api/auth/magic-link?placeId=${placeId}`);
+      const data = await response.json();
+      if (data.magicLink) {
+        let finalLink = data.magicLink;
+        if (placeId) {
+          finalLink += `&to=/admin/place/${placeId}`;
+        }
+        await navigator.clipboard.writeText(finalLink);
+        alert('¡Link de acceso rápido copiado al portapapeles!');
+      }
+    } catch (err) {
+      console.error('Error al generar magic link:', err);
+      alert('Error al generar el link de acceso.');
+    }
+  };
 
   const toggleSelect = (id: number, index: number, event?: React.MouseEvent | React.ChangeEvent) => {
     const isShiftPressed = (event as any)?.nativeEvent?.shiftKey;
@@ -184,6 +224,7 @@ export default function PlaceManager({
     image: '',
     state_id: null as number | null,
     municipality_id: null as number | null,
+    user_id: undefined as string | undefined,
     content: null as any,
   });
 
@@ -214,6 +255,7 @@ export default function PlaceManager({
         image: restaurant.image || '',
         state_id: restaurant.state_id || null,
         municipality_id: (restaurant as any).municipality_id || null,
+        user_id: restaurant.user_id,
         content: restaurant.content || null,
       });
       setStep(1); // Always step 1 for editing
@@ -235,6 +277,7 @@ export default function PlaceManager({
         image: '',
         state_id: null,
         municipality_id: null,
+        user_id: undefined,
         content: null,
       });
       setStep(1);
@@ -262,6 +305,7 @@ export default function PlaceManager({
       image: restaurant.image || '',
       state_id: restaurant.state_id || null,
       municipality_id: (restaurant as any).municipality_id || null,
+      user_id: restaurant.user_id,
       content: restaurant.content || null,
     });
     setStep(1);
@@ -640,7 +684,18 @@ export default function PlaceManager({
                       : `/${(r.type === 'cafe' || r.type === 'restaurant') ? 'menus' : (formater[r.type as keyof typeof formater] || r.type)}/${r.short_name}`}`}
                     restaurantName={r.name}
                     size="sm"
+                    slug={r.short_name}
+                    userId={user?.id}
                   />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => copyMagicLink(r.id)}
+                    className="px-2"
+                    title="Link de acceso rápido"
+                  >
+                    <Zap size={14} className="text-amber-500" />
+                  </Button>
                   <Button
                     variant="secondary"
                     size="sm"
@@ -823,6 +878,27 @@ export default function PlaceManager({
                       </div>
 
                     </div>
+
+                    {isAdmin && (
+                      <div className="pt-2 border-t border-slate-50 mt-2">
+                        <UISelect
+                          label="Dueño del Establecimiento (Solo Admin)"
+                          name="user_id"
+                          value={formData.user_id || ''}
+                          onChange={handleInputChange}
+                          options={[
+                            { value: "", label: "Sin asignar (Usa mi usuario)" },
+                            ...allUsers.map(u => ({
+                              value: u.id,
+                              label: `${u.email} ${u.business_name ? `(${u.business_name})` : ''}`
+                            }))
+                          ]}
+                        />
+                        <p className="text-[10px] text-amber-600 mt-1 font-medium italic">
+                          * Cambiar el dueño moverá este restaurante al panel del usuario seleccionado.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 gap-4">
                       <Input

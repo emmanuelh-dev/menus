@@ -7,15 +7,22 @@ interface QRDownloadButtonProps {
   restaurantName: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'outline' | 'solid';
+  slug?: string;
+  userId?: string;
 }
 
 export default function QRDownloadButton({
   url,
   restaurantName,
   size = 'md',
-  variant = 'outline'
+  variant = 'outline',
+  slug,
+  userId
 }: QRDownloadButtonProps) {
   const qrRef = useRef<HTMLDivElement>(null);
+
+  // Si tenemos slug, usamos el endpoint de tracking
+  const finalUrl = slug ? `${typeof window !== 'undefined' ? window.location.origin : ''}/qr/${slug}${userId ? `?u=${userId}` : ''}` : url;
 
   const downloadQR = () => {
     const canvas = qrRef.current?.querySelector('canvas');
@@ -49,7 +56,7 @@ export default function QRDownloadButton({
       {/* Hidden QR for generation */}
       <div ref={qrRef} className="hidden">
         <QRCodeCanvas
-          value={url}
+          value={finalUrl}
           size={1024}
           level="H"
           includeMargin={true}
@@ -59,11 +66,11 @@ export default function QRDownloadButton({
       <button
         onClick={downloadQR}
         className={`flex items-center justify-center font-bold rounded-lg transition-all active:scale-95 ${sizeClasses[size]} ${variantClasses[variant]}`}
-        title="Descargar código QR"
+        title={slug ? "Descargar QR con seguimiento" : "Descargar QR directo"}
       >
         <QrCode size={size === 'sm' ? 12 : 14} />
         <span>QR</span>
-        <Download size={size === 'sm' ? 10 : 12} className="opacity-50" />
+        <Download size={size === 'sm' ? 10 : 12} className={`opacity-50 ${slug ? 'text-emerald-500' : ''}`} />
       </button>
     </div>
   );

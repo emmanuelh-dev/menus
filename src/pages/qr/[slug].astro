@@ -1,0 +1,57 @@
+---
+export const prerender = false;
+
+// Redireccionador invisible con tracking server-side
+const { slug } = Astro.params;
+const url = new URL(Astro.request.url);
+const userId = url.searchParams.get("u") || "anonymous";
+const tableId = url.searchParams.get("t") || "";
+
+import { supabase } from "../../lib/supabase";
+
+// 1. Obtener datos del lugar
+const { data: place } = await supabase
+	.from("places")
+	.select("id, name, short_name")
+	.eq("short_name", slug)
+	.single();
+
+if (!place) {
+	return Astro.redirect("/404");
+}
+
+// 2. Tracking Server-Side (Umami API)
+// Esto es 100% invisible para el usuario y no depende de scripts en el cliente
+const targetUrl = `/menus/${slug}${url.search}`;
+
+try {
+	// Intentamos trackear en el servidor. Esto evita que el usuario vea pantallas de carga.
+	// Usamos fetch nativo de Node/Astro
+	fetch("https://cloud.umami.is/api/send", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"User-Agent": Astro.request.headers.get("user-agent") || "",
+		},
+		body: JSON.stringify({
+			type: "event",
+			payload: {
+				website: "b5a89fc6-d2ad-490e-b6f0-e608f3330d6b",
+				url: `/qr/${slug}`,
+				name: "QR Scan",
+				data: {
+					restaurant: place.name,
+					slug: place.short_name,
+					user_id: userId,
+					table_id: tableId,
+				},
+			},
+		}),
+	}).catch((e) => console.error("Umami Error:", e));
+} catch (e) {
+	console.error("Tracking Error:", e);
+}
+
+// 3. Redirección inmediata (Zero Fricción)
+return Astro.redirect(targetUrl);
+---

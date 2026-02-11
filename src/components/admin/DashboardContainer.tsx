@@ -89,6 +89,8 @@ export default function DashboardContainer() {
   return (
     <div className="flex flex-col gap-6 pb-20">
       <PlaceManager
+        user={data?.user}
+        isAdmin={data?.isAdmin}
         initialRestaurants={places}
         totalPlaces={data?.totalPlaces || 0}
         loading={loading}

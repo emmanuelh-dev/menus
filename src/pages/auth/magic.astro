@@ -1,0 +1,53 @@
+---
+export const prerender = false;
+
+// Esta página permite login automático vía Magic Tokens permanentes
+// Ejemplo: /auth/magic?t=MAGIC_TOKEN&p=PLACE_ID
+
+const url = new URL(Astro.request.url);
+const magicToken = url.searchParams.get("t");
+const placeId = url.searchParams.get("p");
+const redirectPath = url.searchParams.get("to") || "/admin/dashboard";
+
+// Fallback para el sistema anterior de tokens temporales (opcional)
+const accessToken = url.searchParams.get("at");
+const refreshToken = url.searchParams.get("rt");
+
+const maxAge = 30 * 24 * 60 * 60; // 30 días
+
+if (magicToken) {
+	// Establecemos el token de acceso permanente
+	Astro.cookies.set("sb-magic-token", magicToken, {
+		path: "/",
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge,
+	});
+
+	return Astro.redirect(redirectPath);
+}
+
+if (accessToken && refreshToken) {
+	Astro.cookies.set("sb-access-token", accessToken, {
+		path: "/",
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge,
+	});
+
+	Astro.cookies.set("sb-refresh-token", refreshToken, {
+		path: "/",
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge,
+	});
+
+	return Astro.redirect(redirectPath);
+}
+
+// Si no hay nada válido, mandamos al login
+return Astro.redirect("/admin/login?error=invalid_token");
+---

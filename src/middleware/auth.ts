@@ -1,46 +1,55 @@
 export const prerender = false;
 
 import { createAuthenticatedClient, createSupabaseClient } from '../lib/supabase';
+import { createClient, type User } from '@supabase/supabase-js';
 
 export async function isAuthenticated(request: Request, cookies: any) {
   const accessToken = cookies.get('sb-access-token')?.value;
   const refreshToken = cookies.get('sb-refresh-token')?.value;
+  const magicAuthToken = cookies.get('sb-magic-token')?.value;
+
+  // 1. Prioridad: Magic Token (Permanente y Cero Fricción)
+  if (magicAuthToken) {
+    const supabaseAdmin = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false } }
+    );
+
+    // Verificar si el token existe en algún restaurante
+    const { data: place } = await supabaseAdmin
+      .from('places')
+      .select('user_id, content')
+      .contains('content', { admin: { magic_token: magicAuthToken } })
+      .single();
+
+    if (place) {
+      console.log('✅ Autenticado vía Magic Token Permanente');
+      return true;
+    }
+  }
 
   if (!accessToken || !refreshToken) {
-    console.log('❌ No hay tokens en las cookies');
     return false;
   }
 
-  console.log('🔍 Verificando autenticación con tokens existentes');
-
   try {
-    // Crear cliente de Supabase con los tokens de la sesión
     const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    
-    // Verificar si el token es válido
     const { data, error } = await supabase.auth.getUser();
 
     if (error || !data?.user) {
-      console.warn('⚠️ Token inválido, intentando refrescar sesión...');
-      
-      // Intentar refrescar la sesión
       const supabaseRefresh = createSupabaseClient();
       const { data: refreshData, error: refreshError } = await supabaseRefresh.auth.refreshSession({
         refresh_token: refreshToken,
       });
 
       if (refreshError || !refreshData?.session) {
-        console.error('🚨 Error al refrescar sesión:', refreshError?.message || 'No se pudo obtener una nueva sesión');
         return false;
       }
 
-      console.log('✅ Sesión refrescada correctamente, actualizando cookies');
-
-      // Actualizar cookies con los nuevos tokens
-      // No usamos httpOnly para que sean accesibles desde JavaScript
       cookies.set('sb-access-token', refreshData.session.access_token, {
         path: '/',
-        httpOnly: false,
+        httpOnly: true,
         secure: true,
         sameSite: 'strict',
         maxAge: refreshData.session.expires_in,
@@ -48,7 +57,7 @@ export async function isAuthenticated(request: Request, cookies: any) {
 
       cookies.set('sb-refresh-token', refreshData.session.refresh_token, {
         path: '/',
-        httpOnly: false,
+        httpOnly: true,
         secure: true,
         sameSite: 'strict',
         maxAge: 60 * 60 * 24 * 30,
@@ -57,51 +66,59 @@ export async function isAuthenticated(request: Request, cookies: any) {
       return true;
     }
 
-    // 1. Verificar si el usuario es administrador
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', data.user.id)
-      .single();
-
-    console.log('✅ Usuario autenticado correctamente');
-
-    // 2. Manejo de Impersonación (Solo para Admins)
-    const { isAdmin } = await import("../lib/admin");
-    if (isAdmin(data.user.email)) {
-      const impersonateId = cookies.get('sb-impersonate-id')?.value;
-      if (impersonateId) {
-        console.log(`👤 MODO IMPERSONACIÓN ACTIVO: Simulando usuario ${impersonateId}`);
-      }
-    }
-
     return true;
   } catch (e) {
-    console.error('🚨 Error inesperado en autenticación:', e);
     return false;
   }
 }
 
-/**
- * Obtiene el usuario real y el usuario efectivo (impersonado) si aplica.
- * Útil para APIs que necesitan saber actuar en nombre de otro.
- */
 export async function getEffectiveUser(request: Request, cookies: any) {
   const accessToken = cookies.get('sb-access-token')?.value;
   const refreshToken = cookies.get('sb-refresh-token')?.value;
-
-  if (!accessToken || !refreshToken) return null;
+  const magicAuthToken = cookies.get('sb-magic-token')?.value;
 
   try {
-    const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    let user: User | null = null;
+    let isRealAdmin = false;
+
+    // 1. Intentar por Magic Token
+    if (magicAuthToken) {
+      const supabaseAdmin = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { persistSession: false } }
+      );
+
+      const { data: place } = await supabaseAdmin
+        .from('places')
+        .select('user_id')
+        .contains('content', { admin: { magic_token: magicAuthToken } })
+        .single();
+
+      if (place) {
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(place.user_id);
+        if (userData?.user) {
+          user = userData.user;
+          const { isAdmin } = await import("../lib/admin");
+          isRealAdmin = isAdmin(user.email || '');
+        }
+      }
+    }
+
+    // 2. Fallback a sesión normal
+    if (!user && accessToken && refreshToken) {
+      const supabase = await createAuthenticatedClient(accessToken, refreshToken);
+      const { data } = await supabase.auth.getUser();
+      user = data?.user;
+      if (user) {
+        const { isAdmin } = await import("../lib/admin");
+        isRealAdmin = isAdmin(user.email || '');
+      }
+    }
+
     if (!user) return null;
 
     const impersonateId = cookies.get('sb-impersonate-id')?.value;
-    
-    const { isAdmin } = await import("../lib/admin");
-    const isRealAdmin = isAdmin(user.email);
 
     if (isRealAdmin && impersonateId) {
       return {

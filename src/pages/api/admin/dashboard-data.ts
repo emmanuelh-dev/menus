@@ -5,22 +5,6 @@ import { createAuthenticatedClient } from "../../../lib/supabase";
 
 export const GET: APIRoute = async ({ cookies, request }) => {
 	try {
-		const accessToken = cookies.get("sb-access-token")?.value;
-		const refreshToken = cookies.get("sb-refresh-token")?.value;
-
-		if (!accessToken || !refreshToken) {
-			return new Response(JSON.stringify({ error: "Unauthorized" }), {
-				status: 401,
-			});
-		}
-
-		const url = new URL(request.url);
-		const page = parseInt(url.searchParams.get("page") || "1");
-		const pageSize = parseInt(url.searchParams.get("pageSize") || "50");
-		const search = url.searchParams.get("search") || "";
-		const sortBy = url.searchParams.get("sortBy") || "newest";
-		const filterType = url.searchParams.get("type") || "";
-
 		const { getEffectiveUser } = await import("../../../middleware/auth");
 		const authResult = await getEffectiveUser(request, cookies);
 
@@ -32,12 +16,23 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 
 		const { realUser: user, effectiveUser, isAdmin: isRealAdmin } = authResult;
 		const userId = effectiveUser.id;
-		const isImpersonating = 'isImpersonated' in effectiveUser && effectiveUser.isImpersonated;
-		const isAdminForUI = isImpersonating ? false : isRealAdmin;
+        const isImpersonating = !!(effectiveUser as any).isImpersonated;
+        const isAdminForUI = isImpersonating ? false : isRealAdmin;
 
-		// Si estamos impersonando, usamos el client de servicio para poder ver data de otros
+		const url = new URL(request.url);
+		const page = parseInt(url.searchParams.get("page") || "1");
+		const pageSize = parseInt(url.searchParams.get("pageSize") || "50");
+		const search = url.searchParams.get("search") || "";
+		const sortBy = url.searchParams.get("sortBy") || "newest";
+		const filterType = url.searchParams.get("type") || "";
+		
+		const accessToken = cookies.get("sb-access-token")?.value;
+		const refreshToken = cookies.get("sb-refresh-token")?.value;
+		const isMagicOrImpersonating = !accessToken || !refreshToken || isImpersonating;
+
+		// Si es Magic Link o Impersonación, usamos Service Role para saltar el RLS y ver la data del usuario destino
 		let supabase;
-		if (isImpersonating) {
+		if (isMagicOrImpersonating) {
 			const { createClient } = await import("@supabase/supabase-js");
 			supabase = createClient(
 				import.meta.env.PUBLIC_SUPABASE_URL,
@@ -45,7 +40,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 				{ auth: { persistSession: false } }
 			);
 		} else {
-			supabase = await createAuthenticatedClient(accessToken, refreshToken);
+			supabase = await createAuthenticatedClient(accessToken!, refreshToken!);
 		}
 
 		let query = supabase.from("places").select(
