@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark, Plus, MessageCircle } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle, Phone, MapPin, Calendar, ExternalLink, Coins, CreditCard, Landmark, Plus, MessageCircle, Search, ArrowLeft, ChevronDown, X, Trash2, Heart, Minus, AlertCircle, Receipt, RefreshCcw, LogOut, ShoppingCart } from 'lucide-react';
 import WaiterMode from './WaiterMode';
 import AdminPageHeader from './AdminPageHeader';
 
@@ -15,6 +15,7 @@ interface Order {
   items: any[];
   subtotal: number;
   total: number;
+  delivery_type?: 'delivery' | 'pickup';
   status: 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
   notes?: string;
   payment_method?: 'cash' | 'card' | 'transfer';
@@ -211,12 +212,18 @@ export default function OrdersManager({ placeId }: { placeId: number }) {
 
                         <div>
                           <label className="text-[10px] font-bold uppercase text-slate-400 flex items-center gap-1.5 mb-1.5">
-                            <MapPin size={10} />
-                            S entrega
+                            {order.delivery_type === 'pickup' ? <ShoppingCart size={10} /> : <MapPin size={10} />}
+                            {order.delivery_type === 'pickup' ? 'Tipo de Pedido' : 'Entrega'}
                           </label>
-                          <p className="text-sm text-slate-700 font-medium">{order.delivery_address}</p>
-                          {order.delivery_colony && (
-                            <p className="text-xs text-slate-500">Colonia: {order.delivery_colony}</p>
+                          {order.delivery_type === 'pickup' ? (
+                            <span className="inline-flex items-center px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-100">
+                              PARA LLEVAR / RECOGER
+                            </span>
+                          ) : (
+                            <p className="text-sm text-slate-700 font-medium">{order.delivery_address || 'Sin dirección'}</p>
+                          )}
+                          {order.delivery_type !== 'pickup' && order.delivery_colony && (
+                            <p className="text-xs text-slate-500 mt-0.5">Colonia: {order.delivery_colony}</p>
                           )}
                         </div>
 

@@ -944,6 +944,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         { id: 'modern', name: 'Moderno', desc: 'Aire de revista', icon: '✨' },
                         { id: 'elegant', name: 'Gourmet', desc: 'Estilo Premium', icon: '🍷' },
                         { id: 'vibrant', name: 'Vibrant (Lalo\'s)', desc: 'Tarjetas y color', icon: '🎨' },
+                        { id: 'mariscos', name: 'Mariscos Coastal', desc: 'Azul, naranja y playa', icon: '🌊' },
                         { id: 'uber', name: 'Uber (Dark)', desc: 'Elegante oscuro', icon: '⚫' },
                         { id: 'didi', name: 'DiDi (Light)', desc: 'Limpio y naranja', icon: '🟠' },
                         { id: 'tienda', name: 'Tienda', desc: 'Categorías visuales', icon: '🏪' },

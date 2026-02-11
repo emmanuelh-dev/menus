@@ -3,7 +3,7 @@ import {
   Package, Clock, CheckCircle, Truck, XCircle,
   MapPin, Phone, MessageCircle, ArrowLeft,
   ChevronRight, Receipt, User, ExternalLink,
-  Coins, CreditCard, Landmark
+  Coins, CreditCard, Landmark, ShoppingCart
 } from 'lucide-react';
 
 interface Order {
@@ -23,6 +23,7 @@ interface Order {
   created_at: string;
   place_id: number;
   uuid?: string;
+  delivery_type?: 'delivery' | 'pickup';
   places?: {
     name: string;
     short_name: string;
@@ -163,7 +164,7 @@ export default function OrderTracker({ orderId, initialOrder }: { orderId: strin
 
         {/* Admin Controls */}
         {isAdmin && (
-          <div className="bg-slate-50 rounded-2xl p-6 mb-8 border border-slate-200/50">
+          <div className=" rounded-2xl mb-8 ">
             <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest flex items-center justify-between">
               <span className="flex items-center gap-2"><User size={12} /> Panel de Control (Dueño)</span>
               {user && <span className="lowercase opacity-50">{user.email}</span>}
@@ -284,12 +285,16 @@ export default function OrderTracker({ orderId, initialOrder }: { orderId: strin
 
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-            <MapPin size={20} />
+            {order.delivery_type === 'pickup' ? <ShoppingCart size={20} /> : <MapPin size={20} />}
           </div>
           <div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Entrega en</p>
-            <p className="font-bold text-slate-900">{order.delivery_address || 'Consumo Local'}</p>
-            {order.delivery_colony && <p className="text-xs text-slate-500">{order.delivery_colony}</p>}
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              {order.delivery_type === 'pickup' ? 'Tipo de Pedido' : 'Entrega en'}
+            </p>
+            <p className="font-bold text-slate-900">
+              {order.delivery_type === 'pickup' ? 'Pasar a Recoger (Para Llevar)' : (order.delivery_address || 'Entrega a domicilio')}
+            </p>
+            {order.delivery_type === 'delivery' && order.delivery_colony && <p className="text-xs text-slate-500">{order.delivery_colony}</p>}
           </div>
         </div>
       </div>

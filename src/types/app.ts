@@ -156,6 +156,7 @@ export interface Order {
   total: number;
   notes?: string;
   payment_method?: 'cash' | 'card' | 'transfer';
+  delivery_type?: 'delivery' | 'pickup';
   status: 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;

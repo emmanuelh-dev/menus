@@ -462,6 +462,7 @@ export default function CartManager({
         total,
         notes: cart.map(i => i.notes).filter(Boolean).join('. '),
         payment_method: paymentMethod,
+        delivery_type: wantsDelivery ? 'delivery' : 'pickup',
         status: 'pending'
       };
 
@@ -908,13 +909,28 @@ export default function CartManager({
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">¿Es pedido a domicilio?</h3>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">¿Cómo prefieres tu pedido?</h3>
+                    <div className="grid grid-cols-2 gap-3">
                       <button
-                        onClick={() => setWantsDelivery(!wantsDelivery)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${wantsDelivery ? 'bg-green-500' : 'bg-slate-200'}`}
+                        onClick={() => setWantsDelivery(true)}
+                        className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all group ${wantsDelivery ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
                       >
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${wantsDelivery ? 'translate-x-6' : 'translate-x-1'}`} />
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${wantsDelivery ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                          <Truck className="w-4 h-4" />
+                        </div>
+                        <span className="text-[10px] font-bold">A Domicilio</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setWantsDelivery(false);
+                          setShippingZone(null);
+                        }}
+                        className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all group ${!wantsDelivery ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${!wantsDelivery ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                          <ShoppingCart className="w-4 h-4" />
+                        </div>
+                        <span className="text-[10px] font-bold tracking-tight">Pasar a Recoger</span>
                       </button>
                     </div>
 
