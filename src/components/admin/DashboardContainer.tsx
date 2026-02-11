@@ -39,11 +39,12 @@ export default function DashboardContainer() {
 
         const response = await fetch(`/api/admin/dashboard-data?${params.toString()}`);
         if (response.status === 401) {
+          // Redirigir silenciosamente sin mostrar pantalla de error
           window.location.href = "/admin/login";
           return;
         }
         if (!response.ok) {
-          throw new Error("Error al cargar los datos");
+          throw new Error("Cargando tu información...");
         }
         const result = await response.json();
         setData(result);
@@ -53,7 +54,15 @@ export default function DashboardContainer() {
           setShowOnboarding(true);
         }
       } catch (err: any) {
-        setError(err.message);
+        // Ignorar errores de red temporales o de abort
+        if (err.name !== 'AbortError') {
+          // Si el mensaje es "Cargando...", lo tratamos como loading extendido
+          if (err.message === "Cargando tu información...") {
+            // No hacemos nada, dejamos el skeleton
+          } else {
+            setError(err.message);
+          }
+        }
       } finally {
         setLoading(false);
       }

@@ -97,7 +97,7 @@ export function ImageSelector({
                 <p className="text-sm text-gray-400">No hay imágenes en la biblioteca. ¡Sube algunas arriba!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4  gap-3">
                 {existingImages.map((url, idx) => {
                   const isSelected = selectedUrls.includes(url);
                   return (
@@ -122,8 +122,8 @@ export function ImageSelector({
 
                       {/* Hover Indicator (Only for non-selected items) */}
                       {!isSelected && (
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                          <div className="bg-white/90 text-gray-900 p-2 rounded-xl opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200">
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-end justify-end">
+                          <div className="bg-white/90 text-gray-900 p-1  opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 rounded-full overflow-clip m-1">
                             <PiPlus className="w-5 h-5" />
                           </div>
                         </div>

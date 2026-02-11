@@ -10,6 +10,17 @@ function AdminHeader() {
 
   const [impersonating, setImpersonating] = useState<any>(null);
   const [isMagicSession, setIsMagicSession] = useState(false);
+  const [isMagicBannerVisible, setIsMagicBannerVisible] = useState(false);
+
+  useEffect(() => {
+    // Si el banner es visible, ocultarlo a los 5 segundos
+    if (isMagicBannerVisible) {
+      const timer = setTimeout(() => {
+        setIsMagicBannerVisible(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isMagicBannerVisible]);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
@@ -55,6 +66,10 @@ function AdminHeader() {
         }
         if (data.isMagic) {
           setIsMagicSession(true);
+          // Solo mostrar banner si NO estamos impersonando (para evitar doble banner)
+          if (!data.impersonating) {
+            setIsMagicBannerVisible(true);
+          }
         }
       } catch (e) {
         console.error("Error fetching user", e);
@@ -128,8 +143,8 @@ function AdminHeader() {
         </div>
       )}
 
-      {/* Banner de Magic Session */}
-      {isMagicSession && !impersonating && (
+      {/* Banner de Magic Session (Se oculta en 5s) */}
+      {isMagicBannerVisible && !impersonating && (
         <div className="fixed top-0 left-0 right-0 bg-amber-500 text-white px-4 py-2 z-[300] flex items-center justify-center gap-4 shadow-lg animate-in fade-in slide-in-from-top duration-300">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 fill-current" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -146,7 +161,7 @@ function AdminHeader() {
         </div>
       )}
 
-      <div className={`fixed ${impersonating || isMagicSession ? 'top-12' : 'top-1'} left-3 z-50 transition-all duration-300`}>
+      <div className={`fixed ${impersonating || isMagicBannerVisible ? 'top-12' : 'top-1'} left-3 z-50 transition-all duration-300`}>
         <button
           onClick={() => {
             const newState = !isOpen;
