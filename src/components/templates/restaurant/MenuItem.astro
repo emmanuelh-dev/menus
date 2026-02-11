@@ -23,34 +23,33 @@ const isMariscos = template === "mariscos";
 {
 	isMariscos && (
 		<div
-			class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-blue-900/5 border border-blue-50 mb-8 relative overflow-hidden group hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-500"
+			class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-blue-900/5 mb-8 relative overflow-hidden group"
 			data-item-id={item.id}
 		>
 			<div class="flex flex-col sm:flex-row gap-8">
 				{item.image && (
-					<div class="relative shrink-0 w-full sm:w-48 h-48 sm:h-48 rounded-[2rem] overflow-hidden shadow-lg border-4 border-white rotate-1 group-hover:rotate-0 transition-transform duration-500">
+					<div class="relative shrink-0 w-full sm:w-48 h-48 sm:h-48 overflow-hidden bg-gray-50 flex items-center justify-center border-0 rounded-none">
 						<Image
 							src={item.image}
 							alt={item.name}
 							width={600}
 							height={600}
-							class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
+							class="w-full h-full object-cover transition-none rounded-[1.5rem]"
 							loading="lazy"
 							format="webp"
 							quality={90}
 						/>
-						<div class="absolute inset-0 bg-gradient-to-t from-[#004AAD]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 					</div>
 				)}
 
 				<div class="flex-1 min-w-0 flex flex-col justify-between py-2">
 					<div>
 						<div class="flex justify-between items-start mb-3">
-							<h3 class="text-2xl font-black text-[#002B5B] tracking-tight leading-none group-hover:text-[#004AAD] transition-colors">
+							<h3 class="text-2xl font-black text-[#002B5B] tracking-tight leading-none uppercase">
 								{item.name}
 							</h3>
 							{showPrices && item.price > 0 && (
-								<div class="bg-[#FF6F00] text-white px-4 py-1.5 rounded-full font-black text-xl shadow-lg shadow-orange-100 -rotate-3 group-hover:rotate-0 transition-transform">
+								<div class="bg-[#FF6F00] text-white px-4 py-1.5 font-black text-xl shadow-lg shadow-orange-100">
 									${item.price}
 								</div>
 							)}
@@ -69,7 +68,7 @@ const isMariscos = template === "mariscos";
 						{item.options && item.options.length > 0 && (
 							<div class="mb-5 flex flex-wrap gap-2">
 								{item.options.map((opt: any) => (
-									<div class="bg-blue-50 text-[10px] text-[#004AAD] px-3 py-1 rounded-full font-black uppercase tracking-wider border border-blue-100">
+									<div class="bg-blue-50 text-[10px] text-[#004AAD] px-3 py-1 font-black uppercase tracking-wider border border-blue-100">
 										{opt.name}: {opt.values.join(", ")}
 									</div>
 								))}
@@ -80,10 +79,10 @@ const isMariscos = template === "mariscos";
 					{enableCart && whatsappNumber && item.price > 0 && (
 						<div class="flex justify-end pt-4">
 							<button
-								class="cart-add-btn group/btn px-8 py-3 bg-[#004AAD] text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all hover:bg-[#FF6F00] hover:scale-105 active:scale-95 shadow-xl shadow-blue-100 hover:shadow-orange-100 flex items-center gap-3"
+								class="cart-add-btn group/btn px-8 py-3 bg-[#004AAD] text-white text-xs font-black uppercase tracking-[0.2em] transition-all hover:bg-[#FF6F00] active:scale-95 shadow-xl shadow-blue-100 hover:shadow-orange-100 flex items-center gap-3"
 								data-item={JSON.stringify(item)}
 							>
-								<span class="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center group-hover/btn:bg-white/40">
+								<span class="w-5 h-5 bg-white/20 flex items-center justify-center group-hover/btn:bg-white/40 font-mono text-lg">
 									+
 								</span>
 								Agregar
@@ -93,9 +92,9 @@ const isMariscos = template === "mariscos";
 				</div>
 			</div>
 
-			{/* Decorative Elements */}
-			<div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 -z-10 group-hover:bg-orange-50 transition-colors" />
-			<div class="absolute bottom-0 left-0 w-24 h-24 bg-[#FF6F00]/5 rounded-full -ml-12 -mb-12 -z-10" />
+			{/* Decorative Elements - Subtle */}
+			<div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 -mr-16 -mt-16 -z-10" />
+			<div class="absolute bottom-0 left-0 w-24 h-24 bg-[#FF6F00]/5 -ml-12 -mb-12 -z-10" />
 		</div>
 	)
 }
@@ -393,7 +392,7 @@ const isMariscos = template === "mariscos";
 }
 
 {
-	!isVibrant && !isUber && !isDidi && !isTienda && (
+	!isMariscos && !isVibrant && !isUber && !isDidi && !isTienda && (
 		<div
 			class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item mb-12"
 			data-item-id={item.id}
