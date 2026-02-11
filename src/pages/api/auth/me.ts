@@ -13,10 +13,12 @@ export const GET: APIRoute = async ({ cookies, request }) => {
     }
 
     const { realUser, effectiveUser, isAdmin } = result;
+    const isMagic = !!cookies.get('sb-magic-token')?.value;
 
     return new Response(JSON.stringify({ 
       user: realUser, 
       isAdmin,
+      isMagic,
       impersonating: effectiveUser.id !== realUser.id ? effectiveUser : null
     }), { status: 200 });
   } catch (error) {

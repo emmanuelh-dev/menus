@@ -14,6 +14,8 @@ export const POST: APIRoute = async ({ cookies }) => {
 
     cookies.delete("sb-access-token", { path: "/" });
     cookies.delete("sb-refresh-token", { path: "/" });
+    cookies.delete("sb-magic-token", { path: "/" });
+    cookies.delete("sb-impersonate-id", { path: "/" });
 
     return new Response(
       JSON.stringify({ success: true }),
@@ -24,6 +26,8 @@ export const POST: APIRoute = async ({ cookies }) => {
     
     cookies.delete("sb-access-token", { path: "/" });
     cookies.delete("sb-refresh-token", { path: "/" });
+    cookies.delete("sb-magic-token", { path: "/" });
+    cookies.delete("sb-impersonate-id", { path: "/" });
     
     return new Response(
       JSON.stringify({ success: true }),
