@@ -9,6 +9,7 @@ function AdminHeader() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   const [impersonating, setImpersonating] = useState<any>(null);
+  const [isMagicSession, setIsMagicSession] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
@@ -51,6 +52,9 @@ function AdminHeader() {
         }
         if (data.impersonating) {
           setImpersonating(data.impersonating);
+        }
+        if (data.isMagic) {
+          setIsMagicSession(true);
         }
       } catch (e) {
         console.error("Error fetching user", e);
@@ -124,7 +128,25 @@ function AdminHeader() {
         </div>
       )}
 
-      <div className={`fixed ${impersonating ? 'top-12' : 'top-1'} left-3 z-50 transition-all duration-300`}>
+      {/* Banner de Magic Session */}
+      {isMagicSession && !impersonating && (
+        <div className="fixed top-0 left-0 right-0 bg-amber-500 text-white px-4 py-2 z-[300] flex items-center justify-center gap-4 shadow-lg animate-in fade-in slide-in-from-top duration-300">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 fill-current" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Sesión de Acceso Rápido (Magic Link)
+          </div>
+          <button
+            onClick={handleLogout}
+            className="bg-white text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-amber-50 transition-all active:scale-95"
+          >
+            Salir
+          </button>
+        </div>
+      )}
+
+      <div className={`fixed ${impersonating || isMagicSession ? 'top-12' : 'top-1'} left-3 z-50 transition-all duration-300`}>
         <button
           onClick={() => {
             const newState = !isOpen;

@@ -81,8 +81,19 @@ export async function getEffectiveUser(request: Request, cookies: any) {
     let user: User | null = null;
     let isRealAdmin = false;
 
-    // 1. Intentar por Magic Token
-    if (magicAuthToken) {
+    // 1. Intentar sesión normal (Prioridad Alta)
+    if (accessToken && refreshToken) {
+      const supabase = await createAuthenticatedClient(accessToken, refreshToken);
+      const { data } = await supabase.auth.getUser();
+      user = data?.user || null;
+      if (user) {
+        const { isAdmin } = await import("../lib/admin");
+        isRealAdmin = isAdmin(user.email || '');
+      }
+    }
+
+    // 2. Si no hay sesión normal, intentar Magic Token
+    if (!user && magicAuthToken) {
       const supabaseAdmin = createClient(
         import.meta.env.PUBLIC_SUPABASE_URL,
         import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -102,17 +113,6 @@ export async function getEffectiveUser(request: Request, cookies: any) {
           const { isAdmin } = await import("../lib/admin");
           isRealAdmin = isAdmin(user.email || '');
         }
-      }
-    }
-
-    // 2. Fallback a sesión normal
-    if (!user && accessToken && refreshToken) {
-      const supabase = await createAuthenticatedClient(accessToken, refreshToken);
-      const { data } = await supabase.auth.getUser();
-      user = data?.user;
-      if (user) {
-        const { isAdmin } = await import("../lib/admin");
-        isRealAdmin = isAdmin(user.email || '');
       }
     }
 
