@@ -1,0 +1,220 @@
+---
+export const prerender = false;
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+
+const currentTemplate = Astro.url.searchParams.get("template") || "default";
+const currentType = Astro.url.searchParams.get("type") || "restaurant";
+
+const seo = {
+  title: "Plantillas de Menú Digital | Ejemplos por plantilla",
+  description: "Explora ejemplos de plantillas de menú digital y cómo usar secciones destacadas según el estilo elegido.",
+  keywords: "plantillas menu digital, ejemplos menu, templates menu, carta digital",
+};
+
+const restaurantTemplates = [
+  {
+    id: "default",
+    name: "Tradicional",
+    description: "Limpio y elegante para cualquier menú",
+    palette: ["#FCFCFC", "#1A1A1A", "#EF4444"],
+    featuredTitle: "Especialidades",
+    featuredItems: ["Ribeye a la parrilla", "Pasta de la casa", "Cheesecake artesanal"],
+    recommendation: "Ideal para restaurantes generales y cartas con muchas categorías",
+  },
+  {
+    id: "modern",
+    name: "Moderno",
+    description: "Editorial, fuerte en tipografía y contraste",
+    palette: ["#FFFFFF", "#111827", "#2563EB"],
+    featuredTitle: "Selección del Chef",
+    featuredItems: ["Salmón sellado", "Bowl signature", "Lasaña premium"],
+    recommendation: "Funciona muy bien en conceptos contemporáneos",
+  },
+  {
+    id: "elegant",
+    name: "Gourmet",
+    description: "Serif y tonos cálidos para una experiencia premium",
+    palette: ["#FAFAF9", "#1C1917", "#B45309"],
+    featuredTitle: "Recomendaciones",
+    featuredItems: ["Filete trufado", "Risotto cremoso", "Volcán de chocolate"],
+    recommendation: "Recomendado para fine dining o bistró",
+  },
+  {
+    id: "cafesoso",
+    name: "Cafetería",
+    description: "Cálido, cremoso y visualmente acogedor",
+    palette: ["#F8F3EC", "#3E2723", "#6D4C41"],
+    featuredTitle: "Favoritos de la Barra",
+    featuredItems: ["Flat White", "Matcha latte", "Croissant de mantequilla"],
+    recommendation: "Pensado para coffee shops y panadería de especialidad",
+  },
+  {
+    id: "vibrant",
+    name: "Vibrant",
+    description: "Alto color y tarjetas para menús dinámicos",
+    palette: ["#F4F7F4", "#0F172A", "#16A34A"],
+    featuredTitle: "Top del Día",
+    featuredItems: ["Burger doble", "Tacos mixtos", "Limonada especial"],
+    recommendation: "Útil para conceptos jóvenes y promociones frecuentes",
+  },
+  {
+    id: "mariscos",
+    name: "Mariscos Coastal",
+    description: "Azules oceánicos y acento naranja",
+    palette: ["#F0F7FF", "#002B5B", "#FF6F00"],
+    featuredTitle: "Pesca del Día",
+    featuredItems: ["Tostada de atún", "Aguachile verde", "Pulpo zarandeado"],
+    recommendation: "Diseñada para marisquerías y cocina del mar",
+  },
+  {
+    id: "uber",
+    name: "Uber Dark",
+    description: "Oscura, limpia y orientada a conversión",
+    palette: ["#121212", "#FFFFFF", "#10B981"],
+    featuredTitle: "Más pedidos",
+    featuredItems: ["Combo familiar", "Hamburguesa premium", "Papas loaded"],
+    recommendation: "Buena para delivery y operación nocturna",
+  },
+  {
+    id: "didi",
+    name: "DiDi Light",
+    description: "Clara, rápida y muy legible",
+    palette: ["#F8F8F8", "#111827", "#FF5B00"],
+    featuredTitle: "Recomendados",
+    featuredItems: ["Combo ejecutivo", "Wrap de pollo", "Papas gajo"],
+    recommendation: "Excelente para catálogos con mucho volumen",
+  },
+  {
+    id: "tienda",
+    name: "Tienda",
+    description: "Navegación visual por categorías",
+    palette: ["#1A1A1A", "#FFFFFF", "#DC2626"],
+    featuredTitle: "Destacados",
+    featuredItems: ["Producto estrella", "Combo semanal", "Novedad"],
+    recommendation: "Pensada para catálogo y retail",
+  },
+];
+
+const motelTemplates = [
+  {
+    id: "default",
+    name: "Urbano App",
+    description: "Oscuro y moderno",
+    palette: ["#111827", "#FFFFFF", "#6366F1"],
+    featuredTitle: "Habitaciones recomendadas",
+    featuredItems: ["Suite Ejecutiva", "Suite con jacuzzi", "Promo entre semana"],
+    recommendation: "Base equilibrada para moteles",
+  },
+  {
+    id: "classic",
+    name: "Clásico VIP",
+    description: "Elegante con acentos dorados",
+    palette: ["#1F2937", "#F9FAFB", "#D4AF37"],
+    featuredTitle: "Suites VIP",
+    featuredItems: ["Suite presidencial", "Suite romántica", "Paquete premium"],
+    recommendation: "Ideal para enfoque premium",
+  },
+  {
+    id: "night",
+    name: "Neon Night",
+    description: "Alto contraste y estilo nocturno",
+    palette: ["#0F172A", "#E2E8F0", "#22D3EE"],
+    featuredTitle: "Lo más solicitado",
+    featuredItems: ["Suite night", "Habitación deluxe", "Promo madrugada"],
+    recommendation: "Atractiva para audiencia nocturna",
+  },
+];
+
+const templates = currentType === "motel" ? motelTemplates : restaurantTemplates;
+const selectedTemplate = templates.find((template) => template.id === currentTemplate) || templates[0];
+const headline = currentType === "motel" ? "Plantillas para Motel" : "Plantillas para Menú";
+---
+
+<DefaultLayout title={seo.title} description={seo.description} keywords={seo.keywords} showAds={false}>
+  <section class="bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-12 md:py-16 space-y-8">
+      <header class="bg-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8">
+        <p class="text-[11px] font-black uppercase tracking-widest text-gray-500">Plantillas</p>
+        <h1 class="text-3xl md:text-4xl font-black text-gray-900 mt-2">{headline}</h1>
+        <p class="text-sm md:text-base text-gray-600 mt-3">
+          Selecciona una plantilla para ver un ejemplo de sección destacada y recomendaciones de uso.
+        </p>
+      </header>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-4 md:p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {templates.map((template) => {
+            const isActive = template.id === selectedTemplate.id;
+            return (
+              <a
+                href={`/plantillas?type=${encodeURIComponent(currentType)}&template=${encodeURIComponent(template.id)}`}
+                class:list={[
+                  "rounded-2xl border p-4 transition-all",
+                  isActive ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 hover:border-gray-400 bg-white",
+                ]}
+              >
+                <p class:list={["text-sm font-black", isActive ? "text-white" : "text-gray-900"]}>{template.name}</p>
+                <p class:list={["text-[11px] uppercase tracking-wider mt-1", isActive ? "text-white/70" : "text-gray-500"]}>{template.description}</p>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <article class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8">
+          <p class="text-[11px] font-black uppercase tracking-widest text-gray-500">Plantilla activa</p>
+          <h2 class="text-2xl font-black text-gray-900 mt-2">{selectedTemplate.name}</h2>
+          <p class="text-sm text-gray-600 mt-3">{selectedTemplate.recommendation}</p>
+
+          <div class="mt-5 flex flex-wrap gap-2">
+            {selectedTemplate.palette.map((color) => (
+              <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 text-xs font-bold text-gray-700">
+                <span class="w-3 h-3 rounded-full border border-gray-200" style={`background:${color};`} />
+                {color}
+              </span>
+            ))}
+          </div>
+
+          <div class="mt-7 border border-gray-200 rounded-2xl overflow-hidden">
+            <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+              <p class="text-xs font-black uppercase tracking-widest text-gray-700">Ejemplo de destacado</p>
+            </div>
+            <div class="p-5">
+              <div class="inline-flex px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black uppercase tracking-widest">
+                Destacada
+              </div>
+              <h3 class="text-lg font-black text-gray-900 mt-4">{selectedTemplate.featuredTitle}</h3>
+              <ul class="mt-3 space-y-2">
+                {selectedTemplate.featuredItems.map((item) => (
+                  <li class="text-sm text-gray-700 font-semibold">{item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="bg-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8">
+          <p class="text-[11px] font-black uppercase tracking-widest text-gray-500">Cómo crear destacados</p>
+          <h2 class="text-2xl font-black text-gray-900 mt-2">En tu menú</h2>
+
+          <ol class="mt-5 space-y-3 text-sm text-gray-700">
+            <li><strong>1.</strong> Marca una categoría como <strong>Destacada</strong>.</li>
+            <li><strong>2.</strong> Sube esa categoría al inicio para darle mayor visibilidad.</li>
+            <li><strong>3.</strong> Mantén 2 a 4 productos clave con nombre y foto claros.</li>
+            <li><strong>4.</strong> Revisa la vista previa del template seleccionado.</li>
+          </ol>
+
+          <div class="mt-7 flex flex-wrap gap-2">
+            <a
+              href={currentType === "motel" ? "/moteles" : "/menus"}
+              class="px-4 py-2.5 rounded-2xl bg-white border border-gray-200 text-[11px] font-black uppercase tracking-widest text-gray-700 hover:bg-gray-100 transition-all"
+            >
+              Ver ejemplos reales
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</DefaultLayout>

@@ -199,7 +199,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     return {
       layout: vs.layout || 'grid',
       show_prices: vs.show_prices ?? true,
-      template: vs.template || (isCafe ? 'elegant' : 'default')
+      template: vs.template || (isCafe ? 'cafesoso' : 'default')
     };
   });
   const [showViewSettings, setShowViewSettings] = useState(false);
@@ -618,6 +618,10 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
         itemTitleClass: 'text-lg font-semibold tracking-wide',
         priceClass: 'text-amber-700 font-bold',
       },
+      cafesoso: {
+        itemTitleClass: 'text-lg font-semibold tracking-tight',
+        priceClass: 'text-amber-900 font-extrabold',
+      },
       vibrant: {},
       uber: {},
       didi: {},
@@ -728,6 +732,12 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     const block = blocks[blockIndex];
     if (!block || block.type !== 'section') return;
     updateBlock(blockIndex, { title });
+  };
+
+  const toggleSectionFeatured = (blockIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    updateBlock(blockIndex, { featured: !(block.data.featured ?? false) });
   };
 
   const updateItemOptionsInSection = (blockIndex: number, itemIndex: number, nextOptions: ItemOption[]) => {
@@ -1344,8 +1354,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
           </div>
 
-          <div className="">
-            <div className="flex bg-gray-100 p-1 rounded-2xl mb-6">
+          <div className="lg:px-4 mb-4 space-y-4 bg-gray-100 p-1 rounded-2xl">
+            <div className="flex">
               <button
                 onClick={() => setEditorMode('simple')}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'simple' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
@@ -1373,7 +1383,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <>
                 <button
                   onClick={() => setShowViewSettings(!showViewSettings)}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
+                  className="w-full flex items-center justify-between p-4 bg-white rounded-2xl hover:border-gray-300 transition-all shadow-sm group"
                 >
                   <div className="flex items-center gap-4">
                     <div className={`p-3 bg-white rounded-2xl shadow-sm text-gray-700 group transition-transform ${showViewSettings ? 'shadow-inner' : ''}`}>
@@ -1387,10 +1397,18 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 </button>
 
                 {showViewSettings && (
-                  <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-xl space-y-6">
+                  <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-sm space-y-6">
                 <div>
-                  <label className="text-xs font-bold text-gray-600 mb-4 block uppercase tracking-wider">Plantilla del {placeType === 'motel' ? 'Motel' : 'Menú'}:</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                    <label className="text-xs font-bold text-gray-600 block uppercase tracking-wider">Plantilla del {placeType === 'motel' ? 'Motel' : 'Menú'}:</label>
+                    <a
+                      href={`/plantillas?template=${encodeURIComponent(viewSettings.template || 'default')}&type=${encodeURIComponent(placeType || 'restaurant')}`}
+                      className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all"
+                    >
+                      Ver ejemplos
+                    </a>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {(
                       placeType === 'motel'
                         ? [
@@ -1402,6 +1420,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           { id: 'default', name: 'Tradicional', desc: 'Limpio y elegante' },
                           { id: 'modern', name: 'Moderno', desc: 'Aire de revista' },
                           { id: 'elegant', name: 'Gourmet', desc: 'Estilo Premium' },
+                          { id: 'cafesoso', name: 'Cafetería', desc: 'Cálido, cremoso y cozy' },
                           { id: 'vibrant', name: 'Vibrant (Lalo\'s)', desc: 'Tarjetas y color' },
                           { id: 'mariscos', name: 'Mariscos Coastal', desc: 'Azul, naranja y playa' },
                           { id: 'uber', name: 'Uber (Dark)', desc: 'Elegante oscuro' },
@@ -1523,6 +1542,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                             placeholder="Nombre de la categoría"
                           />
                           <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => toggleSectionFeatured(index)}
+                                className={`px-3 py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${block.data.featured ? 'bg-amber-500 border-amber-500 text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200'}`}
+                                title={block.data.featured ? 'Quitar destacado' : 'Marcar como destacada'}
+                              >
+                                {block.data.featured ? 'Destacada' : 'Destacar'}
+                              </button>
                             <button
                               type="button"
                               onClick={() => moveSectionAmongSections(index, 'up')}

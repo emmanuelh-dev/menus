@@ -38,6 +38,16 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
       itemTitleClass: "text-lg font-semibold tracking-wide",
       priceClass: "text-amber-700 font-bold",
     },
+    cafesoso: {
+      bg: "bg-[#F8F3EC]",
+      text: "text-[#3E2723]",
+      headerClass: "text-center py-8",
+      titleClass: "text-5xl font-black tracking-tight text-[#4E342E]",
+      sectionTitleClass: "text-xl font-black text-[#5D4037] mb-4 bg-[#EDE0D4] px-4 py-2 rounded-xl",
+      itemTitleClass: "text-lg font-bold tracking-tight text-[#3E2723]",
+      priceClass: "text-[#6D4C41] font-extrabold",
+      itemCardClass: "bg-[#FFF8F1] border border-[#E6D5C4] rounded-2xl p-4",
+    },
     vibrant: {
       bg: "bg-[#f4f7f4]",
       text: "text-slate-900",

@@ -12,6 +12,7 @@ export default function MenuItemPreview({ item, config, template, compact = fals
   const isVibrant = template === 'vibrant';
   const isUber = template === 'uber';
   const isDidi = template === 'didi';
+  const isCafesoso = template === 'cafesoso';
 
   // Renderizado dinámico según el estilo solicitado
   if (isVibrant) {
@@ -115,6 +116,30 @@ export default function MenuItemPreview({ item, config, template, compact = fals
             <span className="text-xl font-black">+</span>
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (isCafesoso) {
+    return (
+      <div className={`bg-[#FFF8F1] border border-[#E6D5C4] ${compact ? 'p-3 mb-0 rounded-xl' : 'p-4 mb-4 rounded-2xl'} flex gap-4`}>
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start gap-3 mb-1">
+            <h3 className="text-[#3E2723] font-bold tracking-tight text-lg">{item.name}</h3>
+            {item.price > 0 && <span className="text-[#6D4C41] font-extrabold text-base">${item.price}</span>}
+          </div>
+          {item.description && (
+            <p className="text-[#6D4C41] text-sm leading-relaxed line-clamp-2">{item.description}</p>
+          )}
+          <button className="mt-3 px-4 py-1.5 bg-[#6D4C41] text-white rounded-full text-[11px] font-bold uppercase tracking-wide">
+            Agregar
+          </button>
+        </div>
+        {item.image && (
+          <div className="w-24 h-24 rounded-xl overflow-hidden border border-[#E6D5C4] shrink-0">
+            <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
+          </div>
+        )}
       </div>
     );
   }

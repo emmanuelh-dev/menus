@@ -230,7 +230,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[
                 { id: 'restaurant', label: 'Restaurante', icon: '🍔', template: 'default' },
-                { id: 'cafe', label: 'Cafetería', icon: '☕', template: 'default' },
+                { id: 'cafe', label: 'Cafetería', icon: '☕', template: 'cafesoso' },
                 { id: 'tienda', label: 'Tienda', icon: '🏪', template: 'tienda', description: 'Categorías visuales' },
                 { id: 'catalogo', label: 'Catálogo', icon: '📋', template: 'tienda', description: 'Listado de productos' },
                 { id: 'motel', label: 'Motel', icon: '🌙', template: 'default' },
