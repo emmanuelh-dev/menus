@@ -1493,10 +1493,10 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     Crea una categoría para empezar.
                   </div>
                 ) : (
-                  <div className="p-4 space-y-10">
+                  <div className="space-y-10">
                     {sectionEntries.map(({ block, index }, sectionPos) => (
                       <div key={block.id} className="space-y-4">
-                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="flex items-center justify-between gap-3 flex-wrap px-4">
                           <input
                             value={block.data.title || ''}
                             onChange={(e) => updateSectionTitle(index, e.target.value)}
@@ -1597,8 +1597,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                                             <button
                                               type="button"
                                               onClick={() => setSimpleImagePicker({ blockIndex: index, itemIndex: itemIdx })}
-                                              className="w-28 h-28 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 shrink-0"
-                                              title="Seleccionar imagen"
+                                              className="group relative w-28 h-28 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 shrink-0"
+                                              title="Cambiar imagen"
                                             >
                                               {item.image ? (
                                                 <img src={item.image} className="w-full h-full object-cover" alt="" />
@@ -1607,6 +1607,13 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                                                   <PiImage className="w-7 h-7" />
                                                 </div>
                                               )}
+
+                                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                              <div className="absolute bottom-2 right-2">
+                                                <span className="px-3 py-1.5 rounded-xl bg-white/90 border border-gray-200 text-gray-800 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                                  Cambiar
+                                                </span>
+                                              </div>
                                             </button>
                                           </div>
 
