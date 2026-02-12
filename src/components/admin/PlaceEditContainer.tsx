@@ -11,7 +11,6 @@ interface PlaceData {
 
 function getTypeSlug(type: unknown) {
   if (type === "motel" || type === "restaurant") return formater[type];
-  if (typeof type === "string") return type;
   return "menus";
 }
 

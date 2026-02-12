@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, X, Trash2, Send, MapPin, User, Phone, Search, Truck, CreditCard, Coins, Landmark, Copy, Check } from 'lucide-react';
 import GooglePlacesAutocomplete from './admin/GooglePlacesAutocomplete';
 
+declare global {
+  interface Window {
+    umami?: {
+      track: (eventName: string, eventData?: Record<string, any>) => void;
+    };
+  }
+}
+
 interface CartItem {
   id: string;
   productId: string;
@@ -65,6 +73,17 @@ function getFavorites(slug: string): Favorite[] {
 
 function saveFavorites(slug: string, favorites: Favorite[]) {
   localStorage.setItem(getFavoritesKey(slug), JSON.stringify(favorites));
+}
+
+function trackUmamiEvent(eventName: string, eventData?: Record<string, any>) {
+  if (typeof window === 'undefined') return;
+  try {
+    if (window.umami && typeof window.umami.track === 'function') {
+      window.umami.track(eventName, eventData);
+    }
+  } catch {
+    // noop
+  }
 }
 
 export default function CartManager({
@@ -474,6 +493,18 @@ export default function CartManager({
 
       if (response.ok) {
         const data = await response.json();
+
+        trackUmamiEvent('Cart Order Created', {
+          place_id: Number(placeId),
+          place_slug: placeSlug,
+          items_count: cart.reduce((sum, item) => sum + (item.quantity || 0), 0),
+          subtotal,
+          delivery_price: deliveryPrice,
+          total,
+          delivery_type: wantsDelivery ? 'delivery' : 'pickup',
+          payment_method: paymentMethod,
+        });
+
         return data.order;
       }
     } catch (error) {

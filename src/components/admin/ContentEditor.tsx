@@ -177,10 +177,29 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [showExtraBlocks, setShowExtraBlocks] = useState(false);
   const [viewSettings, setViewSettings] = useState(() => {
     const vs = initialContent?.view_settings || { layout: 'grid', show_prices: true };
+
+    const normalize = (value: unknown) => {
+      if (typeof value !== 'string') return '';
+      return value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    };
+
+    const isCafe = (() => {
+      if (placeType !== 'restaurant') return false;
+      const cuisine = normalize(initialContent?.semantic_data?.cuisine_type);
+      const name = normalize(placeData?.name || initialContent?.name);
+      const category = normalize(placeData?.category);
+      const description = normalize(initialContent?.semantic_data?.description);
+      const haystack = `${cuisine} ${name} ${category} ${description}`;
+      return haystack.includes('cafe') || haystack.includes('coffee');
+    })();
+
     return {
       layout: vs.layout || 'grid',
       show_prices: vs.show_prices ?? true,
-      template: vs.template || 'default'
+      template: vs.template || (isCafe ? 'elegant' : 'default')
     };
   });
   const [showViewSettings, setShowViewSettings] = useState(false);
@@ -1532,16 +1551,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           </div>
                         </div>
 
-                        <div className="bg-[#0A0A0A] rounded-2xl overflow-hidden border border-gray-100">
-                          <div className="bg-gray-800 p-2 flex items-center justify-between px-4 border-b border-white/10">
-                            <div className="flex gap-1.5">
-                              <div className="w-3 h-3 rounded-full bg-red-400" />
-                              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                              <div className="w-3 h-3 rounded-full bg-green-400" />
-                            </div>
-                            <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Vista del Menú</div>
-                            <div className="w-12" />
-                          </div>
+                        <div>
+                
 
                           <div>
                             <div className="max-w-2xl mx-auto">
@@ -1562,8 +1573,9 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                                   </div>
                                   {(block.data.items || []).map((item: ItemData, itemIdx: number) => {
                                     const optionCount = (item.options || []).length;
+                                    const isAvailable = item.available ?? true;
                                     return (
-                                      <div key={item.id} className="bg-white border-gray-100 overflow-hidden">
+                                      <div key={item.id} className={`bg-white border border-gray-100 overflow-hidden ${isAvailable ? '' : 'opacity-60'}`}>
                                         <div className="p-4">
                                           <div className="flex gap-4 items-start">
                                             <div className="flex-1 min-w-0">
@@ -1618,6 +1630,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                                           </div>
 
                                           <div className="mt-3 flex justify-end gap-2 flex-wrap">
+                                            <button
+                                              type="button"
+                                              onClick={() => updateItemInSection(index, itemIdx, { available: !isAvailable })}
+                                              className={`w-10 h-10 border rounded-xl hover:bg-gray-50 flex items-center justify-center transition-all ${isAvailable ? 'bg-white border-gray-200 text-gray-700' : 'bg-stone-100 border-stone-200 text-stone-500'}`}
+                                              title={isAvailable ? 'Ocultar producto' : 'Mostrar producto'}
+                                            >
+                                              {isAvailable ? <PiEye className="w-4 h-4" /> : <PiEyeSlash className="w-4 h-4" />}
+                                            </button>
                                             <button
                                               type="button"
                                               onClick={() => moveItemWithinSection(index, itemIdx, 'up')}
