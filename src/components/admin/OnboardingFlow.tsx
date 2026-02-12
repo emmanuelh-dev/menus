@@ -9,13 +9,19 @@ interface State {
   name: string;
 }
 
-const slugify = (text: string) => {
+const normalizeForMatch = (text: string) => {
   return text
     .toString()
-    .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+};
+
+const slugify = (text: string) => {
+  const normalized = normalizeForMatch(text);
+  return normalized
+    .replace(/[^a-z0-9]+/g, '-')
     .replace(/--+/g, '-')
     .replace(/^-+/, '')
     .replace(/-+$/, '');
@@ -27,6 +33,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
   const [states, setStates] = useState<State[]>([]);
   const [municipalities, setMunicipalities] = useState<any[]>([]);
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
+  const [detectedStateName, setDetectedStateName] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -50,6 +57,23 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
     };
     fetchStates();
   }, []);
+
+  useEffect(() => {
+    if (!detectedStateName) return;
+    if (states.length === 0) return;
+    if (formData.state_id) return;
+
+    const needle = normalizeForMatch(detectedStateName);
+    const matched = states.find(s => normalizeForMatch(s.name) === needle) ||
+      states.find(s => needle.includes(normalizeForMatch(s.name)) || normalizeForMatch(s.name).includes(needle));
+
+    if (!matched) return;
+    setFormData(prev => ({
+      ...prev,
+      state_id: matched.id,
+      municipality_id: null,
+    }));
+  }, [detectedStateName, states, formData.state_id]);
 
   useEffect(() => {
     const fetchMunicipalities = async () => {
@@ -279,13 +303,14 @@ export default function OnboardingFlow({ onComplete }: { onComplete?: () => void
                 value={formData.formatted_address || formData.address}
                 onChange={(address) => setFormData(prev => ({ ...prev, address }))}
                 onPlaceSelected={(place) => {
+                  if (place.state) setDetectedStateName(place.state);
                   setFormData(prev => ({
                     ...prev,
                     address: place.address,
                     formatted_address: place.formatted_address,
                     lat: place.lat,
                     lng: place.lng,
-                    // Try to guess state if possible later or in next step
+                    // state_id se intenta autocompletar con detectedStateName + lista de estados
                   }));
                 }}
                 placeholder="Busca tu dirección..."

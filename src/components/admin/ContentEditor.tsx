@@ -1584,8 +1584,19 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                           <div>
                             <div className="max-w-2xl mx-auto">
                               {(block.data.items || []).length === 0 ? (
-                                <div className="p-10 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em] bg-white rounded-2xl border border-gray-100">
-                                  Agrega un producto para esta categoría.
+                                <div className="p-10 text-center bg-white rounded-2xl border border-gray-100">
+                                  <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">
+                                    Agrega un producto para esta categoría.
+                                  </p>
+                                  <div className="mt-6 flex justify-center">
+                                    <button
+                                      type="button"
+                                      onClick={() => addItemToSection(index)}
+                                      className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                                    >
+                                      <PiPlus className="w-4 h-4" /> Agregar producto
+                                    </button>
+                                  </div>
                                 </div>
                               ) : (
                                 <div>
