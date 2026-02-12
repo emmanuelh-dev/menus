@@ -5,9 +5,10 @@ interface Props {
   item: any;
   config: any;
   template: string;
+  compact?: boolean;
 }
 
-export default function MenuItemPreview({ item, config, template }: Props) {
+export default function MenuItemPreview({ item, config, template, compact = false }: Props) {
   const isVibrant = template === 'vibrant';
   const isUber = template === 'uber';
   const isDidi = template === 'didi';
@@ -15,7 +16,7 @@ export default function MenuItemPreview({ item, config, template }: Props) {
   // Renderizado dinámico según el estilo solicitado
   if (isVibrant) {
     return (
-      <div className="bg-white p-6 rounded-[32px] shadow-sm border border-emerald-50 mb-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+      <div className={`bg-white ${compact ? 'p-4 rounded-2xl mb-0' : 'p-6 rounded-[32px] mb-6'} shadow-sm border border-emerald-50 relative overflow-hidden group hover:shadow-md transition-shadow`}>
         <div className="flex justify-between items-center gap-6">
           <div className="flex-1 min-w-0">
             <h3 className="text-xl font-black tracking-tight text-slate-800 mb-2">
@@ -82,7 +83,7 @@ export default function MenuItemPreview({ item, config, template }: Props) {
 
   if (isDidi) {
     return (
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-orange-50 mb-4 flex gap-4 hover:shadow-md transition-all group">
+      <div className={`bg-white p-4 rounded-2xl shadow-sm border border-orange-50 ${compact ? 'mb-0' : 'mb-4'} flex gap-4 hover:shadow-md transition-all group`}>
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
             <h3 className="font-black text-slate-800 text-lg mb-1">{item.name}</h3>
@@ -120,7 +121,7 @@ export default function MenuItemPreview({ item, config, template }: Props) {
 
   // Estilos por defecto (Tradicional, Moderno, Gourmet)
   return (
-    <div className={`group ${config.itemCardClass || ''} mb-12`}>
+    <div className={`group ${config.itemCardClass || ''} ${compact ? 'mb-0' : 'mb-12'}`}>
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1">
           <div className="flex justify-between items-baseline mb-1">

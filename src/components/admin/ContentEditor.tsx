@@ -36,11 +36,11 @@
  * - image: string
  * - features?: string[] // ["Jacuzzi", "Clima", "Smart TV"] para moteles
  */
-import { useState, useRef, useEffect, lazy, Suspense } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense, useMemo } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
 import AdminPageHeader from './AdminPageHeader';
-import type { Block, BlockType, ItemData } from './blocks/types';
+import type { Block, BlockType, ItemData, ItemOption } from './blocks/types';
 const MotelPageRenderer = lazy(() => import('../MotelPageRenderer'));
 const RestaurantPreview = lazy(() => import('./RestaurantPreview'));
 const AIChat = lazy(() => import('./AIChat'));
@@ -52,6 +52,7 @@ const CarruselBlock = lazy(() => import('./blocks/CarruselBlock').then(m => ({ d
 const MarkdownBlock = lazy(() => import('./blocks/MarkdownBlockEditor').then(m => ({ default: m.MarkdownBlockEditor })));
 const TableView = lazy(() => import('./blocks/TableView').then(m => ({ default: m.TableView })));
 const BlockTypeButton = lazy(() => import('./blocks/BlockTypeButton').then(m => ({ default: m.BlockTypeButton })));
+const ImageSelector = lazy(() => import('./blocks/ImageSelector').then(m => ({ default: m.ImageSelector })));
 import {
   PiPlus,
   PiTrash,
@@ -167,7 +168,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>('editor');
-  const [editorMode, setEditorMode] = useState<'blocks' | 'table'>('table');
+  const [editorMode, setEditorMode] = useState<'simple' | 'advanced' | 'table'>('simple');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -187,6 +188,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const isInitialLoad = useRef(true);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isLibraryPasting, setIsLibraryPasting] = useState(false);
+  const [simpleVariantsOpen, setSimpleVariantsOpen] = useState<{ blockId: string; itemId: string } | null>(null);
+  const [simpleImagePicker, setSimpleImagePicker] = useState<{ blockIndex: number; itemIndex: number } | null>(null);
 
   const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvdq078aa'
   const uploadPreset = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'
@@ -579,6 +582,258 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const isItemDuplicate = (sectionItems: ItemData[], newItem: any) => {
     const normalizedName = normalizeTitle(newItem.name);
     return sectionItems.some(item => normalizeTitle(item.name) === normalizedName);
+  };
+
+  const templateConfig = useMemo(() => {
+    const template = viewSettings.template || 'default';
+    const templateConfigs: Record<string, any> = {
+      default: {
+        itemTitleClass: 'text-lg font-medium tracking-tight',
+        priceClass: 'text-stone-500 font-bold',
+      },
+      modern: {
+        itemTitleClass: 'text-xl font-bold tracking-tight',
+        priceClass: 'text-blue-600 font-bold',
+      },
+      elegant: {
+        itemTitleClass: 'text-lg font-semibold tracking-wide',
+        priceClass: 'text-amber-700 font-bold',
+      },
+      vibrant: {},
+      uber: {},
+      didi: {},
+      mariscos: {},
+      tienda: {},
+    };
+    return templateConfigs[template] || templateConfigs.default;
+  }, [viewSettings.template]);
+
+  const createDefaultItem = (): ItemData => {
+    return {
+      id: `item-${Date.now()}-${Math.random()}`,
+      name: 'NUEVO PRODUCTO',
+      price: 0,
+      description: '',
+      image: '',
+      available: true,
+      options: [],
+    };
+  };
+
+  const addSectionSimple = () => {
+    addBlock('section');
+  };
+
+  const addItemToSection = (blockIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const newItem = createDefaultItem();
+
+    const newBlocks = [...blocks];
+    const nextItems = [...(block.data.items || []), newItem];
+    newBlocks[blockIndex] = { ...block, data: { ...block.data, items: nextItems } };
+    setBlocks(newBlocks);
+    setSimpleVariantsOpen(null);
+  };
+
+  const updateItemInSection = (blockIndex: number, itemIndex: number, patch: Partial<ItemData>) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const items = [...(block.data.items || [])];
+    const current = items[itemIndex];
+    if (!current) return;
+    items[itemIndex] = { ...current, ...patch };
+    const newBlocks = [...blocks];
+    newBlocks[blockIndex] = { ...block, data: { ...block.data, items } };
+    setBlocks(newBlocks);
+  };
+
+  const removeItemFromSection = (blockIndex: number, itemIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const items = [...(block.data.items || [])];
+    items.splice(itemIndex, 1);
+    const newBlocks = [...blocks];
+    newBlocks[blockIndex] = { ...block, data: { ...block.data, items } };
+    setBlocks(newBlocks);
+  };
+
+  const removeSectionSimple = (blockIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    if (!confirm('¿Seguro que quieres eliminar esta categoría y todos sus productos?')) return;
+    removeBlock(blockIndex);
+  };
+
+  const moveSectionAmongSections = (blockIndex: number, direction: 'up' | 'down') => {
+    const currentBlock = blocks[blockIndex];
+    if (!currentBlock || currentBlock.type !== 'section') return;
+
+    if (direction === 'up') {
+      for (let i = blockIndex - 1; i >= 0; i--) {
+        if (blocks[i]?.type === 'section') {
+          const newBlocks = [...blocks];
+          [newBlocks[i], newBlocks[blockIndex]] = [newBlocks[blockIndex], newBlocks[i]];
+          setBlocks(newBlocks);
+          return;
+        }
+      }
+      return;
+    }
+
+    for (let i = blockIndex + 1; i < blocks.length; i++) {
+      if (blocks[i]?.type === 'section') {
+        const newBlocks = [...blocks];
+        [newBlocks[i], newBlocks[blockIndex]] = [newBlocks[blockIndex], newBlocks[i]];
+        setBlocks(newBlocks);
+        return;
+      }
+    }
+  };
+
+  const moveItemWithinSection = (blockIndex: number, itemIndex: number, direction: 'up' | 'down') => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const items = [...(block.data.items || [])];
+
+    const targetIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    [items[itemIndex], items[targetIndex]] = [items[targetIndex], items[itemIndex]];
+    const newBlocks = [...blocks];
+    newBlocks[blockIndex] = { ...block, data: { ...block.data, items } };
+    setBlocks(newBlocks);
+  };
+
+  const updateSectionTitle = (blockIndex: number, title: string) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    updateBlock(blockIndex, { title });
+  };
+
+  const updateItemOptionsInSection = (blockIndex: number, itemIndex: number, nextOptions: ItemOption[]) => {
+    updateItemInSection(blockIndex, itemIndex, { options: nextOptions });
+  };
+
+  const addVariantGroup = (blockIndex: number, itemIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    nextOptions.push({ name: 'VARIANTE', values: [], prices: {} });
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const removeVariantGroup = (blockIndex: number, itemIndex: number, optionIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    nextOptions.splice(optionIndex, 1);
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const updateVariantGroupName = (blockIndex: number, itemIndex: number, optionIndex: number, name: string) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    const opt = nextOptions[optionIndex];
+    if (!opt) return;
+    nextOptions[optionIndex] = { ...opt, name };
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const addVariantValue = (blockIndex: number, itemIndex: number, optionIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    const opt = nextOptions[optionIndex];
+    if (!opt) return;
+    const nextValues = [...(opt.values || [])];
+    const base = 'OPCIÓN';
+    let candidate = base;
+    let n = 2;
+    while (nextValues.includes(candidate)) {
+      candidate = `${base} ${n}`;
+      n++;
+    }
+    nextValues.push(candidate);
+    const nextPrices = { ...(opt.prices || {}) };
+    nextPrices[candidate] = Number.isFinite(nextPrices[candidate]) ? nextPrices[candidate] : 0;
+    nextOptions[optionIndex] = { ...opt, values: nextValues, prices: nextPrices };
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const removeVariantValue = (blockIndex: number, itemIndex: number, optionIndex: number, valueIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    const opt = nextOptions[optionIndex];
+    if (!opt) return;
+    const nextValues = [...(opt.values || [])];
+    const removed = nextValues[valueIndex];
+    nextValues.splice(valueIndex, 1);
+    const nextPrices = { ...(opt.prices || {}) };
+    if (removed) delete nextPrices[removed];
+    nextOptions[optionIndex] = { ...opt, values: nextValues, prices: nextPrices };
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const renameVariantValue = (blockIndex: number, itemIndex: number, optionIndex: number, valueIndex: number, nextValue: string) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    const opt = nextOptions[optionIndex];
+    if (!opt) return;
+    const values = [...(opt.values || [])];
+    const prevValue = values[valueIndex];
+    const trimmed = nextValue.trim();
+    if (!trimmed) return;
+    values[valueIndex] = trimmed;
+
+    const nextPrices = { ...(opt.prices || {}) };
+    if (prevValue && prevValue !== trimmed) {
+      const prevPrice = nextPrices[prevValue];
+      delete nextPrices[prevValue];
+      if (prevPrice !== undefined) nextPrices[trimmed] = prevPrice;
+    }
+
+    nextOptions[optionIndex] = { ...opt, values, prices: nextPrices };
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const setVariantValuePrice = (blockIndex: number, itemIndex: number, optionIndex: number, value: string, price: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+    const nextOptions = [...(item.options || [])];
+    const opt = nextOptions[optionIndex];
+    if (!opt) return;
+    const nextPrices = { ...(opt.prices || {}) };
+    nextPrices[value] = Number.isFinite(price) ? price : 0;
+    nextOptions[optionIndex] = { ...opt, prices: nextPrices };
+    updateItemOptionsInSection(blockIndex, itemIndex, nextOptions);
+  };
+
+  const findSimpleItemLocation = (blockId: string, itemId: string) => {
+    const blockIndex = blocks.findIndex(b => b.id === blockId && b.type === 'section');
+    if (blockIndex < 0) return null;
+    const block = blocks[blockIndex];
+    const items = block.type === 'section' ? (block.data.items || []) : [];
+    const itemIndex = items.findIndex((it: ItemData) => it.id === itemId);
+    if (itemIndex < 0) return null;
+    return { blockIndex, itemIndex, item: items[itemIndex] as ItemData };
   };
 
   const placeSummary = {
@@ -1073,10 +1328,16 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
           <div className="">
             <div className="flex bg-gray-100 p-1 rounded-2xl mb-6">
               <button
-                onClick={() => setEditorMode('blocks')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'blocks' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setEditorMode('simple')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'simple' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <PiLayout className="w-4 h-4" /> Bloques
+                <PiLayout className="w-4 h-4" /> Simple
+              </button>
+              <button
+                onClick={() => setEditorMode('advanced')}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'advanced' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <PiDotsSixVertical className="w-4 h-4" /> Avanzado
               </button>
               <button
                 onClick={() => {
@@ -1089,7 +1350,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               </button>
             </div>
 
-            {editorMode === 'blocks' && (
+            {editorMode === 'advanced' && (
               <>
                 <button
                   onClick={() => setShowViewSettings(!showViewSettings)}
@@ -1210,7 +1471,213 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             </Suspense>
           )}
 
-          {editorMode === 'blocks' ? (
+          {editorMode === 'simple' ? (
+            <div className="space-y-6 lg:px-4 sm:px-0">
+              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Categorías</p>
+                    <p className="text-xs font-bold text-gray-700">Agrega categorías y productos con vista tipo plantilla.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addSectionSimple}
+                    className="px-4 py-2.5 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-black active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <PiPlus className="w-4 h-4" /> Agregar categoría
+                  </button>
+                </div>
+
+                {sectionEntries.length === 0 ? (
+                  <div className="p-10 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">
+                    Crea una categoría para empezar.
+                  </div>
+                ) : (
+                  <div className="p-4 space-y-10">
+                    {sectionEntries.map(({ block, index }, sectionPos) => (
+                      <div key={block.id} className="space-y-4">
+                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                          <input
+                            value={block.data.title || ''}
+                            onChange={(e) => updateSectionTitle(index, e.target.value)}
+                            className="flex-1 min-w-[220px] bg-transparent font-black text-lg outline-none uppercase tracking-tight focus:text-indigo-600"
+                            placeholder="Nombre de la categoría"
+                          />
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => moveSectionAmongSections(index, 'up')}
+                              disabled={sectionPos === 0}
+                              className="w-10 h-10 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 flex items-center justify-center transition-all"
+                              title="Subir categoría"
+                            >
+                              <PiCaretUp className="w-4 h-4 text-gray-600" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveSectionAmongSections(index, 'down')}
+                              disabled={sectionPos === sectionEntries.length - 1}
+                              className="w-10 h-10 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 flex items-center justify-center transition-all"
+                              title="Bajar categoría"
+                            >
+                              <PiCaretDown className="w-4 h-4 text-gray-600" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeSectionSimple(index)}
+                              className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                            >
+                              <PiTrash className="w-4 h-4" /> Eliminar
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="bg-[#0A0A0A] rounded-2xl overflow-hidden border border-gray-100">
+                          <div className="bg-gray-800 p-2 flex items-center justify-between px-4 border-b border-white/10">
+                            <div className="flex gap-1.5">
+                              <div className="w-3 h-3 rounded-full bg-red-400" />
+                              <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                              <div className="w-3 h-3 rounded-full bg-green-400" />
+                            </div>
+                            <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Vista del Menú</div>
+                            <div className="w-12" />
+                          </div>
+
+                          <div>
+                            <div className="max-w-2xl mx-auto">
+                              {(block.data.items || []).length === 0 ? (
+                                <div className="p-10 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em] bg-white rounded-2xl border border-gray-100">
+                                  Agrega un producto para esta categoría.
+                                </div>
+                              ) : (
+                                <div>
+                                  <div className="flex justify-end">
+                                    <button
+                                      type="button"
+                                      onClick={() => addItemToSection(index)}
+                                      className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                                    >
+                                      <PiPlus className="w-4 h-4" /> Agregar producto
+                                    </button>
+                                  </div>
+                                  {(block.data.items || []).map((item: ItemData, itemIdx: number) => {
+                                    const optionCount = (item.options || []).length;
+                                    return (
+                                      <div key={item.id} className="bg-white border-gray-100 overflow-hidden">
+                                        <div className="p-4">
+                                          <div className="flex gap-4 items-start">
+                                            <div className="flex-1 min-w-0">
+                                              <input
+                                                value={item.name || ''}
+                                                onChange={(e) => updateItemInSection(index, itemIdx, { name: e.target.value })}
+                                                className="w-full bg-transparent font-black text-lg outline-none uppercase tracking-tight focus:text-indigo-600"
+                                                placeholder="Nombre del producto"
+                                              />
+                                              <textarea
+                                                value={item.description || ''}
+                                                onChange={(e) => updateItemInSection(index, itemIdx, { description: e.target.value })}
+                                                className="w-full bg-transparent text-sm text-gray-500 outline-none mt-1 resize-none leading-relaxed"
+                                                placeholder="Descripción"
+                                                rows={2}
+                                              />
+                                              <div className="mt-3 inline-flex items-center gap-2 bg-emerald-50/50 border border-emerald-100/50 rounded-xl px-3 py-2">
+                                                <span className="text-emerald-600 font-black opacity-40">$</span>
+                                                <input
+                                                  value={String(item.price ?? 0)}
+                                                  onChange={(e) => {
+                                                    const next = Number.parseFloat(e.target.value);
+                                                    updateItemInSection(index, itemIdx, { price: Number.isFinite(next) ? next : 0 });
+                                                  }}
+                                                  inputMode="decimal"
+                                                  className="w-24 bg-transparent outline-none font-mono font-black text-emerald-700"
+                                                />
+                                              </div>
+                                            </div>
+
+                                            <button
+                                              type="button"
+                                              onClick={() => setSimpleImagePicker({ blockIndex: index, itemIndex: itemIdx })}
+                                              className="w-28 h-28 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 shrink-0"
+                                              title="Seleccionar imagen"
+                                            >
+                                              {item.image ? (
+                                                <img src={item.image} className="w-full h-full object-cover" alt="" />
+                                              ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                  <PiImage className="w-7 h-7" />
+                                                </div>
+                                              )}
+                                            </button>
+                                          </div>
+
+                                          <div className="mt-3 flex justify-end gap-2 flex-wrap">
+                                            <button
+                                              type="button"
+                                              onClick={() => moveItemWithinSection(index, itemIdx, 'up')}
+                                              disabled={itemIdx === 0}
+                                              className="w-10 h-10 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 flex items-center justify-center transition-all"
+                                              title="Subir producto"
+                                            >
+                                              <PiCaretUp className="w-4 h-4 text-gray-600" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => moveItemWithinSection(index, itemIdx, 'down')}
+                                              disabled={itemIdx === (block.data.items || []).length - 1}
+                                              className="w-10 h-10 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 flex items-center justify-center transition-all"
+                                              title="Bajar producto"
+                                            >
+                                              <PiCaretDown className="w-4 h-4 text-gray-600" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setSimpleVariantsOpen({ blockId: block.id, itemId: item.id });
+                                              }}
+                                              className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 active:scale-95 transition-all"
+                                            >
+                                              Variantes {optionCount > 0 ? `(${optionCount})` : ''}
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                if (!confirm('¿Eliminar este producto?')) return;
+                                                removeItemFromSection(index, itemIdx);
+                                                if (simpleVariantsOpen?.blockId === block.id && simpleVariantsOpen?.itemId === item.id) {
+                                                  setSimpleVariantsOpen(null);
+                                                }
+                                              }}
+                                              className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 active:scale-95 transition-all"
+                                            >
+                                              Eliminar
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+
+                                  <div className="flex justify-end">
+                                    <button
+                                      type="button"
+                                      onClick={() => addItemToSection(index)}
+                                      className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                                    >
+                                      <PiPlus className="w-4 h-4" /> Agregar producto
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : editorMode === 'advanced' ? (
             <>
               {/* <SectionNav
                 blocks={blocks}
@@ -1413,6 +1880,163 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
               <TableView blocks={blocks} onChange={setBlocks} />
             </Suspense>
           )}
+
+          {editorMode === 'simple' && simpleImagePicker && (
+            <Suspense fallback={null}>
+              <ImageSelector
+                existingImages={getAllExistingImages()}
+                onUpload={(urls) => {
+                  setMediaLibrary(prev => [...new Set([...urls, ...prev])]);
+                }}
+                onSelect={(url) => {
+                  updateItemInSection(simpleImagePicker.blockIndex, simpleImagePicker.itemIndex, { image: url });
+                }}
+                onClose={() => setSimpleImagePicker(null)}
+              />
+            </Suspense>
+          )}
+
+          {editorMode === 'simple' && simpleVariantsOpen && (() => {
+            const loc = findSimpleItemLocation(simpleVariantsOpen.blockId, simpleVariantsOpen.itemId);
+            if (!loc) return null;
+            const { blockIndex, itemIndex, item } = loc;
+
+            return (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSimpleVariantsOpen(null)} />
+                <div className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
+                  <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center z-10">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase text-gray-800 tracking-wide">Variantes</h3>
+                      <p className="text-[11px] text-gray-500 font-medium mt-0.5">
+                        Producto: <span className="font-bold text-gray-700">{item.name || 'Sin nombre'}</span>
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSimpleVariantsOpen(null)}
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600"
+                      title="Cerrar"
+                    >
+                      <PiX className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] space-y-6">
+                    <div className="bg-gray-50 rounded-2xl border border-gray-100 p-4">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Cómo usar variantes</p>
+                      <p className="text-sm text-gray-700 font-medium">
+                        Puedes agregar 1 o varias variantes. Ejemplos: <span className="font-bold">Base</span> (harina, maíz), <span className="font-bold">Sabor</span> (picadillo, chicharrón), <span className="font-bold">Guiso</span>, <span className="font-bold">Tamaño</span>.
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        En cada opción puedes poner un precio. Si no aplica, déjalo en 0.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Grupos de variantes</p>
+                        <p className="text-xs font-bold text-gray-700">Nombre de la variante + opciones con precio.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => addVariantGroup(blockIndex, itemIndex)}
+                        className="px-4 py-2.5 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-black active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                      >
+                        <PiPlus className="w-4 h-4" /> Agregar variante
+                      </button>
+                    </div>
+
+                    {(item.options || []).length === 0 ? (
+                      <div className="p-10 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em] bg-white rounded-2xl border border-gray-100">
+                        Sin variantes.
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {(item.options || []).map((opt, optIdx) => (
+                          <div key={optIdx} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                            <div className="p-4 border-b border-gray-100">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1">Nombre de la variante</label>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  value={opt.name || ''}
+                                  onChange={(e) => updateVariantGroupName(blockIndex, itemIndex, optIdx, e.target.value)}
+                                  className="flex-1 min-w-0 text-sm px-3 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-white font-black uppercase tracking-tight"
+                                  placeholder="Ej. Base, Sabor, Guiso"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeVariantGroup(blockIndex, itemIndex, optIdx)}
+                                  className="w-10 h-10 bg-white border border-gray-200 rounded-xl hover:bg-red-50 text-red-600 flex items-center justify-center transition-all"
+                                  title="Eliminar variante"
+                                >
+                                  <PiTrash className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-2">
+                                Ejemplos: Base (harina, maíz), Sabor (picadillo, chicharrón), Tamaño (chico, grande).
+                              </p>
+                            </div>
+
+                            <div className="p-4 space-y-3">
+                              {(opt.values || []).length === 0 ? (
+                                <div className="p-6 text-center text-gray-400 font-bold uppercase text-xs tracking-[0.2em] bg-gray-50 rounded-2xl border border-gray-100">
+                                  Agrega opciones.
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  {(opt.values || []).map((val, valIdx) => (
+                                    <div key={valIdx} className="flex items-center gap-2">
+                                      <input
+                                        value={val}
+                                        onChange={(e) => renameVariantValue(blockIndex, itemIndex, optIdx, valIdx, e.target.value)}
+                                        className="flex-1 min-w-0 text-sm px-3 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 bg-white"
+                                        placeholder="Opción (ej. Picadillo)"
+                                      />
+                                      <div className="w-36 flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white">
+                                        <span className="text-gray-300 font-black">$</span>
+                                        <input
+                                          value={String(opt.prices?.[val] ?? 0)}
+                                          onChange={(e) => {
+                                            const next = Number.parseFloat(e.target.value);
+                                            setVariantValuePrice(blockIndex, itemIndex, optIdx, val, Number.isFinite(next) ? next : 0);
+                                          }}
+                                          inputMode="decimal"
+                                          className="w-full bg-transparent outline-none font-mono font-black text-gray-700"
+                                          placeholder="0"
+                                        />
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => removeVariantValue(blockIndex, itemIndex, optIdx, valIdx)}
+                                        className="w-10 h-10 bg-white border border-gray-200 rounded-xl hover:bg-red-50 text-red-600 flex items-center justify-center transition-all"
+                                        title="Eliminar opción"
+                                      >
+                                        <PiTrash className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              <div className="flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => addVariantValue(blockIndex, itemIndex, optIdx)}
+                                  className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                                >
+                                  <PiPlus className="w-4 h-4" /> Agregar opción
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </>
       ) : activeTab === 'media' ? (
         <div
