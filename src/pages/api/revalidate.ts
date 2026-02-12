@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { invalidateByTag } from '@vercel/functions';
-
+export const prerender = false;
 const toSlug = (value: string) =>
   (value || '')
     .toString()
