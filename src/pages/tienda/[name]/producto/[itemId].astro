@@ -70,5 +70,5 @@ if (!matchedItem || !matchedSection) {
 const categorySlug = toSlug(matchedSection?.data?.title || '') || 'categoria';
 const productSlug = toSlug(matchedItem?.slug || matchedItem?.name || '') || 'producto';
 
-return Astro.redirect(`/${name}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(productSlug)}`);
+return Astro.redirect(`/tienda/${name}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(productSlug)}`);
 ---

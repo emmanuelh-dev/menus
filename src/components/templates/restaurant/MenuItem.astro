@@ -33,7 +33,7 @@ const toItemSlug = (value: string) =>
 		.replace(/-+/g, "-")
 		.replace(/^-|-$/g, "");
 const tiendaItemUrl = placeSlug && categorySlug
-	? `/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(toItemSlug(item.slug || item.name || "") || "producto")}`
+	? `/tienda/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(toItemSlug(item.slug || item.name || "") || "producto")}`
 	: "#";
 ---
 

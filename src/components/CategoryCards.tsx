@@ -123,7 +123,7 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
 
     if (placeSlug) {
       const categorySlug = toCategorySlug(title) || 'categoria';
-      window.location.href = `/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}`;
+      window.location.href = `/tienda/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}`;
       return;
     }
     scrollTo(sectionId);
