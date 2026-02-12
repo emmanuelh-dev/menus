@@ -36,28 +36,22 @@
  * - image: string
  * - features?: string[] // ["Jacuzzi", "Clima", "Smart TV"] para moteles
  */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { ManualUploader } from '../ManualUploader';
 import type { SemanticData } from '../../types/app';
-import MotelPageRenderer from '../MotelPageRenderer';
-import AIChat from './AIChat';
 import AdminPageHeader from './AdminPageHeader';
-import RestaurantPreview from './RestaurantPreview';
-import {
-  SectionBlock,
-  GalleryBlock,
-  ImageBlock,
-  CarruselBlock,
-  MarkdownBlock,
-  SectionNav,
-  TableView,
-  BlockTypeButton,
-  type Block,
-  type BlockType,
-  type ItemData,
-  type SectionData,
-  type GalleryData
-} from './blocks';
+import type { Block, BlockType, ItemData } from './blocks/types';
+const MotelPageRenderer = lazy(() => import('../MotelPageRenderer'));
+const RestaurantPreview = lazy(() => import('./RestaurantPreview'));
+const AIChat = lazy(() => import('./AIChat'));
+
+const SectionBlock = lazy(() => import('./blocks/SectionBlock').then(m => ({ default: m.SectionBlock })));
+const GalleryBlock = lazy(() => import('./blocks/GalleryBlock').then(m => ({ default: m.GalleryBlock })));
+const ImageBlock = lazy(() => import('./blocks/ImageBlock').then(m => ({ default: m.ImageBlock })));
+const CarruselBlock = lazy(() => import('./blocks/CarruselBlock').then(m => ({ default: m.CarruselBlock })));
+const MarkdownBlock = lazy(() => import('./blocks/MarkdownBlockEditor').then(m => ({ default: m.MarkdownBlockEditor })));
+const TableView = lazy(() => import('./blocks/TableView').then(m => ({ default: m.TableView })));
+const BlockTypeButton = lazy(() => import('./blocks/BlockTypeButton').then(m => ({ default: m.BlockTypeButton })));
 import {
   PiPlus,
   PiTrash,
@@ -173,12 +167,13 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>('editor');
-  const [editorMode, setEditorMode] = useState<'blocks' | 'table'>('blocks');
+  const [editorMode, setEditorMode] = useState<'blocks' | 'table'>('table');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [forceCollapse, setForceCollapse] = useState(true);
+  const [showExtraBlocks, setShowExtraBlocks] = useState(false);
   const [viewSettings, setViewSettings] = useState(() => {
     const vs = initialContent?.view_settings || { layout: 'grid', show_prices: true };
     return {
@@ -586,6 +581,13 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     return sectionItems.some(item => normalizeTitle(item.name) === normalizedName);
   };
 
+  const placeSummary = {
+    category: placeType,
+    location: placeData?.states?.name as string | undefined,
+    address: (semanticData.address || placeData?.address) as string | undefined,
+    rating: placeData?.rating as number | string | undefined,
+  };
+
 
   function renderBlock(block: Block, index: number, forceCollapse: boolean) {
     const existingImages = getAllExistingImages();
@@ -595,7 +597,16 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
     switch (block.type) {
       case 'section':
-        return <SectionBlock data={block.data} onChange={(data) => updateBlock(index, data)} placeType={placeType} forceCollapse={forceCollapse} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
+        return (
+          <SectionBlock
+            data={block.data}
+            onChange={(data) => updateBlock(index, data)}
+            placeType={placeType}
+            forceCollapse={forceCollapse}
+            existingImages={existingImages}
+            onUploadToLibrary={onUploadToLibrary}
+          />
+        );
       case 'gallery':
         return <GalleryBlock data={block.data} onChange={(data) => updateBlock(index, data)} existingImages={existingImages} onUploadToLibrary={onUploadToLibrary} />;
       case 'image':
@@ -611,40 +622,67 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
   }
 
+  const sectionEntries = blocks
+    .map((block, index) => ({ block, index }))
+    .filter(entry => entry.block.type === 'section');
+
+  const extraEntries = blocks
+    .map((block, index) => ({ block, index }))
+    .filter(entry => entry.block.type !== 'section');
+
   return (
     <div className=" pb-32">
       <AdminPageHeader
         sticky={activeTab !== 'editor'}
         leftContent={
-          <div className="flex bg-white/50 rounded-xl gap-0.5 border border-gray-200 shadow-sm w-full items-center justify-center">
-            <button
-              onClick={() => setActiveTab('info')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'info' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
-            >
-              <PiHouse className="w-3.5 h-3.5" />
-              <span>General</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('editor')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
-            >
-              <PiPaintBrushBroad className="w-3.5 h-3.5" />
-              <span>Diseño</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('preview')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'preview' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
-            >
-              <PiMonitor className="w-3.5 h-3.5" />
-              <span>Previa</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('media')}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
-            >
-              <PiImages className="w-3.5 h-3.5" />
-              <span>Galería</span>
-            </button>
+          <div className="flex items-center gap-3 w-full">
+            <div className="flex bg-white/50 rounded-xl gap-0.5 border border-gray-200 shadow-sm w-full items-center justify-center">
+              <button
+                onClick={() => setActiveTab('info')}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'info' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
+              >
+                <PiHouse className="w-3.5 h-3.5" />
+                <span>General</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('editor')}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'editor' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
+              >
+                <PiPaintBrushBroad className="w-3.5 h-3.5" />
+                <span>Diseño</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('preview')}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'preview' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
+              >
+                <PiMonitor className="w-3.5 h-3.5" />
+                <span>Previa</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('media')}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-gray-800 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white'}`}
+              >
+                <PiImages className="w-3.5 h-3.5" />
+                <span>Galería</span>
+              </button>
+            </div>
+
+            <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white/60 shadow-sm whitespace-nowrap">
+              <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{placeSummary.category}</span>
+              {placeSummary.location && (
+                <span className="text-[10px] font-bold text-gray-600">{placeSummary.location}</span>
+              )}
+              {placeSummary.address && (
+                <span className="text-[10px] font-bold text-gray-500 max-w-[260px] truncate" title={placeSummary.address}>
+                  {placeSummary.address}
+                </span>
+              )}
+              {placeSummary.rating !== undefined && placeSummary.rating !== null && placeSummary.rating !== '' && (
+                <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">
+                  ★ {placeSummary.rating}
+                </span>
+              )}
+            </div>
           </div>
         }
         rightContent={
@@ -1041,30 +1079,35 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 <PiLayout className="w-4 h-4" /> Bloques
               </button>
               <button
-                onClick={() => setEditorMode('table')}
+                onClick={() => {
+                  setEditorMode('table');
+                  setShowViewSettings(false);
+                }}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${editorMode === 'table' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 <PiTable className="w-4 h-4" /> Vista Tablas
               </button>
             </div>
 
-            <button
-              onClick={() => setShowViewSettings(!showViewSettings)}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-3 bg-white rounded-2xl shadow-sm text-gray-700 group transition-transform ${showViewSettings ? 'shadow-inner' : ''}`}>
-                  <PiLayout className={`w-5 h-5 transition-transform duration-300 ${showViewSettings ? 'rotate-12 text-indigo-500' : ''} pointer-events-none`} />
-                </div>
-                <div className="text-left">
-                  <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-800 block mb-1">Diseño de Página</span>
-                  <p className="text-xs text-gray-600 font-medium">Plantilla, distribución y visualización</p>
-                </div>
-              </div>
-            </button>
+            {editorMode === 'blocks' && (
+              <>
+                <button
+                  onClick={() => setShowViewSettings(!showViewSettings)}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all shadow-sm group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 bg-white rounded-2xl shadow-sm text-gray-700 group transition-transform ${showViewSettings ? 'shadow-inner' : ''}`}>
+                      <PiLayout className={`w-5 h-5 transition-transform duration-300 ${showViewSettings ? 'rotate-12 text-indigo-500' : ''} pointer-events-none`} />
+                    </div>
+                    <div className="text-left">
+                      <span className="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-800 block mb-1">Diseño de Página</span>
+                      <p className="text-xs text-gray-600 font-medium">Plantilla, distribución y visualización</p>
+                    </div>
+                  </div>
+                </button>
 
-            {showViewSettings && (
-              <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-xl space-y-6">
+                {showViewSettings && (
+                  <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-xl space-y-6">
                 <div>
                   <label className="text-xs font-bold text-gray-600 mb-4 block uppercase tracking-wider">Plantilla del {placeType === 'restaurant' ? 'Menú' : 'Motel'}:</label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1145,27 +1188,27 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                     </label>
                   </div>
                 </div>
-              </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          <AIChat
-            placeId={placeId}
-            currentBlocks={blocks}
-            currentSemanticData={semanticData}
-            onContentUpdate={(newBlocks, newSemanticData) => {
-              setBlocks(newBlocks);
-              setSemanticData(newSemanticData);
-            }}
-            isOpen={showAIChat}
-            onClose={() => setShowAIChat(false)}
-          />
-
-          <div className="hidden xl:flex mt-4 flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider px-1">
-            <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Pega imágenes (Ctrl+V)</span>
-            <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> CMD + Enter para enviar</span>
-            <span className="flex items-center gap-1"><PiCheckCircle className="w-3 h-3" /> Arrastra fotos o archivos</span>
-          </div>
+          {showAIChat && (
+            <Suspense fallback={null}>
+              <AIChat
+                placeId={placeId}
+                currentBlocks={blocks}
+                currentSemanticData={semanticData}
+                onContentUpdate={(newBlocks, newSemanticData) => {
+                  setBlocks(newBlocks);
+                  setSemanticData(newSemanticData);
+                }}
+                isOpen={showAIChat}
+                onClose={() => setShowAIChat(false)}
+              />
+            </Suspense>
+          )}
 
           {editorMode === 'blocks' ? (
             <>
@@ -1174,9 +1217,10 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                 activeSectionId={activeSectionId}
                 onScrollTo={scrollToBlock}
               /> */}
-              <div className="space-y-4 lg:px-4 sm:px-0">
-                {blocks.map((block, index) => (
-                  <div key={block.id} id={block.id} className="relative scroll-mt-24">
+              <Suspense fallback={<div className="bg-white rounded-2xl border border-gray-200 p-6 lg:mx-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Cargando editor...</div>}>
+                <div className="space-y-4 lg:px-4 sm:px-0">
+                  {sectionEntries.map(({ block, index }) => (
+                    <div key={block.id} id={block.id} className="relative scroll-mt-24">
 
                     <div className="flex justify-end gap-2 mb-3 ">
                       <button
@@ -1211,7 +1255,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                       </button>
                     </div>
 
-                    {renderBlock(block, index, forceCollapse)}
+                      {renderBlock(block, index, forceCollapse)}
 
                     <div className="flex justify-center my-4">
                       <button
@@ -1222,7 +1266,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                       </button>
                     </div>
 
-                    {showBlockMenu === `after-${index}` && (
+                      {showBlockMenu === `after-${index}` && (
                       <div className="mt-3 p-4 bg-white border rounded-xl ">
                         <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
                         <div className="grid grid-cols-2 gap-2">
@@ -1240,11 +1284,100 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         </button>
                       </div>
                     )}
-                  </div>
-                ))}
+                    </div>
+                  ))}
 
-                {blocks.length === 0 && (
-                  <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
+                  {extraEntries.length > 0 && (
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setShowExtraBlocks(v => !v)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="text-left">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Extras</p>
+                          <p className="text-xs font-bold text-gray-700">Imágenes, galerías, promociones y texto</p>
+                        </div>
+                        <span className="text-[10px] font-black text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                          {extraEntries.length}
+                        </span>
+                      </button>
+
+                      {showExtraBlocks && (
+                        <div className="p-4 space-y-4">
+                          {extraEntries.map(({ block, index }) => (
+                            <div key={block.id} id={block.id} className="relative scroll-mt-24">
+                              <div className="flex justify-end gap-2 mb-3 ">
+                                <button
+                                  onClick={() => moveBlock(index, 'up')}
+                                  disabled={index === 0}
+                                  className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                                  title="Subir"
+                                >
+                                  <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                                </button>
+                                <button
+                                  onClick={() => moveBlock(index, 'down')}
+                                  disabled={index === blocks.length - 1}
+                                  className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                                  title="Bajar"
+                                >
+                                  <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                                </button>
+                                <button
+                                  onClick={() => duplicateBlock(index)}
+                                  className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
+                                  title="Duplicar"
+                                >
+                                  <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+                                </button>
+                                <button
+                                  onClick={() => removeBlock(index)}
+                                  className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
+                                  title="Eliminar"
+                                >
+                                  <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
+                                </button>
+                              </div>
+
+                              {renderBlock(block, index, forceCollapse)}
+
+                              <div className="flex justify-center my-4">
+                                <button
+                                  onClick={() => setShowBlockMenu(`after-${index}`)}
+                                  className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
+                                >
+                                  <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
+                                </button>
+                              </div>
+
+                              {showBlockMenu === `after-${index}` && (
+                                <div className="mt-3 p-4 bg-white border rounded-xl ">
+                                  <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
+                                    <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
+                                    <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
+                                    <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
+                                    <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown', index)} />
+                                  </div>
+                                  <button
+                                    onClick={() => setShowBlockMenu(false)}
+                                    className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {blocks.length === 0 && (
+                    <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
                     <div className="mb-4 flex justify-center">
                       <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
                         <PiTray className="w-8 h-8" />
@@ -1258,24 +1391,27 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                       <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
                     </button>
 
-                    {showBlockMenu === true && (
-                      <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
-                        <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
-                        <div className="grid grid-cols-2 gap-3">
-                          <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section')} />
-                          <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
-                          <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
-                          <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
-                          <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown')} />
+                      {showBlockMenu === true && (
+                        <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
+                          <p className="text-xs font-bold text-gray-400 mb-4 uppercase">Selecciona el tipo de bloque:</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section')} />
+                            <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image')} />
+                            <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery')} />
+                            <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel')} />
+                            <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown')} />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Suspense>
             </>
           ) : (
-            <TableView blocks={blocks} onChange={setBlocks} />
+            <Suspense fallback={<div className="bg-white rounded-2xl border border-gray-200 p-6 lg:mx-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Cargando tablas...</div>}>
+              <TableView blocks={blocks} onChange={setBlocks} />
+            </Suspense>
           )}
         </>
       ) : activeTab === 'media' ? (
@@ -1359,22 +1495,24 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
             <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Vista Previa en Vivo</div>
             <div className="w-12" />
           </div>
-          {placeType === 'motel' ? (
-            <MotelPageRenderer
-              place={{
-                ...placeData,
-                content: { blocks, semantic_data: semanticData, view_settings: viewSettings }
-              }}
-              isPreview={true}
-            />
-          ) : (
-            <div className="py-10 bg-gray-50/50 min-h-screen">
-              <RestaurantPreview
-                place={{ name: initialContent?.name, content: { blocks, semantic_data: semanticData }, image: initialContent?.image }}
-                template={viewSettings.template}
+          <Suspense fallback={<div className="p-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Cargando vista previa...</div>}>
+            {placeType === 'motel' ? (
+              <MotelPageRenderer
+                place={{
+                  ...placeData,
+                  content: { blocks, semantic_data: semanticData, view_settings: viewSettings }
+                }}
+                isPreview={true}
               />
-            </div>
-          )}
+            ) : (
+              <div className="py-10 bg-gray-50/50 min-h-screen">
+                <RestaurantPreview
+                  place={{ name: initialContent?.name, content: { blocks, semantic_data: semanticData }, image: initialContent?.image }}
+                  template={viewSettings.template}
+                />
+              </div>
+            )}
+          </Suspense>
         </div>
       )}
 
