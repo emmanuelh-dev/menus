@@ -8,6 +8,13 @@ Astro.response.headers.set(
 
 const { name, state } = Astro.params;
 
+if (!name) {
+	throw new Error("No se ha especificado el nombre del restaurante");
+}
+
+const placeTag = `place-${name}`;
+Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
+
 import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
 import {
 	supabase,
@@ -17,10 +24,6 @@ import {
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
 import { isAuthenticated } from "../../../../../middleware/auth";
-
-if (!name) {
-	throw new Error("No se ha especificado el nombre del restaurante");
-}
 
 const isAdmin = await isAuthenticated(Astro.request, Astro.cookies);
 

@@ -9,14 +9,17 @@ Astro.response.headers.set(
 
 const { name } = Astro.params;
 
+if (!name) {
+	throw new Error("No se ha especificado el nombre del restaurante");
+}
+
+const placeTag = `place-${name}`;
+Astro.response.headers.set('Vercel-Cache-Tag', placeTag);
+
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../../components/Gallery.astro";
 import WhatsappButton from "../../../../components/WhatsappButton";
 import { supabase } from "../../../../lib/supabase";
-
-if (!name) {
-	throw new Error("No se ha especificado el nombre del restaurante");
-}
 const { data: place } = await supabase
 	.from("places")
 	.select("*")
@@ -30,9 +33,9 @@ if (!place) {
 let { blocks = [], view_settings = {} } = place.content || {};
 
 // Limpieza de bloques
-blocks = blocks.map((block) => {
+blocks = blocks.map((block: any) => {
 	if (block.type === "gallery" && block.data.images) {
-		const imagesWithAlt = block.data.images.map((img, idx) => ({
+		const imagesWithAlt = block.data.images.map((img: any, idx: number) => ({
 			...img,
 			alt: img.alt || `${place.name} - Galería ${idx + 1}`,
 		}));
@@ -180,7 +183,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 				{
 					(() => {
 						let sectionCounter = 0;
-						return blocks.map((block) => {
+						return blocks.map((block: any) => {
 							if (block.type === "section") {
 								const isOpen = sectionCounter < 2;
 								sectionCounter++;
@@ -217,7 +220,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 												</p>
 											)}
 
-											{block.data.items?.map((item) => (
+											{block.data.items?.map((item: any) => (
 												<div class="space-y-4">
 													<div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item">
 														<div class="order-2 sm:order-1">

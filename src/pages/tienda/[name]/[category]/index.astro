@@ -31,6 +31,9 @@ const toSlug = (value: string) =>
     .replace(/^-|-$/g, '');
 
 const decodedCategory = decodeURIComponent(category);
+const placeTag = `place-${name}`;
+const categoryTag = `place-${name}-cat-${decodedCategory}`;
+Astro.response.headers.set('Vercel-Cache-Tag', `${placeTag},${categoryTag}`);
 
 const { data: place } = await supabase
   .from('places')

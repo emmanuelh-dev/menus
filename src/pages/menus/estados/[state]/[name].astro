@@ -8,13 +8,16 @@ Astro.response.headers.set(
 
 const { name, state } = Astro.params;
 
-import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
-import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
-import { supabase } from "../../../../lib/supabase";
-
 if (!name) {
 	throw new Error("No se ha especificado el nombre del restaurante");
 }
+
+const placeTag = `place-${name}`;
+Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
+
+import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
+import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+import { supabase } from "../../../../lib/supabase";
 
 // Buscamos el lugar asegurándonos que el estado coincida para SEO
 const { data: place } = await supabase

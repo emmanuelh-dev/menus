@@ -8,12 +8,15 @@ Astro.response.headers.set(
 
 const { name } = Astro.params;
 
-import MenuPageRenderer from "../../../components/templates/MenuPageRenderer.astro";
-import { supabase } from "../../../lib/supabase";
-
 if (!name) {
   throw new Error("No se ha especificado el nombre de la tienda");
 }
+
+const placeTag = `place-${name}`;
+Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
+
+import MenuPageRenderer from "../../../components/templates/MenuPageRenderer.astro";
+import { supabase } from "../../../lib/supabase";
 
 const { data: place } = await supabase
   .from("places")
