@@ -199,6 +199,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     return {
       layout: vs.layout || 'grid',
       show_prices: vs.show_prices ?? true,
+      show_categories_at_start: vs.show_categories_at_start ?? false,
+      hide_category_images: vs.hide_category_images ?? false,
       template: vs.template || (isCafe ? 'cafesoso' : 'default')
     };
   });
@@ -209,6 +211,8 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [isLibraryPasting, setIsLibraryPasting] = useState(false);
   const [simpleVariantsOpen, setSimpleVariantsOpen] = useState<{ blockId: string; itemId: string } | null>(null);
   const [simpleImagePicker, setSimpleImagePicker] = useState<{ blockIndex: number; itemIndex: number } | null>(null);
+  const [simpleGalleryPicker, setSimpleGalleryPicker] = useState<{ blockIndex: number; itemIndex: number } | null>(null);
+  const [simpleSectionImagePicker, setSimpleSectionImagePicker] = useState<{ blockIndex: number } | null>(null);
 
   const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvdq078aa'
   const uploadPreset = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'
@@ -591,6 +595,35 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
       .replace(/[^a-z0-9]/g, '');
   };
 
+  const toItemSlug = (value: string) => {
+    return (value || '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  const getUniqueItemSlug = (sectionItems: ItemData[], baseSlug: string, currentItemId?: string) => {
+    const initialSlug = baseSlug || 'producto';
+    let nextSlug = initialSlug;
+    let counter = 2;
+
+    const exists = (slug: string) =>
+      sectionItems.some((item) => item.id !== currentItemId && (item.slug || toItemSlug(item.name || '')) === slug);
+
+    while (exists(nextSlug)) {
+      nextSlug = `${initialSlug}-${counter}`;
+      counter += 1;
+    }
+
+    return nextSlug;
+  };
+
   const findSimilarSection = (title: string) => {
     const normalized = normalizeTitle(title);
     return blocks.findIndex(
@@ -631,10 +664,13 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     return templateConfigs[template] || templateConfigs.default;
   }, [viewSettings.template]);
 
-  const createDefaultItem = (): ItemData => {
+  const createDefaultItem = (existingItems: ItemData[] = []): ItemData => {
+    const defaultName = 'NUEVO PRODUCTO';
+    const slug = getUniqueItemSlug(existingItems, toItemSlug(defaultName));
     return {
       id: `item-${Date.now()}-${Math.random()}`,
-      name: 'NUEVO PRODUCTO',
+      slug,
+      name: defaultName,
       price: 0,
       description: '',
       image: '',
@@ -650,7 +686,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const addItemToSection = (blockIndex: number) => {
     const block = blocks[blockIndex];
     if (!block || block.type !== 'section') return;
-    const newItem = createDefaultItem();
+    const newItem = createDefaultItem(block.data.items || []);
 
     const newBlocks = [...blocks];
     const nextItems = [...(block.data.items || []), newItem];
@@ -665,7 +701,17 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     const items = [...(block.data.items || [])];
     const current = items[itemIndex];
     if (!current) return;
-    items[itemIndex] = { ...current, ...patch };
+    const nextItem: ItemData = { ...current, ...patch };
+
+    if (typeof patch.name === 'string' && patch.slug === undefined) {
+      nextItem.slug = getUniqueItemSlug(items, toItemSlug(patch.name), current.id);
+    }
+
+    if (typeof patch.slug === 'string') {
+      nextItem.slug = getUniqueItemSlug(items, toItemSlug(patch.slug), current.id);
+    }
+
+    items[itemIndex] = nextItem;
     const newBlocks = [...blocks];
     newBlocks[blockIndex] = { ...block, data: { ...block.data, items } };
     setBlocks(newBlocks);
@@ -681,11 +727,113 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     setBlocks(newBlocks);
   };
 
+  const addGalleryImagesToItem = (blockIndex: number, itemIndex: number, urls: string[]) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+
+    const existingGallery = item.gallery || [];
+    const existingUrls = new Set(existingGallery.map((img: NonNullable<ItemData['gallery']>[number]) => img.src));
+    const toAdd = urls.filter(url => !existingUrls.has(url)).map(src => ({ src }));
+    const nextGallery = [...existingGallery, ...toAdd];
+
+    updateItemInSection(blockIndex, itemIndex, {
+      gallery: nextGallery,
+      image: item.image || nextGallery[0]?.src || '',
+    });
+  };
+
+  const setFeaturedGalleryImage = (blockIndex: number, itemIndex: number, url: string) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+
+    const existingGallery = item.gallery || [];
+    const hasUrl = existingGallery.some((img: NonNullable<ItemData['gallery']>[number]) => img.src === url);
+    const nextGallery = hasUrl ? existingGallery : [...existingGallery, { src: url }];
+
+    updateItemInSection(blockIndex, itemIndex, {
+      image: url,
+      gallery: nextGallery,
+    });
+  };
+
+  const removeGalleryImageFromItem = (blockIndex: number, itemIndex: number, url: string) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const item = block.data.items?.[itemIndex];
+    if (!item) return;
+
+    const nextGallery = (item.gallery || []).filter((img: NonNullable<ItemData['gallery']>[number]) => img.src !== url);
+    const nextMainImage = item.image === url ? (nextGallery[0]?.src || '') : item.image;
+
+    updateItemInSection(blockIndex, itemIndex, {
+      gallery: nextGallery,
+      image: nextMainImage,
+    });
+  };
+
+  const duplicateItemInSection = (blockIndex: number, itemIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    const items = [...(block.data.items || [])];
+    const current = items[itemIndex];
+    if (!current) return;
+
+    const duplicatedItem: ItemData = {
+      ...current,
+      id: `item-${Date.now()}-${Math.random()}`,
+      slug: getUniqueItemSlug(items, toItemSlug(current.name || 'producto')),
+    };
+
+    items.splice(itemIndex + 1, 0, duplicatedItem);
+    const newBlocks = [...blocks];
+    newBlocks[blockIndex] = { ...block, data: { ...block.data, items } };
+    setBlocks(newBlocks);
+  };
+
   const removeSectionSimple = (blockIndex: number) => {
     const block = blocks[blockIndex];
     if (!block || block.type !== 'section') return;
     if (!confirm('¿Seguro que quieres eliminar esta categoría y todos sus productos?')) return;
     removeBlock(blockIndex);
+  };
+
+  const duplicateSectionSimple = (blockIndex: number) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+
+    const duplicatedItems: ItemData[] = [];
+    const sourceItems = block.data.items || [];
+
+    sourceItems.forEach((item: ItemData) => {
+      const nextItem: ItemData = {
+        ...item,
+        id: `item-${Date.now()}-${Math.random()}`,
+        slug: getUniqueItemSlug(
+          duplicatedItems,
+          toItemSlug(item.slug || item.name || 'producto'),
+        ),
+      };
+      duplicatedItems.push(nextItem);
+    });
+
+    const duplicatedBlock: Block = {
+      ...block,
+      id: `block-${Date.now()}-${Math.random()}`,
+      data: {
+        ...block.data,
+        title: `${block.data.title || 'Categoría'} (Copia)`,
+        featured: false,
+        items: duplicatedItems,
+      },
+    };
+
+    const newBlocks = [...blocks];
+    newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
+    setBlocks(newBlocks);
   };
 
   const moveSectionAmongSections = (blockIndex: number, direction: 'up' | 'down') => {
@@ -738,6 +886,12 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
     const block = blocks[blockIndex];
     if (!block || block.type !== 'section') return;
     updateBlock(blockIndex, { featured: !(block.data.featured ?? false) });
+  };
+
+  const updateSectionImage = (blockIndex: number, image: string) => {
+    const block = blocks[blockIndex];
+    if (!block || block.type !== 'section') return;
+    updateBlock(blockIndex, { image });
   };
 
   const updateItemOptionsInSection = (blockIndex: number, itemIndex: number, nextOptions: ItemOption[]) => {
@@ -1486,6 +1640,49 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                       Este negocio tiene administrador
                     </label>
                   </div>
+
+                  {viewSettings.template === 'tienda' && (
+                    <div className="md:col-span-2 grid grid-cols-1 gap-3">
+                      <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <input
+                          type="checkbox"
+                          id="enable_cart_from_template"
+                          checked={semanticData.enable_cart || false}
+                          onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
+                          className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500"
+                        />
+                        <label htmlFor="enable_cart_from_template" className="text-sm font-bold text-emerald-900 cursor-pointer">
+                          Habilitar carrito en esta tienda
+                        </label>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <input
+                          type="checkbox"
+                          id="show_categories_at_start"
+                          checked={Boolean(viewSettings.show_categories_at_start)}
+                          onChange={(e) => setViewSettings({ ...viewSettings, show_categories_at_start: e.target.checked })}
+                          className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                        <label htmlFor="show_categories_at_start" className="text-sm font-bold text-indigo-900 cursor-pointer">
+                          Mostrar categorías al inicio (carrusel)
+                        </label>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <input
+                          type="checkbox"
+                          id="hide_category_images"
+                          checked={Boolean(viewSettings.hide_category_images)}
+                          onChange={(e) => setViewSettings({ ...viewSettings, hide_category_images: e.target.checked })}
+                          className="w-5 h-5 text-slate-700 rounded focus:ring-slate-500"
+                        />
+                        <label htmlFor="hide_category_images" className="text-sm font-bold text-slate-800 cursor-pointer">
+                          Ocultar imágenes de categoría en el listado
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
                   </div>
                 )}
@@ -1542,6 +1739,26 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                             placeholder="Nombre de la categoría"
                           />
                           <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setSimpleSectionImagePicker({ blockIndex: index })}
+                              className="px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 active:scale-95 transition-all"
+                              title="Imagen de fondo de categoría"
+                            >
+                              {block.data.image ? 'Cambiar fondo' : 'Agregar fondo'}
+                            </button>
+                            {block.data.image && (
+                              <button
+                                type="button"
+                                onClick={() => updateSectionImage(index, '')}
+                                className="px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 active:scale-95 transition-all"
+                                title="Quitar imagen de fondo"
+                              >
+                                Quitar fondo
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => toggleSectionFeatured(index)}
@@ -1575,8 +1792,23 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                             >
                               <PiTrash className="w-4 h-4" /> Eliminar
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => duplicateSectionSimple(index)}
+                              className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-indigo-700 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                            >
+                              <PiCopy className="w-4 h-4" /> Duplicar
+                            </button>
                           </div>
                         </div>
+
+                        {block.data.image && (
+                          <div className="px-4">
+                            <div className="h-24 rounded-2xl overflow-hidden border border-gray-200 bg-gray-50">
+                              <img src={block.data.image} alt={block.data.title || 'Categoría'} className="w-full h-full object-cover" />
+                            </div>
+                          </div>
+                        )}
 
                         <div>
                 
@@ -1644,28 +1876,66 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                                               </div>
                                             </div>
 
-                                            <button
-                                              type="button"
-                                              onClick={() => setSimpleImagePicker({ blockIndex: index, itemIndex: itemIdx })}
-                                              className="group relative w-28 h-28 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 shrink-0"
-                                              title="Cambiar imagen"
-                                            >
-                                              {item.image ? (
-                                                <img src={item.image} className="w-full h-full object-cover" alt="" />
-                                              ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                  <PiImage className="w-7 h-7" />
-                                                </div>
-                                              )}
+                                            <div className="shrink-0 w-28">
+                                              <button
+                                                type="button"
+                                                onClick={() => setSimpleImagePicker({ blockIndex: index, itemIndex: itemIdx })}
+                                                className="group relative w-28 h-28 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50"
+                                                title="Cambiar imagen"
+                                              >
+                                                {item.image ? (
+                                                  <img src={item.image} className="w-full h-full object-cover" alt="" />
+                                                ) : (
+                                                  <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                    <PiImage className="w-7 h-7" />
+                                                  </div>
+                                                )}
 
-                                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                                              <div className="absolute bottom-2 right-2">
-                                                <span className="px-3 py-1.5 rounded-xl bg-white/90 border border-gray-200 text-gray-800 text-[10px] font-black uppercase tracking-widest shadow-sm">
-                                                  Cambiar
-                                                </span>
-                                              </div>
-                                            </button>
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                                <div className="absolute bottom-2 right-2">
+                                                  <span className="px-3 py-1.5 rounded-xl bg-white/90 border border-gray-200 text-gray-800 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                                    Cambiar
+                                                  </span>
+                                                </div>
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => setSimpleGalleryPicker({ blockIndex: index, itemIndex: itemIdx })}
+                                                className="w-full mt-2 px-2 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 active:scale-95 transition-all"
+                                              >
+                                                Galería {(item.gallery || []).length > 0 ? `(${(item.gallery || []).length})` : ''}
+                                              </button>
+                                            </div>
                                           </div>
+
+                                          {(item.gallery || []).length > 0 && (
+                                            <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                              {(item.gallery || []).map((img, gIdx) => {
+                                                const isFeaturedImage = item.image === img.src;
+                                                return (
+                                                  <div key={gIdx} className="rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+                                                    <img src={img.src} alt="" className="w-full h-20 object-cover" />
+                                                    <div className="p-1.5 flex gap-1">
+                                                      <button
+                                                        type="button"
+                                                        onClick={() => setFeaturedGalleryImage(index, itemIdx, img.src)}
+                                                        className={`flex-1 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${isFeaturedImage ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700'}`}
+                                                      >
+                                                        {isFeaturedImage ? 'Destacada' : 'Destacar'}
+                                                      </button>
+                                                      <button
+                                                        type="button"
+                                                        onClick={() => removeGalleryImageFromItem(index, itemIdx, img.src)}
+                                                        className="px-2 py-1 rounded-lg bg-white border border-gray-200 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-50 transition-all"
+                                                      >
+                                                        Quitar
+                                                      </button>
+                                                    </div>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          )}
 
                                           <div className="mt-3 flex justify-end gap-2 flex-wrap">
                                             <button
@@ -1693,6 +1963,13 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                                               title="Bajar producto"
                                             >
                                               <PiCaretDown className="w-4 h-4 text-gray-600" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => duplicateItemInSection(index, itemIdx)}
+                                              className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 active:scale-95 transition-all"
+                                            >
+                                              Duplicar
                                             </button>
                                             <button
                                               type="button"
@@ -1957,6 +2234,37 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   updateItemInSection(simpleImagePicker.blockIndex, simpleImagePicker.itemIndex, { image: url });
                 }}
                 onClose={() => setSimpleImagePicker(null)}
+              />
+            </Suspense>
+          )}
+
+          {editorMode === 'simple' && simpleSectionImagePicker && (
+            <Suspense fallback={null}>
+              <ImageSelector
+                existingImages={getAllExistingImages()}
+                onUpload={(urls) => {
+                  setMediaLibrary(prev => [...new Set([...urls, ...prev])]);
+                }}
+                onSelect={(url) => {
+                  updateSectionImage(simpleSectionImagePicker.blockIndex, url);
+                }}
+                onClose={() => setSimpleSectionImagePicker(null)}
+              />
+            </Suspense>
+          )}
+
+          {editorMode === 'simple' && simpleGalleryPicker && (
+            <Suspense fallback={null}>
+              <ImageSelector
+                existingImages={getAllExistingImages()}
+                multiple={true}
+                onUpload={(urls) => {
+                  setMediaLibrary(prev => [...new Set([...urls, ...prev])]);
+                }}
+                onSelectMultiple={(urls) => {
+                  addGalleryImagesToItem(simpleGalleryPicker.blockIndex, simpleGalleryPicker.itemIndex, urls);
+                }}
+                onClose={() => setSimpleGalleryPicker(null)}
               />
             </Suspense>
           )}

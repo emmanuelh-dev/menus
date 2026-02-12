@@ -1,0 +1,139 @@
+---
+import { X } from 'lucide-react';
+import DefaultLayout from '../layouts/DefaultLayout.astro';
+import BysmaxSectionNav from '../components/BysmaxSectionNav.astro';
+import { comparativeFeatures, publicPlans } from '../data/pricing';
+
+const seo = {
+  title: 'Planes para abrir tu tienda online | BySMax',
+  description: 'Publica tus productos y potencia tus ventas recibiendo pedidos por WhatsApp. Conoce los planes y elige el que mejor se adapta a tu negocio.',
+  keywords: 'planes tienda online, pedidos por whatsapp, plan gratis ecommerce, software tienda online',
+};
+
+const quickBenefits = [
+  {
+    title: 'Ahorra tiempo',
+    text: 'Reduce las horas que dedicas a gestionar tu negocio.',
+  },
+  {
+    title: 'Toma el control',
+    text: 'Ofrece un mejor precio con una tienda independiente.',
+  },
+  {
+    title: 'Aumenta tu alcance',
+    text: 'Llega a más clientes con un canal de venta online.',
+  },
+];
+
+const features = [
+  {
+    title: 'Crea productos',
+    text: 'Publica productos fácilmente, con imágenes, promociones y stock.',
+  },
+  {
+    title: 'Ofrece variedad',
+    text: 'Ten un catálogo versátil con opciones según cada producto.',
+  },
+  {
+    title: 'Personaliza tu tienda',
+    text: 'Aplica los colores e identidad visual de tu marca.',
+  },
+  {
+    title: 'Información del pedido',
+    text: 'Solicita solo los datos que necesitas para procesar cada venta.',
+  },
+  {
+    title: 'Medios de pago',
+    text: 'Configura efectivo, transferencias y otros medios.',
+  },
+  {
+    title: 'Estadísticas de ventas',
+    text: 'Revisa rendimiento de ventas y visitas para tomar mejores decisiones.',
+  },
+];
+---
+
+<DefaultLayout title={seo.title} description={seo.description} keywords={seo.keywords} showAds={false}>
+  <BysmaxSectionNav />
+
+  <main>
+    <section class="max-w-7xl mx-auto px-6 pt-14 pb-10">
+      <div class="max-w-3xl">
+        <p class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700">Planes</p>
+        <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mt-3 leading-[0.95]">Abre hoy tu tienda online</h1>
+        <p class="text-lg text-slate-600 mt-6 font-medium">Publica tus productos y potencia tus ventas recibiendo pedidos ilimitados por WhatsApp.</p>
+        <div class="mt-8">
+          <a href="/admin/register" class="inline-flex items-center px-6 py-3 rounded-xl bg-emerald-600 text-white text-xs font-black uppercase tracking-widest hover:bg-emerald-700 transition-colors">
+            Crea tu cuenta
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 pb-14">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {quickBenefits.map((item) => (
+          <article class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+            <h2 class="text-lg font-black text-slate-900">{item.title}</h2>
+            <p class="text-sm text-slate-600 mt-2">{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="bg-slate-50 border-y border-slate-200">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Descubre todo lo que puedes hacer</h2>
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((feature) => (
+            <article class="bg-white rounded-2xl border border-slate-200 p-5">
+              <h3 class="text-base font-black text-slate-900">{feature.title}</h3>
+              <p class="text-sm text-slate-600 mt-2">{feature.text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 py-14">
+      <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Paga solo por lo que necesitas</h2>
+      <p class="text-slate-600 mt-3">Este comparativo usa el pricing actual configurado en la plataforma.</p>
+
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {publicPlans.map((plan) => (
+          <article class="bg-white rounded-2xl border border-slate-200 p-6">
+            <p class="text-[11px] font-black uppercase tracking-widest text-slate-500">{plan.name}</p>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-4">{plan.fromLabel}</p>
+            <p class="text-3xl font-black text-slate-900 mt-1">{plan.headline}</p>
+            <p class="text-sm text-slate-600 mt-4">{plan.description}</p>
+            <p class="text-xs text-slate-500 mt-3">{plan.note}</p>
+            <a href={plan.ctaHref} class="mt-5 inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest hover:bg-black transition-colors">{plan.ctaLabel}</a>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-10 overflow-x-auto border border-slate-200 rounded-2xl bg-white">
+        <table class="w-full min-w-[800px]">
+          <thead>
+            <tr class="bg-slate-50">
+              <th class="p-4 text-left text-xs uppercase tracking-widest text-slate-500">Característica</th>
+              <th class="p-4 text-center text-xs uppercase tracking-widest text-slate-500">Gratis</th>
+              <th class="p-4 text-center text-xs uppercase tracking-widest text-slate-500">Pro</th>
+              <th class="p-4 text-center text-xs uppercase tracking-widest text-slate-500">Empresarial</th>
+            </tr>
+          </thead>
+          <tbody>
+            {comparativeFeatures.map((feature) => (
+              <tr class="border-t border-slate-100">
+                <td class="p-4 text-sm font-bold text-slate-800">{feature.name}</td>
+                <td class="p-4 text-center text-sm text-slate-600">{feature.free === 'No' ? <X className="w-4 h-4 mx-auto text-red-500" /> : feature.free}</td>
+                <td class="p-4 text-center text-sm text-slate-600">{feature.pro === 'No' ? <X className="w-4 h-4 mx-auto text-red-500" /> : feature.pro}</td>
+                <td class="p-4 text-center text-sm text-slate-600">{feature.enterprise === 'No' ? <X className="w-4 h-4 mx-auto text-red-500" /> : feature.enterprise}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</DefaultLayout>

@@ -4,6 +4,8 @@ import { Image } from "astro:assets";
 interface Props {
 	item: any;
 	template: string;
+	placeSlug?: string;
+	categorySlug?: string;
 	showPrices: boolean;
 	enableCart: boolean;
 	whatsappNumber: string;
@@ -11,7 +13,7 @@ interface Props {
 
 import MarkdownBlock from "../../MarkdownBlock";
 
-const { item, template, showPrices, enableCart, whatsappNumber } = Astro.props;
+const { item, template, placeSlug = "", categorySlug = "", showPrices, enableCart, whatsappNumber } = Astro.props;
 
 const isVibrant = template === "vibrant";
 const isUber = template === "uber";
@@ -19,6 +21,20 @@ const isDidi = template === "didi";
 const isTienda = template === "tienda";
 const isMariscos = template === "mariscos";
 const isCafesoso = template === "cafesoso";
+const toItemSlug = (value: string) =>
+	(value || "")
+		.toString()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "-")
+		.replace(/[^a-z0-9-]/g, "")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "");
+const tiendaItemUrl = placeSlug && categorySlug
+	? `/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(toItemSlug(item.slug || item.name || "") || "producto")}`
+	: "#";
 ---
 
 {
@@ -313,79 +329,64 @@ const isCafesoso = template === "cafesoso";
 {
 	isTienda && (
 		<div
-			class="bg-white/5 backdrop-blur-sm p-4 rounded-3xl border border-white/10 hover:border-white/20 transition-all group hover:bg-white/10"
+			class="relative bg-[#242424] border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all group h-full flex flex-col"
 			data-item-id={item.id}
 		>
-			<div class="flex gap-4">
-				{/* Image */}
-				<div class="relative shrink-0">
-					{item.image ? (
-						<div class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shadow-xl ring-2 ring-white/10">
-							<Image
-								src={item.image}
-								alt={item.name}
-								width={400}
-								height={400}
-								class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-								loading="lazy"
-								format="webp"
-								quality={80}
-							/>
-						</div>
+			{placeSlug && (
+				<a
+					href={tiendaItemUrl}
+					class="absolute inset-0 z-10"
+					aria-label={`Ver ${item.name}`}
+				/>
+			)}
+			<div class="relative aspect-square bg-black/20 overflow-hidden">
+				{item.image ? (
+					<Image
+						src={item.image}
+						alt={item.name}
+						width={640}
+						height={640}
+						class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+						loading="lazy"
+						format="webp"
+						quality={85}
+					/>
+				) : (
+					<div class="w-full h-full bg-white/5" />
+				)}
+			</div>
+
+			<div class="p-3 sm:p-4 flex-1 flex flex-col relative z-20">
+				<h3 class="font-black text-white text-sm sm:text-base line-clamp-2 min-h-[2.5rem]">
+					{item.name}
+				</h3>
+
+				{item.description && (
+					<div class="mt-1 line-clamp-2 min-h-[2rem]">
+						<MarkdownBlock
+							client:load
+							content={item.description}
+							className="text-gray-400 text-[11px] leading-relaxed !m-0"
+						/>
+					</div>
+				)}
+
+				<div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+					{showPrices && item.price > 0 ? (
+						<span class="text-red-400 font-black text-base sm:text-lg">${item.price}</span>
 					) : (
-						<div class="w-24 h-24 rounded-2xl bg-white/5 flex items-center justify-center text-white/30">
-							<span class="text-3xl">🍽️</span>
-						</div>
+						<span class="text-white/40 text-xs font-bold uppercase">Sin precio</span>
 					)}
+
 					{enableCart && (
 						<button
-							class="cart-add-btn absolute -bottom-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-xl shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-transform"
+							onclick="event.stopPropagation()"
+							class="cart-add-btn px-3 py-1.5 bg-red-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-600 active:scale-95 transition-all"
 							data-item={JSON.stringify(item)}
 						>
-							<span class="text-lg font-black">+</span>
+							Agregar
 						</button>
 					)}
-				</div>
-
-				{/* Content */}
-				<div class="flex-1 min-w-0 flex flex-col justify-between">
-					<div>
-						<h3 class="font-bold text-white text-base mb-1 line-clamp-1">
-							{item.name}
-						</h3>
-						{item.description && (
-							<div class="line-clamp-2 leading-relaxed">
-								<MarkdownBlock
-									client:load
-									content={item.description}
-									className="text-gray-400 text-xs !m-0"
-								/>
-							</div>
-						)}
-						{item.options && item.options.length > 0 && (
-							<div class="mt-2 flex flex-wrap gap-1">
-								{item.options.map((opt: any) => (
-									<div class="bg-white/10 text-[9px] text-white/70 px-2 py-0.5 rounded-lg font-bold uppercase border border-white/5">
-										{opt.name}: {opt.values.join(", ")}
-									</div>
-								))}
-							</div>
-						)}
-					</div>
-					<div class="flex items-center gap-3 mt-2">
-						{showPrices && item.price > 0 && (
-							<span class="text-red-400 font-black text-lg">${item.price}</span>
-						)}
-						{item.features && item.features.length > 0 && (
-							<div class="flex gap-1">
-								{item.features.slice(0, 2).map((feature: string) => (
-									<span class="text-[8px] bg-white/10 text-white/60 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
-										{feature}
-									</span>
-								))}
-							</div>
-						)}
-					</div>
 				</div>
 			</div>
 		</div>

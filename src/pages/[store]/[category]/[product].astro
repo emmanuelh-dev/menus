@@ -1,0 +1,174 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=300, stale-while-revalidate=60',
+);
+
+import { Image } from 'astro:assets';
+import RestaurantLayout from '../../../layouts/RestaurantLayout.astro';
+import CartManager from '../../../components/CartManager';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { supabase } from '../../../lib/supabase';
+
+const { store, category, product } = Astro.params;
+
+if (!store || !category || !product) {
+  throw new Error('Ruta de producto inválida');
+}
+
+const toSlug = (value: string) =>
+  (value || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const decodedCategory = decodeURIComponent(category);
+const decodedProduct = decodeURIComponent(product);
+
+const { data: place } = await supabase
+  .from('places')
+  .select('*, states(*)')
+  .eq('short_name', store)
+  .single();
+
+if (!place) {
+  return Astro.redirect('/tienda');
+}
+
+const template = place?.content?.view_settings?.template;
+if (template !== 'tienda') {
+  return Astro.redirect(`/menus/${store}`);
+}
+
+const blocks = place?.content?.blocks || [];
+const selectedSection = blocks.find((block: any) => {
+  if (block?.type !== 'section') return false;
+  const sectionSlug = toSlug(block?.data?.title || '');
+  return sectionSlug === decodedCategory;
+});
+
+if (!selectedSection) {
+  return Astro.redirect(`/tienda/${store}`);
+}
+
+const selectedItem = (selectedSection?.data?.items || []).find((item: any) => {
+  const itemSlug = toSlug(item?.slug || item?.name || '');
+  return itemSlug === decodedProduct;
+});
+
+if (!selectedItem) {
+  return Astro.redirect(`/${store}/${decodedCategory}`);
+}
+
+const canonicalCategorySlug = toSlug(selectedSection?.data?.title || '') || 'categoria';
+const canonicalProductSlug = toSlug(selectedItem?.slug || selectedItem?.name || '') || 'producto';
+
+if (decodedCategory !== canonicalCategorySlug || decodedProduct !== canonicalProductSlug) {
+  return Astro.redirect(`/${store}/${encodeURIComponent(canonicalCategorySlug)}/${encodeURIComponent(canonicalProductSlug)}`);
+}
+
+const semanticData = place?.content?.semantic_data || {};
+const enableCart = semanticData.enable_cart || semanticData.enableCart || false;
+const enableDelivery = semanticData.enable_delivery || semanticData.enableDelivery || false;
+const whatsappNumber = semanticData.whatsapp || semanticData.whatsappNumber || '';
+---
+
+<RestaurantLayout
+  title={`${selectedItem.name} | ${place.name}`}
+  description={selectedItem.description || `Producto en ${place.name}`}
+  image={selectedItem.image}
+  place={place}
+  backgroundColor="bg-[#1a1a1a]"
+>
+  <div class="bg-[#1a1a1a] min-h-screen text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Inicio', href: '/tienda' },
+          { label: 'Tienda', href: '/tienda' },
+          { label: place.name, href: `/tienda/${store}` },
+          { label: selectedSection?.data?.title || 'Categoría', href: `/${store}/${canonicalCategorySlug}` },
+          { label: selectedItem.name },
+        ]}
+      />
+    </div>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <section>
+        <div class="bg-[#242424] border border-white/10 rounded-2xl overflow-hidden">
+          <div class="aspect-square bg-black/20">
+            {selectedItem.image ? (
+              <Image
+                src={selectedItem.image}
+                alt={selectedItem.name}
+                width={1000}
+                height={1000}
+                class="w-full h-full object-cover"
+                loading="eager"
+                format="webp"
+                quality={90}
+              />
+            ) : (
+              <div class="w-full h-full bg-white/5" />
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-[#242424] border border-white/10 rounded-2xl p-6">
+        <p class="text-[10px] uppercase tracking-widest text-white/50 font-black">{selectedSection?.data?.title || 'Producto'}</p>
+        <h1 class="text-3xl md:text-4xl font-black mt-2">{selectedItem.name}</h1>
+
+        {selectedItem.description && (
+          <p class="text-sm text-white/70 mt-4 leading-relaxed">{selectedItem.description}</p>
+        )}
+
+        <div class="mt-6 flex items-center justify-between gap-4">
+          <p class="text-2xl font-black text-red-400">${selectedItem.price || 0}</p>
+          {enableCart && (
+            <button
+              class="cart-add-btn px-5 py-2.5 bg-red-500 text-white rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-red-600 active:scale-95 transition-all"
+              data-item={JSON.stringify(selectedItem)}
+            >
+              Agregar al carrito
+            </button>
+          )}
+        </div>
+
+        {(selectedItem.options || []).length > 0 && (
+          <div class="mt-6 pt-5 border-t border-white/10">
+            <p class="text-xs font-black uppercase tracking-wider text-white/60 mb-3">Variantes</p>
+            <div class="flex flex-wrap gap-2">
+              {(selectedItem.options || []).map((opt: any) => (
+                <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-[11px] font-bold text-white/80">
+                  {opt.name}: {(opt.values || []).join(', ')}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
+
+    {(enableCart || enableDelivery) && (
+      <CartManager
+        client:load
+        placeName={place.name}
+        placeSlug={store}
+        placeId={place.id}
+        whatsappNumber={whatsappNumber || ''}
+        deliveryEnabled={enableDelivery}
+        blocks={blocks}
+        clabe={semanticData?.clabe}
+      />
+    )}
+  </div>
+</RestaurantLayout>

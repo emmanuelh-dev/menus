@@ -148,10 +148,14 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
     
     // Mapear type
     const { type, ...rest } = restaurantData;
-    const dataToUpdate = {
+    const dataToUpdate: any = {
       ...rest,
       type: type || rest.type,
     };
+
+    if (dataToUpdate.content === null || dataToUpdate.content === undefined) {
+      delete dataToUpdate.content;
+    }
     
     // Actualizar en la base de datos
     const { data, error } = await supabase

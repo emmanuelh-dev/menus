@@ -1,0 +1,85 @@
+---
+import DefaultLayout from '../layouts/DefaultLayout.astro';
+import BysmaxSectionNav from '../components/BysmaxSectionNav.astro';
+
+const seo = {
+  title: 'Soporte y Preguntas Frecuentes | BySMax',
+  description: 'Resuelve dudas sobre creación de tienda, administración, países disponibles y gestión de tu cuenta.',
+  keywords: 'soporte tienda online, preguntas frecuentes ecommerce, ayuda pedidos whatsapp',
+};
+
+const faqs = [
+  {
+    q: '¿Qué es BySMax?',
+    a: 'BySMax es una plataforma para crear y gestionar tu tienda online en minutos. Cuando un cliente finaliza su pedido, se envía por WhatsApp para mantener contacto directo.',
+  },
+  {
+    q: '¿Necesito descargar alguna app?',
+    a: 'No. Funciona directamente en tu navegador web.',
+  },
+  {
+    q: '¿Se puede probar gratis?',
+    a: 'Sí. Puedes iniciar con el plan gratuito y comenzar a publicar productos desde el primer día.',
+  },
+  {
+    q: '¿Puedo crear mi cuenta desde móvil?',
+    a: 'Sí. Puedes crear, administrar y revisar tu tienda desde computadora, tablet o teléfono.',
+  },
+  {
+    q: '¿Puedo usar la plataforma para vender servicios?',
+    a: 'Sí. Se adapta tanto a negocios que venden productos como a negocios que venden servicios.',
+  },
+  {
+    q: '¿Cómo administro mi cuenta?',
+    a: 'Ingresa a /admin/login para iniciar sesión y gestionar tu tienda.',
+  },
+  {
+    q: '¿Está disponible en mi país?',
+    a: 'La plataforma está disponible en español, portugués e inglés. La moneda puede ajustarse según configuración del negocio.',
+  },
+  {
+    q: '¿Puedo cancelar mi cuenta cuando quiera?',
+    a: 'Sí. Puedes cancelar en cualquier momento.',
+  },
+];
+---
+
+<DefaultLayout title={seo.title} description={seo.description} keywords={seo.keywords} showAds={false}>
+  <BysmaxSectionNav />
+
+  <main>
+    <section class="max-w-7xl mx-auto px-6 pt-14 pb-10">
+      <div class="max-w-3xl">
+        <p class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700">Soporte</p>
+        <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mt-3 leading-[0.95]">Saber más acerca de BySMax</h1>
+        <p class="text-lg text-slate-600 mt-6 font-medium">Respondemos las preguntas clave para que abras tu tienda online con claridad.</p>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 pb-14">
+      <div class="space-y-3">
+        {faqs.map((item) => (
+          <details class="group bg-white border border-slate-200 rounded-2xl p-5">
+            <summary class="list-none cursor-pointer font-black text-slate-900 text-base">{item.q}</summary>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 pb-16">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="/admin/register" class="block bg-emerald-600 text-white rounded-2xl p-6 hover:bg-emerald-700 transition-colors">
+          <p class="text-[11px] uppercase tracking-widest font-black text-emerald-100">Comenzar</p>
+          <h2 class="text-xl font-black mt-2">Crear cuenta gratis</h2>
+          <p class="text-sm text-emerald-50 mt-2">Abre tu tienda online en minutos.</p>
+        </a>
+        <a href="mailto:hola@bysmax.com" class="block bg-slate-900 text-white rounded-2xl p-6 hover:bg-black transition-colors">
+          <p class="text-[11px] uppercase tracking-widest font-black text-slate-400">Contacto</p>
+          <h2 class="text-xl font-black mt-2">Hablar con soporte</h2>
+          <p class="text-sm text-slate-300 mt-2">Escríbenos a hola@bysmax.com</p>
+        </a>
+      </div>
+    </section>
+  </main>
+</DefaultLayout>

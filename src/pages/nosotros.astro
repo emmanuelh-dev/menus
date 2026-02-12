@@ -1,0 +1,103 @@
+---
+import DefaultLayout from '../layouts/DefaultLayout.astro';
+import BysmaxSectionNav from '../components/BysmaxSectionNav.astro';
+
+const seo = {
+  title: 'Nosotros | Tienda pensada para tus clientes',
+  description: 'Diseñamos una plataforma para que tus clientes disfruten comprar y tú puedas vender online sin fricción.',
+  keywords: 'nosotros tienda online, plataforma ecommerce whatsapp, experiencia de compra',
+};
+
+const valuePoints = [
+  'Funciona y carga rápido en cualquier dispositivo.',
+  'Ofrece una experiencia de compra simple e intuitiva.',
+  'Se adapta a todo tipo de comercios.',
+  'No requiere descargar una app ni registrarse para comprar.',
+];
+
+const testimonials = [
+  {
+    quote: 'BySMax apareció en el momento justo como una herramienta para potenciar la venta online y llegar a nuestros clientes de forma simple y segura.',
+    author: 'Francisco',
+    brand: 'Blondies',
+  },
+  {
+    quote: 'Me pude organizar mejor con los pedidos y el rendimiento de mi tiempo se duplicó.',
+    author: 'Carolina',
+    brand: 'Almacén El Calden',
+  },
+  {
+    quote: 'Lo mejor es la practicidad de ser claros con la mercadería y precios. Además, los clientes reciben la cuenta al instante.',
+    author: 'Brenda',
+    brand: 'FyV Bajo Cero',
+  },
+  {
+    quote: 'Lo que más resalto es la sencillez de la interfaz, clave para públicos de todas las edades.',
+    author: 'Fernando',
+    brand: 'Reverdecer',
+  },
+  {
+    quote: 'Nunca se concretaban los pedidos. Ahora bajaron las consultas y subieron las ventas concretadas.',
+    author: 'Daniela',
+    brand: 'You Lencería',
+  },
+  {
+    quote: 'La facilidad para cargar productos y usar WhatsApp como canal de venta es excelente.',
+    author: 'Filomena',
+    brand: 'Filomena Quilmes',
+  },
+];
+---
+
+<DefaultLayout title={seo.title} description={seo.description} keywords={seo.keywords} showAds={false}>
+  <BysmaxSectionNav />
+
+  <main>
+    <section class="max-w-7xl mx-auto px-6 pt-14 pb-10">
+      <div class="max-w-3xl">
+        <p class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700">Nosotros</p>
+        <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mt-3 leading-[0.95]">Vende en una tienda pensada para tus clientes</h1>
+        <p class="text-lg text-slate-600 mt-6 font-medium">Diseñamos una plataforma donde tus clientes disfrutan comprar y tu negocio crece con más control.</p>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 pb-14">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {valuePoints.map((point) => (
+          <article class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+            <p class="text-sm font-bold text-slate-700">{point}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="bg-slate-50 border-y border-slate-200">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Historias de negocios que ya venden online</h2>
+        <p class="text-slate-600 mt-3">Más de 40,000 emprendedores usan la plataforma para recibir pedidos y gestionar ventas.</p>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {testimonials.map((item) => (
+            <article class="bg-white border border-slate-200 rounded-2xl p-6">
+              <p class="text-sm text-slate-700 leading-relaxed">“{item.quote}”</p>
+              <div class="mt-4 pt-4 border-t border-slate-100">
+                <p class="text-sm font-black text-slate-900">{item.author}</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mt-1">{item.brand}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 py-14">
+      <div class="bg-emerald-600 rounded-3xl p-8 md:p-10 text-white">
+        <h2 class="text-2xl md:text-3xl font-black tracking-tight">Crea tu cuenta ahora y abre tu tienda online en minutos</h2>
+        <p class="text-sm md:text-base mt-3 text-emerald-50">Es gratis y no requiere tarjetas de crédito.</p>
+        <a href="/admin/register" class="inline-flex mt-6 items-center px-6 py-3 rounded-xl bg-white text-emerald-700 text-xs font-black uppercase tracking-widest hover:bg-emerald-50 transition-colors">
+          Crear cuenta
+        </a>
+      </div>
+    </section>
+  </main>
+</DefaultLayout>

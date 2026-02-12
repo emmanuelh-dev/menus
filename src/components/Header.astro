@@ -225,12 +225,26 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 					</div>
 				</div>
 
-				{/* Standalone: Precios */}
+				{/* Standalone: Planes */}
 				<a
-					href="/precios"
+					href="/planes"
 					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
 				>
-					Precios
+					Planes
+				</a>
+
+				<a
+					href="/nosotros"
+					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
+				>
+					Nosotros
+				</a>
+
+				<a
+					href="/soporte"
+					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
+				>
+					Soporte
 				</a>
 
 				{/* Standalone Link: Blog */}
@@ -358,7 +372,7 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 							<ArrowRight className="w-4 h-4 text-slate-300" />
 						</a>
 						<a
-							href="/precios"
+							href="/planes"
 							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
 						>
 							<div class="flex items-center gap-3">
@@ -369,11 +383,45 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 								</div>
 								<span
 									class="text-sm font-black text-slate-900 uppercase tracking-widest"
-									>Precios y Planes</span
+									>Planes</span
 								>
 							</div>
 							<ArrowRight className="w-4 h-4 text-slate-300" />
 						</a>
+							<a
+								href="/nosotros"
+								class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
+							>
+								<div class="flex items-center gap-3">
+									<div
+										class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
+									>
+										<Zap className="w-5 h-5" />
+									</div>
+									<span
+										class="text-sm font-black text-slate-900 uppercase tracking-widest"
+										>Nosotros</span
+									>
+								</div>
+								<ArrowRight className="w-4 h-4 text-slate-300" />
+							</a>
+							<a
+								href="/soporte"
+								class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
+							>
+								<div class="flex items-center gap-3">
+									<div
+										class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
+									>
+										<Zap className="w-5 h-5" />
+									</div>
+									<span
+										class="text-sm font-black text-slate-900 uppercase tracking-widest"
+										>Soporte</span
+									>
+								</div>
+								<ArrowRight className="w-4 h-4 text-slate-300" />
+							</a>
 					</div>
 				</div>
 			</div>

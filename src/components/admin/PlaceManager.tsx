@@ -293,7 +293,21 @@ export default function PlaceManager({
     setIsModalOpen(true);
   };
 
-  const handleClone = (restaurant: Restaurant) => {
+  const handleClone = async (restaurant: Restaurant) => {
+    let fullContent = (restaurant as any).content || null;
+
+    if (!fullContent && restaurant.id) {
+      try {
+        const response = await fetch(`/api/restaurants/${restaurant.id}`);
+        if (response.ok) {
+          const result = await response.json();
+          fullContent = result?.data?.content || null;
+        }
+      } catch (err) {
+        console.error('Error loading full content for clone:', err);
+      }
+    }
+
     setEditingId(null);
     setFormData({
       name: `${restaurant.name} (Copia)`,
@@ -312,7 +326,7 @@ export default function PlaceManager({
       state_id: restaurant.state_id || null,
       municipality_id: (restaurant as any).municipality_id || null,
       user_id: restaurant.user_id,
-      content: restaurant.content || null,
+      content: fullContent,
     });
     setStep(1);
     setCreatedPlaceId(null);
@@ -369,11 +383,16 @@ export default function PlaceManager({
     try {
       const url = editingId ? `/api/restaurants/${editingId}` : '/api/restaurants';
       const method = editingId ? 'PUT' : 'POST';
+      const payload: any = { ...formData };
+
+      if (editingId && (payload.content === null || payload.content === undefined)) {
+        delete payload.content;
+      }
 
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();

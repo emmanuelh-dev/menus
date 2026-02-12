@@ -65,6 +65,7 @@ export interface SectionData {
 
 export interface ItemData {
   id: string;
+  slug?: string;
   name: string;
   price: number;
   description?: string;

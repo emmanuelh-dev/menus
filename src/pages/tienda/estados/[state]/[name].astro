@@ -1,0 +1,55 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, s-maxage=300, stale-while-revalidate=60",
+);
+
+const { name, state } = Astro.params;
+
+import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
+import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+import { supabase } from "../../../../lib/supabase";
+
+if (!name) {
+  throw new Error("No se ha especificado el nombre de la tienda");
+}
+
+const { data: place } = await supabase
+  .from("places")
+  .select("*, states(*)")
+  .eq("short_name", name)
+  .single();
+
+if (!place) {
+  return Astro.redirect("/tienda");
+}
+
+const template = place?.content?.view_settings?.template;
+if (template !== "tienda") {
+  return Astro.redirect(`/menus/${name}`);
+}
+
+if (!place.states || place.states.slug !== state) {
+  return Astro.redirect(`/tienda/${name}`);
+}
+---
+
+<div class="bg-[#FCFCFC] pt-6 px-6">
+  <div class="max-w-2xl mx-auto">
+    <Breadcrumbs
+      items={[
+        { label: "Inicio", href: "/tienda" },
+        { label: "Tienda", href: "/tienda" },
+        {
+          label: place.states?.name || "Estado",
+          href: `/tienda/estados/${state}`,
+        },
+        { label: place.name },
+      ]}
+    />
+  </div>
+</div>
+
+<MenuPageRenderer place={place} name={name} />

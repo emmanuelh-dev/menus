@@ -1,0 +1,60 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, s-maxage=300, stale-while-revalidate=60",
+);
+
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+import { supabase } from "../../lib/supabase";
+
+const { data: placesRaw } = await supabase
+  .from("places")
+  .select("id, name, short_name, image, address, content")
+  .not("short_name", "is", null)
+  .order("name");
+
+const places = (placesRaw || []).filter((place: any) => {
+  const template = place?.content?.view_settings?.template;
+  return template === "tienda";
+});
+---
+
+<DefaultLayout
+  title="Tiendas digitales | BySMax"
+  description="Explora tiendas digitales creadas en BySMax."
+  keywords="tienda digital, catalogo digital, ecommerce local"
+  showAds={false}
+>
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-black text-gray-900">Tiendas</h1>
+      <p class="text-sm text-gray-600 mt-2">Catálogo de tiendas publicadas.</p>
+    </header>
+
+    {places.length === 0 ? (
+      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
+        <p class="text-sm font-bold text-gray-600">Aún no hay tiendas publicadas.</p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {places.map((place: any) => (
+          <a href={`/tienda/${place.short_name}`} class="block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-gray-400 transition-all">
+            <div class="aspect-square bg-gray-100">
+              {place.image ? (
+                <img src={place.image} alt={place.name} class="w-full h-full object-cover" loading="lazy" />
+              ) : (
+                <div class="w-full h-full bg-gray-100" />
+              )}
+            </div>
+            <div class="p-3">
+              <p class="text-sm font-black text-gray-900 line-clamp-2">{place.name}</p>
+              {place.address && <p class="text-xs text-gray-500 mt-1 line-clamp-1">{place.address}</p>}
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </main>
+</DefaultLayout>

@@ -13,6 +13,7 @@ export default function MenuItemPreview({ item, config, template, compact = fals
   const isUber = template === 'uber';
   const isDidi = template === 'didi';
   const isCafesoso = template === 'cafesoso';
+  const isTienda = template === 'tienda';
 
   // Renderizado dinámico según el estilo solicitado
   if (isVibrant) {
@@ -140,6 +141,32 @@ export default function MenuItemPreview({ item, config, template, compact = fals
             <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
           </div>
         )}
+      </div>
+    );
+  }
+
+  if (isTienda) {
+    return (
+      <div className={`bg-[#242424] border border-white/10 rounded-2xl overflow-hidden ${compact ? 'mb-0' : 'mb-3'} h-full flex flex-col`}>
+        <div className="aspect-square bg-black/20 overflow-hidden">
+          {item.image ? (
+            <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
+          ) : (
+            <div className="w-full h-full bg-white/5" />
+          )}
+        </div>
+        <div className="p-3 flex-1 flex flex-col">
+          <h3 className="text-white font-black text-sm line-clamp-2 min-h-[2.5rem]">{item.name}</h3>
+          {item.description && (
+            <p className="text-gray-400 text-[11px] line-clamp-2 mt-1 min-h-[2rem]">{item.description}</p>
+          )}
+          <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <span className="text-red-400 font-black text-sm">${item.price}</span>
+            <button className="px-2.5 py-1 bg-red-500 text-white rounded text-[10px] font-black uppercase tracking-wide">
+              Agregar
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

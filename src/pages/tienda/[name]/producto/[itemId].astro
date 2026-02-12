@@ -1,0 +1,74 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=300, stale-while-revalidate=60',
+);
+
+import { supabase } from '../../../../lib/supabase';
+
+const { name, itemId } = Astro.params;
+
+if (!name || !itemId) {
+  throw new Error('Ruta de producto inválida');
+}
+
+const toSlug = (value: string) =>
+  (value || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const decodedItemId = decodeURIComponent(itemId);
+
+const { data: place } = await supabase
+  .from('places')
+  .select('content')
+  .eq('short_name', name)
+  .single();
+
+if (!place) {
+  return Astro.redirect('/tienda');
+}
+
+const template = place?.content?.view_settings?.template;
+if (template !== 'tienda') {
+  return Astro.redirect(`/menus/${name}`);
+}
+
+const blocks = place?.content?.blocks || [];
+
+let matchedSection: any = null;
+let matchedItem: any = null;
+
+for (const block of blocks) {
+  if (block?.type !== 'section') continue;
+
+  const item = (block?.data?.items || []).find((candidate: any) => {
+    const candidateSlug = toSlug(candidate?.slug || candidate?.name || '');
+    return candidateSlug === decodedItemId;
+  });
+
+  if (item) {
+    matchedSection = block;
+    matchedItem = item;
+    break;
+  }
+}
+
+if (!matchedItem || !matchedSection) {
+  return Astro.redirect(`/tienda/${name}`);
+}
+
+const categorySlug = toSlug(matchedSection?.data?.title || '') || 'categoria';
+const productSlug = toSlug(matchedItem?.slug || matchedItem?.name || '') || 'producto';
+
+return Astro.redirect(`/${name}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(productSlug)}`);
+---

@@ -1,45 +1,7 @@
 ---
 import { ArrowRight, X } from "lucide-react";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
-
-const comparativeFeatures = [
-	{
-		name: "Menú digital",
-		free: "Básico",
-		pro: "Avanzado",
-		enterprise: "Personalizado",
-	},
-	{
-		name: "Productos",
-		free: "Ilimitados",
-		pro: "Ilimitados",
-		enterprise: "Ilimitados",
-	},
-	{
-		name: "Soporte",
-		free: "Sin soporte",
-		pro: "Prioritario",
-		enterprise: "Dedicado 24/7",
-	},
-	{ name: "Dominio propio", free: "No", pro: "Sí", enterprise: "Sí" },
-	{ name: "Análisis de popularidad", free: "No", pro: "Sí", enterprise: "Sí" },
-	{ name: "Diseño personalizado", free: "No", pro: "No", enterprise: "Sí" },
-	{
-		name: "Fotografía profesional",
-		free: "No",
-		pro: "No",
-		enterprise: "20 platillos",
-	},
-	{
-		name: "Segmentación por sucursal",
-		free: "No",
-		pro: "No",
-		enterprise: "Sí",
-	},
-	{ name: "Integración POS", free: "No", pro: "No", enterprise: "Sí" },
-	{ name: "API personalizada", free: "No", pro: "No", enterprise: "Sí" },
-	{ name: "Solicitud de funciones", free: "No", pro: "No", enterprise: "Sí" },
-];
+import { comparativeFeatures } from "../../data/pricing";
 const seoData = {
 	title: "Precios y Planes para Menú Digital y Carta QR | BySMax",
 	description:

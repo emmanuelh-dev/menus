@@ -68,6 +68,13 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
       headerClass: "text-center py-10 bg-white shadow-sm mb-6",
       titleClass: "text-3xl font-black italic text-[#FF5B00]",
       sectionTitleClass: "text-lg font-bold text-gray-800 mb-4 bg-gray-100/50 px-4 py-2 rounded-lg",
+    },
+    tienda: {
+      bg: "bg-[#1a1a1a]",
+      text: "text-white",
+      headerClass: "text-center py-10",
+      titleClass: "text-4xl font-black tracking-tight text-white",
+      sectionTitleClass: "text-lg font-black uppercase tracking-widest text-white mb-4",
     }
   };
 
@@ -115,7 +122,7 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
                   <p className="text-stone-400 text-sm font-normal italic mb-8 px-4 opacity-80 leading-relaxed">{block.data.description}</p>
                 )}
 
-                <div className="pt-2">
+                <div className={template === 'tienda' ? 'pt-2 grid grid-cols-2 lg:grid-cols-4 gap-3' : 'pt-2'}>
                   {block.data.items?.map((item: any, iIdx: number) => (
                     <MenuItemPreview
                       key={item.id || iIdx}

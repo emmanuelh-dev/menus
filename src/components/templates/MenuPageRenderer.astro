@@ -202,6 +202,21 @@ const config = templateConfigs[template] || templateConfigs.default;
 const justifyClass = config.headerClass?.includes("text-left")
 	? "justify-start"
 	: "justify-center";
+const isTiendaTemplate = template === "tienda";
+const showCategoriesAtStart = isTiendaTemplate && Boolean(view_settings.show_categories_at_start);
+const hideCategoryImages = isTiendaTemplate && Boolean(view_settings.hide_category_images);
+const shouldShowHero = !isTiendaTemplate || (!showCategoriesAtStart && heroCarousel && heroCarousel.data?.items?.length > 0);
+const toCategorySlug = (value: string) =>
+	(value || "")
+		.toString()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "-")
+		.replace(/[^a-z0-9-]/g, "")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "");
 ---
 
 <RestaurantLayout
@@ -213,54 +228,92 @@ const justifyClass = config.headerClass?.includes("text-left")
 	backgroundColor={config.bg}
 >
 	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
-		{/* Hero Section with Carousel or Image */}
-		<div>
-			{
-				heroCarousel && heroCarousel.data.items?.length > 0 ? (
-					<Carousel
-						client:load
-						items={heroCarousel.data.items}
-						className="w-full max-w-3xl mx-auto"
-					/>
-				) : place.image?.trim() ? (
+		{showCategoriesAtStart && (
+			<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
+				{place.image?.trim() ? (
 					<Image
 						src={place.image}
-						alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
-						width={1200}
-						height={800}
-						class="w-full h-auto object-cover max-h-[60dvh]"
+						alt={`${place.name} fondo`}
+						width={1600}
+						height={900}
+						class="w-full h-full object-cover"
 						loading="eager"
 						format="webp"
 						quality={90}
 					/>
 				) : (
-					<div class="h-32 bg-stone-900" />
-				)
-			}
-		</div>
+					<div class="absolute inset-0 bg-gradient-to-b from-[#181818] to-[#0f0f0f]" />
+				)}
 
-		<CategoryNav
-			client:load
-			blocks={blocks}
-			variant="icons"
-			backgroundClass={config.navColors?.bg}
-			textClass={config.navColors?.text}
-			activeColorClass={config.navColors?.active}
-		/>
+
+				<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-10">
+					<h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white drop-shadow-xl">
+						{place.name}
+					</h1>
+				</div>
+
+				<div>
+					<CategoryCards client:load blocks={blocks} variant="carousel" placeSlug={name} />
+				</div>
+			</section>
+		)}
+
+		{/* Hero Section with Carousel or Image */}
+		{shouldShowHero && !showCategoriesAtStart && (
+			<div>
+				{
+					heroCarousel && heroCarousel.data.items?.length > 0 ? (
+						<Carousel
+							client:load
+							items={heroCarousel.data.items}
+							className="w-full max-w-3xl mx-auto"
+						/>
+					) : place.image?.trim() ? (
+						<Image
+							src={place.image}
+							alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
+							width={1200}
+							height={800}
+							class="w-full h-auto object-cover max-h-[60dvh]"
+							loading="eager"
+							format="webp"
+							quality={90}
+						/>
+					) : (
+						<div class="h-32 bg-stone-900" />
+					)
+				}
+			</div>
+		)}
+
+		{!isTiendaTemplate && (
+			<CategoryNav
+				client:load
+				blocks={blocks}
+				variant="icons"
+				backgroundClass={config.navColors?.bg}
+				textClass={config.navColors?.text}
+				activeColorClass={config.navColors?.active}
+			/>
+		)}
 
 		{/* Category Cards for Tienda template */}
-		{config.showCategoryCards && <CategoryCards client:load blocks={blocks} />}
+		{config.showCategoryCards && !showCategoriesAtStart && <CategoryCards client:load blocks={blocks} placeSlug={name} />}
 
-		<div class:list={["max-w-2xl mx-auto px-6 mt-8", config.headerClass]}>
+		<div class:list={["max-w-2xl mx-auto px-6", config.headerClass, showCategoriesAtStart ? "hidden" : ""]}>
 			<h1 class={config.titleClass}>
 				{place.name}
 			</h1>
 		</div>
 
-		<div class="max-w-2xl mx-auto px-6 mt-8">
+		<div
+			class:list={[
+				template === "tienda" ? "max-w-7xl mx-auto px-4 sm:px-6 mt-8" : "max-w-2xl mx-auto px-6 mt-8",
+			]}
+		>
 			{/* Info compacta en una sola línea de chips */}
 			{
-				place.content?.semantic_data && (
+				place.content?.semantic_data && !isTiendaTemplate && (
 					<section class="mb-12" aria-label="Información del restaurante">
 						<InfoChips place={place} className={justifyClass} />
 					</section>
@@ -294,6 +347,7 @@ const justifyClass = config.headerClass?.includes("text-left")
 						return blocks.map((block: any) => {
 							if (block.type === "section") {
 								const isOpen = sectionCounter < 2;
+								const categorySlug = toCategorySlug(block.data?.title || "") || "categoria";
 								sectionCounter++;
 
 								return (
@@ -312,7 +366,7 @@ const justifyClass = config.headerClass?.includes("text-left")
 										</div>
 
 										<div class="px-2">
-											{block.data.image && (
+											{block.data.image && !hideCategoryImages && (
 												<div>
 													<Image
 														src={block.data.image}
@@ -337,11 +391,17 @@ const justifyClass = config.headerClass?.includes("text-left")
 												</div>
 											)}
 
-											<div class="grid grid-cols-1 gap-4">
+											<div
+												class:list={[
+													template === "tienda" ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" : "grid grid-cols-1 gap-4",
+												]}
+											>
 												{block.data.items?.map((item: any) => (
 													<MenuItem
 														item={item}
 														template={template}
+														placeSlug={name}
+														categorySlug={categorySlug}
 														showPrices={view_settings.show_prices}
 														enableCart={enableCart || enableDelivery}
 														whatsappNumber={whatsappNumber}

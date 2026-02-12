@@ -45,7 +45,25 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 
 		let query = supabase.from("places").select(
 			`
-				*,
+				id,
+				name,
+				address,
+				formatted_address,
+				lat,
+				lng,
+				type,
+				category,
+				short_name,
+				image,
+				rating,
+				priceRange,
+				hours,
+				featured,
+				state_id,
+				municipality_id,
+				user_id,
+				created_at,
+				updated_at,
 				states (
 					id,
 					name,

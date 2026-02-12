@@ -1,0 +1,125 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=300, stale-while-revalidate=60',
+);
+
+import RestaurantLayout from '../../../layouts/RestaurantLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import CartManager from '../../../components/CartManager';
+import MenuItem from '../../../components/templates/restaurant/MenuItem.astro';
+import { supabase } from '../../../lib/supabase';
+
+const { store, category } = Astro.params;
+
+if (!store || !category) {
+  throw new Error('Ruta de categoría inválida');
+}
+
+const toSlug = (value: string) =>
+  (value || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const decodedCategory = decodeURIComponent(category);
+
+const { data: place } = await supabase
+  .from('places')
+  .select('*, states(*)')
+  .eq('short_name', store)
+  .single();
+
+if (!place) {
+  return Astro.redirect('/tienda');
+}
+
+const template = place?.content?.view_settings?.template;
+if (template !== 'tienda') {
+  return Astro.redirect(`/menus/${store}`);
+}
+
+const blocks = place?.content?.blocks || [];
+const section = blocks.find((block: any) => {
+  if (block?.type !== 'section') return false;
+  const sectionSlug = toSlug(block?.data?.title || '');
+  return sectionSlug === decodedCategory;
+});
+
+if (!section) {
+  return Astro.redirect(`/tienda/${store}`);
+}
+
+const canonicalCategorySlug = toSlug(section?.data?.title || '') || 'categoria';
+if (decodedCategory !== canonicalCategorySlug) {
+  return Astro.redirect(`/${store}/${encodeURIComponent(canonicalCategorySlug)}`);
+}
+
+const semanticData = place?.content?.semantic_data || {};
+const enableCart = semanticData.enable_cart || semanticData.enableCart || false;
+const enableDelivery = semanticData.enable_delivery || semanticData.enableDelivery || false;
+const whatsappNumber = semanticData.whatsapp || semanticData.whatsappNumber || '';
+---
+
+<RestaurantLayout
+  title={`${section?.data?.title || 'Categoría'} | ${place.name}`}
+  description={section?.data?.description || `Productos de ${place.name}`}
+  image={section?.data?.image || place.image}
+  place={place}
+  backgroundColor="bg-[#1a1a1a]"
+>
+  <div class="bg-[#1a1a1a] min-h-screen text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Inicio', href: '/tienda' },
+          { label: 'Tienda', href: '/tienda' },
+          { label: place.name, href: `/tienda/${store}` },
+          { label: section?.data?.title || 'Categoría' },
+        ]}
+      />
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
+      <header class="mb-6">
+        <h1 class="text-3xl md:text-4xl font-black tracking-tight">{section?.data?.title}</h1>
+        {section?.data?.description && <p class="text-sm text-white/70 mt-2">{section?.data?.description}</p>}
+      </header>
+
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {(section?.data?.items || []).map((item: any) => (
+          <MenuItem
+            item={item}
+            template="tienda"
+            placeSlug={store}
+            categorySlug={canonicalCategorySlug}
+            showPrices={place?.content?.view_settings?.show_prices ?? true}
+            enableCart={enableCart || enableDelivery}
+            whatsappNumber={whatsappNumber}
+          />
+        ))}
+      </section>
+    </main>
+
+    {(enableCart || enableDelivery) && (
+      <CartManager
+        client:load
+        placeName={place.name}
+        placeSlug={store}
+        placeId={place.id}
+        whatsappNumber={whatsappNumber || ''}
+        deliveryEnabled={enableDelivery}
+        blocks={blocks}
+        clabe={semanticData?.clabe}
+      />
+    )}
+  </div>
+</RestaurantLayout>
