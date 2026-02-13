@@ -23,12 +23,14 @@ const {
 	whatsappNumber,
 } = Astro.props;
 
-const isVibrant = template === "vibrant";
-const isUber = template === "uber";
-const isDidi = template === "didi";
+const isVibrant = false;
+const isUber = false;
+const isDidi = false;
 const isTienda = template === "tienda";
-const isMariscos = template === "mariscos";
-const isCafesoso = template === "cafesoso";
+const isMariscos = false;
+const isCafesoso = false;
+const hasImage = typeof item?.image === "string" && item.image.trim() !== "";
+const showCartButton = enableCart && item.price > 0;
 const toItemSlug = (value: string) =>
 	(value || "")
 		.toString()
@@ -478,15 +480,26 @@ const tiendaItemUrl =
 		!isDidi &&
 		!isTienda &&
 		!isCafesoso && (
-			<div class="grid grid-cols-4 gap-4 mb-8" data-item-id={item.id}>
-				{item.image && item.image.trim() !== "" && (
-					<div class="order-1 sm:order-1 overflow-hidden rounded-xl shrink-0 w-full sm:w-40">
+			<div
+				class:list={[
+					"grid gap-3 md:gap-5 mb-8 items-start",
+					hasImage && showCartButton &&
+						"grid-cols-[6rem_1fr_auto] md:grid-cols-[7.5rem_1fr_auto]",
+					hasImage && !showCartButton &&
+						"grid-cols-[6rem_1fr] md:grid-cols-[7.5rem_1fr]",
+					!hasImage && showCartButton && "grid-cols-[1fr_auto]",
+					!hasImage && !showCartButton && "grid-cols-1",
+				]}
+				data-item-id={item.id}
+			>
+				{hasImage && (
+					<div class="order-1 overflow-hidden rounded-xl w-full md:w-[7.5rem]">
 						<Image
 							src={item.image}
 							alt={item.name}
 							width={500}
 							height={500}
-							class="w-full h-56 sm:h-40 object-cover transition-all duration-700 hover:scale-110"
+							class="w-full h-24 md:h-[7.5rem] object-cover transition-all duration-700 hover:scale-110"
 							loading="lazy"
 							format="webp"
 							quality={85}
@@ -494,7 +507,7 @@ const tiendaItemUrl =
 					</div>
 				)}
 
-				<div class="col-span-3 order-2 sm:order-2 flex-1 min-w-0">
+				<div class="order-2 min-w-0">
 					<h3 class="text-lg font-bold tracking-tight mb-1">{item.name}</h3>
 					{item.options && item.options.length > 0 ? (
 						<div class="mb-4 space-y-1">
@@ -523,18 +536,32 @@ const tiendaItemUrl =
 							${item.price}
 						</span>
 					)}
-
-					{enableCart && item.price > 0 && (
-						<div class="order-3 sm:order-3 w-full sm:w-auto sm:self-center sm:ml-auto">
-							<button
-								class="cart-add-btn w-full sm:w-auto px-6 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm"
-								data-item={JSON.stringify(item)}
-							>
-								Agregar al Pedido
-							</button>
-						</div>
-					)}
 				</div>
+
+				{showCartButton && (
+					<div class="order-3 self-center justify-self-end">
+						<button
+							class="cart-add-btn w-9 h-9 md:w-10 md:h-10 bg-black text-white rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+							data-item={JSON.stringify(item)}
+							aria-label={`Agregar ${item.name} al pedido`}
+							title="Agregar al pedido"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M12 5v14M5 12h14" />
+							</svg>
+						</button>
+					</div>
+				)}
 			</div>
 		)
 }
