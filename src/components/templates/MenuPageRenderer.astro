@@ -328,9 +328,7 @@ const toCategorySlug = (value: string) =>
 		</div>
 
 		<div
-			class:list={[
-				template === "tienda" ? "max-w-7xl mx-auto px-4 sm:px-6 mt-8" : "max-w-2xl mx-auto px-6 mt-8",
-			]}
+			class="max-w-7xl mx-auto px-4 sm:px-6 mt-8"
 		>
 			{/* Info compacta en una sola línea de chips */}
 			{
@@ -414,7 +412,7 @@ const toCategorySlug = (value: string) =>
 
 											<div
 												class:list={[
-													template === "tienda" ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" : "grid grid-cols-1 gap-4",
+													template === "tienda" ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" : "grid grid-cols-1 lg:grid-cols-3 gap-4",
 												]}
 											>
 												{block.data.items?.map((item: any) => (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, User, Calendar, Search, ExternalLink, Utensils, Clock, Send } from 'lucide-react';
+import { Mail, Phone, User, Calendar, Search, ExternalLink, Utensils, Clock, Send, Trash2 } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -12,6 +12,8 @@ interface UserProfile {
   places: string[];
 }
 
+type ContactStatus = 'contacted' | 'not_reached';
+
 const AdminUserList = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,10 +22,45 @@ const AdminUserList = () => {
   const [phoneFilter, setPhoneFilter] = useState<'all' | 'with' | 'without'>('all');
   const [placeFilter, setPlaceFilter] = useState<'all' | 'with' | 'without'>('all');
   const [loginFilter, setLoginFilter] = useState<'all' | 'v1d' | 'v3d' | 'v7d' | 'never'>('all');
+  const [contactFilter, setContactFilter] = useState<'all' | 'contacted' | 'not_contacted'>('all');
   const [activeMenu, setActiveMenu] = useState<{ id: string, type: 'whatsapp' | 'email' } | null>(null);
   const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
   const [emailStatus, setEmailStatus] = useState<{ id: string, status: 'success' | 'error' } | null>(null);
   const [testingEmail, setTestingEmail] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [contactedUsers, setContactedUsers] = useState<Record<string, ContactStatus>>({});
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('admin_whatsapp_contacted_users');
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        const normalized: Record<string, ContactStatus> = {};
+        Object.entries(parsed).forEach(([userId, value]) => {
+          if (value === true || value === 'contacted') {
+            normalized[userId] = 'contacted';
+            return;
+          }
+
+          if (value === 'not_reached') {
+            normalized[userId] = 'not_reached';
+          }
+        });
+        setContactedUsers(normalized);
+      }
+    } catch (error) {
+      console.error('Error loading contacted users from storage:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('admin_whatsapp_contacted_users', JSON.stringify(contactedUsers));
+    } catch (error) {
+      console.error('Error saving contacted users to storage:', error);
+    }
+  }, [contactedUsers]);
 
   useEffect(() => {
     // ... (rest of fetch remains the same)
@@ -82,12 +119,38 @@ const AdminUserList = () => {
       }
     }
 
-    return matchesSearch && matchesPhone && matchesPlace && matchesLogin;
+    // Filter by Contact status
+    const isContacted = contactedUsers[user.id] === 'contacted';
+    const matchesContact =
+      contactFilter === 'all' ||
+      (contactFilter === 'contacted' && isContacted) ||
+      (contactFilter === 'not_contacted' && !isContacted);
+
+    return matchesSearch && matchesPhone && matchesPlace && matchesLogin && matchesContact;
   });
 
-  const getWhatsAppLink = (phone: string, text: string) => {
+  const getWhatsAppAppLink = (phone: string, text: string) => {
     const cleanPhone = phone.replace(/\D/g, '');
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+  };
+
+  const getWhatsAppWebLink = (phone: string, text: string) => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+  };
+
+  const setContactStatus = (userId: string, status: ContactStatus) => {
+    setContactedUsers((prev) => {
+      const next = { ...prev };
+
+      if (next[userId] === status) {
+        delete next[userId];
+      } else {
+        next[userId] = status;
+      }
+
+      return next;
+    });
   };
 
   const getMessageTemplates = (user: UserProfile) => {
@@ -98,20 +161,20 @@ const AdminUserList = () => {
       {
         id: 'welcome',
         label: 'Bienvenida',
-        subject: `¡Gracias por registrarte, ${firstName}!`,
-        text: `Hola ${firstName}, gracias por registrarte en Menús BysMax. Si tienes alguna duda o necesitas ayuda, estamos para ayudarte.`
+        subject: `¡Bienvenido, ${firstName}! Te apoyamos con ${business}`,
+        text: `Hola ${firstName}, gracias por registrarte en Menús BysMax para ${business}. Si tienes alguna duda o sugerencia en la que te podamos ayudar para mejorar tu negocio, estoy aquí para ayudarte.`
       },
       {
         id: 'support-business',
         label: 'Soporte',
         subject: `Ayuda con ${business}`,
-        text: `Hola ${firstName}, gracias por registrarte. Si tienes alguna duda con ${business}, estamos para ayudarte.`
+        text: `Hola ${firstName}, gracias por registrarte en Menús BysMax para ${business}. Si tienes alguna duda o sugerencia en la que te podamos ayudar para mejorar tu negocio, estoy aquí para ayudarte.`
       },
       {
         id: 'no-menu',
         label: 'Sin Menú',
         subject: `¿Te ayudamos con tu menú, ${firstName}?`,
-        text: `Hola ${firstName}, gracias por registrarte. Si necesitas ayuda para crear tu primer menú, estamos para ayudarte.`
+        text: `Hola ${firstName}, gracias por registrarte en Menús BysMax para ${business}. Si tienes alguna duda o sugerencia en la que te podamos ayudar para mejorar tu negocio, estoy aquí para ayudarte a crear tu primer menú.`
       }
     ];
   };
@@ -216,6 +279,38 @@ const AdminUserList = () => {
     if (diffInDays < 7) return `hace ${diffInDays} días`;
 
     return date.toLocaleDateString();
+  };
+
+  const handleDeleteUser = async (targetUser: UserProfile) => {
+    const confirmed = window.confirm(`¿Eliminar usuario ${targetUser.email}? También se eliminarán sus establecimientos.`);
+    if (!confirmed) return;
+
+    setDeletingUserId(targetUser.id);
+
+    try {
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: targetUser.id }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || 'No se pudo eliminar el usuario');
+        return;
+      }
+
+      setUsers((prev) => prev.filter((user) => user.id !== targetUser.id));
+      setContactedUsers((prev) => {
+        const next = { ...prev };
+        delete next[targetUser.id];
+        return next;
+      });
+    } catch (requestError) {
+      alert('Error de conexión al eliminar usuario');
+    } finally {
+      setDeletingUserId((current) => (current === targetUser.id ? null : current));
+    }
   };
 
   if (loading) return null;
@@ -361,6 +456,39 @@ const AdminUserList = () => {
               Enviar Prueba
             </button>
           </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">Contacto:</div>
+            <div className="flex bg-slate-200/50 p-1 rounded-2xl shadow-inner">
+              <button
+                onClick={() => setContactFilter('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${contactFilter === 'all'
+                  ? 'bg-white text-emerald-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+                  }`}
+              >
+                Todos
+              </button>
+              <button
+                onClick={() => setContactFilter('contacted')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${contactFilter === 'contacted'
+                  ? 'bg-white text-emerald-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+                  }`}
+              >
+                Contactados
+              </button>
+              <button
+                onClick={() => setContactFilter('not_contacted')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${contactFilter === 'not_contacted'
+                  ? 'bg-white text-emerald-600 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+                  }`}
+              >
+                No contactados
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="flex bg-slate-100/50 px-4 py-2 rounded-2xl border border-slate-100 flex-wrap items-center justify-between gap-4">
@@ -387,6 +515,16 @@ const AdminUserList = () => {
                     <div>
                       <h3 className="font-bold text-slate-900 flex flex-wrap items-center gap-2">
                         {user.name || 'Sin nombre'}
+                        {contactedUsers[user.id] === 'contacted' && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full border border-emerald-200">
+                            Contactado
+                          </span>
+                        )}
+                        {contactedUsers[user.id] === 'not_reached' && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full border border-amber-200">
+                            No se pudo contactar
+                          </span>
+                        )}
                         {user.business_name && (
                           <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
                             {user.business_name}
@@ -429,21 +567,68 @@ const AdminUserList = () => {
                         </div>
                         <div className="p-1">
                           {getMessageTemplates(user).map((template) => (
-                            <a
+                            <div
                               key={template.id}
-                              href={getWhatsAppLink(user.whatsapp, template.text)}
-                              target="_blank"
-                              onClick={() => setActiveMenu(null)}
                               className="block p-3 hover:bg-emerald-50 rounded-xl transition-colors group/item"
                             >
                               <p className="text-xs font-bold text-slate-800">{template.label}</p>
                               <p className="text-[10px] text-slate-500 mt-1 whitespace-pre-wrap">"{template.text}"</p>
-                            </a>
+                              <div className="mt-3 flex items-center gap-2">
+                                <a
+                                  href={getWhatsAppAppLink(user.whatsapp, template.text)}
+                                  target="_blank"
+                                  onClick={() => setActiveMenu(null)}
+                                  className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors"
+                                >
+                                  WhatsApp
+                                </a>
+                                <a
+                                  href={getWhatsAppWebLink(user.whatsapp, template.text)}
+                                  target="_blank"
+                                  onClick={() => setActiveMenu(null)}
+                                  className="px-3 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider hover:bg-emerald-50 transition-colors"
+                                >
+                                  WhatsApp Web
+                                </a>
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
+
+                  <button
+                    onClick={() => setContactStatus(user.id, 'contacted')}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${contactedUsers[user.id] === 'contacted'
+                      ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200'
+                      : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                      }`}
+                  >
+                    Marcar contactado
+                  </button>
+
+                  <button
+                    onClick={() => setContactStatus(user.id, 'not_reached')}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${contactedUsers[user.id] === 'not_reached'
+                      ? 'bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200'
+                      : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                      }`}
+                  >
+                    No se pudo contactar
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteUser(user)}
+                    disabled={deletingUserId === user.id}
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 disabled:opacity-50"
+                    title="Eliminar usuario"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {deletingUserId === user.id ? 'Eliminando' : 'Eliminar usuario'}
+                    </span>
+                  </button>
 
                   {/* Impersonate Button */}
                   <button

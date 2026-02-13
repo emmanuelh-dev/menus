@@ -13,7 +13,15 @@ interface Props {
 
 import MarkdownBlock from "../../MarkdownBlock";
 
-const { item, template, placeSlug = "", categorySlug = "", showPrices, enableCart, whatsappNumber } = Astro.props;
+const {
+	item,
+	template,
+	placeSlug = "",
+	categorySlug = "",
+	showPrices,
+	enableCart,
+	whatsappNumber,
+} = Astro.props;
 
 const isVibrant = template === "vibrant";
 const isUber = template === "uber";
@@ -32,9 +40,10 @@ const toItemSlug = (value: string) =>
 		.replace(/[^a-z0-9-]/g, "")
 		.replace(/-+/g, "-")
 		.replace(/^-|-$/g, "");
-const tiendaItemUrl = placeSlug && categorySlug
-	? `/tienda/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(toItemSlug(item.slug || item.name || "") || "producto")}`
-	: "#";
+const tiendaItemUrl =
+	placeSlug && categorySlug
+		? `/tienda/${encodeURIComponent(placeSlug)}/${encodeURIComponent(categorySlug)}/${encodeURIComponent(toItemSlug(item.slug || item.name || "") || "producto")}`
+		: "#";
 ---
 
 {
@@ -373,9 +382,13 @@ const tiendaItemUrl = placeSlug && categorySlug
 
 				<div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
 					{showPrices && item.price > 0 ? (
-						<span class="text-red-400 font-black text-base sm:text-lg">${item.price}</span>
+						<span class="text-red-400 font-black text-base sm:text-lg">
+							${item.price}
+						</span>
 					) : (
-						<span class="text-white/40 text-xs font-bold uppercase">Sin precio</span>
+						<span class="text-white/40 text-xs font-bold uppercase">
+							Sin precio
+						</span>
 					)}
 
 					{enableCart && (
@@ -402,9 +415,13 @@ const tiendaItemUrl = placeSlug && categorySlug
 			<div class="flex gap-4 items-start">
 				<div class="flex-1 min-w-0">
 					<div class="flex items-start justify-between gap-3 mb-2">
-						<h3 class="text-lg font-black tracking-tight text-[#3E2723]">{item.name}</h3>
+						<h3 class="text-lg font-black tracking-tight text-[#3E2723]">
+							{item.name}
+						</h3>
 						{showPrices && item.price > 0 && (
-							<span class="text-base font-black text-[#6D4C41]">${item.price}</span>
+							<span class="text-base font-black text-[#6D4C41]">
+								${item.price}
+							</span>
 						)}
 					</div>
 					{item.description && (
@@ -455,67 +472,69 @@ const tiendaItemUrl = placeSlug && categorySlug
 }
 
 {
-	!isMariscos && !isVibrant && !isUber && !isDidi && !isTienda && !isCafesoso && (
-		<div
-			class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item mb-12"
-			data-item-id={item.id}
-		>
-			<div class="order-2 sm:order-1">
-				<div class="flex justify-between items-baseline mb-1">
-					<h3 class="text-lg font-bold tracking-tight">{item.name}</h3>
-					{showPrices && (
-						<span class="text-sm font-bold text-stone-500 ml-4">
-							${item.price}
-						</span>
-					)}
-				</div>
-				{item.description && (
-					<div class="mb-4">
-						<MarkdownBlock
-							client:load
-							content={item.description}
-							className="text-stone-400 text-sm font-light leading-relaxed !m-0"
+	!isMariscos &&
+		!isVibrant &&
+		!isUber &&
+		!isDidi &&
+		!isTienda &&
+		!isCafesoso && (
+			<div class="grid grid-cols-4 gap-4 mb-8" data-item-id={item.id}>
+				{item.image && item.image.trim() !== "" && (
+					<div class="order-1 sm:order-1 overflow-hidden rounded-xl shrink-0 w-full sm:w-40">
+						<Image
+							src={item.image}
+							alt={item.name}
+							width={500}
+							height={500}
+							class="w-full h-56 sm:h-40 object-cover transition-all duration-700 hover:scale-110"
+							loading="lazy"
+							format="webp"
+							quality={85}
 						/>
 					</div>
 				)}
-				{item.options && item.options.length > 0 && (
-					<div class="mb-4 space-y-1">
-						{item.options.map((opt: any) => (
-							<div class="text-[11px] text-stone-500 italic">
-								<span class="font-bold not-italic text-stone-700 capitalize">
-									{opt.name}:
-								</span>{" "}
-								{opt.values.join(", ")}
-							</div>
-						))}
-					</div>
-				)}
-				{enableCart && item.price > 0 && (
-					<div class="flex gap-2 mt-3">
-						<button
-							class="cart-add-btn px-6 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm"
-							data-item={JSON.stringify(item)}
-						>
-							Agregar al Pedido
-						</button>
-					</div>
-				)}
-			</div>
 
-			{item.image && item.image.trim() !== "" && (
-				<div class="order-1 sm:order-2 mb-4 sm:mb-0 overflow-hidden rounded-xl ">
-					<Image
-						src={item.image}
-						alt={item.name}
-						width={500}
-						height={500}
-						class="w-full sm:w-40 h-56 sm:h-40 object-cover transition-all duration-700 hover:scale-110"
-						loading="lazy"
-						format="webp"
-						quality={85}
-					/>
+				<div class="col-span-3 order-2 sm:order-2 flex-1 min-w-0">
+					<h3 class="text-lg font-bold tracking-tight mb-1">{item.name}</h3>
+					{item.options && item.options.length > 0 ? (
+						<div class="mb-4 space-y-1">
+							{item.options.map((opt: any) => (
+								<div class="text-[11px] text-stone-500 italic">
+									<span class="font-bold not-italic text-stone-700 capitalize">
+										{opt.name}:
+									</span>{" "}
+									{opt.values.join(", ")}
+								</div>
+							))}
+						</div>
+					) : (
+						item.description && (
+							<div class="mb-2">
+								<MarkdownBlock
+									client:load
+									content={item.description}
+									className="text-stone-400 text-sm font-light leading-relaxed !m-0"
+								/>
+							</div>
+						)
+					)}
+					{showPrices && (
+						<span class="block text-sm font-bold text-stone-500 mb-3">
+							${item.price}
+						</span>
+					)}
+
+					{enableCart && item.price > 0 && (
+						<div class="order-3 sm:order-3 w-full sm:w-auto sm:self-center sm:ml-auto">
+							<button
+								class="cart-add-btn w-full sm:w-auto px-6 py-2 bg-black text-white text-xs font-medium uppercase tracking-wider rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm"
+								data-item={JSON.stringify(item)}
+							>
+								Agregar al Pedido
+							</button>
+						</div>
+					)}
 				</div>
-			)}
-		</div>
-	)
+			</div>
+		)
 }

@@ -22,6 +22,57 @@ const toSlug = (value: string) =>
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 
+const getPublicIdFromCloudinaryUrl = (imageUrl?: string) => {
+  if (!imageUrl || !imageUrl.includes('cloudinary.com')) return null;
+
+  try {
+    const parsed = new URL(imageUrl);
+    const marker = '/image/upload/';
+    const markerIndex = parsed.pathname.indexOf(marker);
+    if (markerIndex === -1) return null;
+
+    const afterUpload = parsed.pathname.slice(markerIndex + marker.length);
+    const segments = afterUpload.split('/').filter(Boolean);
+    const versionIndex = segments.findIndex((segment) => /^v\d+$/.test(segment));
+    const publicIdSegments = versionIndex >= 0 ? segments.slice(versionIndex + 1) : segments;
+    if (publicIdSegments.length === 0) return null;
+
+    return publicIdSegments.join('/').replace(/\.[a-zA-Z0-9]+$/, '');
+  } catch {
+    return null;
+  }
+};
+
+const deleteCloudinaryImageByUrl = async (imageUrl?: string) => {
+  const publicId = getPublicIdFromCloudinaryUrl(imageUrl);
+  if (!publicId) return;
+
+  const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const apiKey = import.meta.env.CLOUDINARY_API_KEY;
+  const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret) return;
+
+  const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      public_id: publicId,
+      invalidate: true,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText);
+  }
+};
+
 export const GET: APIRoute = async ({ params, cookies, request }) => {
   const { id } = params;
   if (!id) {
@@ -128,7 +179,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
     // Verificar que el restaurante pertenezca al usuario (o sea admin)
     const { data: existingPlace } = await supabase
       .from('places')
-      .select('user_id, short_name, name')
+      .select('user_id, short_name, name, image')
       .eq('id', id)
       .single();
 
@@ -202,6 +253,22 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
         await Promise.all([...tagsToInvalidate].map((tag) => invalidateByTag(tag)));
       } catch (invalidateError) {
         console.error('Error invalidando caché por tags:', invalidateError);
+      }
+    }
+
+    const previousImage = existingPlace.image || '';
+    const nextImage = data?.image || '';
+    const shouldDeletePreviousImage =
+      previousImage &&
+      nextImage &&
+      previousImage !== nextImage &&
+      previousImage.includes('cloudinary.com');
+
+    if (shouldDeletePreviousImage) {
+      try {
+        await deleteCloudinaryImageByUrl(previousImage);
+      } catch (cloudinaryDeleteError) {
+        console.error('Error eliminando imagen anterior de Cloudinary:', cloudinaryDeleteError);
       }
     }
     

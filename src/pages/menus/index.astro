@@ -55,11 +55,11 @@ if (selectedSort === "recent") {
 } else if (selectedSort === "rating") {
 	restaurantsQuery = restaurantsQuery
 		.order("rating", { ascending: false })
-		.order("reviewCount", { ascending: false });
+		.order("created_at", { ascending: false });
 } else {
 	restaurantsQuery = restaurantsQuery
-		.order("reviewCount", { ascending: false })
-		.order("rating", { ascending: false });
+		.order("rating", { ascending: false })
+		.order("created_at", { ascending: false });
 }
 
 const from = (currentPage - 1) * pageSize;
@@ -67,12 +67,29 @@ const to = from + pageSize - 1;
 
 restaurantsQuery = restaurantsQuery.range(from, to);
 
-const [{ data: restaurantsData, count: totalRestaurants }, states] = await Promise.all([
+const [restaurantsResult, states] = await Promise.all([
 	restaurantsQuery,
 	getStates().then((list) =>
 		list.filter((s) => s.total_places > 0 || s.slug === "nuevo-leon"),
 	),
 ]);
+
+let restaurantsData = restaurantsResult.data;
+let totalRestaurants = restaurantsResult.count;
+
+if (restaurantsResult.error) {
+	console.error("Error loading /menus with selected filters:", restaurantsResult.error);
+
+	const fallbackResult = await supabase
+		.from("places")
+		.select("*, states(*)", { count: "exact" })
+		.neq("type", "motel")
+		.order("created_at", { ascending: false })
+		.range(from, to);
+
+	restaurantsData = fallbackResult.data;
+	totalRestaurants = fallbackResult.count;
+}
 
 const restaurants = (restaurantsData || []).map((place: any) => ({
 	...place,

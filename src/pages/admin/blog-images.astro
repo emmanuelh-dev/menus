@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import BlogImageManager from "../../components/admin/BlogImageManager";
+---
+
+<AdminLayout title="Fotos Blog | Administrador">
+  <div class="px-8 py-10">
+    <div class="mb-10">
+      <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Fotos para Blog</h1>
+      <p class="text-slate-500">Consulta las últimas 100 imágenes y sube nuevas fotos para obtener su enlace de Cloudinary.</p>
+    </div>
+
+    <BlogImageManager client:only="react" />
+  </div>
+</AdminLayout>
