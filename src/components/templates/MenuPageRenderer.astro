@@ -235,17 +235,6 @@ const toCategorySlug = (value: string) =>
 	backgroundColor={config.bg}
 >
 	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
-		{breadcrumbItems.length > 0 && (
-			<div
-				class:list={[
-					"pt-6",
-					template === "tienda" ? "max-w-7xl mx-auto px-4 sm:px-6" : "max-w-2xl mx-auto px-6",
-				]}
-			>
-				<Breadcrumbs items={breadcrumbItems} />
-			</div>
-		)}
-
 		{showCategoriesAtStart && (
 			<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
 				{place.image?.trim() ? (
@@ -314,7 +303,12 @@ const toCategorySlug = (value: string) =>
 				activeColorClass={config.navColors?.active}
 			/>
 		)}
-
+		{breadcrumbItems.length > 0 && (
+			<div class="sr-only"
+			>
+				<Breadcrumbs items={breadcrumbItems} />
+			</div>
+		)}
 		{/* Category Cards for Tienda template */}
 		{config.showCategoryCards && !showCategoriesAtStart && <CategoryCards client:load blocks={blocks} placeSlug={name} />}
 
