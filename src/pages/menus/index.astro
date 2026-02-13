@@ -8,7 +8,7 @@ Astro.response.headers.set(
 
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight, MapPin } from "lucide-react";
-import { getRestaurants, getStates } from "../../lib/supabase";
+import { getStates, supabase } from "../../lib/supabase";
 import { formater } from "../../types/app";
 import { Image } from "astro:assets";
 
@@ -26,14 +26,112 @@ const types: BusinessType[] = [
 ];
 const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
 
-const [restaurants, states] = await Promise.all([
-	getRestaurants({ type: null }).then((list) =>
-		list.filter((r) => r.type !== "motel"),
-	),
+const pageSize = 9;
+const searchParams = Astro.url.searchParams;
+const currentPage = Math.max(1, Number(searchParams.get("page") || "1"));
+const selectedIndustry = (searchParams.get("industry") || "Todos") as Industry;
+const selectedType = (searchParams.get("type") || "Todos") as BusinessType;
+const selectedSort = searchParams.get("sort") || "popular";
+
+let restaurantsQuery = supabase
+	.from("places")
+	.select("*, states(*)", { count: "exact" })
+	.neq("type", "motel");
+
+if (selectedIndustry !== "Todos") {
+	restaurantsQuery = restaurantsQuery.eq("category", selectedIndustry);
+}
+
+if (selectedType !== "Todos") {
+	if (selectedType === "Casual") {
+		restaurantsQuery = restaurantsQuery.eq("type", "restaurant");
+	} else {
+		restaurantsQuery = restaurantsQuery.eq("type", selectedType);
+	}
+}
+
+if (selectedSort === "recent") {
+	restaurantsQuery = restaurantsQuery.order("created_at", { ascending: false });
+} else if (selectedSort === "rating") {
+	restaurantsQuery = restaurantsQuery
+		.order("rating", { ascending: false })
+		.order("reviewCount", { ascending: false });
+} else {
+	restaurantsQuery = restaurantsQuery
+		.order("reviewCount", { ascending: false })
+		.order("rating", { ascending: false });
+}
+
+const from = (currentPage - 1) * pageSize;
+const to = from + pageSize - 1;
+
+restaurantsQuery = restaurantsQuery.range(from, to);
+
+const [{ data: restaurantsData, count: totalRestaurants }, states] = await Promise.all([
+	restaurantsQuery,
 	getStates().then((list) =>
 		list.filter((s) => s.total_places > 0 || s.slug === "nuevo-leon"),
 	),
 ]);
+
+const restaurants = (restaurantsData || []).map((place: any) => ({
+	...place,
+	state_slug: place.states?.slug || "nuevo-leon",
+	rating: place.rating || 4.0,
+	reviewCount: place.reviewCount || 0,
+	priceRange: place.priceRange || "$$",
+	address: place.address || "",
+	hours: place.hours || "24 horas",
+	amenities: place.amenities || [],
+	specialties: place.specialties || [],
+	destacado: place.featured,
+}));
+
+const totalPages = Math.max(1, Math.ceil((totalRestaurants || 0) / pageSize));
+const safeCurrentPage = Math.min(currentPage, totalPages);
+const summaryFrom = totalRestaurants ? (safeCurrentPage - 1) * pageSize + 1 : 0;
+const summaryTo = totalRestaurants
+	? Math.min((safeCurrentPage - 1) * pageSize + restaurants.length, totalRestaurants)
+	: 0;
+
+const buildQueryString = (page: number) => {
+	const params = new URLSearchParams();
+	params.set("page", String(page));
+	params.set("industry", selectedIndustry);
+	params.set("type", selectedType);
+	params.set("sort", selectedSort);
+	return `/menus?${params.toString()}`;
+};
+
+const getPageItems = (pages: number, current: number): Array<number | "ellipsis"> => {
+	if (pages <= 7) {
+		return Array.from({ length: pages }, (_, index) => index + 1);
+	}
+
+	const visiblePages = new Set<number>([
+		1,
+		pages,
+		current,
+		Math.max(1, current - 1),
+		Math.min(pages, current + 1),
+	]);
+
+	const sorted = [...visiblePages].sort((a, b) => a - b);
+	const result: Array<number | "ellipsis"> = [];
+
+	sorted.forEach((value, index) => {
+		const previous = sorted[index - 1];
+		if (previous && value - previous > 1) {
+			result.push("ellipsis");
+		}
+		result.push(value);
+	});
+
+	return result;
+};
+
+const pageItems = getPageItems(totalPages, safeCurrentPage);
+
 
 const seoData = {
 	title: "Ejemplos de Menús Digitales y Cartas QR Reales | BySMax",
@@ -58,32 +156,41 @@ const seoData = {
 			</h2>
 
 			<div class="mb-8 flex flex-wrap gap-4 justify-center">
-				<select
-					id="industry-filter"
+				<form method="get" action="/menus" class="mb-8 flex flex-wrap gap-4 justify-center">
+					<select
+						name="industry"
 					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
-				>
+					>
 					{
 						industries.map((industry) => (
-							<option value={industry}>{industry}</option>
+							<option value={industry} selected={selectedIndustry === industry}>{industry}</option>
 						))
 					}
-				</select>
+					</select>
 
-				<select
-					id="type-filter"
+					<select
+						name="type"
 					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
-				>
-					{types.map((type) => <option value={type}>{type}</option>)}
-				</select>
+					>
+						{types.map((type) => <option value={type} selected={selectedType === type}>{type}</option>)}
+					</select>
 
-				<select
-					id="sort-filter"
+					<select
+						name="sort"
 					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
-				>
-					<option value="popular">Más populares</option>
-					<option value="recent">Más recientes</option>
-					<option value="rating">Mejor calificados</option>
-				</select>
+					>
+						<option value="popular" selected={selectedSort === "popular"}>Más populares</option>
+						<option value="recent" selected={selectedSort === "recent"}>Más recientes</option>
+						<option value="rating" selected={selectedSort === "rating"}>Mejor calificados</option>
+					</select>
+
+					<button
+						type="submit"
+						class="px-4 py-2 border border-gray-900 bg-gray-900 text-white rounded-md text-sm font-bold hover:bg-black"
+					>
+						Aplicar
+					</button>
+				</form>
 			</div>
 
 			<div
@@ -157,6 +264,55 @@ const seoData = {
 				}
 			</div>
 
+			<div
+				id="pagination-controls"
+				class="mt-10 flex flex-col items-center gap-4"
+			>
+				<div class="flex items-center gap-2">
+					<a
+						href={buildQueryString(Math.max(1, safeCurrentPage - 1))}
+						class={`px-4 py-2 border border-gray-300 rounded-md text-sm font-bold text-gray-700 hover:bg-gray-50 ${safeCurrentPage <= 1 ? "pointer-events-none opacity-40" : ""}`}
+					>
+						Anterior
+					</a>
+
+					<div id="pagination-numbers" class="flex items-center gap-2">
+						{
+							pageItems.map((item) =>
+								item === "ellipsis" ? (
+									<span class="w-9 h-9 flex items-center justify-center text-gray-400 font-bold">…</span>
+								) : (
+									<a
+										href={buildQueryString(item)}
+										class={`w-9 h-9 rounded-md text-sm font-bold transition-colors flex items-center justify-center ${
+											item === safeCurrentPage
+												? "bg-gray-900 text-white"
+												: "border border-gray-300 text-gray-700 hover:bg-gray-50"
+										}`}
+									>
+										{item}
+									</a>
+								),
+							)
+						}
+					</div>
+
+					<a
+						href={buildQueryString(Math.min(totalPages, safeCurrentPage + 1))}
+						class={`px-4 py-2 border border-gray-300 rounded-md text-sm font-bold text-gray-700 hover:bg-gray-50 ${safeCurrentPage >= totalPages ? "pointer-events-none opacity-40" : ""}`}
+					>
+						Siguiente
+					</a>
+				</div>
+
+				<p
+					id="pagination-summary"
+					class="text-xs font-bold uppercase tracking-widest text-gray-400"
+				>
+					{totalRestaurants ? `Mostrando ${summaryFrom}-${summaryTo} de ${totalRestaurants}` : "Sin resultados"}
+				</p>
+			</div>
+
 			<!-- Nueva sección: Menús por Estado -->
 			<div class="mt-32 mb-16 px-4 md:px-0">
 				<div
@@ -227,112 +383,3 @@ const seoData = {
 		</div>
 	</div>
 </RestaurantLayout>
-
-<script>
-	type FilterValue = string | null;
-
-	interface HTMLElementWithDataset extends HTMLElement {
-		dataset: {
-			industry: string;
-			type: string;
-			capacity: string;
-		};
-	}
-
-	class RestaurantFilter {
-		private industryFilter: HTMLSelectElement;
-		private typeFilter: HTMLSelectElement;
-		private sortFilter: HTMLSelectElement;
-		private grid: HTMLElement;
-
-		constructor() {
-			const industryElement = document.getElementById("industry-filter");
-			const typeElement = document.getElementById("type-filter");
-			const sortElement = document.getElementById("sort-filter");
-			const gridElement = document.getElementById("restaurants-grid");
-
-			if (!industryElement || !typeElement || !sortElement || !gridElement) {
-				return;
-			}
-
-			this.industryFilter = industryElement as HTMLSelectElement;
-			this.typeFilter = typeElement as HTMLSelectElement;
-			this.sortFilter = sortElement as HTMLSelectElement;
-			this.grid = gridElement;
-
-			this.initializeEventListeners();
-			// Initial sort
-			this.filterAndSort();
-		}
-
-		private initializeEventListeners(): void {
-			const filters = [this.industryFilter, this.typeFilter, this.sortFilter];
-			filters.forEach((filter) => {
-				filter.addEventListener("change", () => this.filterAndSort());
-			});
-		}
-
-		private filterAndSort(): void {
-			const industryValue = this.industryFilter.value;
-			const typeValue = this.typeFilter.value;
-			const sortValue = this.sortFilter.value;
-
-			const cards = Array.from(
-				document.querySelectorAll(".restaurant-card"),
-			) as HTMLElement[];
-
-			// Filter
-			cards.forEach((card) => {
-				const industry = card.dataset.industry || "Restaurante";
-				const type = card.dataset.type || "Casual";
-
-				const matchIndustry =
-					industryValue === "Todos" || industry === industryValue;
-				const matchType =
-					typeValue === "Todos" ||
-					(typeValue === "Casual" && type === "restaurant") ||
-					type === typeValue;
-
-				card.style.display = matchIndustry && matchType ? "block" : "none";
-			});
-
-			// Sort
-			const visibleCards = cards.filter(
-				(card) => card.style.display !== "none",
-			);
-			const hiddenCards = cards.filter((card) => card.style.display === "none");
-
-			visibleCards.sort((a, b) => {
-				if (sortValue === "recent") {
-					const dateA = new Date(a.dataset.created || 0).getTime();
-					const dateB = new Date(b.dataset.created || 0).getTime();
-					return dateB - dateA;
-				}
-				if (sortValue === "rating") {
-					return (
-						parseFloat(b.dataset.rating || "0") -
-						parseFloat(a.dataset.rating || "0")
-					);
-				}
-				if (sortValue === "popular") {
-					const scoreA =
-						parseFloat(a.dataset.rating || "0") *
-						parseInt(a.dataset.reviews || "0");
-					const scoreB =
-						parseFloat(b.dataset.rating || "0") *
-						parseInt(b.dataset.reviews || "0");
-					return scoreB - scoreA;
-				}
-				return 0;
-			});
-
-			// Re-append in order
-			const allCardsInOrder = [...visibleCards, ...hiddenCards];
-			allCardsInOrder.forEach((card) => this.grid.appendChild(card));
-		}
-	}
-
-	document.addEventListener("DOMContentLoaded", () => {
-		new RestaurantFilter();
-	});
-</script>

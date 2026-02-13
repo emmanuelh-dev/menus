@@ -25,23 +25,31 @@ export function ManualUploader({
   const uploadPreset = import.meta.env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ml_default'
 
   const optimizeImageUrl = (url: string) => {
-    const params = 'f_auto,q_auto,w_1000'
+    const params = 'f_auto,q_auto:good,dpr_auto,c_limit,w_1800'
     return url.includes('/upload/') ? url.replace('/upload/', `/upload/${params}/`) : url
   }
 
   const compressImage = (file: File): Promise<Blob | File> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.src = URL.createObjectURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      img.src = objectUrl;
       img.onload = () => {
-        const maxDimension = 1080;
-        const fileSizeThreshold = 200 * 1024; // 200KB
+        const fileSizeThreshold = 1024 * 1024; // 1MB
+        const maxDimensionWithoutCompression = 2200;
 
-        // Si la imagen ya es pequeña en dimensiones y peso, no le hacemos nada
-        if (img.width <= maxDimension && img.height <= maxDimension && file.size <= fileSizeThreshold) {
+        if (
+          file.size <= fileSizeThreshold &&
+          img.width <= maxDimensionWithoutCompression &&
+          img.height <= maxDimensionWithoutCompression
+        ) {
+          URL.revokeObjectURL(objectUrl);
           resolve(file);
           return;
         }
+
+        const maxDimension = file.size > 4 * 1024 * 1024 ? 1600 : 2000;
+        const jpegQuality = file.size > 4 * 1024 * 1024 ? 0.78 : 0.86;
 
         const canvas = document.createElement('canvas');
         let width = img.width;
@@ -63,6 +71,7 @@ export function ManualUploader({
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
+          URL.revokeObjectURL(objectUrl);
           resolve(file);
           return;
         }
@@ -74,8 +83,8 @@ export function ManualUploader({
 
         canvas.toBlob(
           (blob) => {
+            URL.revokeObjectURL(objectUrl);
             if (blob) {
-              // Convert blob back to file to maintain filename
               const compressedFile = new File([blob], file.name, {
                 type: type,
                 lastModified: Date.now(),
@@ -86,10 +95,13 @@ export function ManualUploader({
             }
           },
           type,
-          isPng ? undefined : 0.9,
+          isPng ? undefined : jpegQuality,
         );
       };
-      img.onerror = () => resolve(file);
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(file);
+      };
     });
   };
 
