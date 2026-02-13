@@ -2,12 +2,25 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { createAuthenticatedClient } from '../../../lib/supabase';
 import { getEffectiveUser } from '../../../middleware/auth';
+import { invalidateByTag } from '@vercel/functions';
 
 const ADMIN_EMAILS = [
   "emmanuelh.dev@gmail.com",
   "admin@bysmax.com",
   "e805177@gmail.com",
 ];
+
+const toSlug = (value: string) =>
+  (value || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 
 export const GET: APIRoute = async ({ params, cookies, request }) => {
   const { id } = params;
@@ -115,7 +128,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
     // Verificar que el restaurante pertenezca al usuario (o sea admin)
     const { data: existingPlace } = await supabase
       .from('places')
-      .select('user_id')
+      .select('user_id, short_name, name')
       .eq('id', id)
       .single();
 
@@ -170,6 +183,26 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
         JSON.stringify({ error: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
+    }
+
+    const currentSlug = toSlug(data?.short_name || data?.name || '');
+    const previousSlug = toSlug(existingPlace.short_name || existingPlace.name || '');
+    const tagsToInvalidate = new Set<string>();
+
+    if (currentSlug) {
+      tagsToInvalidate.add(`place-${currentSlug}`);
+    }
+
+    if (previousSlug && previousSlug !== currentSlug) {
+      tagsToInvalidate.add(`place-${previousSlug}`);
+    }
+
+    if (tagsToInvalidate.size > 0) {
+      try {
+        await Promise.all([...tagsToInvalidate].map((tag) => invalidateByTag(tag)));
+      } catch (invalidateError) {
+        console.error('Error invalidando caché por tags:', invalidateError);
+      }
     }
     
     return new Response(
