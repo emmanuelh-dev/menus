@@ -44,8 +44,18 @@ function getPlaceLocation(place: any) {
 function getPublicPath(place: any) {
   if (!place) return '';
 
-  if (place?.menu) {
-    return place.menu;
+  const menuPath = String(place?.menu || '').trim();
+  if (
+    menuPath &&
+    menuPath !== '/' &&
+    menuPath !== '/tienda' &&
+    menuPath !== '/menus'
+  ) {
+    return menuPath;
+  }
+
+  if (menuPath === '/tienda') {
+    return `/tienda/${place?.short_name || ''}`;
   }
 
   if (place?.type === 'motel' && place?.states?.slug) {

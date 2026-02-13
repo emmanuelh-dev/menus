@@ -48,7 +48,18 @@ export default function PlaceDashboardContainer({ placeId }: Props) {
 
   useEffect(() => {
     const buildPublicPath = (place: any) => {
-      if (place?.menu) return place.menu;
+      const menuPath = String(place?.menu || "").trim();
+      if (
+        menuPath &&
+        menuPath !== "/" &&
+        menuPath !== "/tienda" &&
+        menuPath !== "/menus"
+      ) return menuPath;
+
+      if (menuPath === "/tienda") {
+        return `/tienda/${place?.short_name || ""}`;
+      }
+
       if (place?.type === "motel" && place?.states?.slug) {
         return `/moteles/estados/${place.states.slug}/${place.short_name}`;
       }
@@ -66,6 +77,33 @@ export default function PlaceDashboardContainer({ placeId }: Props) {
           const result = await response.json();
           setData(result);
           return;
+        }
+
+        let fallbackVisits = {
+          today: { total: 0, unique: 0 },
+          yesterday: { total: 0, unique: 0 },
+          week: { total: 0, unique: 0 }
+        };
+
+        try {
+          const dashboardResponse = await fetch('/api/admin/dashboard-data?page=1&pageSize=1&sortBy=updated');
+          if (dashboardResponse.ok) {
+            const dashboardData = await dashboardResponse.json();
+            const match = (dashboardData?.placeVisitStats || []).find((entry: any) => String(entry.placeId) === String(placeId));
+            if (match) {
+              fallbackVisits = {
+                today: { total: Number(match.todayVisits || 0), unique: Number(match.todayVisits || 0) },
+                yesterday: { total: 0, unique: 0 },
+                week: { total: Number(match.weekVisits || 0), unique: Number(match.weekUniqueVisitors || 0) }
+              };
+            }
+          }
+        } catch (_dashboardAnalyticsError) {
+          fallbackVisits = {
+            today: { total: 0, unique: 0 },
+            yesterday: { total: 0, unique: 0 },
+            week: { total: 0, unique: 0 }
+          };
         }
 
         const fallbackResponse = await fetch(`/api/admin/place/${placeId}`);
@@ -96,11 +134,7 @@ export default function PlaceDashboardContainer({ placeId }: Props) {
             short_name: place.short_name,
             publicPath: buildPublicPath(place)
           },
-          visits: {
-            today: { total: 0, unique: 0 },
-            yesterday: { total: 0, unique: 0 },
-            week: { total: 0, unique: 0 }
-          },
+          visits: fallbackVisits,
           rating: {
             average,
             totalReviews

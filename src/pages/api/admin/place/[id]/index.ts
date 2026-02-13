@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { createAuthenticatedClient } from "../../../../lib/supabase";
+import { createAuthenticatedClient } from "../../../../../lib/supabase";
 
 const ADMIN_EMAILS = [
 	"emmanuelh.dev@gmail.com",
@@ -41,7 +41,6 @@ export const GET: APIRoute = async ({ params, cookies }) => {
 
 		const isAdmin = ADMIN_EMAILS.includes(user.email || "");
 
-		// 1. OBTENER EL LUGAR
 		const { data: place, error: placeError } = await supabase
 			.from("places")
 			.select("*, states(*)")
@@ -54,18 +53,16 @@ export const GET: APIRoute = async ({ params, cookies }) => {
 			});
 		}
 
-		// 2. VERIFICAR PROPIEDAD
 		if (place.user_id !== user.id && !isAdmin) {
 			return new Response(JSON.stringify({ error: "Forbidden" }), {
 				status: 403,
 			});
 		}
 
-		// 3. OBTENER REVIEWS
 		const { data: reviews } = await supabase
 			.from("reviews")
 			.select("*")
-			.eq("place_id", id) // Usamos place_id directamente
+			.eq("place_id", id)
 			.order("created_at", { ascending: false });
 
 		return new Response(

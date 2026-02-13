@@ -11,7 +11,7 @@ interface DashboardData {
   recentComments: any[];
   history: any[];
   placeVisitStats?: Array<{
-    placeId: number;
+    placeId: string;
     name: string;
     shortName: string;
     todayVisits: number;

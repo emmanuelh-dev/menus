@@ -43,6 +43,16 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 			supabase = await createAuthenticatedClient(accessToken!, refreshToken!);
 		}
 
+		let analyticsSupabase = supabase;
+		if (import.meta.env.SUPABASE_SERVICE_ROLE_KEY) {
+			const { createClient } = await import("@supabase/supabase-js");
+			analyticsSupabase = createClient(
+				import.meta.env.PUBLIC_SUPABASE_URL,
+				import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+				{ auth: { persistSession: false } },
+			);
+		}
+
 		let query = supabase.from("places").select(
 			`
 				id,
@@ -147,7 +157,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 		startWeek.setDate(startWeek.getDate() - 6);
 
 		let placeVisitStats: Array<{
-			placeId: number;
+			placeId: string;
 			name: string;
 			shortName: string;
 			todayVisits: number;
@@ -165,10 +175,11 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 			}
 
 			const { data: allPlaces } = await allPlacesQuery;
-			const placeMap = new Map<number, { name: string; short_name: string }>();
+			const placeMap = new Map<string, { name: string; short_name: string }>();
 
 			(allPlaces || []).forEach((place: any) => {
-				placeMap.set(place.id, {
+				const key = String(place.id);
+				placeMap.set(key, {
 					name: place.name || "Sin nombre",
 					short_name: place.short_name || "",
 				});
@@ -176,20 +187,22 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 
 			const allPlaceIds = Array.from(placeMap.keys());
 			if (allPlaceIds.length > 0) {
-				const { data: visitRows } = await supabase
+				const { data: visitRows } = await analyticsSupabase
 					.from("place_menu_visits")
 					.select("place_id, visitor_id, visited_at")
 					.in("place_id", allPlaceIds)
 					.gte("visited_at", startWeek.toISOString());
 
-				const statsMap = new Map<number, {
+        
+
+				const statsMap = new Map<string, {
 					todayVisits: number;
 					weekVisits: number;
 					weekVisitors: Set<string>;
 				}>();
 
 				(visitRows || []).forEach((row: any) => {
-					const placeId = Number(row.place_id);
+					const placeId = String(row.place_id);
 					if (!statsMap.has(placeId)) {
 						statsMap.set(placeId, {
 							todayVisits: 0,

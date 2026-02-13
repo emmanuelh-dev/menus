@@ -9,8 +9,18 @@ export const POST: APIRoute = async ({ request }) => {
 		const placeId = Number(body?.placeId);
 		const visitorId = String(body?.visitorId || "").trim();
 		const path = String(body?.path || "").slice(0, 255);
+		const referer = request.headers.get("referer") || "";
+		const userAgent = request.headers.get("user-agent") || "";
+
+		console.log("[analytics/visit] incoming", {
+			placeId,
+			visitorId,
+			path,
+			referer,
+		});
 
 		if (!placeId || Number.isNaN(placeId) || !visitorId) {
+			console.error("[analytics/visit] invalid payload", body);
 			return new Response(JSON.stringify({ error: "Invalid payload" }), { status: 400 });
 		}
 
@@ -19,9 +29,6 @@ export const POST: APIRoute = async ({ request }) => {
 			import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
 			{ auth: { persistSession: false } },
 		);
-
-		const userAgent = request.headers.get("user-agent") || "";
-		const referer = request.headers.get("referer") || "";
 
 		const { error } = await supabase.from("place_menu_visits").insert({
 			place_id: placeId,
@@ -32,8 +39,16 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 
 		if (error) {
-			return new Response(JSON.stringify({ error: "Insert failed" }), { status: 500 });
+			console.error("[analytics/visit] insert failed", {
+				message: error.message,
+				details: error.details,
+				hint: error.hint,
+				code: error.code,
+			});
+			return new Response(JSON.stringify({ error: "Insert failed", details: error.message }), { status: 500 });
 		}
+
+		console.log("[analytics/visit] saved", { placeId, path });
 
 		return new Response(null, { status: 204 });
 	} catch (error) {

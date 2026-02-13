@@ -1,10 +1,24 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
+import { createClient } from "@supabase/supabase-js";
 import { createAuthenticatedClient } from "../../../../../lib/supabase";
 
 function getPublicPath(place: any) {
-	if (place?.menu) return place.menu;
+	const menuPath = String(place?.menu || "").trim();
+	if (
+		menuPath &&
+		menuPath !== "/" &&
+		menuPath !== "/tienda" &&
+		menuPath !== "/menus"
+	) {
+		return menuPath;
+	}
+
+	if (menuPath === "/tienda") {
+		return `/tienda/${place?.short_name || ""}`;
+	}
+
 	if (place?.type === "motel" && place?.states?.slug) {
 		return `/moteles/estados/${place.states.slug}/${place.short_name}`;
 	}
@@ -40,6 +54,13 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 		}
 
 		const supabase = await createAuthenticatedClient(accessToken, refreshToken);
+		const analyticsSupabase = import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+			? createClient(
+				import.meta.env.PUBLIC_SUPABASE_URL,
+				import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+				{ auth: { persistSession: false } },
+			)
+			: supabase;
 
 		const { data: place, error: placeError } = await supabase
 			.from("places")
@@ -63,7 +84,7 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 		startWeek.setUTCDate(startWeek.getUTCDate() - 6);
 
 		const [{ data: visits, error: visitsError }, { data: rates }, { data: recentReviews }] = await Promise.all([
-			supabase
+			analyticsSupabase
 				.from("place_menu_visits")
 				.select("visited_at, visitor_id")
 				.eq("place_id", id)
@@ -76,6 +97,21 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 				.order("created_at", { ascending: false })
 				.limit(20),
 		]);
+
+		if (visitsError) {
+			console.error("[insights] visits query error", {
+				placeId: id,
+				message: visitsError.message,
+				details: visitsError.details,
+				code: visitsError.code,
+			});
+		} else {
+			console.log("[insights] visits loaded", {
+				placeId: id,
+				count: (visits || []).length,
+				startWeek: startWeek.toISOString(),
+			});
+		}
 
 		const safeVisits = visitsError ? [] : visits || [];
 		const todayRows = safeVisits.filter((row: any) => new Date(row.visited_at) >= startToday);
