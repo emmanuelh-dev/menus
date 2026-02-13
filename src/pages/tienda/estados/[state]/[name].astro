@@ -9,7 +9,6 @@ Astro.response.headers.set(
 const { name, state } = Astro.params;
 
 import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
-import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
 import { supabase } from "../../../../lib/supabase";
 
 if (!name) {
@@ -36,20 +35,16 @@ if (!place.states || place.states.slug !== state) {
 }
 ---
 
-<div class="bg-[#FCFCFC] pt-6 px-6">
-  <div class="max-w-2xl mx-auto">
-    <Breadcrumbs
-      items={[
-        { label: "Inicio", href: "/tienda" },
-        { label: "Tienda", href: "/tienda" },
-        {
-          label: place.states?.name || "Estado",
-          href: `/tienda/estados/${state}`,
-        },
-        { label: place.name },
-      ]}
-    />
-  </div>
-</div>
-
-<MenuPageRenderer place={place} name={name} />
+<MenuPageRenderer
+  place={place}
+  name={name}
+  breadcrumbItems={[
+    { label: "Inicio", href: "/tienda" },
+    { label: "Tienda", href: "/tienda" },
+    {
+      label: place.states?.name || "Estado",
+      href: `/tienda/estados/${state}`,
+    },
+    { label: place.name },
+  ]}
+/>

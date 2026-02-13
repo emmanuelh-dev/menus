@@ -10,13 +10,20 @@ import CategoryCards from "../CategoryCards.tsx";
 import MenuItem from "./restaurant/MenuItem.astro";
 import InfoChips from "../InfoChips.astro";
 import MarkdownBlock from "../MarkdownBlock.tsx";
+import Breadcrumbs from "../Breadcrumbs.astro";
+
+interface BreadcrumbItem {
+	label: string;
+	href?: string;
+}
 
 interface Props {
 	place: any;
 	name: string;
+	breadcrumbItems?: BreadcrumbItem[];
 }
 
-const { place, name } = Astro.props;
+const { place, name, breadcrumbItems = [] } = Astro.props;
 
 let { blocks = [], view_settings = {} } = place.content || {};
 const sd = place.content?.semantic_data || {};
@@ -228,6 +235,17 @@ const toCategorySlug = (value: string) =>
 	backgroundColor={config.bg}
 >
 	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
+		{breadcrumbItems.length > 0 && (
+			<div
+				class:list={[
+					"pt-6",
+					template === "tienda" ? "max-w-7xl mx-auto px-4 sm:px-6" : "max-w-2xl mx-auto px-6",
+				]}
+			>
+				<Breadcrumbs items={breadcrumbItems} />
+			</div>
+		)}
+
 		{showCategoriesAtStart && (
 			<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
 				{place.image?.trim() ? (

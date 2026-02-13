@@ -16,7 +16,6 @@ const placeTag = `place-${name}`;
 Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 
 import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
-import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
 import { supabase } from "../../../../lib/supabase";
 
 // Buscamos el lugar asegurándonos que el estado coincida para SEO
@@ -35,6 +34,16 @@ if (!place || !place.states || place.states.slug !== state) {
 	return Astro.redirect("/menus");
 }
 ---
-
-
-<MenuPageRenderer place={place} name={name} />
+<MenuPageRenderer
+	place={place}
+	name={name}
+	breadcrumbItems={[
+		{ label: "Inicio", href: "/" },
+		{ label: "Menús", href: "/menus" },
+		{
+			label: place.states?.name || "Estado",
+			href: `/menus/estados/${state}`,
+		},
+		{ label: place.name },
+	]}
+/>
