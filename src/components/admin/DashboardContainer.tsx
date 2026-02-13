@@ -10,6 +10,14 @@ interface DashboardData {
   totalPlaces: number;
   recentComments: any[];
   history: any[];
+  placeVisitStats?: Array<{
+    placeId: number;
+    name: string;
+    shortName: string;
+    todayVisits: number;
+    weekVisits: number;
+    weekUniqueVisitors: number;
+  }>;
 }
 
 export default function DashboardContainer() {
@@ -139,47 +147,48 @@ export default function DashboardContainer() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <a
-            href="/admin/comments"
-            className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-all group"
-          >
+        <>
+          <div className="bg-white rounded-xl border border-slate-100 p-5">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:bg-emerald-50 transition-all">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="size-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  />
-                </svg>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Restaurantes más visitados</h3>
+                <p className="text-xs text-slate-500">Resumen de visitas de menú (hoy y últimos 7 días)</p>
               </div>
-              <span className="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
-                Gestionar →
-              </span>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">
-              Reseñas y feedback
-            </h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Consulta los últimos comentarios y opiniones de tus clientes.
-            </p>
-          </a>
 
-          {isAdmin && (
+            {(!data?.placeVisitStats || data.placeVisitStats.length === 0) ? (
+              <div className="text-sm text-slate-500 bg-slate-50 border border-slate-100 rounded-lg p-4">
+                Aún no hay datos de visitas para mostrar.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {data.placeVisitStats.map((item) => (
+                  <a
+                    key={item.placeId}
+                    href={`/admin/place/${item.placeId}`}
+                    className="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-900 truncate">{item.name}</p>
+                      <p className="text-xs text-slate-500 truncate">/{item.shortName || "sin-slug"}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-bold text-slate-700">Hoy: {item.todayVisits}</p>
+                      <p className="text-xs text-slate-500">7d: {item.weekVisits} · únicos: {item.weekUniqueVisitors}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a
-              href="/admin/history"
+              href="/admin/comments"
               className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-all group"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-slate-900 group-hover:bg-slate-100 transition-all">
+                <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:bg-emerald-50 transition-all">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="size-5"
@@ -191,24 +200,59 @@ export default function DashboardContainer() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                     />
                   </svg>
                 </div>
                 <span className="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
-                  Auditar →
+                  Gestionar →
                 </span>
               </div>
               <h3 className="text-base font-bold text-slate-900 mb-1">
-                Historial de IA
+                Reseñas y feedback
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Control de versiones y registros de cambios generados por la
-                IA.
+                Consulta los últimos comentarios y opiniones de tus clientes.
               </p>
             </a>
-          )}
-        </div>
+
+            {isAdmin && (
+              <a
+                href="/admin/history"
+                className="bg-white rounded-xl border border-slate-100 p-5 hover:border-slate-200 transition-all group"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-slate-900 group-hover:bg-slate-100 transition-all">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="size-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">
+                    Auditar →
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-slate-900 mb-1">
+                  Historial de IA
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Control de versiones y registros de cambios generados por la
+                  IA.
+                </p>
+              </a>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

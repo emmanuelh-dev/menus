@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ContentEditor from "./ContentEditor";
 import { formater } from "../../types/app";
-import QRDownloadButton from "./QRDownloadButton";
 
 interface PlaceData {
   place: any;
@@ -23,7 +22,7 @@ function getPublicPath(place: any) {
   return `/${typeSlug}/${place?.short_name}`;
 }
 
-export default function PlaceEditContainer({ placeId }: { placeId: string }) {
+export default function PlaceEditContainer({ placeId, initialTab = "editor" }: { placeId: string; initialTab?: "info" | "editor" | "preview" | "media" }) {
   const [data, setData] = useState<PlaceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,38 +75,16 @@ export default function PlaceEditContainer({ placeId }: { placeId: string }) {
   }
 
   const { place } = data;
-  const publicPath = getPublicPath(place);
 
   return (
     <div className="xl:p-4 lg:p-8">
-      <div className="mb-6 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <a href="/admin/dashboard" className="text-sm text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors">
-            ← Dashboard
-          </a>
-          <a
-            href={publicPath}
-            target="_blank"
-            className="text-xs font-bold text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
-          >
-            Ver sitio público
-          </a>
-          <QRDownloadButton
-            url={`${typeof window !== "undefined" ? window.location.origin : ""}${publicPath}`}
-            restaurantName={place.name}
-            size="md"
-            variant="solid"
-          />
-        </div>
-        <h1 className="text-2xl font-bold text-slate-900">{place.name}</h1>
-      </div>
-
       <div>
         <ContentEditor
           placeId={place.id}
           initialContent={place.content}
           placeType={place.type}
           placeData={place}
+          initialTab={initialTab}
         />
       </div>
     </div>

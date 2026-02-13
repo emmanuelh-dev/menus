@@ -19,13 +19,13 @@ export default function AdminPageHeader({
   className = '',
   sticky = true
 }: Props) {
+  const headerClassName = sticky
+    ? 'sticky top-0 z-40 bg-gray-100/95 backdrop-blur supports-[backdrop-filter]:bg-gray-100/85 shadow-md'
+    : 'bg-gray-100/90';
+
   return (
     <header
-      className={`
-         bg-gray-100/90 backdrop-blur-md border-b border-gray-200 py-3 px-4
-        ${sticky ? 'sticky top-0 md:top-14' : ''} 
-        ${className}
-      `}
+      className={`${headerClassName} py-3 px-4 ${className}`}
     >
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full max-w-[1600px] mx-auto">
         {/* Lado Izquierdo o área de Tabs */}

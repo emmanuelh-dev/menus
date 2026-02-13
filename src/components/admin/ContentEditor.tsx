@@ -119,7 +119,7 @@ const migrateFlatToNested = (content: any): Block[] => {
 };
 
 
-export default function ContentEditor({ placeId, initialContent, placeType = 'restaurant', placeData }: { placeId: number; initialContent: any; placeType?: 'restaurant' | 'motel'; placeData?: any }) {
+export default function ContentEditor({ placeId, initialContent, placeType = 'restaurant', placeData, initialTab = 'editor' }: { placeId: number; initialContent: any; placeType?: 'restaurant' | 'motel'; placeData?: any; initialTab?: 'info' | 'editor' | 'preview' | 'media' }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialContent?.blocks) {
       const hasOldStructure = initialContent.blocks.some((block: any) => block.type === 'item');
@@ -167,7 +167,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   const [isSaving, setIsSaving] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState<string | boolean>(false);
   const [showAIChat, setShowAIChat] = useState(false);
-  const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>('editor');
+  const [activeTab, setActiveTab] = useState<'info' | 'editor' | 'preview' | 'media'>(initialTab);
   const [editorMode, setEditorMode] = useState<'simple' | 'advanced' | 'table'>('simple');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);

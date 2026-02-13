@@ -158,6 +158,7 @@ try {
 
 const seoTitle = generateSEOTitle();
 const seoDescription = generateSEODescription();
+const trackingPlaceId = place?.id || restaurantData?.id || null;
 
 // Fallback image logic
 let ogImage = image || place.image;
@@ -384,6 +385,43 @@ if (schemaEnrichment.suitableForDiet) {
 			defer
 			src="https://cloud.umami.is/script.js"
 			data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
+		{trackingPlaceId && (
+			<script is:inline define:vars={{ trackingPlaceId }}>
+				(() => {
+					try {
+						const storageKey = "menu_visitor_id";
+						let visitorId = localStorage.getItem(storageKey);
+						if (!visitorId) {
+							visitorId =
+								typeof crypto !== "undefined" && "randomUUID" in crypto
+									? crypto.randomUUID()
+									: `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+							localStorage.setItem(storageKey, visitorId);
+						}
+
+						const payload = JSON.stringify({
+							placeId: trackingPlaceId,
+							visitorId,
+							path: window.location.pathname,
+						});
+
+						if (navigator.sendBeacon) {
+							const blob = new Blob([payload], { type: "application/json" });
+							navigator.sendBeacon("/api/analytics/visit", blob);
+						} else {
+							fetch("/api/analytics/visit", {
+								method: "POST",
+								headers: { "Content-Type": "application/json" },
+								body: payload,
+								keepalive: true,
+							}).catch(() => null);
+						}
+					} catch (_error) {
+						return;
+					}
+				})();
+			</script>
+		)}
 		<script is:inline>
 			(function (c, l, a, r, i, t, y) {
 				c[a] =

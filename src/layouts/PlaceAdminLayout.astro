@@ -1,24 +1,16 @@
 ---
 import AdminLayout from "./AdminLayout.astro";
-import PlaceSecondaryNav from "../components/admin/PlaceSecondaryNav";
 
 interface Props {
 	title: string;
-	placeId: string;
+	placeId?: string;
 }
 
-const { title, placeId } = Astro.props;
-const currentPath = Astro.url.pathname;
+const { title } = Astro.props;
 ---
 
 <AdminLayout title={title}>
 	<div class="flex flex-col min-h-screen">
-		<PlaceSecondaryNav
-			placeId={placeId}
-			currentPath={currentPath}
-			client:load
-		/>
-
 		<div class="flex-1 w-full">
 			<slot />
 		</div>

@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import PlaceAdminLayout from "../../../../layouts/PlaceAdminLayout.astro";
+import { isAuthenticated } from "../../../../middleware/auth";
+import PlaceDashboardContainer from "../../../../components/admin/PlaceDashboardContainer";
+
+const { id } = Astro.params;
+const isAuth = await isAuthenticated(Astro.request, Astro.cookies);
+
+if (!isAuth) return Astro.redirect("/admin/login");
+---
+
+<PlaceAdminLayout title={`Dashboard | BysMax`} placeId={id!}>
+	<PlaceDashboardContainer client:only="react" placeId={id!} />
+</PlaceAdminLayout>

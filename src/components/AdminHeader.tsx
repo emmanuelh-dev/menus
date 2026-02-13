@@ -1,4 +1,118 @@
 import React, { useState, useEffect } from 'react'
+import { UtensilsCrossed, BarChart3, ExternalLink } from 'lucide-react'
+
+type PlaceDetails = {
+  name: string;
+  location: string;
+  publicPath: string;
+};
+
+type PlaceNavItem = {
+  label: string;
+  href: string;
+  paths: string[];
+  exact?: boolean;
+};
+
+function getPlaceRouteContext(path: string) {
+  const match = path.match(/^\/admin\/place\/([^/]+)(?:\/(.*))?$/);
+  if (!match) return null;
+
+  const [, placeId, section = ''] = match;
+  return { placeId, section };
+}
+
+function getPlaceSectionLabel(section: string) {
+  if (!section) return 'Dashboard';
+  if (section.startsWith('settings')) return 'Menú';
+  if (section.startsWith('caja') || section.startsWith('orders')) return 'Caja';
+  if (section.startsWith('shipping')) return 'Zonas de envío';
+  if (section.startsWith('insights')) return 'Analíticas';
+  if (section.startsWith('pos')) return 'POS táctil';
+  if (section.startsWith('comanda')) return 'Nueva comanda';
+  if (section.startsWith('mesas')) return 'Mapa de mesas';
+  if (section.startsWith('arqueo')) return 'Arqueos';
+  return 'Sección';
+}
+
+function getPlaceLocation(place: any) {
+  const city = place?.city || place?.municipality || place?.municipio || '';
+  const state = place?.state || place?.states?.name || '';
+  return [city, state].filter(Boolean).join(', ');
+}
+
+function getPublicPath(place: any) {
+  if (!place) return '';
+
+  if (place?.menu) {
+    return place.menu;
+  }
+
+  if (place?.type === 'motel' && place?.states?.slug) {
+    return `/moteles/estados/${place.states.slug}/${place.short_name}`;
+  }
+
+  return `/menus/${place?.short_name || ''}`;
+}
+
+function getPlaceNavItems(placeId: string): PlaceNavItem[] {
+  const basePath = `/admin/place/${placeId}`;
+  return [
+    {
+      label: 'Dashboard',
+      href: basePath,
+      paths: [basePath],
+      exact: true
+    },
+    {
+      label: 'Menú',
+      href: `${basePath}/settings`,
+      paths: [`${basePath}/settings`]
+    },
+    {
+      label: 'Caja',
+      href: `${basePath}/caja`,
+      paths: [`${basePath}/caja`, `${basePath}/orders`]
+    },
+    {
+      label: 'Zonas',
+      href: `${basePath}/shipping`,
+      paths: [`${basePath}/shipping`]
+    },
+    {
+      label: 'Analíticas',
+      href: `${basePath}/insights`,
+      paths: [`${basePath}/insights`]
+    },
+    {
+      label: 'POS',
+      href: `${basePath}/pos`,
+      paths: [`${basePath}/pos`]
+    },
+    {
+      label: 'Comanda',
+      href: `${basePath}/comanda`,
+      paths: [`${basePath}/comanda`]
+    },
+    {
+      label: 'Mesas',
+      href: `${basePath}/mesas`,
+      paths: [`${basePath}/mesas`]
+    },
+    {
+      label: 'Arqueos',
+      href: `${basePath}/arqueo`,
+      paths: [`${basePath}/arqueo`]
+    }
+  ];
+}
+
+function isPlaceItemActive(currentPath: string, item: PlaceNavItem) {
+  return item.paths.some((path) => {
+    if (item.exact) return currentPath === path;
+    return currentPath === path || currentPath.startsWith(`${path}/`);
+  });
+}
 
 function AdminHeader() {
   const [isOpen, setIsOpen] = useState(true);
@@ -7,6 +121,7 @@ function AdminHeader() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails>({ name: '', location: '', publicPath: '' });
 
   const [impersonating, setImpersonating] = useState<any>(null);
   const [isMagicSession, setIsMagicSession] = useState(false);
@@ -28,8 +143,14 @@ function AdminHeader() {
       setDeferredPrompt(e);
     };
 
+    const updateCurrentPath = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    setCurrentPath(window.location.pathname);
+    window.addEventListener('popstate', updateCurrentPath);
+    document.addEventListener('astro:page-load', updateCurrentPath);
+    updateCurrentPath();
 
     const checkIfMobile = () => {
       const isMobileWidth = window.innerWidth < 1024; // Aumentamos a 1024 para incluir tablets
@@ -82,8 +203,66 @@ function AdminHeader() {
     return () => {
       window.removeEventListener('resize', checkIfMobile);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('popstate', updateCurrentPath);
+      document.removeEventListener('astro:page-load', updateCurrentPath);
     };
   }, []);
+
+  const placeContext = getPlaceRouteContext(currentPath);
+  const activePlaceId = placeContext?.placeId || null;
+  const placeSectionLabel = placeContext ? getPlaceSectionLabel(placeContext.section) : '';
+  const placeNavItems = activePlaceId ? getPlaceNavItems(activePlaceId) : [];
+
+  useEffect(() => {
+    if (!activePlaceId) {
+      setPlaceDetails({ name: '', location: '', publicPath: '' });
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchPlaceDetails = async () => {
+      try {
+        const response = await fetch(`/api/admin/place/${activePlaceId}`);
+        if (!response.ok) {
+          if (!cancelled) {
+            setPlaceDetails({
+              name: `Restaurante ${activePlaceId}`,
+              location: '',
+              publicPath: ''
+            });
+          }
+          return;
+        }
+
+        const data = await response.json();
+        const place = data?.place || {};
+
+        if (!cancelled) {
+          setPlaceDetails({
+            name: place?.name || `Restaurante ${activePlaceId}`,
+            location: getPlaceLocation(place),
+            publicPath: getPublicPath(place)
+          });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setPlaceDetails({
+            name: `Restaurante ${activePlaceId}`,
+            location: '',
+            publicPath: ''
+          });
+        }
+        console.error('Error al cargar contexto del restaurante:', error);
+      }
+    };
+
+    fetchPlaceDetails();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activePlaceId]);
 
   const handleStopImpersonation = async () => {
     try {
@@ -161,7 +340,7 @@ function AdminHeader() {
         </div>
       )}
 
-      <div className={`fixed ${impersonating || isMagicBannerVisible ? 'top-12' : 'top-1'} left-3 z-50 transition-all duration-300`}>
+      <div className="flex items-center gap-3 bg-white">
         <button
           onClick={() => {
             const newState = !isOpen;
@@ -185,14 +364,56 @@ function AdminHeader() {
             </svg>
           )}
         </button>
+
+        {activePlaceId && (
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[11px] font-black uppercase tracking-wider text-gray-500">{placeSectionLabel}</div>
+                <div className="text-sm font-semibold text-gray-900 truncate">{placeDetails.name || `Restaurante ${activePlaceId}`}</div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={`/admin/place/${activePlaceId}/settings`}
+                  className={`px-2.5 py-1.5 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors inline-flex items-center gap-1.5 ${isMobile ? 'text-xs' : 'text-[11px] font-bold uppercase tracking-wider'}`}
+                  title="Editar menú"
+                >
+                  <UtensilsCrossed size={14} />
+                  {!isMobile && 'Menú'}
+                </a>
+                {!isMobile && (
+                  <a
+                    href={`/admin/place/${activePlaceId}/insights`}
+                    className="px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <BarChart3 size={14} />
+                    Insights
+                  </a>
+                )}
+                {placeDetails.publicPath && (
+                  <a
+                    href={placeDetails.publicPath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`px-2.5 py-1.5 rounded-md bg-gray-900 text-white hover:bg-black transition-colors inline-flex items-center gap-1.5 ${isMobile ? 'text-xs' : 'text-[11px] font-bold uppercase tracking-wider'}`}
+                  >
+                    <ExternalLink size={14} />
+                    {!isMobile && 'Ver público'}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sidebar */}
       <aside className={`
                 bg-white border-r border-gray-200
-                w-64 h-screen
+          w-64 h-[100dvh]
                 fixed left-0 top-0 z-[200]
-                transition-transform duration-300 ease-in-out 
+          transition-transform duration-300 ease-in-out overflow-hidden
                 ${!isOpen ? '-translate-x-full' : 'translate-x-0'}
             `}>
         <div className="flex flex-col h-[100dvh]">
@@ -201,7 +422,31 @@ function AdminHeader() {
             <p className="text-xs text-gray-500 mt-0.5">Panel de control</p>
           </div>
 
-          <nav className="flex-1 px-3 py-4 space-y-0.5">
+          <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-0.5">
+            {activePlaceId && (
+              <div className="pb-3 mb-3 border-b border-gray-100">
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">
+                  {placeDetails.name || `Restaurante ${activePlaceId}`}
+                </div>
+
+                {placeNavItems.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className={`${isPlaceItemActive(currentPath, item)
+                      ? 'bg-gray-900 text-white font-medium'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } flex items-center px-3 py-2 text-sm rounded-md transition-colors`}
+                  >
+                    <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            )}
+
             <a
               href="/admin/dashboard"
               className={`${isActive('/admin/dashboard')
@@ -329,7 +574,7 @@ function AdminHeader() {
             )}
           </nav>
 
-          <div className="p-3 border-t border-gray-100 flex flex-col gap-2">
+          <div className="p-3 border-t border-gray-100 flex flex-col gap-2 shrink-0 bg-white">
             {deferredPrompt && (
               <button
                 onClick={handleInstall}
