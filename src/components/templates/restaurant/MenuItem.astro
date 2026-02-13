@@ -482,7 +482,7 @@ const tiendaItemUrl =
 		!isCafesoso && (
 			<div
 				class:list={[
-					"grid gap-3 md:gap-5 mb-8 items-start",
+					"grid gap-3 md:gap-5 py-4 md:py-5 items-start border-b border-[#DDD4C7]",
 					hasImage && showCartButton &&
 						"grid-cols-[6rem_1fr_auto] md:grid-cols-[7.5rem_1fr_auto]",
 					hasImage && !showCartButton &&
@@ -493,13 +493,13 @@ const tiendaItemUrl =
 				data-item-id={item.id}
 			>
 				{hasImage && (
-					<div class="order-1 overflow-hidden rounded-xl w-full md:w-[7.5rem]">
+					<div class="order-1 overflow-hidden w-full md:w-[7.5rem]">
 						<Image
 							src={item.image}
 							alt={item.name}
 							width={500}
 							height={500}
-							class="w-full h-24 md:h-[7.5rem] object-cover transition-all duration-700 hover:scale-110"
+							class="w-full h-24 md:h-[7.5rem] object-cover transition-all duration-700 hover:scale-110 rounded-md"
 							loading="lazy"
 							format="webp"
 							quality={85}
@@ -508,11 +508,11 @@ const tiendaItemUrl =
 				)}
 
 				<div class="order-2 min-w-0">
-					<h3 class="text-lg font-bold tracking-tight mb-1">{item.name}</h3>
+					<h3 class="text-lg font-bold tracking-tight mb-1 text-[#2F2A25]">{item.name}</h3>
 					{item.options && item.options.length > 0 ? (
 						<div class="mb-4 space-y-1">
 							{item.options.map((opt: any) => (
-								<div class="text-[11px] text-stone-500 italic">
+								<div class="text-[11px] text-stone-600 italic">
 									<span class="font-bold not-italic text-stone-700 capitalize">
 										{opt.name}:
 									</span>{" "}
@@ -526,13 +526,13 @@ const tiendaItemUrl =
 								<MarkdownBlock
 									client:load
 									content={item.description}
-									className="text-stone-400 text-sm font-light leading-relaxed !m-0"
+									className="text-stone-600 text-sm font-light leading-relaxed !m-0"
 								/>
 							</div>
 						)
 					)}
 					{showPrices && (
-						<span class="block text-sm font-bold text-stone-500 mb-3">
+						<span class="block text-sm font-bold text-[#4A433B] mb-3">
 							${item.price}
 						</span>
 					)}
@@ -541,7 +541,7 @@ const tiendaItemUrl =
 				{showCartButton && (
 					<div class="order-3 self-center justify-self-end">
 						<button
-							class="cart-add-btn w-9 h-9 md:w-10 md:h-10 bg-black text-white rounded-full transition-all hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+							class="cart-add-btn w-9 h-9 md:w-10 md:h-10 bg-[#3A342E] text-[#f6f3f3] border border-[#2F2A25] transition-all hover:bg-[#2F2A25] active:scale-95 flex items-center justify-center rounded-full"
 							data-item={JSON.stringify(item)}
 							aria-label={`Agregar ${item.name} al pedido`}
 							title="Agregar al pedido"
