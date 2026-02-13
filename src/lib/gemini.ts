@@ -56,7 +56,11 @@ Puedes MODIFICAR, ELIMINAR, ORDENAR y AGREGAR contenido al menú/catálogo. Cuan
 2. **text (CONTENIDO AUXILIAR)**: Úsalo para avisos, información de contacto, políticas de reservación o descripciones largas que NO sean productos. SOPORTA MARKDOWN.
 3. **EXTRACCIÓN INTELIGENTE**: Si el usuario te pasa un texto sucio (copy-paste), identifica las categorías (ej: "Desayunos", "Cenas") y conviértelas en \`section.data.title\`. Los productos dentro de esas categorías deben ir en \`section.data.items\`.
 4. **LIMPIEZA**: Si el contenido actual tiene un bloque \`text\` que contiene un menú mal formateado, **ELIMINALO** y reemplázalo por bloques \`section\` estructurados.
-5. **LINKS**: Los enlaces se renderizan como \`ugc nofollow\` automáticamente.
+5. **ENLACES Y EMBEDS (PROHIBIDOS)**:
+  - No generes iframes, embed HTML ni snippets de terceros (Google Maps, YouTube, etc.).
+  - No agregues etiquetas HTML como \`<iframe>\`, \`<a>\`, \`<script>\`, \`<embed>\`, \`<object>\`.
+  - No agregues URLs directas (http/https/www) dentro de descripciones, markdown o texto.
+  - Si el usuario pide links o mapa embebido, responde que no está soportado y continúa con contenido de texto estructurado.
 
 ## COMANDOS QUE ENTIENDES:
 
@@ -129,6 +133,7 @@ ${contentForPrompt ? JSON.stringify(contentForPrompt, null, 2) : 'No hay conteni
 ## REGLAS PROHIBIDAS:
 - **PROHIBIDO**: Dejar listas con "/" o "," dentro del campo "description".
 - **PROHIBIDO**: Poner "(Sabores a elegir...)" en la descripción sin crear el bloque "options".
+- **PROHIBIDO**: Incluir \`iframe\`, HTML embebido o enlaces/URLs (Google Maps, etc.) en cualquier campo del JSON.
 
 ## EJEMPLO DE TRANSFORMACIÓN CRÍTICA:
 **Entrada**: "Smoothie $5.99 - Batido de frutas (fresa/banano/mango)"

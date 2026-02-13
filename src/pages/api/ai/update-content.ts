@@ -5,6 +5,67 @@ import { supabase } from '../../../lib/supabase';
 import { callGemini } from '../../../lib/gemini';
 import { uploadToCloudinary } from '../../../lib/cloudinary';
 
+const sanitizeTextContent = (value: unknown): unknown => {
+  if (typeof value !== 'string') return value;
+
+  return value
+    .replace(/<iframe[\s\S]*?<\/iframe>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi, '$1')
+    .replace(/(?:https?:\/\/|www\.)[^\s]+/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+};
+
+const sanitizeUnsupportedContent = (content: any) => {
+  if (!content || typeof content !== 'object') return content;
+
+  const clone = JSON.parse(JSON.stringify(content));
+
+  if (clone.semantic_data && typeof clone.semantic_data === 'object') {
+    Object.keys(clone.semantic_data).forEach((key) => {
+      const value = clone.semantic_data[key];
+      if (typeof value === 'string') {
+        clone.semantic_data[key] = sanitizeTextContent(value);
+      }
+      if (Array.isArray(value)) {
+        clone.semantic_data[key] = value.map((item: any) => sanitizeTextContent(item));
+      }
+    });
+  }
+
+  if (Array.isArray(clone.blocks)) {
+    clone.blocks = clone.blocks.map((block: any) => {
+      if (!block?.data || typeof block.data !== 'object') return block;
+
+      const data = { ...block.data };
+
+      if (typeof data.content === 'string') {
+        data.content = sanitizeTextContent(data.content);
+      }
+
+      if (typeof data.description === 'string') {
+        data.description = sanitizeTextContent(data.description);
+      }
+
+      if (Array.isArray(data.items)) {
+        data.items = data.items.map((item: any) => ({
+          ...item,
+          description: sanitizeTextContent(item?.description),
+        }));
+      }
+
+      return {
+        ...block,
+        data,
+      };
+    });
+  }
+
+  return clone;
+};
+
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const textBody = await request.text();
@@ -87,6 +148,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // --- MODO SAVE ONLY ---
     if (saveOnly && providedContent) {
+      const sanitizedProvidedContent = sanitizeUnsupportedContent(providedContent);
+
       if (placeData) {
         await supabase.from('place_content_history').insert({
           place_id: placeId,
@@ -99,7 +162,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
       const { error: updateError } = await supabase
         .from('places')
-        .update({ content: providedContent })
+        .update({ content: sanitizedProvidedContent })
         .eq('id', placeId);
 
       if (updateError) throw updateError;
@@ -107,7 +170,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return new Response(JSON.stringify({ 
         success: true, 
         message: 'Contenido guardado correctamente',
-        content: providedContent
+        content: sanitizedProvidedContent
       }), { status: 200 });
     }
 
@@ -295,10 +358,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         version_label: `AI_GEN: cost:${totalCostMx.toFixed(4)} | ${aiResponse.change_summary?.substring(0, 30) || instruction?.substring(0, 30) || 'AI Scan'}`
       });
 
+    const sanitizedNewContent = sanitizeUnsupportedContent(newContent);
+
     const stats = {
-      sections: newContent.blocks?.length || 0,
-      items: newContent.blocks?.reduce((acc: number, b: any) => acc + (b.data?.items?.length || 0), 0) || 0,
-      options: newContent.blocks?.reduce((acc: number, b: any) => {
+      sections: sanitizedNewContent.blocks?.length || 0,
+      items: sanitizedNewContent.blocks?.reduce((acc: number, b: any) => acc + (b.data?.items?.length || 0), 0) || 0,
+      options: sanitizedNewContent.blocks?.reduce((acc: number, b: any) => {
         return acc + (b.data?.items?.reduce((iAcc: number, item: any) => iAcc + (item.options?.length || 0), 0) || 0);
       }, 0) || 0,
       hasAddress: !!aiResponse.semantic_data?.address,
@@ -307,8 +372,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     };
 
     // DETECTAR SI HUBO CAMBIOS REALES
-    const contentChanged = JSON.stringify(currentContent.blocks) !== JSON.stringify(newContent.blocks) || 
-                           JSON.stringify(currentContent.semantic_data) !== JSON.stringify(newContent.semantic_data);
+    const contentChanged = JSON.stringify(currentContent.blocks) !== JSON.stringify(sanitizedNewContent.blocks) || 
+                 JSON.stringify(currentContent.semantic_data) !== JSON.stringify(sanitizedNewContent.semantic_data);
 
     console.log('📝 Content change detection:');
     console.log('  - contentChanged:', contentChanged);
@@ -330,14 +395,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         change_summary: aiResponse.change_summary
       },
       conversational_response: aiResponse.conversational_response,
-      content: isPurelyConversational ? currentContent : newContent,
+      content: isPurelyConversational ? currentContent : sanitizedNewContent,
       usage: aiResponse.usageMetadata
     }), { status: 200 });
   }
 
   const { error: updateError } = await supabase
     .from('places')
-    .update({ content: newContent })
+    .update({ content: sanitizedNewContent })
     .eq('id', placeId);
 
   if (updateError) throw updateError;
@@ -346,7 +411,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     success: true, 
     stats,
     conversational_response: aiResponse.conversational_response,
-    content: newContent,
+    content: sanitizedNewContent,
     usage: aiResponse.usageMetadata
   }), { status: 200 });
 
