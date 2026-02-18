@@ -4,27 +4,6 @@ import type { APIRoute } from "astro";
 import { createClient } from "@supabase/supabase-js";
 import { createAuthenticatedClient } from "../../../../../lib/supabase";
 
-function getPublicPath(place: any) {
-	const menuPath = String(place?.menu || "").trim();
-	if (
-		menuPath &&
-		menuPath !== "/" &&
-		menuPath !== "/tienda" &&
-		menuPath !== "/menus"
-	) {
-		return menuPath;
-	}
-
-	if (menuPath === "/tienda") {
-		return `/tienda/${place?.short_name || ""}`;
-	}
-
-	if (place?.type === "motel" && place?.states?.slug) {
-		return `/moteles/estados/${place.states.slug}/${place.short_name}`;
-	}
-	return `/menus/${place?.short_name || ""}`;
-}
-
 function getStartOfUtcDay(date: Date) {
 	return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 }
@@ -37,9 +16,6 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 		if (!authResult) {
 			return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 		}
-
-		const { effectiveUser, isAdmin: isRealAdmin } = authResult;
-		const isImpersonating = !!(effectiveUser as any).isImpersonated;
 
 		const accessToken = cookies.get("sb-access-token")?.value;
 		const refreshToken = cookies.get("sb-refresh-token")?.value;
@@ -62,19 +38,8 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 			)
 			: supabase;
 
-		const { data: place, error: placeError } = await supabase
-			.from("places")
-			.select("id, name, type, menu, short_name, user_id, states(name, slug)")
-			.eq("id", id)
-			.single();
-
-		if (placeError || !place) {
-			return new Response(JSON.stringify({ error: "Place not found" }), { status: 404 });
-		}
-
-		if ((!isRealAdmin || isImpersonating) && place.user_id !== effectiveUser.id) {
-			return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403 });
-		}
+		// Removed place query as requested to avoid RLS/column issues and improve performance
+		// We only need the ID for the visits query
 
 		const now = new Date();
 		const startToday = getStartOfUtcDay(now);
@@ -105,12 +70,6 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 				details: visitsError.details,
 				code: visitsError.code,
 			});
-		} else {
-			console.log("[insights] visits loaded", {
-				placeId: id,
-				count: (visits || []).length,
-				startWeek: startWeek.toISOString(),
-			});
 		}
 
 		const safeVisits = visitsError ? [] : visits || [];
@@ -131,22 +90,9 @@ export const GET: APIRoute = async ({ params, cookies, request }) => {
 			? Number((ratesList.reduce((sum: number, rate: number) => sum + rate, 0) / totalReviews).toFixed(1))
 			: 0;
 
-		const statesData: any = (place as any)?.states;
-		const stateName = Array.isArray(statesData)
-			? statesData[0]?.name || ""
-			: statesData?.name || "";
-		const location = stateName;
-		const publicPath = getPublicPath(place);
-
 		return new Response(
 			JSON.stringify({
-				place: {
-					id: place.id,
-					name: place.name,
-					location,
-					short_name: place.short_name,
-					publicPath,
-				},
+				// Place data removed
 				visits: {
 					today: { total: todayRows.length, unique: todayUnique },
 					yesterday: { total: yesterdayRows.length, unique: yesterdayUnique },

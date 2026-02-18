@@ -483,9 +483,11 @@ const tiendaItemUrl =
 			<div
 				class:list={[
 					"grid gap-3 md:gap-5 py-4 md:py-5 items-start border-b border-[#DDD4C7]",
-					hasImage && showCartButton &&
+					hasImage &&
+						showCartButton &&
 						"grid-cols-[6rem_1fr_auto] md:grid-cols-[7.5rem_1fr_auto]",
-					hasImage && !showCartButton &&
+					hasImage &&
+						!showCartButton &&
 						"grid-cols-[6rem_1fr] md:grid-cols-[7.5rem_1fr]",
 					!hasImage && showCartButton && "grid-cols-[1fr_auto]",
 					!hasImage && !showCartButton && "grid-cols-1",
@@ -508,12 +510,35 @@ const tiendaItemUrl =
 				)}
 
 				<div class="order-2 min-w-0">
-					<h3 class="text-lg font-bold tracking-tight mb-1 text-[#2F2A25]">{item.name}</h3>
+					<h3
+						class:list={[
+							"text-lg font-bold tracking-tight mb-1",
+							template === "elegant" || template === "uber"
+								? "text-white"
+								: "text-[#2F2A25]",
+						]}
+					>
+						{item.name}
+					</h3>
 					{item.options && item.options.length > 0 ? (
 						<div class="mb-4 space-y-1">
 							{item.options.map((opt: any) => (
-								<div class="text-[11px] text-stone-600 italic">
-									<span class="font-bold not-italic text-stone-700 capitalize">
+								<div
+									class:list={[
+										"text-[11px] italic",
+										template === "elegant" || template === "uber"
+											? "text-gray-400"
+											: "text-stone-600",
+									]}
+								>
+									<span
+										class:list={[
+											"font-bold not-italic capitalize",
+											template === "elegant" || template === "uber"
+												? "text-gray-300"
+												: "text-stone-700",
+										]}
+									>
 										{opt.name}:
 									</span>{" "}
 									{opt.values.join(", ")}
@@ -526,13 +551,24 @@ const tiendaItemUrl =
 								<MarkdownBlock
 									client:load
 									content={item.description}
-									className="text-stone-600 text-sm font-light leading-relaxed !m-0"
+									className={
+										template === "elegant" || template === "uber"
+											? "text-gray-300 text-sm font-light leading-relaxed !m-0"
+											: "text-stone-600 text-sm font-light leading-relaxed !m-0"
+									}
 								/>
 							</div>
 						)
 					)}
-					{showPrices && (
-						<span class="block text-sm font-bold text-[#4A433B] mb-3">
+					{item.price > 0 && showPrices && (
+						<span
+							class:list={[
+								"block text-sm font-bold mb-3",
+								template === "elegant" || template === "uber"
+									? "text-white"
+									: "text-[#4A433B]",
+							]}
+						>
 							${item.price}
 						</span>
 					)}

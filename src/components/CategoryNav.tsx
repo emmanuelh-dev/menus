@@ -183,7 +183,7 @@ export default function CategoryNav({
   // Icons variant
   if (variant === 'icons') {
     return (
-      <div className={`sticky top-0 z-40 backdrop-blur-xl border-b border-black/5 shadow-sm ${backgroundClass}`}>
+      <div className={`sticky top-0 z-30 border-b border-black/5 shadow-sm ${backgroundClass}`}>
         <div
           ref={navRef}
           className="max-w-7xl mx-auto px-4 py-4 overflow-x-auto hide-scrollbar flex items-center gap-3"
@@ -217,7 +217,7 @@ export default function CategoryNav({
   // Pills variant
   if (variant === 'pills') {
     return (
-      <div className={`sticky top-0 z-40 border-b border-black/5 py-3 shadow-sm backdrop-blur-md ${backgroundClass}`}>
+      <div className={`sticky top-0 z-30 border-b border-black/5 py-3 shadow-sm backdrop-blur-md ${backgroundClass}`}>
         <div
           ref={navRef}
           className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar flex items-center gap-2"
@@ -248,7 +248,7 @@ export default function CategoryNav({
 
   // Default variant
   return (
-    <div className={`sticky top-0 z-40 backdrop-blur-md border-b border-black/5 py-3 mb-8 shadow-sm ${backgroundClass}`}>
+    <div className={`sticky top-0 z-30 backdrop-blur-md border-b border-black/5 py-3 mb-8 shadow-sm ${backgroundClass}`}>
       <div
         ref={navRef}
         className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar flex items-center gap-2"

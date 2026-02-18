@@ -20,7 +20,7 @@ export default function AdminPageHeader({
   sticky = true
 }: Props) {
   const headerClassName = sticky
-    ? 'sticky top-0 z-40 bg-gray-100/95 backdrop-blur supports-[backdrop-filter]:bg-gray-100/85 shadow-md'
+    ? 'sticky top-0 z-30 bg-gray-100/95'
     : 'bg-gray-100/90';
 
   return (

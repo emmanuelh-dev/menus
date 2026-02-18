@@ -89,20 +89,22 @@ const templateConfigs: Record<string, any> = {
 		fontFamily: "'Inter', sans-serif",
 	},
 	elegant: {
-		bg: "bg-stone-50",
-		text: "text-stone-900",
+		bg: "bg-[#050505]", // Pure black/darkest gray
+		text: "text-gray-100", // Bright almost-white text for readability
 		navColors: {
-			bg: "bg-stone-50/80",
-			text: "text-stone-900",
-			active: "bg-amber-700 text-white",
+			bg: "bg-[#050505]/95",
+			text: "text-gray-300",
+			active: "bg-white text-black font-bold", // Maximum contrast
 		},
-		headerClass: "text-center py-12",
-		titleClass: "text-5xl md:text-8xl font-light serif italic tracking-tight",
+		headerClass: "text-center py-20",
+		titleClass:
+			"text-5xl md:text-8xl font-thin serif italic tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]",
 		sectionTitleClass:
-			"text-2xl serif italic tracking-widest text-stone-800 group-open:text-amber-700",
+			"text-3xl serif italic tracking-widest text-gray-400 group-open:text-white border-b border-gray-800 pb-2 mb-8 w-full transition-all duration-500",
 		itemTitleClass:
-			"text-lg serif font-semibold tracking-wide group-hover/item:text-amber-700 transition-colors",
-		fontImport: "family=Cormorant+Garamond:ital,wght@1,300;1,600",
+			"text-xl serif font-normal tracking-wide text-white group-hover/item:text-yellow-200 transition-colors",
+		fontImport:
+			"family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400",
 		fontFamily: "'Cormorant Garamond', serif",
 	},
 	cafesoso: {
@@ -114,8 +116,7 @@ const templateConfigs: Record<string, any> = {
 			active: "bg-[#6D4C41] text-white",
 		},
 		headerClass: "text-center py-10",
-		titleClass:
-			"text-5xl md:text-7xl font-black tracking-tight text-[#4E342E]",
+		titleClass: "text-5xl md:text-7xl font-black tracking-tight text-[#4E342E]",
 		sectionTitleClass:
 			"text-xl md:text-2xl font-black tracking-wide text-[#5D4037] bg-[#EDE0D4] px-6 py-3 rounded-2xl w-full",
 		itemTitleClass:
@@ -215,9 +216,15 @@ const allSectionsHaveImage =
 	sectionBlocks.length > 1 &&
 	sectionBlocks.every((block: any) => Boolean(block.data?.image?.trim()));
 const useImageCategoryCarousel = !isTiendaTemplate && allSectionsHaveImage;
-const showCategoriesAtStart = isTiendaTemplate && Boolean(view_settings.show_categories_at_start);
-const hideCategoryImages = isTiendaTemplate && Boolean(view_settings.hide_category_images);
-const shouldShowHero = !isTiendaTemplate || (!showCategoriesAtStart && heroCarousel && heroCarousel.data?.items?.length > 0);
+const showCategoriesAtStart =
+	isTiendaTemplate && Boolean(view_settings.show_categories_at_start);
+const hideCategoryImages =
+	isTiendaTemplate && Boolean(view_settings.hide_category_images);
+const shouldShowHero =
+	!isTiendaTemplate ||
+	(!showCategoriesAtStart &&
+		heroCarousel &&
+		heroCarousel.data?.items?.length > 0);
 const toCategorySlug = (value: string) =>
 	(value || "")
 		.toString()
@@ -240,40 +247,82 @@ const toCategorySlug = (value: string) =>
 	backgroundColor={config.bg}
 >
 	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
-		{showCategoriesAtStart && (
-			<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
-				{place.image?.trim() ? (
-					<Image
-						src={place.image}
-						alt={`${place.name} fondo`}
-						width={1600}
-						height={900}
-						class="w-full h-full object-cover"
-						loading="eager"
-						format="webp"
-						quality={90}
-					/>
-				) : (
-					<div class="absolute inset-0 bg-gradient-to-b from-[#181818] to-[#0f0f0f]" />
-				)}
+		{
+			showCategoriesAtStart && (
+				<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
+					{place.image?.trim() ? (
+						<Image
+							src={place.image}
+							alt={`${place.name} fondo`}
+							width={1600}
+							height={900}
+							class="w-full h-full object-cover"
+							loading="eager"
+							format="webp"
+							quality={90}
+						/>
+					) : (
+						<div class="inset-0 bg-gradient-to-b from-[#181818] to-[#0f0f0f]" />
+					)}
 
+					<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-10">
+						<h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white drop-shadow-xl">
+							{place.name}
+						</h1>
+					</div>
 
-				<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-10">
-					<h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white drop-shadow-xl">
-						{place.name}
-					</h1>
-				</div>
-
-				<div>
-					<CategoryCards client:load blocks={blocks} variant="carousel" placeSlug={name} />
-				</div>
-			</section>
-		)}
+					<div>
+						<CategoryCards
+							client:load
+							blocks={blocks}
+							variant="carousel"
+							placeSlug={name}
+						/>
+					</div>
+				</section>
+			)
+		}
 
 		{/* Hero Section with Carousel or Image */}
-		{shouldShowHero && !showCategoriesAtStart && (
-			<div>
-				{
+		{
+			shouldShowHero && !showCategoriesAtStart && (
+				<div>
+					{template === "elegant" || template === "uber" ? (
+						// "Mobile App" Style Header for Premium/Dark Templates
+						<header class="relative pt-16 pb-8 px-6 flex flex-col items-center justify-center text-center z-10 transition-all">
+							<div class="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] overflow-hidden shadow-2xl mb-6 border-4 border-white/5 shrink-0 bg-stone-900 ring-1 ring-white/10">
+								{place.image?.trim() ? (
+									<Image
+										src={place.image}
+										alt={place.name}
+										width={300}
+										height={300}
+										class="w-full h-full object-cover"
+										loading="eager"
+										format="webp"
+										quality={90}
+									/>
+								) : (
+									<div class="w-full h-full flex items-center justify-center text-4xl font-bold text-white/20">
+										{place.name.substring(0, 1)}
+									</div>
+								)}
+							</div>
+
+							<h1 class={config.titleClass}>{place.name}</h1>
+
+							{place.content?.semantic_data?.description && (
+								<div class="mt-4 max-w-lg mx-auto">
+									<p class="text-sm sm:text-base text-gray-400 font-light leading-relaxed">
+										{place.content?.semantic_data?.description}
+									</p>
+								</div>
+							)}
+
+							{/* Divider for elegance */}
+							<div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent mt-8 mx-auto" />
+						</header>
+					) : // Default Hero Image/Carousel
 					heroCarousel && heroCarousel.data.items?.length > 0 ? (
 						<Carousel
 							client:load
@@ -286,50 +335,70 @@ const toCategorySlug = (value: string) =>
 							alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
 							width={1200}
 							height={800}
-							class="w-full h-auto object-cover max-h-[60dvh]"
+							class="w-full h-auto object-cover xl:max-h-[60dvh]"
 							loading="eager"
 							format="webp"
 							quality={90}
 						/>
 					) : (
 						<div class="h-32 bg-stone-900" />
-					)
-				}
-			</div>
-		)}
+					)}
+				</div>
+			)
+		}
 
-		{!isTiendaTemplate && !useImageCategoryCarousel && (
-			<CategoryNav
-				client:load
-				blocks={blocks}
-				variant="icons"
-				backgroundClass={config.navColors?.bg}
-				textClass={config.navColors?.text}
-				activeColorClass={config.navColors?.active}
-			/>
-		)}
+		{
+			!isTiendaTemplate && !useImageCategoryCarousel && (
+				<CategoryNav
+					client:load
+					blocks={blocks}
+					variant="icons"
+					backgroundClass={config.navColors?.bg}
+					textClass={config.navColors?.text}
+					activeColorClass={config.navColors?.active}
+				/>
+			)
+		}
 
-		{useImageCategoryCarousel && (
-			<CategoryCards client:load blocks={blocks} variant="carousel" placeSlug={name} />
-		)}
-		{breadcrumbItems.length > 0 && (
-			<div class="sr-only"
-			>
-				<Breadcrumbs items={breadcrumbItems} />
-			</div>
-		)}
+		{
+			useImageCategoryCarousel && (
+				<CategoryCards
+					client:load
+					blocks={blocks}
+					variant="carousel"
+					placeSlug={name}
+				/>
+			)
+		}
+		{
+			breadcrumbItems.length > 0 && (
+				<div class="sr-only">
+					<Breadcrumbs items={breadcrumbItems} />
+				</div>
+			)
+		}
 		{/* Category Cards for Tienda template */}
-		{config.showCategoryCards && !showCategoriesAtStart && <CategoryCards client:load blocks={blocks} placeSlug={name} />}
+		{
+			config.showCategoryCards && !showCategoriesAtStart && (
+				<CategoryCards client:load blocks={blocks} placeSlug={name} />
+			)
+		}
 
-		<div class:list={["max-w-2xl mx-auto px-6", config.headerClass, showCategoriesAtStart ? "hidden" : ""]}>
-			<h1 class={config.titleClass}>
-				{place.name}
-			</h1>
-		</div>
+		{
+			template !== "elegant" && template !== "uber" && (
+				<div
+					class:list={[
+						"max-w-2xl mx-auto px-6",
+						config.headerClass,
+						showCategoriesAtStart ? "hidden" : "",
+					]}
+				>
+					<h1 class={config.titleClass}>{place.name}</h1>
+				</div>
+			)
+		}
 
-		<div
-			class="max-w-7xl mx-auto px-4 sm:px-6 mt-8"
-		>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
 			{/* Info compacta en una sola línea de chips */}
 			{
 				place.content?.semantic_data && !isTiendaTemplate && (
@@ -366,11 +435,12 @@ const toCategorySlug = (value: string) =>
 						return blocks.map((block: any) => {
 							if (block.type === "section") {
 								const isOpen = sectionCounter < 2;
-								const categorySlug = toCategorySlug(block.data?.title || "") || "categoria";
+								const categorySlug =
+									toCategorySlug(block.data?.title || "") || "categoria";
 								sectionCounter++;
 
 								return (
-									<section id={block.id} >
+									<section id={block.id}>
 										<div class="py-4 mb-8">
 											<div
 												class:list={[
@@ -405,14 +475,20 @@ const toCategorySlug = (value: string) =>
 													<MarkdownBlock
 														client:load
 														content={block.data.description}
-														className="text-stone-400 text-sm font-normal italic leading-relaxed"
+														className={
+															template === "elegant" || template === "uber"
+																? "text-gray-300 text-sm font-normal italic leading-relaxed"
+																: "text-stone-400 text-sm font-normal italic leading-relaxed"
+														}
 													/>
 												</div>
 											)}
 
 											<div
 												class:list={[
-													template === "tienda" ? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" : "grid grid-cols-1 lg:grid-cols-3 lg:gap-4",
+													template === "tienda"
+														? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+														: "grid grid-cols-1 lg:grid-cols-3 lg:gap-4",
 												]}
 											>
 												{block.data.items?.map((item: any) => (

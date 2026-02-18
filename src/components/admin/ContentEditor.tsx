@@ -1071,7 +1071,6 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
   return (
     <div className=" pb-32">
       <AdminPageHeader
-        sticky={activeTab !== 'editor'}
         leftContent={
           <div className="flex items-center gap-3 w-full">
             <div className="flex bg-white/50 rounded-xl gap-0.5 border border-gray-200 shadow-sm w-full items-center justify-center">
@@ -1552,138 +1551,138 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
                 {showViewSettings && (
                   <div className="mt-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-sm space-y-6">
-                <div>
-                  <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-                    <label className="text-xs font-bold text-gray-600 block uppercase tracking-wider">Plantilla del {placeType === 'motel' ? 'Motel' : 'Menú'}:</label>
-                    <a
-                      href={`/plantillas?template=${encodeURIComponent(viewSettings.template || 'default')}&type=${encodeURIComponent(placeType || 'restaurant')}`}
-                      className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all"
-                    >
-                      Ver ejemplos
-                    </a>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {(
-                      placeType === 'motel'
-                        ? [
-                          { id: 'default', name: 'Urbano App', desc: 'Oscuro y moderno' },
-                          { id: 'classic', name: 'Clásico VIP', desc: 'Dorado y elegante' },
-                          { id: 'night', name: 'Neon Night', desc: 'Vibrante y atrevido' },
-                        ]
-                        : [
-                          { id: 'default', name: 'Tradicional', desc: 'Limpio y elegante' },
-                          { id: 'modern', name: 'Moderno', desc: 'Aire de revista' },
-                          { id: 'elegant', name: 'Gourmet', desc: 'Estilo Premium' },
-                          { id: 'cafesoso', name: 'Cafetería', desc: 'Cálido, cremoso y cozy' },
-                          { id: 'vibrant', name: 'Vibrant (Lalo\'s)', desc: 'Tarjetas y color' },
-                          { id: 'mariscos', name: 'Mariscos Coastal', desc: 'Azul, naranja y playa' },
-                          { id: 'uber', name: 'Uber (Dark)', desc: 'Elegante oscuro' },
-                          { id: 'didi', name: 'DiDi (Light)', desc: 'Limpio y naranja' },
-                          { id: 'tienda', name: 'Tienda', desc: 'Categorías visuales' },
-                        ]
-                    ).map((tpl) => (
-                      <button
-                        key={tpl.id}
-                        onClick={() => setViewSettings({ ...viewSettings, template: tpl.id })}
-                        className={`p-3 rounded-xl border text-left transition-all ${viewSettings.template === tpl.id
-                          ? 'border-indigo-600 bg-indigo-50/50'
-                          : 'border-gray-200 hover:border-indigo-200 bg-gray-50/30'}`}
-                      >
-                        <div className={`font-bold text-sm ${viewSettings.template === tpl.id ? 'text-indigo-900' : 'text-gray-700'}`}>{tpl.name}</div>
-                        <div className="text-[10px] text-gray-500 uppercase font-bold tracking-tight">{tpl.desc}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Distribución:</label>
-                    <div className="flex bg-gray-100 p-1 rounded-xl">
-                      <button
-                        onClick={() => setViewSettings({ ...viewSettings, layout: 'grid' })}
-                        className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase transition-all ${viewSettings.layout === 'grid' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
-                      >
-                        Cuadrícula (Grid)
-                      </button>
-                      <button
-                        onClick={() => setViewSettings({ ...viewSettings, layout: 'list' })}
-                        className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase transition-all ${viewSettings.layout === 'list' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
-                      >
-                        Lista
-                      </button>
+                    <div>
+                      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                        <label className="text-xs font-bold text-gray-600 block uppercase tracking-wider">Plantilla del {placeType === 'motel' ? 'Motel' : 'Menú'}:</label>
+                        <a
+                          href={`/plantillas?template=${encodeURIComponent(viewSettings.template || 'default')}&type=${encodeURIComponent(placeType || 'restaurant')}`}
+                          className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all"
+                        >
+                          Ver ejemplos
+                        </a>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {(
+                          placeType === 'motel'
+                            ? [
+                              { id: 'default', name: 'Urbano App', desc: 'Oscuro y moderno' },
+                              { id: 'classic', name: 'Clásico VIP', desc: 'Dorado y elegante' },
+                              { id: 'night', name: 'Neon Night', desc: 'Vibrante y atrevido' },
+                            ]
+                            : [
+                              { id: 'default', name: 'Tradicional', desc: 'Limpio y elegante' },
+                              { id: 'modern', name: 'Moderno', desc: 'Aire de revista' },
+                              { id: 'elegant', name: 'Gourmet', desc: 'Estilo Premium' },
+                              { id: 'cafesoso', name: 'Cafetería', desc: 'Cálido, cremoso y cozy' },
+                              { id: 'vibrant', name: 'Vibrant (Lalo\'s)', desc: 'Tarjetas y color' },
+                              { id: 'mariscos', name: 'Mariscos Coastal', desc: 'Azul, naranja y playa' },
+                              { id: 'uber', name: 'Uber (Dark)', desc: 'Elegante oscuro' },
+                              { id: 'didi', name: 'DiDi (Light)', desc: 'Limpio y naranja' },
+                              { id: 'tienda', name: 'Tienda', desc: 'Categorías visuales' },
+                            ]
+                        ).map((tpl) => (
+                          <button
+                            key={tpl.id}
+                            onClick={() => setViewSettings({ ...viewSettings, template: tpl.id })}
+                            className={`p-3 rounded-xl border text-left transition-all ${viewSettings.template === tpl.id
+                              ? 'border-indigo-600 bg-indigo-50/50'
+                              : 'border-gray-200 hover:border-indigo-200 bg-gray-50/30'}`}
+                          >
+                            <div className={`font-bold text-sm ${viewSettings.template === tpl.id ? 'text-indigo-900' : 'text-gray-700'}`}>{tpl.name}</div>
+                            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-tight">{tpl.desc}</div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <input
-                      type="checkbox"
-                      id="show_prices"
-                      checked={viewSettings.show_prices}
-                      onChange={(e) => setViewSettings({ ...viewSettings, show_prices: e.target.checked })}
-                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                    />
-                    <label htmlFor="show_prices" className="text-sm font-bold text-gray-700 cursor-pointer">
-                      Mostrar precios al público
-                    </label>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <input
-                      type="checkbox"
-                      id="has_admin"
-                      checked={semanticData.has_admin || false}
-                      onChange={(e) => setSemanticData({ ...semanticData, has_admin: e.target.checked })}
-                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                    />
-                    <label htmlFor="has_admin" className="text-sm font-bold text-gray-700 cursor-pointer">
-                      Este negocio tiene administrador
-                    </label>
-                  </div>
-
-                  {viewSettings.template === 'tienda' && (
-                    <div className="md:col-span-2 grid grid-cols-1 gap-3">
-                      <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                        <input
-                          type="checkbox"
-                          id="enable_cart_from_template"
-                          checked={semanticData.enable_cart || false}
-                          onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
-                          className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500"
-                        />
-                        <label htmlFor="enable_cart_from_template" className="text-sm font-bold text-emerald-900 cursor-pointer">
-                          Habilitar carrito en esta tienda
-                        </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+                      <div>
+                        <label className="text-xs font-bold text-gray-600 mb-2 block uppercase tracking-wider px-4">Distribución:</label>
+                        <div className="flex bg-gray-100 p-1 rounded-xl">
+                          <button
+                            onClick={() => setViewSettings({ ...viewSettings, layout: 'grid' })}
+                            className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase transition-all ${viewSettings.layout === 'grid' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
+                          >
+                            Cuadrícula (Grid)
+                          </button>
+                          <button
+                            onClick={() => setViewSettings({ ...viewSettings, layout: 'list' })}
+                            className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase transition-all ${viewSettings.layout === 'list' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}
+                          >
+                            Lista
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
                         <input
                           type="checkbox"
-                          id="show_categories_at_start"
-                          checked={Boolean(viewSettings.show_categories_at_start)}
-                          onChange={(e) => setViewSettings({ ...viewSettings, show_categories_at_start: e.target.checked })}
+                          id="show_prices"
+                          checked={viewSettings.show_prices}
+                          onChange={(e) => setViewSettings({ ...viewSettings, show_prices: e.target.checked })}
                           className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
                         />
-                        <label htmlFor="show_categories_at_start" className="text-sm font-bold text-indigo-900 cursor-pointer">
-                          Mostrar categorías al inicio (carrusel)
+                        <label htmlFor="show_prices" className="text-sm font-bold text-gray-700 cursor-pointer">
+                          Mostrar precios al público
                         </label>
                       </div>
 
-                      <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
                         <input
                           type="checkbox"
-                          id="hide_category_images"
-                          checked={Boolean(viewSettings.hide_category_images)}
-                          onChange={(e) => setViewSettings({ ...viewSettings, hide_category_images: e.target.checked })}
-                          className="w-5 h-5 text-slate-700 rounded focus:ring-slate-500"
+                          id="has_admin"
+                          checked={semanticData.has_admin || false}
+                          onChange={(e) => setSemanticData({ ...semanticData, has_admin: e.target.checked })}
+                          className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
                         />
-                        <label htmlFor="hide_category_images" className="text-sm font-bold text-slate-800 cursor-pointer">
-                          Ocultar imágenes de categoría en el listado
+                        <label htmlFor="has_admin" className="text-sm font-bold text-gray-700 cursor-pointer">
+                          Este negocio tiene administrador
                         </label>
                       </div>
+
+                      {viewSettings.template === 'tienda' && (
+                        <div className="md:col-span-2 grid grid-cols-1 gap-3">
+                          <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <input
+                              type="checkbox"
+                              id="enable_cart_from_template"
+                              checked={semanticData.enable_cart || false}
+                              onChange={(e) => setSemanticData({ ...semanticData, enable_cart: e.target.checked })}
+                              className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500"
+                            />
+                            <label htmlFor="enable_cart_from_template" className="text-sm font-bold text-emerald-900 cursor-pointer">
+                              Habilitar carrito en esta tienda
+                            </label>
+                          </div>
+
+                          <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                            <input
+                              type="checkbox"
+                              id="show_categories_at_start"
+                              checked={Boolean(viewSettings.show_categories_at_start)}
+                              onChange={(e) => setViewSettings({ ...viewSettings, show_categories_at_start: e.target.checked })}
+                              className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                            />
+                            <label htmlFor="show_categories_at_start" className="text-sm font-bold text-indigo-900 cursor-pointer">
+                              Mostrar categorías al inicio (carrusel)
+                            </label>
+                          </div>
+
+                          <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <input
+                              type="checkbox"
+                              id="hide_category_images"
+                              checked={Boolean(viewSettings.hide_category_images)}
+                              onChange={(e) => setViewSettings({ ...viewSettings, hide_category_images: e.target.checked })}
+                              className="w-5 h-5 text-slate-700 rounded focus:ring-slate-500"
+                            />
+                            <label htmlFor="hide_category_images" className="text-sm font-bold text-slate-800 cursor-pointer">
+                              Ocultar imágenes de categoría en el listado
+                            </label>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
                   </div>
                 )}
               </>
@@ -1759,14 +1758,14 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                             )}
                           </div>
                           <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => toggleSectionFeatured(index)}
-                                className={`px-3 py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${block.data.featured ? 'bg-amber-500 border-amber-500 text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200'}`}
-                                title={block.data.featured ? 'Quitar destacado' : 'Marcar como destacada'}
-                              >
-                                {block.data.featured ? 'Destacada' : 'Destacar'}
-                              </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleSectionFeatured(index)}
+                              className={`px-3 py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${block.data.featured ? 'bg-amber-500 border-amber-500 text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200'}`}
+                              title={block.data.featured ? 'Quitar destacado' : 'Marcar como destacada'}
+                            >
+                              {block.data.featured ? 'Destacada' : 'Destacar'}
+                            </button>
                             <button
                               type="button"
                               onClick={() => moveSectionAmongSections(index, 'up')}
@@ -1811,7 +1810,7 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                         )}
 
                         <div>
-                
+
 
                           <div>
                             <div className="max-w-2xl mx-auto">
@@ -2031,68 +2030,68 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
                   {sectionEntries.map(({ block, index }) => (
                     <div key={block.id} id={block.id} className="relative scroll-mt-24">
 
-                    <div className="flex justify-end gap-2 mb-3 ">
-                      <button
-                        onClick={() => moveBlock(index, 'up')}
-                        disabled={index === 0}
-                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
-                        title="Subir"
-                      >
-                        <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
-                      </button>
-                      <button
-                        onClick={() => moveBlock(index, 'down')}
-                        disabled={index === blocks.length - 1}
-                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
-                        title="Bajar"
-                      >
-                        <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
-                      </button>
-                      <button
-                        onClick={() => duplicateBlock(index)}
-                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
-                        title="Duplicar"
-                      >
-                        <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => removeBlock(index)}
-                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
-                        title="Eliminar"
-                      >
-                        <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
-                      </button>
-                    </div>
+                      <div className="flex justify-end gap-2 mb-3 ">
+                        <button
+                          onClick={() => moveBlock(index, 'up')}
+                          disabled={index === 0}
+                          className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                          title="Subir"
+                        >
+                          <PiCaretUp className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                        </button>
+                        <button
+                          onClick={() => moveBlock(index, 'down')}
+                          disabled={index === blocks.length - 1}
+                          className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 flex items-center justify-center transition-all group"
+                          title="Bajar"
+                        >
+                          <PiCaretDown className="w-4 h-4 text-gray-500 group-hover:text-emerald-600" />
+                        </button>
+                        <button
+                          onClick={() => duplicateBlock(index)}
+                          className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 flex items-center justify-center transition-all group"
+                          title="Duplicar"
+                        >
+                          <PiCopy className="w-4 h-4 text-gray-600 group-hover:text-blue-600" />
+                        </button>
+                        <button
+                          onClick={() => removeBlock(index)}
+                          className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl hover:bg-red-50 hover:border-red-200 flex items-center justify-center transition-all group"
+                          title="Eliminar"
+                        >
+                          <PiTrash className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
+                        </button>
+                      </div>
 
                       {renderBlock(block, index, forceCollapse)}
 
-                    <div className="flex justify-center my-4">
-                      <button
-                        onClick={() => setShowBlockMenu(`after-${index}`)}
-                        className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
-                      >
-                        <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
-                      </button>
-                    </div>
-
-                      {showBlockMenu === `after-${index}` && (
-                      <div className="mt-3 p-4 bg-white border rounded-xl ">
-                        <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
-                          <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
-                          <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
-                          <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
-                          <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown', index)} />
-                        </div>
+                      <div className="flex justify-center my-4">
                         <button
-                          onClick={() => setShowBlockMenu(false)}
-                          className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                          onClick={() => setShowBlockMenu(`after-${index}`)}
+                          className="bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-100 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:shadow-md hover:scale-105 flex items-center gap-2"
                         >
-                          Cancelar
+                          <PiPlus className="w-3 h-3" /> Agregar nuevo bloque
                         </button>
                       </div>
-                    )}
+
+                      {showBlockMenu === `after-${index}` && (
+                        <div className="mt-3 p-4 bg-white border rounded-xl ">
+                          <p className="text-xs font-bold text-gray-500 mb-3">¿QUÉ QUIERES AGREGAR?</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            <BlockTypeButton icon={<PiLayout className="w-8 h-8" />} label="Sección" onClick={() => addBlock('section', index)} />
+                            <BlockTypeButton icon={<PiImage className="w-8 h-8" />} label="Imagen" onClick={() => addBlock('image', index)} />
+                            <BlockTypeButton icon={<PiSparkle className="w-8 h-8" />} label="Galería" onClick={() => addBlock('gallery', index)} />
+                            <BlockTypeButton icon={<PiPaperPlaneTilt className="w-8 h-8" />} label="Promociones" onClick={() => addBlock('carrusel', index)} />
+                            <BlockTypeButton icon={<PiFileText className="w-8 h-8" />} label="Texto/Markdown" onClick={() => addBlock('markdown', index)} />
+                          </div>
+                          <button
+                            onClick={() => setShowBlockMenu(false)}
+                            className="mt-3 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
 
@@ -2187,18 +2186,18 @@ export default function ContentEditor({ placeId, initialContent, placeType = 're
 
                   {blocks.length === 0 && (
                     <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 mx-4">
-                    <div className="mb-4 flex justify-center">
-                      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
-                        <PiTray className="w-8 h-8" />
+                      <div className="mb-4 flex justify-center">
+                        <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300">
+                          <PiTray className="w-8 h-8" />
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
-                    <button
-                      onClick={() => setShowBlockMenu(true)}
-                      className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
-                    >
-                      <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
-                    </button>
+                      <p className="text-gray-500 font-bold uppercase text-xs mb-6 tracking-widest">El menú está vacío. Comienza agregando contenido.</p>
+                      <button
+                        onClick={() => setShowBlockMenu(true)}
+                        className="bg-gray-900 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black shadow-xl transition-all flex items-center gap-2 mx-auto"
+                      >
+                        <PiPlus className="w-4 h-4" /> Agregar Primer Bloque
+                      </button>
 
                       {showBlockMenu === true && (
                         <div className="mt-8 max-w-md mx-auto p-6 bg-white border rounded-2xl shadow-xl">
