@@ -176,7 +176,7 @@ export default function PlaceDashboardContainer({ placeId }: Props) {
     return (
       <div className="p-4 sm:p-6 lg:p-8 animate-pulse">
         <div className="h-8 w-56 bg-gray-100 rounded mb-6"></div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8">
           <div className="h-24 bg-gray-100 rounded-2xl"></div>
           <div className="h-24 bg-gray-100 rounded-2xl"></div>
           <div className="h-24 bg-gray-100 rounded-2xl"></div>
@@ -248,7 +248,7 @@ export default function PlaceDashboardContainer({ placeId }: Props) {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <MetricCard label="Visitas hoy" value={String(data.visits.today.total)} detail={`Únicos: ${data.visits.today.unique}`} />
         <MetricCard label="Visitas ayer" value={String(data.visits.yesterday.total)} detail={`Únicos: ${data.visits.yesterday.unique}`} />
         <MetricCard label="Últimos 7 días" value={String(data.visits.week.total)} detail={`Únicos: ${data.visits.week.unique}`} />

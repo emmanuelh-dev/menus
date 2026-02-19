@@ -25,6 +25,17 @@ const { title, description = "Panel de administrador" } = Astro.props;
 			defer></script>
 	</head>
 	<body class="bg-gray-100 min-h-screen">
+		<div
+			class="bg-indigo-600 text-white px-4 py-3 text-center text-sm font-medium relative z-[100]"
+		>
+			⚠️ Esta versión del panel dejará de estar disponible pronto.
+			<a
+				href="https://admin-menus.bysmax.com"
+				class="underline font-bold hover:text-indigo-100 ml-1"
+			>
+				Ir al nuevo panel (admin-menus.bysmax.com)
+			</a>
+		</div>
 		<AdminHeader client:load transition:persist />
 
 		<div
