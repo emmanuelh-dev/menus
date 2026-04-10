@@ -348,19 +348,6 @@ const toCategorySlug = (value: string) =>
 		}
 
 		{
-			!isTiendaTemplate && !useImageCategoryCarousel && (
-				<CategoryNav
-					client:load
-					blocks={blocks}
-					variant="icons"
-					backgroundClass={config.navColors?.bg}
-					textClass={config.navColors?.text}
-					activeColorClass={config.navColors?.active}
-				/>
-			)
-		}
-
-		{
 			useImageCategoryCarousel && (
 				<CategoryCards
 					client:load
