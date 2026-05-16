@@ -105,14 +105,19 @@ const buildCloudinaryTransform = (url: string, transform: string) =>
 
 const buildMenuImageSliceUrl = (
 	url: string,
-	slice: Pick<RenderedMenuImageSlice, "width" | "height"> & { x: number; y: number },
+	slice: Pick<RenderedMenuImageSlice, "width" | "height"> & {
+		x: number;
+		y: number;
+	},
 ) =>
 	buildCloudinaryTransform(
 		url,
 		`f_avif,q_auto:best/c_crop,x_${Math.max(0, Math.round(slice.x))},y_${Math.max(0, Math.round(slice.y))},w_${Math.round(slice.width)},h_${Math.round(slice.height)}/c_limit,w_1200`,
 	);
 
-const buildMenuImageSlices = (image: MenuImageItem): RenderedMenuImageSlice[] => {
+const buildMenuImageSlices = (
+	image: MenuImageItem,
+): RenderedMenuImageSlice[] => {
 	if (!image?.src) return [];
 
 	const originalSrc = getCloudinaryOriginalUrl(image.src);
@@ -146,7 +151,10 @@ const buildMenuImageSlices = (image: MenuImageItem): RenderedMenuImageSlice[] =>
 
 	const x = Math.max(0, Math.round(image.crop?.x || 0));
 	const yStart = Math.max(0, Math.round(image.crop?.y || 0));
-	const sliceWidth = Math.max(1, Math.min(Math.round(width), width - x || width));
+	const sliceWidth = Math.max(
+		1,
+		Math.min(Math.round(width), width - x || width),
+	);
 	const availableHeight = Math.max(1, height - yStart);
 	const normalizedSliceHeight = Math.max(
 		1,
@@ -379,6 +387,39 @@ const toCategorySlug = (value: string) =>
 >
 	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
 		{
+			menuImageBlocks.length > 0 && (
+				<div class="max-w-7xl mx-auto xl:px-4 sm:px-6">
+					{menuImageBlocks.map((block: any) => {
+						const images: MenuImageItem[] = block.data?.images || [];
+						const renderedImages = images.flatMap((img: MenuImageItem) =>
+							buildMenuImageSlices(img),
+						);
+
+						return (
+							<div>
+								<div class="flex flex-col">
+									{renderedImages.map((img: RenderedMenuImageSlice) => (
+										<div class="w-full">
+											<img
+												src={img.src}
+												alt={img.alt}
+												width={img.width}
+												height={img.height}
+												class="block w-full h-auto"
+												loading="lazy"
+												decoding="async"
+												style={`aspect-ratio: ${img.aspectRatio};`}
+											/>
+										</div>
+									))}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			)
+		}
+		{
 			showCategoriesAtStart && (
 				<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
 					{place.image?.trim() ? (
@@ -388,7 +429,7 @@ const toCategorySlug = (value: string) =>
 							width={1600}
 							height={900}
 							class="w-full h-full object-cover"
-							loading="eager"
+							loading="lazy"
 							format="webp"
 							quality={90}
 						/>
@@ -512,39 +553,6 @@ const toCategorySlug = (value: string) =>
 				</div>
 			)
 		}
-		{
-			menuImageBlocks.length > 0 && (
-				<div class="max-w-7xl mx-auto xl:px-4 sm:px-6 mt-6">
-					{menuImageBlocks.map((block: any) => {
-						const images: MenuImageItem[] = block.data?.images || [];
-						const renderedImages = images.flatMap((img: MenuImageItem) =>
-							buildMenuImageSlices(img),
-						);
-
-						return (
-							<div class="py-6">
-								<div class="flex flex-col">
-									{renderedImages.map((img: RenderedMenuImageSlice) => (
-										<div class="w-full">
-											<img
-												src={img.src}
-												alt={img.alt}
-												width={img.width}
-												height={img.height}
-												class="block w-full h-auto"
-												loading="lazy"
-												decoding="async"
-												style={`aspect-ratio: ${img.aspectRatio};`}
-											/>
-										</div>
-									))}
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			)
-		}
 
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
 			{/* Info compacta en una sola línea de chips */}
@@ -607,7 +615,7 @@ const toCategorySlug = (value: string) =>
 												<div>
 													<Image
 														src={block.data.image}
-														alt={`${place.name} - ${block.data.title || 'Menú'}`}
+														alt={`${place.name} - ${block.data.title || "Menú"}`}
 														width={1000}
 														height={600}
 														class="w-full h-56 sm:h-72 object-cover transition-transform duration-700 hover:scale-105"
