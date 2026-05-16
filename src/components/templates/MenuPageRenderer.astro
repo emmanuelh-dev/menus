@@ -62,7 +62,7 @@ const templateConfigs: Record<string, any> = {
 			active: "bg-[#3A342E] text-[#f6f3f3]",
 		},
 		headerClass: "text-center",
-		titleClass: "text-4xl md:text-6xl font-bold serif italic drop-shadow-2xl",
+		titleClass: "text-4xl md:text-6xl font-bold serif drop-shadow-2xl",
 		sectionTitleClass:
 			"text-xl uppercase tracking-[0.3em] font-black text-stone-700 transition-all group-open:text-stone-900",
 		itemTitleClass:
@@ -98,9 +98,9 @@ const templateConfigs: Record<string, any> = {
 		},
 		headerClass: "text-center py-20",
 		titleClass:
-			"text-5xl md:text-8xl font-thin serif italic tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]",
+			"text-5xl md:text-8xl font-thin serif tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]",
 		sectionTitleClass:
-			"text-3xl serif italic tracking-widest text-gray-400 group-open:text-white pb-2 w-full transition-all duration-500",
+			"text-3xl serif tracking-widest text-gray-300 group-open:text-white pb-2 w-full transition-all duration-500",
 		itemTitleClass:
 			"text-xl serif font-normal tracking-wide text-white group-hover/item:text-yellow-200 transition-colors",
 		fontImport:
@@ -180,7 +180,7 @@ const templateConfigs: Record<string, any> = {
 			active: "bg-[#FF5B00] text-white",
 		},
 		headerClass: "text-center py-12 bg-white shadow-sm mb-6",
-		titleClass: "text-4xl font-black italic text-[#FF5B00]",
+		titleClass: "text-4xl font-black text-[#FF5B00]",
 		sectionTitleClass:
 			"text-xl font-bold text-gray-800 mb-6 bg-gray-100/50 px-6 py-3 rounded-2xl",
 		fontImport: "family=Outfit:wght@400;700;900",
@@ -289,14 +289,14 @@ const toCategorySlug = (value: string) =>
 				<div>
 					{template === "elegant" || template === "uber" ? (
 						// "Mobile App" Style Header for Premium/Dark Templates
-						<header class="relative pt-16 pb-8 px-6 flex flex-col items-center justify-center text-center z-10 transition-all">
-							<div class="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] overflow-hidden shadow-2xl mb-6 border-4 border-white/5 shrink-0 bg-stone-900 ring-1 ring-white/10">
+						<header class="pb-4 flex flex-col items-center justify-center text-center z-10 transition-all">
+							<div class="w-full mb-4">
 								{place.image?.trim() ? (
 									<Image
 										src={place.image}
 										alt={place.name}
-										width={300}
-										height={300}
+										width={900}
+										height={900}
 										class="w-full h-full object-cover"
 										loading="eager"
 										format="webp"
@@ -318,9 +318,6 @@ const toCategorySlug = (value: string) =>
 									</p>
 								</div>
 							)}
-
-							{/* Divider for elegance */}
-							<div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent mt-8 mx-auto" />
 						</header>
 					) : // Default Hero Image/Carousel
 					heroCarousel && heroCarousel.data.items?.length > 0 ? (
