@@ -121,6 +121,11 @@ const buildMenuImageSlices = (image: MenuImageItem): RenderedMenuImageSlice[] =>
 	const sliceHeight = image.sliceHeight || image.crop?.height;
 
 	if (!isCloudinaryUrl(originalSrc) || !width || !height || !sliceHeight) {
+		const baseAlt = image.alt || image.title || "Menú Digital";
+		const finalAlt = baseAlt.toLowerCase().includes(place.name.toLowerCase())
+			? baseAlt
+			: `${place.name} - ${baseAlt}`;
+
 		return [
 			{
 				src: isCloudinaryUrl(image.src)
@@ -129,7 +134,7 @@ const buildMenuImageSlices = (image: MenuImageItem): RenderedMenuImageSlice[] =>
 							"f_avif,q_auto:best,c_limit,w_1200",
 						)
 					: originalSrc,
-				alt: image.alt || place.name,
+				alt: finalAlt,
 				width: width || 1200,
 				height: height || 1600,
 				aspectRatio: width && height ? width / height : 1,
@@ -160,7 +165,7 @@ const buildMenuImageSlices = (image: MenuImageItem): RenderedMenuImageSlice[] =>
 				width: sliceWidth,
 				height: currentHeight,
 			}),
-			alt: `${image.alt || place.name} - parte ${index + 1} de ${total}`,
+			alt: `${place.name} - ${image.alt || image.title || "Menú Digital"} - parte ${index + 1} de ${total}`,
 			width: sliceWidth,
 			height: currentHeight,
 			aspectRatio: sliceWidth / currentHeight,
@@ -602,7 +607,7 @@ const toCategorySlug = (value: string) =>
 												<div>
 													<Image
 														src={block.data.image}
-														alt={block.data.title}
+														alt={`${place.name} - ${block.data.title || 'Menú'}`}
 														width={1000}
 														height={600}
 														class="w-full h-56 sm:h-72 object-cover transition-transform duration-700 hover:scale-105"
@@ -629,6 +634,7 @@ const toCategorySlug = (value: string) =>
 														showPrices={view_settings.show_prices}
 														enableCart={enableCart || enableDelivery}
 														whatsappNumber={whatsappNumber}
+														placeName={place.name}
 													/>
 												))}
 											</div>
