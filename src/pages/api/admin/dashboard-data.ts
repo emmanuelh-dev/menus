@@ -146,8 +146,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
 					)
 				`,
 				)
-				.order("created_at", { ascending: false })
-				.limit(10);
+				.order("created_at", { ascending: false });
 			history = historyData || [];
 		}
 
