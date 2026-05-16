@@ -118,10 +118,6 @@ export default function RestaurantPreview({ place, template = 'default' }: Props
                   </div>
                 </div>
 
-                {block.data.description && (
-                  <p className="text-stone-400 text-sm font-normal italic mb-8 px-4 opacity-80 leading-relaxed">{block.data.description}</p>
-                )}
-
                 <div className={template === 'tienda' ? 'pt-2 grid grid-cols-2 lg:grid-cols-4 gap-3' : 'pt-2'}>
                   {block.data.items?.map((item: any, iIdx: number) => (
                     <MenuItemPreview
