@@ -23,6 +23,33 @@ interface Props {
 	breadcrumbItems?: BreadcrumbItem[];
 }
 
+interface MenuImageItem {
+	src: string;
+	alt?: string;
+	title?: string;
+	description?: string;
+	width?: number;
+	height?: number;
+	sliceHeight?: number;
+	crop?: {
+		enabled?: boolean;
+		x?: number;
+		y?: number;
+		width?: number;
+		height?: number;
+	};
+}
+
+interface RenderedMenuImageSlice {
+	src: string;
+	alt: string;
+	width: number;
+	height: number;
+	aspectRatio: number;
+	index: number;
+	total: number;
+}
+
 const { place, name, breadcrumbItems = [] } = Astro.props;
 
 let { blocks = [], view_settings = {} } = place.content || {};
@@ -50,40 +77,97 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 const isCloudinaryUrl = (url: string) =>
 	url.includes("res.cloudinary.com") && url.includes("/upload/");
 
-const buildCloudinaryTransform = (url: string, transform: string) =>
-	isCloudinaryUrl(url) ? url.replace("/upload/", `/upload/${transform}/`) : url;
-const menuSlices = [
-	{ gravity: "g_north", label: "top" },
-	{ gravity: "g_center", label: "center" },
-	{ gravity: "g_south", label: "bottom" },
-];
+const getCloudinaryOriginalUrl = (url: string) => {
+	if (!isCloudinaryUrl(url)) return url;
 
-const buildMenuImageSlices = (image: any, slice: boolean) => {
+	const [base, rest] = url.split("/upload/");
+	const parts = rest.split("/");
+	const versionIndex = parts.findIndex((part) => /^v\d+$/.test(part));
+
+	if (versionIndex <= 0) {
+		const firstNonTransformIndex = parts.findIndex(
+			(part) => !/^(?:[a-z]_|fl_|dpr_|ar_)/.test(part),
+		);
+		if (firstNonTransformIndex > 0) {
+			return `${base}/upload/${parts.slice(firstNonTransformIndex).join("/")}`;
+		}
+
+		return url;
+	}
+
+	return `${base}/upload/${parts.slice(versionIndex).join("/")}`;
+};
+
+const buildCloudinaryTransform = (url: string, transform: string) =>
+	isCloudinaryUrl(url)
+		? getCloudinaryOriginalUrl(url).replace("/upload/", `/upload/${transform}/`)
+		: url;
+
+const buildMenuImageSliceUrl = (
+	url: string,
+	slice: Pick<RenderedMenuImageSlice, "width" | "height"> & { x: number; y: number },
+) =>
+	buildCloudinaryTransform(
+		url,
+		`f_avif,q_auto:best/c_crop,x_${Math.max(0, Math.round(slice.x))},y_${Math.max(0, Math.round(slice.y))},w_${Math.round(slice.width)},h_${Math.round(slice.height)}/c_limit,w_1200`,
+	);
+
+const buildMenuImageSlices = (image: MenuImageItem): RenderedMenuImageSlice[] => {
 	if (!image?.src) return [];
 
-	if (!slice || !isCloudinaryUrl(image.src)) {
+	const originalSrc = getCloudinaryOriginalUrl(image.src);
+	const width = image.width || image.crop?.width;
+	const height = image.height;
+	const sliceHeight = image.sliceHeight || image.crop?.height;
+
+	if (!isCloudinaryUrl(originalSrc) || !width || !height || !sliceHeight) {
 		return [
 			{
 				src: isCloudinaryUrl(image.src)
 					? buildCloudinaryTransform(
-							image.src,
+							originalSrc,
 							"f_avif,q_auto:best,c_limit,w_1200",
 						)
-					: image.src,
+					: originalSrc,
 				alt: image.alt || place.name,
-				position: "50% 50%",
+				width: width || 1200,
+				height: height || 1600,
+				aspectRatio: width && height ? width / height : 1,
+				index: 0,
+				total: 1,
 			},
 		];
 	}
 
-	return menuSlices.map(({ gravity, label }) => ({
-		src: buildCloudinaryTransform(
-			image.src,
-			`f_avif,q_auto:best,c_fill,ar_3:4,${gravity},w_800`,
-		),
-		alt: `${image.alt || place.name} - ${label}`,
-		position: "50% 50%",
-	}));
+	const x = Math.max(0, Math.round(image.crop?.x || 0));
+	const yStart = Math.max(0, Math.round(image.crop?.y || 0));
+	const sliceWidth = Math.max(1, Math.min(Math.round(width), width - x || width));
+	const availableHeight = Math.max(1, height - yStart);
+	const normalizedSliceHeight = Math.max(
+		1,
+		Math.min(Math.round(sliceHeight), availableHeight),
+	);
+	const total = Math.ceil(availableHeight / normalizedSliceHeight);
+
+	return Array.from({ length: total }, (_, index) => {
+		const y = yStart + index * normalizedSliceHeight;
+		const currentHeight = Math.min(normalizedSliceHeight, height - y);
+
+		return {
+			src: buildMenuImageSliceUrl(originalSrc, {
+				x,
+				y,
+				width: sliceWidth,
+				height: currentHeight,
+			}),
+			alt: `${image.alt || place.name} - parte ${index + 1} de ${total}`,
+			width: sliceWidth,
+			height: currentHeight,
+			aspectRatio: sliceWidth / currentHeight,
+			index,
+			total,
+		};
+	});
 };
 
 // Find first carousel block for hero
@@ -427,26 +511,25 @@ const toCategorySlug = (value: string) =>
 			menuImageBlocks.length > 0 && (
 				<div class="max-w-7xl mx-auto xl:px-4 sm:px-6 mt-6">
 					{menuImageBlocks.map((block: any) => {
-						const images = block.data?.images || [];
-						const shouldSlice = images.length === 1;
-						const renderedImages = images.flatMap((img: any) =>
-							buildMenuImageSlices(img, shouldSlice),
+						const images: MenuImageItem[] = block.data?.images || [];
+						const renderedImages = images.flatMap((img: MenuImageItem) =>
+							buildMenuImageSlices(img),
 						);
 
 						return (
 							<div class="py-6">
 								<div class="flex flex-col">
-									{renderedImages.map((img, idx) => (
+									{renderedImages.map((img: RenderedMenuImageSlice) => (
 										<div class="w-full">
-											<Image
+											<img
 												src={img.src}
 												alt={img.alt}
-												width={800}
-												height={1067}
-												class="w-full h-auto object-cover"
+												width={img.width}
+												height={img.height}
+												class="block w-full h-auto"
 												loading="lazy"
-												format="avif"
-												quality={90}
+												decoding="async"
+												style={`aspect-ratio: ${img.aspectRatio};`}
 											/>
 										</div>
 									))}
