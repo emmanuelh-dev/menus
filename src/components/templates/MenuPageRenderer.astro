@@ -67,8 +67,8 @@ const templateConfigs: Record<string, any> = {
 			"text-xl uppercase tracking-[0.3em] font-black text-stone-700 transition-all group-open:text-stone-900",
 		itemTitleClass:
 			"text-lg font-medium tracking-tight group-hover/item:text-stone-900 transition-colors",
-		fontImport: "family=Playfair+Display:ital,wght@1,400;1,700",
-		fontFamily: "'Playfair Display', serif",
+		fontImport: "family=Montserrat:ital,wght@0,400;0,600;1,400;1,600",
+		fontFamily: "'Montserrat', system-ui, sans-serif",
 	},
 	modern: {
 		bg: "bg-white",
@@ -78,7 +78,7 @@ const templateConfigs: Record<string, any> = {
 			text: "text-gray-900",
 			active: "bg-blue-600 text-white",
 		},
-		headerClass: "text-left border-l-4 border-black pl-6",
+		headerClass: "text-left border-l-4 pl-6",
 		titleClass:
 			"text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none",
 		sectionTitleClass:
@@ -100,7 +100,7 @@ const templateConfigs: Record<string, any> = {
 		titleClass:
 			"text-5xl md:text-8xl font-thin serif italic tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]",
 		sectionTitleClass:
-			"text-3xl serif italic tracking-widest text-gray-400 group-open:text-white border-b border-gray-800 pb-2 mb-8 w-full transition-all duration-500",
+			"text-3xl serif italic tracking-widest text-gray-400 group-open:text-white pb-2 w-full transition-all duration-500",
 		itemTitleClass:
 			"text-xl serif font-normal tracking-wide text-white group-hover/item:text-yellow-200 transition-colors",
 		fontImport:
@@ -167,7 +167,7 @@ const templateConfigs: Record<string, any> = {
 		headerClass:
 			"text-left py-12 px-6 bg-gradient-to-b from-[#1a1a1a] to-[#121212]",
 		titleClass: "text-4xl font-bold tracking-tight",
-		sectionTitleClass: "text-2xl font-bold border-b border-white/10 pb-4 mb-4",
+		sectionTitleClass: "text-2xl font-bold pb-4 mb-4",
 		fontImport: "family=Inter:wght@400;700;900",
 		fontFamily: "'Inter', sans-serif",
 	},
@@ -428,7 +428,7 @@ const toCategorySlug = (value: string) =>
 
 								return (
 									<section id={block.id}>
-										<div class="py-4 mb-8">
+										<div class="mb-8">
 											<div
 												class:list={[
 													"flex justify-between items-center px-4 rounded-2xl backdrop-blur-md",
