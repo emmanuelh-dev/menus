@@ -52,35 +52,38 @@ const isCloudinaryUrl = (url: string) =>
 
 const buildCloudinaryTransform = (url: string, transform: string) =>
 	isCloudinaryUrl(url) ? url.replace("/upload/", `/upload/${transform}/`) : url;
-
-const menuSliceTransforms = [
-	"f_auto,q_auto:good,c_fill,ar_4:3,g_north,w_1200",
-	"f_auto,q_auto:good,c_fill,ar_4:3,g_center,w_1200",
-	"f_auto,q_auto:good,c_fill,ar_4:3,g_south,w_1200",
+const menuSlices = [
+	{ gravity: "g_north", label: "top" },
+	{ gravity: "g_center", label: "center" },
+	{ gravity: "g_south", label: "bottom" },
 ];
 
 const buildMenuImageSlices = (image: any, slice: boolean) => {
 	if (!image?.src) return [];
-	if (!isCloudinaryUrl(image.src)) return [image];
 
-	if (slice) {
-		return menuSliceTransforms.map((transform, idx) => ({
-			src: buildCloudinaryTransform(image.src, transform),
-			alt: image.alt || `${place.name} menu ${idx + 1}`,
-			title: image.title,
-		}));
+	if (!slice || !isCloudinaryUrl(image.src)) {
+		return [
+			{
+				src: isCloudinaryUrl(image.src)
+					? buildCloudinaryTransform(
+							image.src,
+							"f_avif,q_auto:best,c_limit,w_1200",
+						)
+					: image.src,
+				alt: image.alt || place.name,
+				position: "50% 50%",
+			},
+		];
 	}
 
-	return [
-		{
-			src: buildCloudinaryTransform(
-				image.src,
-				"f_auto,q_auto:good,c_fill,ar_4:3,w_1200"
-			),
-			alt: image.alt || `${place.name} menu`,
-			title: image.title,
-		},
-	];
+	return menuSlices.map(({ gravity, label }) => ({
+		src: buildCloudinaryTransform(
+			image.src,
+			`f_avif,q_auto:best,c_fill,ar_3:4,${gravity},w_800`,
+		),
+		alt: `${image.alt || place.name} - ${label}`,
+		position: "50% 50%",
+	}));
 };
 
 // Find first carousel block for hero
@@ -248,6 +251,9 @@ const justifyClass = config.headerClass?.includes("text-left")
 	: "justify-center";
 const isTiendaTemplate = template === "tienda";
 const sectionBlocks = blocks.filter((block: any) => block.type === "section");
+const menuImageBlocks = blocks.filter(
+	(block: any) => block.type === "menu_image",
+);
 const allSectionsHaveImage =
 	sectionBlocks.length > 1 &&
 	sectionBlocks.every((block: any) => Boolean(block.data?.image?.trim()));
@@ -417,6 +423,40 @@ const toCategorySlug = (value: string) =>
 				</div>
 			)
 		}
+		{
+			menuImageBlocks.length > 0 && (
+				<div class="max-w-7xl mx-auto xl:px-4 sm:px-6 mt-6">
+					{menuImageBlocks.map((block: any) => {
+						const images = block.data?.images || [];
+						const shouldSlice = images.length === 1;
+						const renderedImages = images.flatMap((img: any) =>
+							buildMenuImageSlices(img, shouldSlice),
+						);
+
+						return (
+							<div class="py-6">
+								<div class="flex flex-col">
+									{renderedImages.map((img, idx) => (
+										<div class="w-full">
+											<Image
+												src={img.src}
+												alt={img.alt}
+												width={800}
+												height={1067}
+												class="w-full h-auto object-cover"
+												loading="lazy"
+												format="avif"
+												quality={90}
+											/>
+										</div>
+									))}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			)
+		}
 
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
 			{/* Info compacta en una sola línea de chips */}
@@ -490,20 +530,6 @@ const toCategorySlug = (value: string) =>
 												</div>
 											)}
 
-											{block.data.description && (
-												<div class="mb-8 px-4 opacity-80">
-													<MarkdownBlock
-														client:load
-														content={block.data.description}
-														className={
-															template === "elegant" || template === "uber"
-																? "text-gray-300 text-sm font-normal italic leading-relaxed"
-																: "text-stone-400 text-sm font-normal italic leading-relaxed"
-														}
-													/>
-												</div>
-											)}
-
 											<div
 												class:list={[
 													template === "tienda"
@@ -537,32 +563,7 @@ const toCategorySlug = (value: string) =>
 							}
 
 							if (block.type === "menu_image") {
-								const images = block.data?.images || [];
-								const shouldSlice = images.length === 1;
-								const renderedImages = images.flatMap((img: any) =>
-									buildMenuImageSlices(img, shouldSlice)
-								);
-
-								return (
-									<div class="py-12 px-4">
-										<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-											{renderedImages.map((img: any, idx: number) => (
-												<div class="overflow-hidden rounded-3xl border border-white/10 bg-black/5">
-													<Image
-														src={img.src}
-														alt={img.alt || `${place.name} menu ${idx + 1}`}
-														width={1200}
-														height={900}
-														class="w-full h-full object-cover"
-														loading="lazy"
-														format="webp"
-														quality={85}
-													/>
-												</div>
-											))}
-										</div>
-									</div>
-								);
+								return null;
 							}
 
 							if (block.type === "carrusel") {
