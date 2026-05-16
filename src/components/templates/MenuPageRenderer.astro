@@ -47,6 +47,42 @@ const address = place.content?.semantic_data?.address || place.address || "";
 const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 
+const isCloudinaryUrl = (url: string) =>
+	url.includes("res.cloudinary.com") && url.includes("/upload/");
+
+const buildCloudinaryTransform = (url: string, transform: string) =>
+	isCloudinaryUrl(url) ? url.replace("/upload/", `/upload/${transform}/`) : url;
+
+const menuSliceTransforms = [
+	"f_auto,q_auto:good,c_fill,ar_4:3,g_north,w_1200",
+	"f_auto,q_auto:good,c_fill,ar_4:3,g_center,w_1200",
+	"f_auto,q_auto:good,c_fill,ar_4:3,g_south,w_1200",
+];
+
+const buildMenuImageSlices = (image: any, slice: boolean) => {
+	if (!image?.src) return [];
+	if (!isCloudinaryUrl(image.src)) return [image];
+
+	if (slice) {
+		return menuSliceTransforms.map((transform, idx) => ({
+			src: buildCloudinaryTransform(image.src, transform),
+			alt: image.alt || `${place.name} menu ${idx + 1}`,
+			title: image.title,
+		}));
+	}
+
+	return [
+		{
+			src: buildCloudinaryTransform(
+				image.src,
+				"f_auto,q_auto:good,c_fill,ar_4:3,w_1200"
+			),
+			alt: image.alt || `${place.name} menu`,
+			title: image.title,
+		},
+	];
+};
+
 // Find first carousel block for hero
 const heroCarousel = blocks.find((block: any) => block.type === "carrusel");
 
@@ -496,6 +532,35 @@ const toCategorySlug = (value: string) =>
 								return (
 									<div class="py-12 px-4 bg-white/5 rounded-3xl">
 										<Gallery images={block.data.images || []} />
+									</div>
+								);
+							}
+
+							if (block.type === "menu_image") {
+								const images = block.data?.images || [];
+								const shouldSlice = images.length === 1;
+								const renderedImages = images.flatMap((img: any) =>
+									buildMenuImageSlices(img, shouldSlice)
+								);
+
+								return (
+									<div class="py-12 px-4">
+										<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+											{renderedImages.map((img: any, idx: number) => (
+												<div class="overflow-hidden rounded-3xl border border-white/10 bg-black/5">
+													<Image
+														src={img.src}
+														alt={img.alt || `${place.name} menu ${idx + 1}`}
+														width={1200}
+														height={900}
+														class="w-full h-full object-cover"
+														loading="lazy"
+														format="webp"
+														quality={85}
+													/>
+												</div>
+											))}
+										</div>
 									</div>
 								);
 							}

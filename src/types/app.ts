@@ -51,8 +51,8 @@ export interface Content {
 
 export interface Block {
   id: string;
-  type: 'section' | 'gallery' | 'image' | 'carrusel';
-  data: SectionData | GalleryData | ImageData | CarruselData;
+  type: 'section' | 'gallery' | 'image' | 'carrusel' | 'menu_image';
+  data: SectionData | GalleryData | ImageData | CarruselData | MenuImageData;
 }
 
 export interface SectionData {
@@ -83,6 +83,10 @@ export interface ItemData {
 }
 
 export interface GalleryData {
+  images: { src: string; alt?: string; title?: string }[];
+}
+
+export interface MenuImageData {
   images: { src: string; alt?: string; title?: string }[];
 }
 
