@@ -93,17 +93,26 @@ const city =
 	place?.states?.name ||
 	"Monterrey";
 
+const isMotel = place?.type === "motel" || path.includes("/moteles");
+
 function generateSEOTitle(): string {
 	const location = city ? ` en ${city}` : "";
-	return `${title}  Menú Digital | Precios, Fotos y Carta Digital ${currentYear}${location}`;
+	if (isMotel) {
+		return `${title} Precios, Fotos y Habitaciones (${currentYear})${location}`;
+	}
+	return `Menú de ${title} y Precios (${currentYear}) | Carta Digital${location}`;
 }
 
 function generateSEODescription(): string {
 	const reviews =
 		reviewStats.reviewCount > 0
-			? `. Con ${reviewStats.reviewCount} opiniones y ${reviewStats.ratingValue} estrellas`
+			? ` Con ${reviewStats.reviewCount} opiniones y ${reviewStats.ratingValue} estrellas.`
 			: "";
-	return `Consulta el menú digital de ${title} en ${city}. ${description}${reviews}. ¡Abierto ahora con los mejores precios!`;
+			
+	if (isMotel) {
+		return `Consulta los precios actualizados, fotos de habitaciones y ubicación de ${title}${location}. Descubre tarifas de 12 horas y opciones con jacuzzi.${reviews}`;
+	}
+	return `Conoce el menú actualizado de ${title}${location}. Consulta todos los precios del ${currentYear}, paquetes y fotos de los platillos. ${description || ''}${reviews}`;
 }
 
 let reviewStats = {

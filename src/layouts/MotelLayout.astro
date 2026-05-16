@@ -15,19 +15,17 @@ function generateSEOTitle(
 	year: number = new Date().getFullYear(),
 ): string {
 	const city = place.states?.name || "Monterrey";
-	return `${place.name} | ¿Cuánto cuesta? Precios, Habitaciones y Opiniones ${year}${city ? ` en ${city}` : ""}`;
+	return `${place.name} Precios, Fotos y Habitaciones (${year})${city ? ` en ${city}` : ""}`;
 }
 
 function generateSEODescription(place: Place, description?: string): string {
 	const city = place.states?.name || "Monterrey";
-	const baseDesc =
-		description || `${place.name} ofrece habitaciones cómodas y privadas`;
 	const reviews =
 		place.reviewCount > 0
-			? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas` : ""}`
+			? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas.` : "."}`
 			: "";
 
-	return `${baseDesc}. Encuentra precios, fotos de las habitaciones, ubicación en ${city}${reviews}. ¡Abierto ahora!`;
+	return `Consulta los precios actualizados, fotos de habitaciones y ubicación de ${place.name} en ${city}. Descubre tarifas de 12 horas y opciones con jacuzzi.${reviews}`;
 }
 
 interface Address {
