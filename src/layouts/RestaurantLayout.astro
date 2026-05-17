@@ -104,15 +104,16 @@ function generateSEOTitle(): string {
 }
 
 function generateSEODescription(): string {
+	const location = city ? ` en ${city}` : "";
 	const reviews =
 		reviewStats.reviewCount > 0
 			? ` Con ${reviewStats.reviewCount} opiniones y ${reviewStats.ratingValue} estrellas.`
 			: "";
-			
+
 	if (isMotel) {
 		return `Consulta los precios actualizados, fotos de habitaciones y ubicación de ${title}${location}. Descubre tarifas de 12 horas y opciones con jacuzzi.${reviews}`;
 	}
-	return `Conoce el menú actualizado de ${title}${location}. Consulta todos los precios del ${currentYear}, paquetes y fotos de los platillos. ${description || ''}${reviews}`;
+	return `Conoce el menú actualizado de ${title}${location}. Consulta todos los precios del ${currentYear}, paquetes y fotos de los platillos. ${description || ""}${reviews}`;
 }
 
 let reviewStats = {
