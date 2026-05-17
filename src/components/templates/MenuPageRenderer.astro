@@ -112,7 +112,7 @@ const buildMenuImageSliceUrl = (
 ) =>
 	buildCloudinaryTransform(
 		url,
-		`f_avif,q_auto:best/c_crop,x_${Math.max(0, Math.round(slice.x))},y_${Math.max(0, Math.round(slice.y))},w_${Math.round(slice.width)},h_${Math.round(slice.height)}/c_limit,w_1200`,
+		`f_avif,q_auto:best/c_crop,x_${Math.max(0, Math.round(slice.x))},y_${Math.max(0, Math.round(slice.y))},w_${Math.round(slice.width)},h_${Math.round(slice.height)}/c_limit,w_500`,
 	);
 
 const buildMenuImageSlices = (
@@ -136,12 +136,12 @@ const buildMenuImageSlices = (
 				src: isCloudinaryUrl(image.src)
 					? buildCloudinaryTransform(
 							originalSrc,
-							"f_avif,q_auto:best,c_limit,w_1200",
+							"f_avif,q_auto:best,c_limit,w_500",
 						)
 					: originalSrc,
 				alt: finalAlt,
-				width: width || 1200,
-				height: height || 1600,
+				width: width || 500,
+				height: height || 800,
 				aspectRatio: width && height ? width / height : 1,
 				index: 0,
 				total: 1,
@@ -426,8 +426,8 @@ const toCategorySlug = (value: string) =>
 						<Image
 							src={place.image}
 							alt={`${place.name} fondo`}
-							width={1600}
-							height={900}
+							width={800}
+							height={450}
 							class="w-full h-full object-cover"
 							loading="lazy"
 							format="webp"
@@ -467,8 +467,8 @@ const toCategorySlug = (value: string) =>
 									<Image
 										src={place.image}
 										alt={place.name}
-										width={900}
-										height={900}
+										width={500}
+										height={500}
 										class="w-full h-full object-cover"
 										loading="eager"
 										format="webp"
@@ -502,8 +502,8 @@ const toCategorySlug = (value: string) =>
 						<Image
 							src={place.image}
 							alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
-							width={1200}
-							height={800}
+							width={500}
+							height={333}
 							class="w-full h-auto object-cover xl:max-h-[60dvh]"
 							loading="eager"
 							format="webp"
