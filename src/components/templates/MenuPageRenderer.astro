@@ -59,6 +59,8 @@ const enableDelivery = sd.enable_delivery || sd.enableDelivery || false;
 const whatsappNumber = sd.whatsapp || sd.whatsappNumber || "";
 
 // Limpieza de bloques
+const galleryBlocks = blocks.filter((block: any) => block.type === "gallery");
+
 blocks = blocks.map((block: any) => {
 	if (block.type === "gallery" && block.data.images) {
 		const imagesWithAlt = block.data.images.map((img: any, idx: number) => ({
@@ -364,6 +366,10 @@ const shouldShowHero =
 	(!showCategoriesAtStart &&
 		heroCarousel &&
 		heroCarousel.data?.items?.length > 0);
+const heroGalleryImages =
+	place.content?.semantic_data?.gallery?.length > 0
+		? place.content.semantic_data.gallery
+		: galleryBlocks.flatMap((block: any) => block.data?.images || []);
 const toCategorySlug = (value: string) =>
 	(value || "")
 		.toString()
@@ -461,8 +467,8 @@ const toCategorySlug = (value: string) =>
 				<div>
 					{template === "elegant" || template === "uber" ? (
 						// "Mobile App" Style Header for Premium/Dark Templates
-						<header class="pb-4 flex flex-col items-center justify-center text-center z-10 transition-all">
-							<div class="w-full mb-4">
+						<header class="pb-4 flex flex-col xl:flex-row items-center justify-center text-center z-10 transition-all">
+							<div class="w-full mb-4 xl:w-1/2">
 								{place.image?.trim() ? (
 									<Image
 										src={place.image}
@@ -481,15 +487,31 @@ const toCategorySlug = (value: string) =>
 								)}
 							</div>
 
-							<h1 class={config.titleClass}>{place.name}</h1>
+							<div class="xl:w-1/2 flex flex-col">
+								<h1 class={config.titleClass}>{place.name}</h1>
 
-							{place.content?.semantic_data?.description && (
-								<div class="mt-4 max-w-lg mx-auto">
-									<p class="text-sm sm:text-base text-gray-400 font-light leading-relaxed">
-										{place.content?.semantic_data?.description}
-									</p>
-								</div>
-							)}
+								{place.content?.semantic_data?.description && (
+									<div class="mt-4 max-w-lg mx-auto">
+										<p class="text-sm sm:text-base text-gray-400 font-light leading-relaxed">
+											{place.content?.semantic_data?.description}
+										</p>
+									</div>
+								)}
+								{place.content?.semantic_data && !isTiendaTemplate && (
+									<section
+										class="mb-12"
+										aria-label="Información del restaurante"
+									>
+										<InfoChips place={place} className={justifyClass} />
+
+																{heroGalleryImages.length > 0 && (
+																	<div class="mt-6">
+																		<Gallery images={heroGalleryImages} />
+																	</div>
+																)}
+									</section>
+								)}
+							</div>
 						</header>
 					) : // Default Hero Image/Carousel
 					heroCarousel && heroCarousel.data.items?.length > 0 ? (
@@ -556,13 +578,6 @@ const toCategorySlug = (value: string) =>
 
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
 			{/* Info compacta en una sola línea de chips */}
-			{
-				place.content?.semantic_data && !isTiendaTemplate && (
-					<section class="mb-12" aria-label="Información del restaurante">
-						<InfoChips place={place} className={justifyClass} />
-					</section>
-				)
-			}
 
 			{/* Favorites Manager - Always visible */}
 			<FavoritesManager client:load placeSlug={name} blocks={blocks} />
@@ -651,15 +666,13 @@ const toCategorySlug = (value: string) =>
 								);
 							}
 
-							if (block.type === "gallery") {
-								return (
-									<div class="py-12 px-4 bg-white/5 rounded-3xl">
-										<Gallery images={block.data.images || []} />
-									</div>
-								);
-							}
+
 
 							if (block.type === "menu_image") {
+								return null;
+							}
+
+							if (block.type === "gallery") {
 								return null;
 							}
 
