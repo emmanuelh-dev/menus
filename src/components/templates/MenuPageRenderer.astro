@@ -112,7 +112,7 @@ const buildMenuImageSliceUrl = (
 ) =>
 	buildCloudinaryTransform(
 		url,
-		`f_avif,q_auto:best/c_crop,x_${Math.max(0, Math.round(slice.x))},y_${Math.max(0, Math.round(slice.y))},w_${Math.round(slice.width)},h_${Math.round(slice.height)}/c_limit,w_500`,
+		`f_avif,q_auto:best/c_crop,x_${Math.max(0, Math.round(slice.x))},y_${Math.max(0, Math.round(slice.y))},w_${Math.round(slice.width)},h_${Math.round(slice.height)}/c_limit,w_800`,
 	);
 
 const buildMenuImageSlices = (
@@ -136,11 +136,11 @@ const buildMenuImageSlices = (
 				src: isCloudinaryUrl(image.src)
 					? buildCloudinaryTransform(
 							originalSrc,
-							"f_avif,q_auto:best,c_limit,w_500",
+							"f_avif,q_auto:best,c_limit,w_800",
 						)
 					: originalSrc,
 				alt: finalAlt,
-				width: width || 500,
+				width: width || 800,
 				height: height || 800,
 				aspectRatio: width && height ? width / height : 1,
 				index: 0,
