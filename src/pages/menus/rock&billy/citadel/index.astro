@@ -1,200 +1,25 @@
 ---
 export const prerender = false;
 
-import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
-import Gallery from "../../../../components/Gallery.astro";
-import WhatsappButton from "../../../../components/WhatsappButton";
-import InfoChips from "../../../../components/InfoChips.astro";
-import { supabase } from "../../../../lib/supabase";
-import { Image } from "astro:assets";
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, s-maxage=300, stale-while-revalidate=60",
+);
 
+
+import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
+import { supabase } from "../../../../lib/supabase";
 const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", "rock&billy")
-	.single();
+.from("places")
+.select("*")
+.eq("short_name", "rock&billy")
+.single();
+const placeTag = `place-${place.name}`;
+Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 
 if (!place) {
-	throw new Error(`No se encontró el restaurante: ${name}`);
+	throw new Error(`No se encontró el restaurante: ${place.name}`);
 }
-
-let { blocks = [], view_settings = {} } = place.content || {};
-
-// Limpieza de bloques
-blocks = blocks.map((block) => {
-	if (block.type === "gallery" && block.data.images) {
-		const imagesWithAlt = block.data.images.map((img, idx) => ({
-			...img,
-			alt: img.alt || `${place.name} - Galería ${idx + 1}`,
-		}));
-		return { ...block, data: { ...block.data, images: imagesWithAlt } };
-	}
-	return block;
-});
 ---
 
-<RestaurantLayout
-	description={place?.content?.semantic_data?.description ||
-		place?.description ||
-		place.name}
-	title={place.name}
-	place={place}
-	backgroundColor="bg-[#FCFCFC]"
->
-	<div class="min-h-screen bg-[#FCFCFC] text-[#1A1A1A]">
-		<div class="max-w-2xl mx-auto px-6 py-20">
-			{/* Header (Mantengo tu estructura de revista) */}
-			<header class="mb-24 flex flex-col items-center">
-				{place.image && (
-					<div class="relative mb-8">
-						<Image
-							src={place.image}
-							alt={place.name}
-							width={200}
-							height={200}
-							class="size-48 rounded-full transition-all duration-700 object-cover ring-1 ring-stone-200 ring-offset-4"
-						/>
-					</div>
-				)}
-				<h1
-					class="text-5xl text-center font-light tracking-tighter serif italic mb-2 text-balance"
-				>
-					{place.name}
-				</h1>
-				<p
-					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8 text-pretty"
-				>
-					{
-						place?.content?.semantic_data?.description ||
-							place?.description ||
-							place.name
-					}
-				</p>
-
-				<InfoChips place={place} className="mt-8" />
-
-				<div class="h-[1px] w-12 bg-stone-200"></div>
-			</header>
-
-			{/* Menú con Acordeón Nativo y Lógica de Apertura */}
-			<div class="space-y-8">
-				{
-					(() => {
-						let sectionCounter = 0;
-						return blocks.map((block) => {
-							if (block.type === "section") {
-								const isOpen = sectionCounter < 2;
-								sectionCounter++;
-
-								return (
-									<details
-										class="group border-b border-stone-100 pb-4"
-										open={isOpen}
-									>
-										<summary class="flex justify-between items-center cursor-pointer list-none sticky top-0 bg-[#FCFCFC]/95 backdrop-blur-md z-10 py-6 outline-none">
-											<h2 class="text-xl uppercase tracking-[0.3em] font-black text-stone-800 transition-all group-open:text-red-900">
-												{block.data.title}
-											</h2>
-											<div class="text-black transition-transform duration-300 group-open:rotate-180">
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													class="h-5 w-5"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke="currentColor"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M19 9l-7 7-7-7"
-													/>
-												</svg>
-											</div>
-										</summary>
-
-										<div class="space-y-12 pt-8 animate-in fade-in slide-in-from-top-2 duration-500 overflow-hidden">
-											{block.data.description && (
-												<p class="text-stone-400 text-sm font-light italic mb-8 border-l-2 border-red-50 px-4">
-													{block.data.description}
-												</p>
-											)}
-
-											{block.data.items?.map((item) => (
-												<div class="space-y-4">
-													<div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-8 items-start group/item">
-														<div class="order-2 sm:order-1">
-															<div class="flex justify-between items-baseline mb-1">
-																<h3 class="text-lg font-medium tracking-tight group-hover/item:text-red-900 transition-colors">
-																	{item.name}
-																</h3>
-																<span class="text-sm font-light text-stone-400 ml-4">
-																	{view_settings.show_prices &&
-																		item.price > 0 &&
-																		`$${item.price}`}
-																</span>
-															</div>
-															{item.description && (
-																<p class="text-stone-400 text-sm font-light leading-relaxed">
-																	{item.description}
-																</p>
-															)}
-														</div>
-
-														{item.image && item.image.trim() !== "" && (
-															<div class="order-1 sm:order-2 mb-4 sm:mb-0 overflow-hidden rounded-lg">
-																<Image
-																	src={item.image}
-																	alt={item.name}
-																	width={200}
-																	height={200}
-																	class="w-full sm:w-24 h-48 sm:h-24 object-cover saturate-[0.8] group-hover/item:saturate-100 transition-all duration-500"
-																/>
-															</div>
-														)}
-													</div>
-
-													{item.gallery && item.gallery.length > 0 && (
-														<div class="mt-4">
-															<Gallery images={item.gallery} />
-														</div>
-													)}
-												</div>
-											))}
-										</div>
-									</details>
-								);
-							}
-
-							if (block.type === "gallery") {
-								return (
-									<div class="py-12">
-										<Gallery images={block.data.images || []} />
-									</div>
-								);
-							}
-						});
-					})()
-				}
-			</div>
-
-			<footer class="mt-32 pb-16 text-center border-t border-stone-100 pt-16">
-				<p class="text-[10px] text-stone-300 uppercase tracking-widest">
-					Potenciado por BYSMAX • {place.name}
-				</p>
-			</footer>
-		</div>
-	</div>
-</RestaurantLayout>
-
-<style>
-	@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap");
-	.serif {
-		font-family: "Playfair Display", serif;
-	}
-
-	/* Quita la flecha nativa de details en Safari/Chrome */
-	summary::-webkit-details-marker {
-		display: none;
-	}
-</style>
+<MenuPageRenderer place={place} name={place.name} />
