@@ -277,7 +277,7 @@ const schemaEnrichment = {
           <div class="mt-20 mb-16">
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles Destacados</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-2 gap-8">
               {motelesList.filter(motel => motel.featured === true).map(motel => (
                 <div class="bg-[#1E1E1E] rounded-xl overflow-hidden  flex flex-col md:flex-row">
                   <div class="md:w-2/5 relative">
@@ -343,7 +343,7 @@ const schemaEnrichment = {
                         <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </a>
                     )}
-]                    {motel.phone && (
+                   {motel.phone && (
                       <div class="flex items-center mt-3">
                         <Phone className="w-4 h-4 text-gray-400 mr-2" />
                         <a href={`tel:${motel.phone}`} class="text-sm text-pink-400 hover:text-pink-300 transition-colors">
@@ -357,7 +357,7 @@ const schemaEnrichment = {
             </div>
           </div>
           <!-- Grid de moteles con diseño creativo -->
-          <div id="moteles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div id="moteles-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {motelesList.sort((a, b) => {
               if (a.featured !== b.featured) {
                   return a.featured ? -1 : 1; 
