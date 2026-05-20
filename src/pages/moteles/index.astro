@@ -195,23 +195,16 @@ const schemaEnrichment = {
   <MotelBreadcrumbSchema zona={zona} tipo={tipo} />
 
 <main>
-    <section class="relative overflow-hidden">
-        <!-- Background Image with Overlay -->
-        <div class="absolute inset-0 bg-cover bg-center bg-gradient-to-r from-[#4a5568] to-[#553c7b]"></div>
-          <!-- Content -->
-        <div class="relative z-10 max-w-6xl mx-auto px-4 py-24 md:py-32 text-center">
-            <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">💕 Romance & Privacidad</span>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">{seoData.heading}</h1>
-            <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">{seoData.subheading}</p>
-            <p class="text-lg text-white/80 max-w-2xl mx-auto">Guía completa de moteles en Monterrey con ubicaciones verificadas, horarios actualizados y recomendaciones personales. Incluye opciones desde $300 hasta moteles de lujo.</p>
-        </div>
-
-    </section>
-
-    <section class="min-h-screen bg-black text-white py-12">
+    <section class="min-h-screen bg-black text-white pt-6 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <Breadcrumbs items={breadcrumbItems} />
+          
+          <!-- Cabecera Minimalista -->
+          <div class="mt-6 mb-10">
+            <h1 class="text-3xl md:text-5xl font-bold text-pink-400 font-serif tracking-tight mb-3">{seoData.heading}</h1>
+            <p class="text-base md:text-lg text-gray-300 max-w-3xl">{seoData.subheading}. Guía con precios actualizados, fotos de habitaciones y ubicaciones en mapa.</p>
+          </div>
           
           <!-- Filtros interactivos -->
           <!-- <div class="mb-12 space-y-4">
@@ -270,94 +263,22 @@ const schemaEnrichment = {
                 textColor="text-indigo-400"
                 borderColor="border-indigo-500/30"
                 hoverBgColor="hover:bg-indigo-500"
-              />
+                      <!-- Banner: Califica y ayuda a otros -->
+          <div class="mb-8 bg-[#1a0a1a] border border-pink-500/20 rounded-xl px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="text-2xl">⭐</div>
+              <div>
+                <p class="text-white font-bold text-sm">¿Ya fuiste a un motel? Deja tu calificación</p>
+                <p class="text-gray-400 text-xs mt-0.5">Tus reseñas ayudan a otros usuarios a elegir mejor</p>
+              </div>
             </div>
-          </div> -->
-
-          <div class="mt-20 mb-16">
-            <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Moteles Destacados</h2>
-            
-            <div class="grid grid-cols-2 md:grid-cols-2 gap-8">
-              {motelesList.filter(motel => motel.featured === true).map(motel => (
-                <div class="bg-[#1E1E1E] rounded-xl overflow-hidden  flex flex-col md:flex-row">
-                  <div class="md:w-2/5 relative">
-                    <Image
-                      src={motel.image || '/motel.png'} 
-                      alt={motel.name}
-                      width={400}
-                      height={500}
-                      class="w-full h-full object-cover"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent md:bg-gradient-to-t"></div>
-                    <div class="absolute bottom-4 left-4 md:bottom-auto md:top-4">
-                      <div class="bg-black/90 px-2 py-1 rounded-full inline-block">
-                        <Star className="w-4 h-4 text-pink-400 inline mr-1" />
-                        <span class="text-sm font-medium text-white">{motel.rating} ({motel.reviewCount})</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="md:w-3/5 p-6">
-                    <h3 class="font-serif text-2xl font-bold text-pink-400 mb-2">{motel.name}</h3>
-                    <p class="text-gray-300 mb-4">{motel.address}</p>
-                    <div class="flex items-center mb-2">
-                      <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                      <span class="text-sm text-gray-300">{motel.address}</span>
-                    </div>
-                    <div class="flex items-center mb-4">
-                      <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                      <span class="text-sm text-gray-300">{motel.priceRange}</span>
-                    </div>
-               
-                    {motel.specialties && motel.specialties.length > 0 && (
-                      <div class="flex flex-wrap gap-2 mb-4">
-                        {motel.specialties.map(specialty => (
-                          <span class="text-xs bg-pink-900/30 text-pink-300 px-2 py-1 rounded-full border border-pink-500/30">
-                            {specialty}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                     
-                    <div class="bg-pink-900/30 border border-pink-500/30 rounded-lg p-3 mb-4">
-                      {motel.name === "Motel Love" && (
-                        <p class="text-pink-300 text-sm">💡 <strong>Tip:</strong> Llega con tiempo, especialmente los fines de semana, ya que suele haber fila por su alta demanda.</p>
-                      )}
-                      {motel.name === "Motel Marbella" && (
-                        <p class="text-pink-300 text-sm">🛁 <strong>Tip:</strong> Perfecto para ocasiones especiales con jacuzzi privado y amenidades de lujo.</p>
-                      )}
-                      {motel.name === "Motel Niu" && (
-                        <p class="text-pink-300 text-sm"> <strong>Tip:</strong> Destacado por su limpieza excepcional y excelente servicio al cliente.</p>
-                      )}
-                      {!["Motel Love", "Motel Marbella", "Motel Niu"].includes(motel.name) && (
-                        <p class="text-pink-300 text-sm">⭐ <strong>Destacado:</strong> Excelente opción recomendada por nuestros usuarios.</p>
-                      )}
-                    </div>
-                    {motel.short_name && (
-                      <a 
-                        data-astro-prefetch="hover"
-                        href={`/moteles/estados/${motel.state_slug}/${motel.short_name}`}
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
-                      >
-                        Ver Habitaciones
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </a>
-                    )}
-                   {motel.phone && (
-                      <div class="flex items-center mt-3">
-                        <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                        <a href={`tel:${motel.phone}`} class="text-sm text-pink-400 hover:text-pink-300 transition-colors">
-                          {motel.phone}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p class="text-pink-400 text-xs font-semibold tracking-wide text-center sm:text-right shrink-0">
+              Entra al motel y<br class="hidden sm:block" /> califica abajo 👇
+            </p>
           </div>
-          <!-- Grid de moteles con diseño creativo -->
-          <div id="moteles-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+
+          <!-- Grid de moteles -->
+          <div id="moteles-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {motelesList.sort((a, b) => {
               if (a.featured !== b.featured) {
                   return a.featured ? -1 : 1; 
@@ -371,7 +292,7 @@ const schemaEnrichment = {
                 data-has-amenities={motel.amenities.length > 3 ? "true" : "false"}
               >
                 <!-- Imagen con overlay -->
-                <div class="relative h-48 overflow-hidden">
+                <div class="relative h-32 sm:h-48 overflow-hidden">
                   <Image
                     src={motel.image || '/motel.png'} 
                     alt={motel.name}
@@ -382,125 +303,120 @@ const schemaEnrichment = {
                   <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
                   
                   <!-- Calificación y precio -->
-                  <div class="absolute bottom-3 left-3 flex items-center space-x-2">
-                    <div class="flex items-center bg-black/90 px-2 py-1 rounded-full">
-                      <Star className="w-4 h-4 text-pink-400 mr-1" />
-                      <span class="text-sm font-medium text-white">{motel.rating}</span>
-                      <span class="text-xs text-gray-400 ml-1">({motel.reviewCount})</span>
+                  <div class="absolute bottom-2.5 left-2.5 flex items-center space-x-1.5">
+                    <div class="flex items-center bg-black/90 px-1.5 py-0.5 rounded-full">
+                      <Star className="w-3 h-3 text-pink-400 mr-0.5" />
+                      <span class="text-[11px] font-medium text-white">{motel.rating}</span>
+                      <span class="text-[9px] text-gray-400 ml-0.5">({motel.reviewCount})</span>
                     </div>
-                    <div class="bg-black/90 px-2 py-1 rounded-full">
-                      <span class="text-sm font-medium text-white">{motel.priceRange}</span>
+                    <div class="bg-black/90 px-1.5 py-0.5 rounded-full">
+                      <span class="text-[11px] font-medium text-white">{motel.priceRange}</span>
                     </div>
                   </div>
     
                   <!-- Destacado -->
                   {motel.highlight && (
-                    <div class="absolute top-3 left-3 bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-semibold animate-pulse">
+                    <div class="absolute top-2 left-2 bg-pink-500 text-white px-1.5 py-0.5 rounded-full text-[9px] font-semibold animate-pulse">
                       ⭐ Recomendado
                     </div>
                   )}
                 </div>
     
                 <!-- Contenido de la tarjeta -->
-                <div class="p-5">
-                  <h3 class="font-serif text-xl font-bold text-pink-400 mb-2 group-hover:text-pink-300 transition-colors">
-                    {motel.name}
-                  </h3>
-                      <!-- Rating Real-Time -->
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="flex items-center bg-amber-500 text-black px-1.5 py-0.5 rounded text-xs font-bold">
-                      <Star className="w-3 h-3 mr-1 fill-current" />
-                      {motel.rating}
+                <div class="p-3 sm:p-5 flex flex-col justify-between h-[calc(100%-8rem)] sm:h-[calc(100%-12rem)]">
+                  <div>
+                    <h3 class="font-serif text-[15px] sm:text-lg font-bold text-pink-400 mb-1.5 group-hover:text-pink-300 transition-colors line-clamp-1">
+                      {motel.name}
+                    </h3>
+                    
+                    <!-- Estado (24 horas) -->
+                    <div class="flex items-center mb-1.5">
+                      <Clock className="w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0" />
+                      <span class="text-xs text-green-400">Abierto 24h</span>
                     </div>
-                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
-                      {motel.reviewCount} REVOLUCIONES
-                    </span>
-                  </div>
-                  <!-- Estado (24 horas) -->
-                  <div class="flex items-center mb-3">
-                    <Clock className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-green-400">Abierto 24 horas</span>
-                  </div>                  <!-- Dirección -->
-                  <div class="flex items-start mb-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
-                    <div class="flex flex-col">
-                      <span class="text-sm text-gray-300">{motel.address}</span>
+                    
+                    <!-- Dirección -->
+                    <div class="flex items-start mb-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" />
+                      <span class="text-xs text-gray-300 line-clamp-1">{motel.address}</span>
                     </div>
-                  </div>
-
-                  <!-- Teléfono -->
-                  {motel.phone && (
-                    <div class="flex items-center mb-3">
-                      <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                      <a href={`tel:${motel.phone}`} class="text-sm text-pink-400 hover:text-pink-300 transition-colors">
-                        {motel.phone}
-                      </a>
-                    </div>
-                  )}
-    
-                  <!-- Especialidades -->
-                  <div class="flex flex-wrap gap-2 mt-3 mb-3">
-                    {motel.specialties && motel.specialties.map((specialty) => (
-                      <span class="text-xs bg-[#2A2A2A] text-pink-400 px-2 py-1 rounded-full">{specialty}</span>
-                    ))}
-                  </div>
-    
-                  <!-- Amenidades disponibles con iconos -->
-                  <div class="grid grid-cols-2 gap-2 mt-4">
-                    {motel.amenities && motel.amenities.slice(0, 6).map((amenity) => (
-                      <div class="flex items-center text-xs text-gray-300">
-                        {amenity.toLowerCase().includes('wifi') && <Wifi className="w-3 h-3 mr-1 text-blue-400" />}
-                        {amenity.toLowerCase().includes('estacionamiento') && <Car className="w-3 h-3 mr-1 text-green-400" />}
-                        {amenity.toLowerCase().includes('aire') && <Snowflake className="w-3 h-3 mr-1 text-cyan-400" />}
-                        {amenity.toLowerCase().includes('alberca') && <Waves className="w-3 h-3 mr-1 text-blue-400" />}
-                        {amenity.toLowerCase().includes('restaurante') && <Utensils className="w-3 h-3 mr-1 text-orange-400" />}
-                        {amenity.toLowerCase().includes('bar') && <Martini className="w-3 h-3 mr-1 text-purple-400" />}
-                        <span class="truncate">{amenity}</span>
+  
+                    <!-- Teléfono -->
+                    {motel.phone && (
+                      <div class="flex items-center mb-2">
+                        <Phone className="w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0" />
+                        <a href={`tel:${motel.phone}`} class="text-xs text-pink-400 hover:text-pink-300 transition-colors truncate">
+                          {motel.phone}
+                        </a>
                       </div>
-                    ))}
-                  </div>
-    
-                  <!-- Información adicional -->
-                  {motel.distance && (
-                    <div class="mt-3 p-2 bg-[#2A2A2A] rounded-lg">
-                      <p class="text-xs text-yellow-400">ℹ️ {motel.distance}</p>
+                    )}
+      
+                    <!-- Especialidades -->
+                    {motel.specialties && motel.specialties.length > 0 && (
+                      <div class="flex flex-wrap gap-1 mt-1.5 mb-1.5">
+                        {motel.specialties.slice(0, 2).map((specialty) => (
+                          <span class="text-[9px] sm:text-xs bg-[#2A2A2A] text-pink-400 px-1.5 py-0.5 rounded-full">{specialty}</span>
+                        ))}
+                      </div>
+                    )}
+      
+                    <!-- Amenidades disponibles con iconos (Ocultas en móviles para minimalismo) -->
+                    <div class="hidden sm:grid grid-cols-2 gap-1.5 mt-3">
+                      {motel.amenities && motel.amenities.slice(0, 4).map((amenity) => (
+                        <div class="flex items-center text-[11px] text-gray-300">
+                          {amenity.toLowerCase().includes('wifi') && <Wifi className="w-3 h-3 mr-1 text-blue-400" />}
+                          {amenity.toLowerCase().includes('estacionamiento') && <Car className="w-3 h-3 mr-1 text-green-400" />}
+                          {amenity.toLowerCase().includes('aire') && <Snowflake className="w-3 h-3 mr-1 text-cyan-400" />}
+                          {amenity.toLowerCase().includes('alberca') && <Waves className="w-3 h-3 mr-1 text-blue-400" />}
+                          {amenity.toLowerCase().includes('restaurante') && <Utensils className="w-3 h-3 mr-1 text-orange-400" />}
+                          {amenity.toLowerCase().includes('bar') && <Martini className="w-3 h-3 mr-1 text-purple-400" />}
+                          <span class="truncate">{amenity}</span>
+                        </div>
+                      ))}
                     </div>
-                  )}
+      
+                    <!-- Información adicional -->
+                    {motel.distance && (
+                      <div class="mt-2 p-1.5 bg-[#2A2A2A] rounded-lg hidden sm:block">
+                        <p class="text-[10px] text-yellow-400">ℹ️ {motel.distance}</p>
+                      </div>
+                    )}
+                  </div>
     
                   <!-- Botón de acción -->
-                  <div class="mt-5">
+                  <div class="mt-3.5">
                     {motel.short_name ? (
                       <a 
                         data-astro-prefetch="hover"
                         href={`/moteles/estados/${motel.state_slug}/${motel.short_name}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                        class="w-full bg-pink-500 text-white px-3 py-1.5 rounded-lg font-serif text-xs sm:text-sm font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >
-                        Ver Habitaciones
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        Habitaciones
+                        <ArrowRight className="ml-1 w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </a>
                     ) : motel.menu ? (
                       <a 
                         href={motel.menu} 
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="inline-block w-full text-center py-2 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
+                        class="inline-block w-full text-center py-1.5 bg-pink-500 text-white rounded-lg font-serif text-xs sm:text-sm hover:bg-pink-400 transition-colors"
                       >
-                        Ver Información
+                        Información
                       </a>
                     ) : motel.phone ? (
                       <a 
                         href={`tel:${motel.phone}`}
                         data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-4 py-2 rounded-lg font-serif font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
+                        class="w-full bg-pink-500 text-white px-3 py-1.5 rounded-lg font-serif text-xs sm:text-sm font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
                       >
-                        <Phone className="mr-2 w-4 h-4" />
-                        Llamar ahora
+                        <Phone className="mr-1 w-3.5 h-3.5" />
+                        Llamar
                       </a>
                     ) : (
                       <button 
-                        class="w-full py-2 bg-[#2A2A2A] text-pink-400 rounded-lg font-serif hover:bg-[#3A3A3A] transition-colors"
+                        class="w-full py-1.5 bg-[#2A2A2A] text-pink-400 rounded-lg font-serif text-xs sm:text-sm hover:bg-[#3A3A3A] transition-colors"
                       >
-                        Más Información
+                        Ver más
                       </button>
                     )}
                   </div>

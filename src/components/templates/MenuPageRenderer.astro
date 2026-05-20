@@ -521,16 +521,18 @@ const toCategorySlug = (value: string) =>
 							className="w-full max-w-3xl mx-auto"
 						/>
 					) : place.image?.trim() ? (
-						<Image
-							src={place.image}
-							alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
-							width={500}
-							height={333}
-							class="w-full h-auto object-cover xl:max-h-[60dvh]"
-							loading="eager"
-							format="webp"
-							quality={90}
-						/>
+						<div class="w-full h-40 sm:h-56 md:h-72 xl:max-h-[60dvh] overflow-hidden">
+							<Image
+								src={place.image}
+								alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
+								width={800}
+								height={450}
+								class="w-full h-full object-cover"
+								loading="eager"
+								format="webp"
+								quality={90}
+							/>
+						</div>
 					) : (
 						<div class="h-32 bg-stone-900" />
 					)}
@@ -566,7 +568,7 @@ const toCategorySlug = (value: string) =>
 			template !== "elegant" && template !== "uber" && (
 				<div
 					class:list={[
-						"max-w-2xl mx-auto px-6",
+						"max-w-2xl mx-auto px-4 sm:px-6 pt-4 pb-2",
 						config.headerClass,
 						showCategoriesAtStart ? "hidden" : "",
 					]}
@@ -576,7 +578,7 @@ const toCategorySlug = (value: string) =>
 			)
 		}
 
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 mt-8">
+		<div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 mt-4 sm:mt-8">
 			{/* Info compacta en una sola línea de chips */}
 
 			{/* Favorites Manager - Always visible */}
@@ -645,7 +647,7 @@ const toCategorySlug = (value: string) =>
 												class:list={[
 													template === "tienda"
 														? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-														: "grid grid-cols-1 lg:grid-cols-3 lg:gap-4",
+														: "grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-4",
 												]}
 											>
 												{block.data.items?.map((item: any) => (
