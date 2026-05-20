@@ -41,3 +41,35 @@ Palabras clave orientadas a dueños de negocios (restaurantes, bares, cafetería
 - **Enfoque de Solución:** Crear landing pages específicas para cada necesidad (ej. "Punto de venta para Pizzerías", "Menú digital para Bares").
 - **Llamados a la Acción (CTAs):** Fricción baja, usar priorización de contacto rápido (WhatsApp/Formulario corto).
 - **SEO de Comparación:** Abordar búsquedas relacionadas a alternativas destacando los diferenciadores de Bysmax frente a competidores.
+
+## 4. DIRECTRICES DE OPTIMIZACIÓN DE CTR (Títulos y Descripciones Dinámicos)
+Para contrarrestar la dificultad de subir posiciones, el CTR (Click-Through Rate) se maximiza usando copys persuasivos en los metadatos globales de forma dinámica basados en datos estructurados.
+
+### 4.1 Fórmulas para Moteles (B2C)
+Los títulos y descripciones de moteles deben responder directamente a dudas sobre **precios por hora/estadía** y **amenidades especiales (jacuzzi)**.
+
+*   **Fórmulas de Meta Title (Máx. 60 caracteres):**
+    *   *Si tiene precio y jacuzzi:* `Motel [Nombre] en [Ciudad] | Precios desde $[MinPrice], Fotos y Jacuzzi ([Año])`
+    *   *Si tiene precio sin jacuzzi:* `Motel [Nombre] en [Ciudad] | Precios desde $[MinPrice], Fotos y Tarifas ([Año])`
+    *   *Si tiene jacuzzi sin precio:* `Motel [Nombre] en [Ciudad] | Precios, Fotos y Jacuzzi ([Año])`
+    *   *Fallback:* `Motel [Nombre] en [Ciudad] ➔ Precios, Fotos y Habitaciones ([Año])`
+*   **Fórmulas de Meta Description (Máx. 155 caracteres):**
+    *   *Estructura:* `¿Buscas tarifas de Motel [Nombre] en [Ciudad]? ➔ Entra y consulta tarifas de 12 horas, [precioText][jacuzziText], fotos reales de habitaciones y ubicación en mapa.[opinionesText]`
+    *   *Ejemplo:* `¿Buscas tarifas de Motel Kyoto en Monterrey? ➔ Entra y consulta tarifas de 12 horas, habitaciones desde $450, suites con jacuzzi, fotos reales y mapa.`
+
+### 4.2 Fórmulas para Restaurantes (B2C)
+Los títulos y descripciones de restaurantes se enfocan en la disponibilidad del **menú/carta digital completa**, **combos/paquetes** y **secciones especiales (desayunos/bebidas)**.
+
+*   **Fórmulas de Meta Title (Máx. 60 caracteres):**
+    *   *Estructura:* `Menú de [Nombre] y Precios ([Año]) ➔ Carta Digital [Ubicación]`
+    *   *Ejemplo:* `Menú de Spikes y Precios (2026) ➔ Carta Digital en Monterrey`
+*   **Fórmulas de Meta Description (Máx. 155 caracteres):**
+    *   *Estructura:* `¿Quieres comer en [Nombre][Ubicación]? ➔ Consulta el MENÚ COMPLETO y PRECIOS del [Año]. Descubre paquetes, platos populares, bebidas[highlightsText] y opiniones.`
+    *   *highlightsText (Dinámico):* Si detecta secciones de "desayunos", "bebidas", "combos" o "postres", las enumera explícitamente en el texto para coincidir con keywords específicas de Search Console.
+    *   *Ejemplo:* `¿Quieres comer en Spikes en Cumbres? ➔ Consulta el MENÚ COMPLETO y PRECIOS del 2026. Descubre paquetes, platos populares, bebidas, postres y opiniones.`
+
+### 4.3 Elementos Psicológicos de CTR Aplicados
+1.  **Pregunta Directa Inicial:** Despierta el interés del usuario al reflejar exactamente su búsqueda activa.
+2.  **Llamado a la Acción Visibles:** El uso del símbolo `➔` o `|` guía la mirada.
+3.  **MAYÚSCULAS Estratégicas:** Palabras de alta conversión como `MENÚ COMPLETO` o `PRECIOS ACTUALIZADOS` destacan en la SERP sin considerarse spam.
+4.  **Datos Específicos Primero:** Los números (año actual `2026`, precios reales `$350`) ofrecen respuestas inmediatas, lo que genera mayor confianza y clics.

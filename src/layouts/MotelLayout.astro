@@ -10,22 +10,75 @@ function hasAmenity(amenity: string, amenities?: string[]): boolean {
 	return amenities.some((a) => a.toLowerCase().includes(amenity.toLowerCase()));
 }
 
+function getMinPrice(place: any): number | null {
+	let prices: number[] = [];
+
+	if (place.content?.sections) {
+		for (const section of place.content.sections) {
+			if (section.items) {
+				for (const item of section.items) {
+					if (typeof item.price === "number" && item.price > 0) {
+						prices.push(item.price);
+					} else if (typeof item.price === "string") {
+						const num = parseFloat((item.price as string).replace(/[^0-9.]/g, ""));
+						if (!isNaN(num) && num > 0) prices.push(num);
+					}
+				}
+			}
+		}
+	}
+
+	if (place.content?.blocks) {
+		for (const block of place.content.blocks) {
+			if (block.type === "section" && block.data && "items" in block.data) {
+				for (const item of block.data.items) {
+					if (typeof item.price === "number" && item.price > 0) {
+						prices.push(item.price);
+					} else if (typeof item.price === "string") {
+						const num = parseFloat((item.price as string).replace(/[^0-9.]/g, ""));
+						if (!isNaN(num) && num > 0) prices.push(num);
+					}
+				}
+			}
+		}
+	}
+
+	return prices.length > 0 ? Math.min(...prices) : null;
+}
+
 function generateSEOTitle(
 	place: Place,
 	year: number = new Date().getFullYear(),
 ): string {
 	const city = place.states?.name || "Monterrey";
-	return `${place.name} Precios, Fotos y Habitaciones (${year})${city ? ` en ${city}` : ""}`;
+	const minPrice = getMinPrice(place);
+	const hasJacuzzi = hasAmenity("jacuzzi", place.amenities);
+
+	if (minPrice && hasJacuzzi) {
+		return `Motel ${place.name} en ${city} | Precios desde $${minPrice}, Fotos y Jacuzzi (${year})`;
+	}
+	if (minPrice) {
+		return `Motel ${place.name} en ${city} | Precios desde $${minPrice}, Fotos y Tarifas (${year})`;
+	}
+	if (hasJacuzzi) {
+		return `Motel ${place.name} en ${city} | Precios, Fotos y Jacuzzi (${year})`;
+	}
+	return `Motel ${place.name} en ${city} ➔ Precios, Fotos y Habitaciones (${year})`;
 }
 
 function generateSEODescription(place: Place, description?: string): string {
 	const city = place.states?.name || "Monterrey";
+	const minPrice = getMinPrice(place);
+	const hasJacuzzi = hasAmenity("jacuzzi", place.amenities);
 	const reviews =
 		place.reviewCount > 0
 			? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas.` : "."}`
 			: "";
 
-	return `Consulta los precios actualizados, fotos de habitaciones y ubicación de ${place.name} en ${city}. Descubre tarifas de 12 horas y opciones con jacuzzi.${reviews}`;
+	const priceText = minPrice ? `habitaciones desde $${minPrice}` : "precios actualizados";
+	const jacuzziText = hasJacuzzi ? ", suites con jacuzzi" : "";
+
+	return `¿Buscas tarifas de Motel ${place.name} en ${city}? ➔ Entra y consulta tarifas de 12 horas, ${priceText}${jacuzziText}, fotos de las habitaciones y ubicación en mapa.${reviews}`;
 }
 
 interface Address {

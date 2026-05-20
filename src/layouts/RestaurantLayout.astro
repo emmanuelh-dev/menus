@@ -93,14 +93,94 @@ const city =
 	place?.states?.name ||
 	"Monterrey";
 
+function hasAmenity(amenity: string, amenities?: string[]): boolean {
+	if (!amenities) return false;
+	return amenities.some((a) => a.toLowerCase().includes(amenity.toLowerCase()));
+}
+
+function getMinPrice(place?: any): number | null {
+	if (!place) return null;
+	let prices: number[] = [];
+
+	if (place.content?.sections) {
+		for (const section of place.content.sections) {
+			if (section.items) {
+				for (const item of section.items) {
+					if (typeof item.price === "number" && item.price > 0) {
+						prices.push(item.price);
+					} else if (typeof item.price === "string") {
+						const num = parseFloat((item.price as string).replace(/[^0-9.]/g, ""));
+						if (!isNaN(num) && num > 0) prices.push(num);
+					}
+				}
+			}
+		}
+	}
+
+	if (place.content?.blocks) {
+		for (const block of place.content.blocks) {
+			if (block.type === "section" && block.data && "items" in block.data) {
+				for (const item of block.data.items) {
+					if (typeof item.price === "number" && item.price > 0) {
+						prices.push(item.price);
+					} else if (typeof item.price === "string") {
+						const num = parseFloat((item.price as string).replace(/[^0-9.]/g, ""));
+						if (!isNaN(num) && num > 0) prices.push(num);
+					}
+				}
+			}
+		}
+	}
+
+	return prices.length > 0 ? Math.min(...prices) : null;
+}
+
+function getMenuHighlights(place?: any): string[] {
+	if (!place) return [];
+	const highlights: string[] = [];
+	const sectionNames: string[] = [];
+
+	if (place.content?.sections) {
+		for (const s of place.content.sections) {
+			if (s.name) sectionNames.push(s.name.toLowerCase());
+		}
+	}
+	if (place.content?.blocks) {
+		for (const b of place.content.blocks) {
+			if (b.type === "section" && b.data?.title) {
+				sectionNames.push(b.data.title.toLowerCase());
+			}
+		}
+	}
+
+	if (sectionNames.some(name => name.includes("desayuno"))) highlights.push("desayunos");
+	if (sectionNames.some(name => name.includes("bebida") || name.includes("trago") || name.includes("coctel") || name.includes("bar"))) highlights.push("bebidas");
+	if (sectionNames.some(name => name.includes("postre") || name.includes("dulce"))) highlights.push("postres");
+	if (sectionNames.some(name => name.includes("combo") || name.includes("paquete") || name.includes("promocion") || name.includes("promo"))) highlights.push("combos");
+
+	return highlights;
+}
+
 const isMotel = place?.type === "motel" || path.includes("/moteles");
 
 function generateSEOTitle(): string {
 	const location = city ? ` en ${city}` : "";
 	if (isMotel) {
-		return `${title} Precios, Fotos y Habitaciones (${currentYear})${location}`;
+		const minPrice = getMinPrice(place);
+		const hasJacuzzi = hasAmenity("jacuzzi", place?.amenities);
+
+		if (minPrice && hasJacuzzi) {
+			return `Motel ${title}${location} | Precios desde $${minPrice}, Fotos y Jacuzzi (${currentYear})`;
+		}
+		if (minPrice) {
+			return `Motel ${title}${location} | Precios desde $${minPrice}, Fotos y Habitaciones (${currentYear})`;
+		}
+		if (hasJacuzzi) {
+			return `Motel ${title}${location} | Precios, Fotos y Jacuzzi (${currentYear})`;
+		}
+		return `Motel ${title}${location} ➔ Precios, Fotos y Habitaciones (${currentYear})`;
 	}
-	return `Menú de ${title} y Precios (${currentYear}) | Carta Digital${location}`;
+	return `Menú de ${title} y Precios (${currentYear}) ➔ Carta Digital${location}`;
 }
 
 function generateSEODescription(): string {
@@ -111,9 +191,21 @@ function generateSEODescription(): string {
 			: "";
 
 	if (isMotel) {
-		return `Consulta los precios actualizados, fotos de habitaciones y ubicación de ${title}${location}. Descubre tarifas de 12 horas y opciones con jacuzzi.${reviews}`;
+		const minPrice = getMinPrice(place);
+		const hasJacuzzi = hasAmenity("jacuzzi", place?.amenities);
+		const priceText = minPrice ? `habitaciones desde $${minPrice}` : "precios actualizados";
+		const jacuzziText = hasJacuzzi ? ", suites con jacuzzi" : "";
+
+		return `¿Buscas tarifas de Motel ${title}${location}? ➔ Entra y consulta tarifas de 12 horas, ${priceText}${jacuzziText}, fotos reales y ubicación en mapa.${reviews}`;
 	}
-	return `Conoce el menú actualizado de ${title}${location}. Consulta todos los precios del ${currentYear}, paquetes y fotos de los platillos. ${description || ""}${reviews}`;
+
+	const highlights = getMenuHighlights(place);
+	let highlightsText = "";
+	if (highlights.length > 0) {
+		highlightsText = ` Consulta nuestra sección de ${highlights.join(", ")}.`;
+	}
+
+	return `¿Quieres comer en ${title}${location}? ➔ Consulta el MENÚ COMPLETO y PRECIOS del ${currentYear}. Descubre paquetes, platos populares, bebidas${highlightsText} y opiniones.${reviews}`;
 }
 
 let reviewStats = {
