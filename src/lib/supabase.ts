@@ -69,7 +69,7 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
 
   let query = supabase
     .from('places')
-    .select('*, states(*)')
+    .select('*, states(*), municipalities(*)')
 
   if (type){
     query = query.eq('type', type);
@@ -253,7 +253,7 @@ export async function getOpinionesCafeteria(cafeteriaId: number) {
 export async function getRestaurantByName({ name }: { name: string }) {
   const { data, error } = await supabase
     .from('places')
-    .select('*, states(*)')
+    .select('*, states(*), municipalities(*)')
     .eq('short_name', name);
     
   if (error) {

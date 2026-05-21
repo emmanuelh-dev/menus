@@ -1,0 +1,312 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=300, stale-while-revalidate=60'
+);
+
+import ServiciosLayout from "../../../../../layouts/ServiciosLayout.astro";
+import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
+import { getRestaurants, getRestaurantByName, supabase } from "../../../../../lib/supabase";
+import { getServiceTypeFromSlug, getServiceTitlePlural } from "../../../../../lib/services";
+
+const { servicio, state, slug } = Astro.params;
+
+if (!servicio || !state || !slug) {
+  return Astro.redirect('/servicios');
+}
+
+const serviceType = getServiceTypeFromSlug(servicio);
+if (!serviceType) {
+  return Astro.redirect('/servicios');
+}
+
+// 1. Obtener datos del estado
+const { data: stateDb } = await supabase
+  .from('states')
+  .select('*')
+  .eq('slug', state.toLowerCase())
+  .single();
+
+if (!stateDb) {
+  return Astro.redirect(`/servicios/${servicio}`);
+}
+
+// 2. Verificar si el 'slug' corresponde a un municipio de este estado
+const { data: municipalityDb } = await supabase
+  .from('municipalities')
+  .select('*')
+  .eq('state_id', stateDb.id)
+  .eq('slug', slug.toLowerCase())
+  .maybeSingle();
+
+let isMunicipality = !!municipalityDb;
+let isPlaceRedirect = false;
+let redirectUrl = '';
+
+let lista: any[] = [];
+
+if (isMunicipality && municipalityDb) {
+  // Cargar todos los locales de este servicio en el estado
+  const locales = await getRestaurants({ type: serviceType, state_id: stateDb.id });
+  
+  // Filtrar: coincidencia directa de municipio O negocios móviles con cobertura en el municipio
+  lista = locales.filter(v => {
+    const matchDirect = v.municipality_id === municipalityDb.id;
+    
+    const areas = v.content?.semantic_data?.areas || [];
+    const matchMobile = areas.some((a: string) => 
+      a.toLowerCase() === municipalityDb.slug || 
+      a.toLowerCase() === municipalityDb.name.toLowerCase() ||
+      a.toLowerCase() === 'all'
+    );
+    
+    return matchDirect || matchMobile;
+  });
+} else {
+  // No es un municipio. Podría ser un negocio individual (redirección 301 de URL antigua)
+  const results = await getRestaurantByName({ name: slug });
+  const place = results[0];
+  
+  if (place && place.type === serviceType) {
+    isPlaceRedirect = true;
+    const muniSlug = place.municipalities?.slug || 'general';
+    redirectUrl = `/servicios/${servicio}/${state}/${muniSlug}/${slug}`;
+  }
+}
+
+// Si corresponde a redirección de negocio (301)
+if (isPlaceRedirect && redirectUrl) {
+  return Astro.redirect(redirectUrl, 301);
+}
+
+// Si no es municipio ni negocio válido, retornamos 404
+if (!isMunicipality || !municipalityDb) {
+  Astro.response.status = 404;
+  Astro.response.statusText = 'Not Found';
+}
+
+const serviceTitle = getServiceTitlePlural(serviceType);
+const serviceNameSingular = serviceType;
+
+// SEO de la Landing de Municipio
+const seoTitle = municipalityDb 
+  ? `${serviceTitle} en ${municipalityDb.name}, ${stateDb.name} 2026 | Servicio Local`
+  : 'Página no encontrada | BySMax';
+
+const seoDescription = municipalityDb
+  ? `Directorio verificado de ${serviceTitle.toLowerCase()} en ${municipalityDb.name}, ${stateDb.name}. Teléfonos directos, whatsapp y atención a domicilio las 24 horas.`
+  : 'El servicio o localidad solicitada no se encuentra disponible.';
+
+const breadcrumbs = municipalityDb ? [
+  { label: 'Inicio', href: '/' },
+  { label: 'Servicios', href: '/servicios' },
+  { label: serviceTitle, href: `/servicios/${servicio}` },
+  { label: stateDb.name, href: `/servicios/${servicio}/${state}` },
+  { label: municipalityDb.name },
+] : [];
+
+const schemaData = municipalityDb ? {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": seoTitle,
+  "description": seoDescription,
+  "numberOfItems": lista.length,
+  "itemListElement": lista.map((v, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "item": {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": v.name,
+      "telephone": v.phone || v.content?.semantic_data?.phone,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": v.address,
+        "addressLocality": municipalityDb.name,
+        "addressRegion": stateDb.name,
+        "addressCountry": "MX"
+      },
+      "image": v.image
+    }
+  }))
+} : null;
+---
+
+{municipalityDb ? (
+  <ServiciosLayout
+    title={seoTitle}
+    description={seoDescription}
+    canonical={Astro.url.toString()}
+    schemaData={schemaData}
+    servicioActive={serviceType}
+  >
+    <main class="bg-neutral-950 min-h-screen text-neutral-200">
+      <!-- Hero -->
+      <section class="bg-gradient-to-br from-orange-950/25 via-neutral-950 to-neutral-950 border-b border-orange-500/10 py-12 px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider mb-5">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span>Ubicación: {municipalityDb.name} · {stateDb.name}</span>
+          </div>
+          <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">{serviceTitle} en {municipalityDb.name}</h1>
+          <p class="text-neutral-400 text-base md:text-lg mb-5 max-w-2xl leading-relaxed">
+            Encuentra técnicos locales y negocios de {serviceTitle.toLowerCase()} en {municipalityDb.name} con servicio a domicilio y atención de emergencias.
+          </p>
+
+          <!-- Back button -->
+          <div class="mt-4">
+            <a href={`/servicios/${servicio}/${state}`} class="text-orange-500 hover:text-orange-400 text-sm font-semibold transition">
+              ← Ver todo {stateDb.name}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Breadcrumbs -->
+      <div class="max-w-7xl mx-auto px-4 pt-6">
+        <Breadcrumbs items={breadcrumbs} />
+      </div>
+
+      <!-- Resultados -->
+      <section class="max-w-7xl mx-auto px-4 py-6 pb-12">
+        <div class="mb-5">
+          <p class="text-xs md:text-sm text-neutral-400 font-medium">
+            {lista.length > 0
+              ? `${lista.length} ${lista.length !== 1 ? serviceTitle.toLowerCase() : serviceNameSingular} registrada${lista.length !== 1 ? 's' : ''}`
+              : `No se encontraron ${serviceTitle.toLowerCase()} en ${municipalityDb.name}`}
+          </p>
+        </div>
+
+        {lista.length > 0 ? (
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {lista.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)).map(loc => {
+              const es24h = loc.hours?.toLowerCase().includes('24');
+              const phones = (loc.content?.semantic_data?.phone || loc.phone || '')
+                .split(/[,\/|y]/)
+                .map((p: string) => p.trim())
+                .filter(Boolean);
+              const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.name + ' ' + (loc.address || ''))}`;
+              const detailUrl = `/servicios/${servicio}/${state}/${municipalityDb.slug}/${loc.short_name}`;
+              const esMovil = loc.content?.semantic_data?.areas?.length > 0 && loc.municipality_id !== municipalityDb.id;
+
+              return (
+                <article class={`bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-orange-500/30 transition duration-300 flex flex-col hover:shadow-lg hover:shadow-orange-950/5 relative ${loc.featured ? 'border-orange-500/25 bg-gradient-to-b from-orange-950/10 to-neutral-900/60' : ''}`}>
+                  <div class="relative h-40 overflow-hidden bg-neutral-950">
+                    <img
+                      src={loc.image || '/vulcanizadora-placeholder.jpg'}
+                      alt={`${serviceTitle} ${loc.name} en ${municipalityDb.name}`}
+                      loading="lazy"
+                      class="w-full h-full object-cover transition duration-500 hover:scale-105"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent"></div>
+
+                    {es24h && (
+                      <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-emerald-500/90 text-white text-[10px] font-extrabold tracking-wider px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                        24 HORAS
+                      </div>
+                    )}
+
+                    {esMovil && (
+                      <div class="absolute bottom-3 left-3 bg-orange-500/90 text-white text-[10px] font-extrabold tracking-wider px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
+                        🚚 Móvil / Domicilio
+                      </div>
+                    )}
+
+                    {loc.featured && (
+                      <div class="absolute top-3 right-3 bg-amber-500 text-neutral-950 text-[10px] font-black tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                        ⭐ Destacado
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h2 class="text-lg font-bold text-white mb-2 leading-snug">
+                        <a href={detailUrl} class="hover:text-orange-500 transition duration-150">{loc.name}</a>
+                      </h2>
+
+                      {loc.address && (
+                        <a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="flex items-start gap-1.5 text-xs text-neutral-400 hover:text-white transition duration-150 mb-2 leading-relaxed">
+                          <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span class="line-clamp-2">{loc.address}</span>
+                        </a>
+                      )}
+
+                      <div class="flex items-center gap-1.5 text-xs text-neutral-400 mb-4">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" />
+                          <path stroke-linecap="round" d="M12 6v6l4 2" />
+                        </svg>
+                        <span class={es24h ? 'text-emerald-400 font-semibold' : ''}>{loc.hours || 'Consultar horario'}</span>
+                      </div>
+
+                      {phones.length > 0 && (
+                        <div class="flex flex-col gap-1.5 mb-4 border-t border-neutral-800/60 pt-3">
+                          {phones.map((phone: string, idx: number) => (
+                            <a href={`tel:${phone.trim().replace(/\D/g, '')}`} class={`flex items-center gap-1.5 text-xs font-semibold hover:text-white transition duration-150 ${idx === 0 ? 'text-orange-500' : 'text-neutral-300'}`}>
+                              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                              {phone.trim()}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div class="flex gap-2.5 mt-auto pt-2">
+                      {phones.length > 0 && (
+                        <a
+                          href={`tel:${phones[0].trim().replace(/\D/g, '')}`}
+                          class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold text-xs rounded-lg transition duration-150 active:scale-[0.98]"
+                        >
+                          Llamar
+                        </a>
+                      )}
+                      <a href={detailUrl} class="inline-flex items-center justify-center gap-1 py-2 px-3 bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white font-semibold text-xs rounded-lg transition duration-150">
+                        Ver Ficha
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="text-center py-12 px-4 max-w-md mx-auto">
+            <div class="text-5xl mb-4">📍</div>
+            <h2 class="text-xl font-bold text-white mb-2">Sin resultados locales</h2>
+            <p class="text-sm text-neutral-400 leading-relaxed mb-6">
+              Aún no tenemos profesionales de este ramo registrados en {municipalityDb.name}.
+            </p>
+            <a href="/contact" class="inline-flex items-center justify-center gap-1.5 py-2 px-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold text-xs rounded-lg transition duration-150 active:scale-[0.98]">
+              Sugerir un negocio
+            </a>
+          </div>
+        )}
+      </section>
+    </main>
+  </ServiciosLayout>
+) : (
+  <ServiciosLayout
+    title="Página no encontrada"
+    description="El servicio o localidad solicitada no se encuentra disponible."
+  >
+    <main class="flex items-center justify-center min-h-[70vh] bg-neutral-950 text-neutral-200">
+      <div class="text-center py-12 px-4 max-w-md mx-auto">
+        <div class="text-5xl mb-4">404</div>
+        <h2 class="text-xl font-bold text-white mb-2">Localidad o servicio no encontrado</h2>
+        <p class="text-sm text-neutral-400 leading-relaxed mb-6">El enlace que has seguido no existe o no tiene profesionales registrados.</p>
+        <a href="/servicios" class="inline-flex items-center justify-center gap-1.5 py-2 px-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold text-xs rounded-lg transition duration-150 active:scale-[0.98]">
+          Ir al listado de servicios
+        </a>
+      </div>
+    </main>
+  </ServiciosLayout>
+)}

@@ -32,6 +32,12 @@ export interface Place {
     name: string;
     slug: string;
   };
+  municipality_id?: number;
+  municipalities?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
   content?: Content;
   created_at?: string;
 }

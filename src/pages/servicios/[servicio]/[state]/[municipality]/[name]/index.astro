@@ -1,0 +1,312 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=300, stale-while-revalidate=60'
+);
+
+import ServiciosLayout from "../../../../../../layouts/ServiciosLayout.astro";
+import Breadcrumbs from "../../../../../../components/Breadcrumbs.astro";
+import { getRestaurantByName } from "../../../../../../lib/supabase";
+import { getServiceTypeFromSlug, getServiceTitlePlural } from "../../../../../../lib/services";
+
+const { servicio, state, municipality, name } = Astro.params;
+
+if (!servicio || !state || !municipality || !name) {
+  return Astro.redirect('/servicios');
+}
+
+const serviceType = getServiceTypeFromSlug(servicio);
+if (!serviceType) {
+  return Astro.redirect('/servicios');
+}
+
+// Consultar los datos del negocio por su slug/short_name
+const results = await getRestaurantByName({ name });
+const place = results[0];
+
+// Validar que el negocio exista y sea del tipo de servicio adecuado
+if (!place || place.type !== serviceType) {
+  return Astro.redirect(`/servicios/${servicio}/${state}`);
+}
+
+const semantic = place.content?.semantic_data || {};
+const es24h = (place.hours || semantic.hours || '').toLowerCase().includes('24');
+const phone = semantic.phone || place.phone || '';
+const whatsapp = semantic.whatsapp || '';
+const address = semantic.address || place.address || '';
+const description = semantic.description || '';
+
+// Parsear teléfonos múltiples
+const phones = phone.split(/[,\/|y]/).map((p: string) => p.trim()).filter(Boolean);
+const whatsapps = whatsapp.split(/[,\/|y]/).map((w: string) => w.trim()).filter(Boolean);
+
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + address)}`;
+
+const stateName = place.states?.name || 'Nuevo León';
+const municipalityName = place.municipalities?.name || 'General';
+
+const serviceTitle = getServiceTitlePlural(serviceType);
+
+// SEO optimizado
+const title = `${place.name} en ${municipalityName}, ${stateName} | Teléfono ${es24h ? '· Servicio 24h' : ''}`;
+const metaDescription = `${description || `${place.name} en ${municipalityName}, ${stateName}`}.${es24h ? ' Servicio las 24 horas.' : ''} Teléfono${phones.length > 1 ? 's' : ''}: ${phones.slice(0, 2).join(', ')}. Dirección, opiniones y mapa interactivo.`;
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": place.name,
+  "description": metaDescription,
+  "telephone": phones[0],
+  "image": place.image,
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": address,
+    "addressLocality": municipalityName,
+    "addressRegion": stateName,
+    "addressCountry": "MX"
+  },
+  "openingHours": es24h ? ["Mo-Su 00:00-23:59"] : undefined,
+  "priceRange": place.priceRange || "$$",
+  "url": Astro.url.toString(),
+  "aggregateRating": place.reviewCount > 0 ? {
+    "@type": "AggregateRating",
+    "ratingValue": place.rating,
+    "reviewCount": place.reviewCount,
+    "bestRating": 5,
+    "worstRating": 1
+  } : undefined
+};
+
+const breadcrumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Servicios', href: '/servicios' },
+  { label: serviceTitle, href: `/servicios/${servicio}` },
+  { label: stateName, href: `/servicios/${servicio}/${state}` },
+  { label: municipalityName, href: `/servicios/${servicio}/${state}/${municipality}` },
+  { label: place.name },
+];
+---
+
+<ServiciosLayout
+  title={title}
+  description={metaDescription}
+  ogImage={place.image}
+  canonical={Astro.url.toString()}
+  schemaData={schemaData}
+  servicioActive={serviceType}
+>
+  <main class="bg-neutral-950 min-h-screen text-neutral-200">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+      <Breadcrumbs items={breadcrumbs} />
+
+      <!-- Header del establecimiento -->
+      <header class="mb-8 mt-4">
+        <!-- Imagen principal -->
+        {place.image && (
+          <div class="relative h-64 md:h-96 rounded-2xl overflow-hidden mb-6 border border-neutral-800/80 shadow-inner">
+            <img
+              src={place.image}
+              alt={`${place.name} en ${municipalityName}, ${stateName}`}
+              class="w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent"></div>
+            {es24h && (
+              <div class="absolute bottom-4 left-4 flex items-center gap-2 bg-emerald-500/90 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">
+                <span class="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></span>
+                Abierto 24 horas
+              </div>
+            )}
+          </div>
+        )}
+
+        <!-- Info principal -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">{place.name}</h1>
+            {es24h && <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold px-2.5 py-1 rounded uppercase tracking-wider">24h</span>}
+          </div>
+
+          {place.rating > 0 && (
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-amber-400 font-bold">{'★'.repeat(Math.round(place.rating))}</span>
+              <span class="text-white font-bold">{place.rating}</span>
+              {place.reviewCount > 0 && <span class="text-neutral-400">({place.reviewCount} opiniones)</span>}
+            </div>
+          )}
+
+          {description && <p class="text-neutral-400 text-sm leading-relaxed max-w-2xl">{description}</p>}
+
+          <!-- Botones de Acción directos -->
+          <div class="flex flex-wrap gap-3 mt-4">
+            {phones.map((phoneNum: string) => (
+              <a
+                href={`tel:${phoneNum.replace(/\D/g, '')}`}
+                class="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold text-sm rounded-xl transition duration-150 shadow-lg shadow-orange-950/20 active:scale-95"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Llamar: {phoneNum}
+              </a>
+            ))}
+            
+            {whatsapps.map((waNum: string) => (
+              <a
+                href={`https://wa.me/${waNum.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, vi su información en BySMax. ¿Tienen servicio disponible?`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl transition duration-150 active:scale-95"
+              >
+                <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                </svg>
+                WhatsApp: {waNum}
+              </a>
+            ))}
+
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 px-5 py-3 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 font-semibold text-sm rounded-xl transition duration-150"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Google Maps
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Ficha de Datos -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Columna izquierda: información de contacto -->
+        <div class="md:col-span-2 space-y-4">
+          <!-- Teléfonos -->
+          {phones.length > 0 && (
+            <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
+              <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Números Telefónicos
+              </h2>
+              <div class="space-y-2">
+                {phones.map((p: string, i: number) => (
+                  <a
+                    href={`tel:${p.replace(/\D/g, '')}`}
+                    class="flex items-center justify-between p-2.5 rounded-lg bg-neutral-950/40 hover:bg-neutral-950 border border-neutral-800/40 transition duration-150"
+                  >
+                    <span class={i === 0 ? "text-orange-500 font-bold" : "text-neutral-200 font-medium"}>{p}</span>
+                    {i === 0 ? (
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/30 uppercase tracking-wider">Principal</span>
+                    ) : (
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-850 text-neutral-400 border border-neutral-700/30 uppercase tracking-wider">Alternativo</span>
+                    )}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <!-- Horario -->
+          <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
+            <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path stroke-linecap="round" d="M12 6v6l4 2" />
+              </svg>
+              Horarios de Atención
+            </h2>
+            <div class="text-sm text-neutral-300 p-3 bg-neutral-950/40 border border-neutral-800/40 rounded-lg">
+              {es24h ? (
+                <div class="flex items-center gap-2 text-emerald-400 font-bold">
+                  <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                  <span>Abierto las 24 horas (Emergencias / A domicilio)</span>
+                </div>
+              ) : (
+                <span>{place.hours || semantic.hours || 'Consultar horarios directamente'}</span>
+              )}
+            </div>
+          </div>
+
+          <!-- Cobertura Geográfica -->
+          {semantic.areas && semantic.areas.length > 0 && (
+            <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
+              <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">🚚 Zona de Cobertura</h2>
+              <div class="space-y-3">
+                <p class="text-xs text-neutral-400">Este profesional ofrece servicio móvil a domicilio en las siguientes áreas:</p>
+                <div class="flex flex-wrap gap-2">
+                  {semantic.areas.map((area: string) => (
+                    <span class="text-xs bg-neutral-950/80 border border-neutral-800 text-orange-300 px-3 py-1.5 rounded-md font-medium">📍 {area}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <!-- Dirección -->
+          {address && (
+            <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
+              <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Dirección Física
+              </h2>
+              <p class="text-neutral-300 text-sm leading-relaxed mb-3">{address}</p>
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-orange-400 hover:text-orange-300 font-semibold transition">
+                Ver ruta en Google Maps →
+              </a>
+            </div>
+          )}
+
+          <!-- Especialidades -->
+          {place.specialties && place.specialties.length > 0 && (
+            <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
+              <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">🔧 Especialidades y Servicios</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {place.specialties.map((s: string) => (
+                  <div class="flex items-start gap-2.5 text-sm text-neutral-300">
+                    <span class="text-orange-500 font-bold">✓</span>
+                    <span>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- Columna derecha: mapa embed + CTA de dueño -->
+        <div class="space-y-4">
+          <div class="border border-neutral-800/80 rounded-xl overflow-hidden bg-neutral-900/60 shadow-lg">
+            <iframe
+              title={`Ubicación en Google Maps de ${place.name}`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(place.name + ' ' + address)}&output=embed&z=15`}
+              width="100%"
+              height="280"
+              style="border:0;"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+
+          <a href={`/servicios/${servicio}/${state}/${municipality}`} class="block w-full py-3 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 font-bold text-xs rounded-xl transition duration-150 text-center uppercase tracking-wider">
+            ← Volver a {municipalityName}
+          </a>
+
+          <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5 border-dashed border-orange-500/20">
+            <p class="text-sm font-bold text-white mb-1.5">¿Eres el dueño del negocio?</p>
+            <p class="text-xs text-neutral-400 leading-relaxed mb-4">Reclama tu listado gratis para actualizar teléfonos, fotos de tus trabajos y horarios de atención.</p>
+            <a href="/contact" class="inline-block px-4 py-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 hover:bg-orange-500/20 hover:text-orange-300 font-bold text-xs rounded-lg transition duration-150">Reclamar este servicio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</ServiciosLayout>

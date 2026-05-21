@@ -1,0 +1,355 @@
+---
+export const prerender = false;
+
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=300, stale-while-revalidate=60'
+);
+
+import ServiciosLayout from "../../../../layouts/ServiciosLayout.astro";
+import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+import { getRestaurants, supabase } from "../../../../lib/supabase";
+import { getServiceTypeFromSlug, getServiceTitlePlural } from "../../../../lib/services";
+
+const { servicio, state } = Astro.params;
+
+if (!servicio || !state) {
+  return Astro.redirect('/servicios');
+}
+
+const serviceType = getServiceTypeFromSlug(servicio);
+if (!serviceType) {
+  return Astro.redirect('/servicios');
+}
+
+// Consultar los datos del estado por slug
+const { data: stateDb } = await supabase
+  .from('states')
+  .select('*')
+  .eq('slug', state.toLowerCase())
+  .single();
+
+if (!stateDb) {
+  return Astro.redirect(`/servicios/${servicio}`);
+}
+
+// Cargar todos los establecimientos de este tipo en este estado
+const locales = await getRestaurants({ type: serviceType, state_id: stateDb.id });
+
+// Extraer municipios que tienen negocios de este tipo registrados en este estado
+const municipiosConNegociosMap = new Map();
+locales.forEach(loc => {
+  if (loc.municipalities) {
+    municipiosConNegociosMap.set(loc.municipalities.slug, loc.municipalities.name);
+  }
+});
+const municipiosActivos = Array.from(municipiosConNegociosMap.entries()).map(([slug, name]) => ({ slug, name }));
+
+// Filtros desde los parámetros de URL
+const url = new URL(Astro.request.url);
+const horario = url.searchParams.get('horario') || '';
+const municipioSlug = url.searchParams.get('municipio') || '';
+
+// Aplicar filtros en memoria
+let lista = locales;
+if (horario === '24h') {
+  lista = lista.filter(v => v.hours?.toLowerCase().includes('24'));
+}
+if (municipioSlug) {
+  lista = lista.filter(v => {
+    // Coincidencia directa por slug de municipio
+    const matchDirect = v.municipalities?.slug === municipioSlug.toLowerCase();
+    
+    // Coincidencia por áreas de cobertura (negocios móviles)
+    const areas = v.content?.semantic_data?.areas || [];
+    const matchMobile = areas.some((a: string) => 
+      a.toLowerCase() === municipioSlug.toLowerCase() || 
+      a.toLowerCase() === 'all'
+    );
+    
+    return matchDirect || matchMobile;
+  });
+}
+
+// Obtener nombre del municipio seleccionado si aplica
+const nombreMunicipioSeleccionado = municipioSlug 
+  ? (municipiosConNegociosMap.get(municipioSlug.toLowerCase()) || municipioSlug)
+  : '';
+
+const serviceTitle = getServiceTitlePlural(serviceType);
+
+// SEO dinámico
+const seoData = (() => {
+  if (horario === '24h') return {
+    title: `${serviceTitle} 24 Horas en ${stateDb.name} 2026 | Emergencias`,
+    description: `${serviceTitle} abiertas las 24 horas en ${stateDb.name}. Servicio nocturno a domicilio, teléfonos verificados y ubicación de talleres. Llanta ponchada y reparaciones.`,
+    h1: `${serviceTitle} 24 Horas en ${stateDb.name}`,
+    sub: 'Servicio de emergencia disponible de noche y de madrugada'
+  };
+  if (municipioSlug) return {
+    title: `${serviceTitle} en ${nombreMunicipioSeleccionado}, ${stateDb.name} 2026 | Teléfonos`,
+    description: `Directorio de ${serviceTitle.toLowerCase()} en ${nombreMunicipioSeleccionado}, ${stateDb.name}. Teléfonos, horarios y servicios verificados.`,
+    h1: `${serviceTitle} en ${nombreMunicipioSeleccionado}`,
+    sub: `Servicios de confianza en ${nombreMunicipioSeleccionado}, ${stateDb.name}`
+  };
+  return {
+    title: `${serviceTitle} en ${stateDb.name} 2026 | 24 Horas y a Domicilio`,
+    description: `Directorio completo de ${serviceTitle.toLowerCase()} en ${stateDb.name}. Encuentra profesionales con servicio 24 horas, atención a domicilio, teléfonos y mapa.`,
+    h1: `${serviceTitle} en ${stateDb.name}`,
+    sub: `Directorio verificado con teléfonos, horarios y ubicaciones`
+  };
+})();
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": seoData.h1,
+  "description": seoData.description,
+  "numberOfItems": lista.length,
+  "itemListElement": lista.map((v, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "item": {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": v.name,
+      "telephone": v.phone || v.content?.semantic_data?.phone,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": v.address,
+        "addressLocality": stateDb.name,
+        "addressCountry": "MX"
+      },
+      "openingHours": v.hours?.toLowerCase().includes('24') ? ["Mo-Su 00:00-23:59"] : undefined,
+      "image": v.image
+    }
+  }))
+};
+
+const breadcrumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Servicios', href: '/servicios' },
+  { label: serviceTitle, href: `/servicios/${servicio}` },
+  { label: stateDb.name },
+];
+---
+
+<ServiciosLayout
+  title={seoData.title}
+  description={seoData.description}
+  canonical={Astro.url.toString()}
+  schemaData={schemaData}
+  servicioActive={serviceType}
+>
+  <main class="bg-neutral-950 min-h-screen text-neutral-200">
+    <!-- Hero -->
+    <section class="bg-gradient-to-br from-orange-950/25 via-neutral-950 to-neutral-950 border-b border-orange-500/10 py-12 px-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider mb-5">
+          <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          <span>Directorio verificado · {stateDb.name}</span>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">{seoData.h1}</h1>
+        <p class="text-neutral-400 text-base md:text-lg mb-6 max-w-2xl leading-relaxed">{seoData.sub}</p>
+
+        <!-- Filtros rápidos -->
+        <div class="flex flex-wrap gap-2">
+          <a
+            href="?horario=24h"
+            class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${horario === '24h' ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+          >
+            🕐 Solo 24 horas
+          </a>
+          {municipiosActivos.map(m => (
+            <a
+              href={`?municipio=${m.slug}`}
+              class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${municipioSlug === m.slug ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+            >
+              📍 {m.name}
+            </a>
+          ))}
+          {(horario || municipioSlug) && (
+            <a
+              href={`/servicios/${servicio}/${state}`}
+              class="px-4 py-1.5 bg-neutral-900 border border-red-500/30 text-red-400 rounded-full text-xs font-semibold hover:border-red-500/50 hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
+            >
+              ✕ Limpiar
+            </a>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Breadcrumbs -->
+    <div class="max-w-7xl mx-auto px-4 pt-6">
+      <Breadcrumbs items={breadcrumbs} />
+    </div>
+
+    <!-- Grid de resultados -->
+    <section class="max-w-7xl mx-auto px-4 py-6 pb-12">
+      <div class="mb-5">
+        <p class="text-xs md:text-sm text-neutral-400 font-medium">
+          {lista.length > 0
+            ? `${lista.length} ${lista.length !== 1 ? serviceTitle.toLowerCase() : serviceType} encontrada${lista.length !== 1 ? 's' : ''}`
+            : 'Sin resultados para este filtro'}
+        </p>
+      </div>
+
+      {lista.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {lista.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)).map(loc => {
+            const es24h = loc.hours?.toLowerCase().includes('24');
+            const phones = (loc.content?.semantic_data?.phone || loc.phone || '')
+              .split(/[,\/|y]/)
+              .map((p: string) => p.trim())
+              .filter(Boolean);
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.name + ' ' + (loc.address || ''))}`;
+            const detailUrl = `/servicios/${servicio}/${state}/${loc.municipalities?.slug || 'general'}/${loc.short_name}`;
+            
+            return (
+              <article class={`bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-orange-500/30 transition duration-300 flex flex-col hover:shadow-lg hover:shadow-orange-950/5 relative ${loc.featured ? 'border-orange-500/25 bg-gradient-to-b from-orange-950/10 to-neutral-900/60' : ''}`}>
+                {/* Imagen */}
+                <div class="relative h-40 overflow-hidden bg-neutral-950">
+                  <img
+                    src={loc.image || '/vulcanizadora-placeholder.jpg'}
+                    alt={`${serviceTitle} ${loc.name} en ${stateDb.name}`}
+                    loading="lazy"
+                    class="w-full h-full object-cover transition duration-500 hover:scale-105"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent"></div>
+
+                  {es24h && (
+                    <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-emerald-500/90 text-white text-[10px] font-extrabold tracking-wider px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
+                      <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                      24 HORAS
+                    </div>
+                  )}
+
+                  {loc.featured && (
+                    <div class="absolute top-3 right-3 bg-amber-500 text-neutral-950 text-[10px] font-black tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                      ⭐ Destacado
+                    </div>
+                  )}
+                </div>
+
+                {/* Contenido */}
+                <div class="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h2 class="text-lg font-bold text-white mb-2 leading-snug">
+                      <a href={detailUrl} class="hover:text-orange-500 transition duration-150">{loc.name}</a>
+                    </h2>
+
+                    {loc.address && (
+                      <a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="flex items-start gap-1.5 text-xs text-neutral-400 hover:text-white transition duration-150 mb-2 leading-relaxed">
+                        <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span class="line-clamp-2">{loc.address}</span>
+                      </a>
+                    )}
+
+                    {/* Horario */}
+                    <div class="flex items-center gap-1.5 text-xs text-neutral-400 mb-4">
+                      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" />
+                        <path stroke-linecap="round" d="M12 6v6l4 2" />
+                      </svg>
+                      <span class={es24h ? 'text-emerald-400 font-semibold' : ''}>{loc.hours || 'Consultar horario'}</span>
+                    </div>
+
+                    {/* Teléfonos */}
+                    {phones.length > 0 && (
+                      <div class="flex flex-col gap-1.5 mb-4 border-t border-neutral-800/60 pt-3">
+                        {phones.map((phone: string, idx: number) => (
+                          <a href={`tel:${phone.trim().replace(/\D/g, '')}`} class={`flex items-center gap-1.5 text-xs font-semibold hover:text-white transition duration-150 ${idx === 0 ? 'text-orange-500' : 'text-neutral-300'}`}>
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            {phone.trim()}
+                            {idx > 0 && <span class="text-[9px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Alt</span>}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Especialidades/servicios */}
+                    {loc.specialties && loc.specialties.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 mb-4">
+                        {loc.specialties.slice(0, 4).map((s: string) => (
+                          <span class="text-[10px] bg-orange-500/5 border border-orange-500/15 text-orange-300/90 px-2 py-0.5 rounded font-medium">{s}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CTAs */}
+                  <div class="flex gap-2.5 mt-auto pt-2">
+                    {phones.length > 0 && (
+                      <a
+                        href={`tel:${phones[0].trim().replace(/\D/g, '')}`}
+                        class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold text-xs rounded-lg transition duration-150 active:scale-[0.98]"
+                      >
+                        Llamar
+                      </a>
+                    )}
+                    <a href={detailUrl} class="inline-flex items-center justify-center gap-1 py-2 px-3 bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white font-semibold text-xs rounded-lg transition duration-150">
+                      Ver Ficha
+                    </a>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        /* Estado vacío */
+        <div class="text-center py-12 px-4 max-w-md mx-auto">
+          <div class="text-5xl mb-4">🛠️</div>
+          <h2 class="text-xl font-bold text-white mb-2">Directorio en construcción</h2>
+          <p class="text-sm text-neutral-400 leading-relaxed mb-6">
+            Si conoces profesionales de este ramo en {stateDb.name} que deberían aparecer aquí, 
+            dinos y los agregamos de forma gratuita.
+          </p>
+          <a href="/contact" class="inline-flex items-center justify-center gap-1.5 py-2 px-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold text-xs rounded-lg transition duration-150 active:scale-[0.98]">
+            Sugerir un negocio
+          </a>
+        </div>
+      )}
+    </section>
+
+    <!-- Sección de contenido SEO -->
+    <section class="bg-neutral-900/30 border-t border-neutral-900/60 py-16 px-4">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-2xl font-bold text-orange-500 mb-4">¿Por qué usar el directorio BySMax en {stateDb.name}?</h2>
+        <p class="text-neutral-400 text-base leading-relaxed mb-10 max-w-3xl">
+          En BySMax agrupamos a los mejores prestadores de servicio locales en {stateDb.name} para que tengas acceso a sus datos de contacto de forma inmediata.
+          Verificamos los números telefónicos y horarios para ahorrarte tiempo en situaciones de emergencia.
+        </p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+            <span class="text-3xl block mb-3">🕐</span>
+            <h3 class="text-sm font-bold text-white mb-2">Atención 24h</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">Filtra fácilmente aquellos establecimientos abiertos por la noche.</p>
+          </div>
+          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+            <span class="text-3xl block mb-3">📞</span>
+            <h3 class="text-sm font-bold text-white mb-2">Contacto directo</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">Comunícate por llamada o WhatsApp directamente al taller o técnico.</p>
+          </div>
+          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+            <span class="text-3xl block mb-3">📍</span>
+            <h3 class="text-sm font-bold text-white mb-2">Ubicación</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">Direcciones detalladas y enlaces a Google Maps para rutas rápidas.</p>
+          </div>
+          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+            <span class="text-3xl block mb-3">🏙️</span>
+            <h3 class="text-sm font-bold text-white mb-2">Por municipio</h3>
+            <p class="text-xs text-neutral-400 leading-relaxed">Filtros locales rápidos para tu ciudad o zona de cobertura.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</ServiciosLayout>

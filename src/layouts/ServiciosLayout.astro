@@ -1,6 +1,7 @@
 ---
 import Footer from "../components/Footer.astro";
 import ScrollTopAndComment from "../components/ScrollTopAndComment";
+import { getSlugFromServiceType, getServiceTitlePlural, getServiceEmoji } from "../lib/services";
 
 export interface Props {
   title: string;
@@ -11,6 +12,7 @@ export interface Props {
   categoria?: string; // ej: "Vulcanizadoras"
   estado?: string;    // ej: "Nuevo León"
   schemaData?: any;
+  servicioActive?: string; // ej: "vulcanizadora" | "plomero" etc (type de la BD)
 }
 
 const {
@@ -22,7 +24,13 @@ const {
   categoria = "Servicios",
   estado,
   schemaData,
+  servicioActive,
 } = Astro.props;
+
+const serviceSlug = servicioActive ? getSlugFromServiceType(servicioActive) : '';
+const serviceTitle = servicioActive ? getServiceTitlePlural(servicioActive) : 'Servicios';
+const serviceEmoji = servicioActive ? getServiceEmoji(servicioActive) : '🛠️';
+const logoLink = serviceSlug ? `/servicios/${serviceSlug}` : '/servicios';
 ---
 
 <html lang="es">
@@ -75,16 +83,19 @@ const {
     <!-- Header compacto para servicios -->
     <header class="servicios-header">
       <div class="header-inner">
-        <a href="/servicios/vulcanizadoras" class="logo-link">
-          <div class="logo-icon">🔧</div>
+        <a href={logoLink} class="logo-link">
+          <div class="logo-icon">{serviceEmoji}</div>
           <div>
             <span class="logo-title">BySMax</span>
-            <div class="logo-sub">Servicios Locales</div>
+            <div class="logo-sub">{serviceTitle}</div>
           </div>
         </a>
 
         <nav class="header-nav">
-          <a href="/servicios/vulcanizadoras" class="nav-link">Vulcanizadoras</a>
+          <a href="/servicios" class="nav-link">Servicios</a>
+          {servicioActive && (
+            <a href={`/servicios/${serviceSlug}`} class="nav-link">{serviceTitle}</a>
+          )}
           <a href="/moteles" class="nav-link">Moteles</a>
           <a href="/contact" class="nav-cta">Registrar negocio</a>
         </nav>
@@ -98,7 +109,10 @@ const {
 
       <!-- Mobile menu -->
       <div id="mobileMenu" class="mobile-menu hidden">
-        <a href="/servicios/vulcanizadoras" class="mobile-link">🔧 Vulcanizadoras NL</a>
+        <a href="/servicios" class="mobile-link">🛠️ Todos los Servicios</a>
+        {servicioActive && (
+          <a href={`/servicios/${serviceSlug}`} class="mobile-link">{serviceEmoji} {serviceTitle}</a>
+        )}
         <a href="/moteles" class="mobile-link">🏨 Moteles</a>
         <a href="/contact" class="mobile-link mobile-link-cta">Registrar mi negocio</a>
       </div>
