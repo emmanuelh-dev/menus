@@ -139,7 +139,11 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
       address: place.address || "",
       hours: place.hours || "24 horas",
       amenities: place.amenities || [],
-      specialties: place.specialties || [],
+      specialties: [
+        ...(place.content?.semantic_data?.additional_features || []),
+        ...(place.content?.semantic_data?.specialties || []),
+        ...(place.specialties || [])
+      ].filter((v, i, a) => a.indexOf(v) === i),
       destacado: place.featured
     } as SupabasePlace;
   });
@@ -289,7 +293,11 @@ export async function getRestaurantByName({ name }: { name: string }) {
     address: place.address || "",
     hours: place.hours || "24 horas",
     amenities: place.amenities || [],
-    specialties: place.specialties || [],
+    specialties: [
+      ...(place.content?.semantic_data?.additional_features || []),
+      ...(place.content?.semantic_data?.specialties || []),
+      ...(place.specialties || [])
+    ].filter((v, i, a) => a.indexOf(v) === i),
     destacado: place.featured
   }] as SupabasePlace[];
 }

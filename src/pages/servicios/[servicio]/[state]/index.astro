@@ -49,6 +49,32 @@ const municipiosActivos = Array.from(municipiosConNegociosMap.entries()).map(([s
 const url = new URL(Astro.request.url);
 const horario = url.searchParams.get('horario') || '';
 const municipioSlug = url.searchParams.get('municipio') || '';
+const tag = url.searchParams.get('tag') || '';
+
+// Helper para generar URLs de filtros combinados
+const getFilterUrl = (params: { horario?: string | null; municipio?: string | null; tag?: string | null }) => {
+  const newUrl = new URL(Astro.request.url);
+  
+  if (params.horario !== undefined) {
+    if (params.horario) newUrl.searchParams.set('horario', params.horario);
+    else newUrl.searchParams.delete('horario');
+  }
+  if (params.municipio !== undefined) {
+    if (params.municipio) newUrl.searchParams.set('municipio', params.municipio);
+    else newUrl.searchParams.delete('municipio');
+  }
+  if (params.tag !== undefined) {
+    if (params.tag) newUrl.searchParams.set('tag', params.tag);
+    else newUrl.searchParams.delete('tag');
+  }
+  
+  return newUrl.pathname + newUrl.search;
+};
+
+// Extraer especialidades/tags activas y únicas en este estado
+const especialidadesActivas = Array.from(
+  new Set(locales.flatMap(loc => loc.specialties || []))
+).filter(Boolean);
 
 // Aplicar filtros en memoria
 let lista = locales;
@@ -70,6 +96,9 @@ if (municipioSlug) {
     return matchDirect || matchMobile;
   });
 }
+if (tag) {
+  lista = lista.filter(v => v.specialties?.some((s: string) => s.toLowerCase() === tag.toLowerCase()));
+}
 
 // Obtener nombre del municipio seleccionado si aplica
 const nombreMunicipioSeleccionado = municipioSlug 
@@ -80,6 +109,12 @@ const serviceTitle = getServiceTitlePlural(serviceType);
 
 // SEO dinámico
 const seoData = (() => {
+  if (tag) return {
+    title: `${serviceTitle} con ${tag} en ${stateDb.name} 2026 | Servicios`,
+    description: `Encuentra ${serviceTitle.toLowerCase()} con especialidad en ${tag} en ${stateDb.name}. Teléfonos, horarios y ubicación de talleres.`,
+    h1: `${serviceTitle} con ${tag} en ${stateDb.name}`,
+    sub: `Servicios especializados en ${tag} en el estado de ${stateDb.name}`
+  };
   if (horario === '24h') return {
     title: `${serviceTitle} 24 Horas en ${stateDb.name} 2026 | Emergencias`,
     description: `${serviceTitle} abiertas las 24 horas en ${stateDb.name}. Servicio nocturno a domicilio, teléfonos verificados y ubicación de talleres. Llanta ponchada y reparaciones.`,
@@ -155,20 +190,20 @@ const breadcrumbs = [
         <!-- Filtros rápidos -->
         <div class="flex flex-wrap gap-2">
           <a
-            href="?horario=24h"
+            href={getFilterUrl({ horario: horario === '24h' ? null : '24h' })}
             class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${horario === '24h' ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
           >
             🕐 Solo 24 horas
           </a>
           {municipiosActivos.map(m => (
             <a
-              href={`?municipio=${m.slug}`}
+              href={getFilterUrl({ municipio: municipioSlug === m.slug ? null : m.slug })}
               class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${municipioSlug === m.slug ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
             >
               📍 {m.name}
             </a>
           ))}
-          {(horario || municipioSlug) && (
+          {(horario || municipioSlug || tag) && (
             <a
               href={`/servicios/${servicio}/${state}`}
               class="px-4 py-1.5 bg-neutral-900 border border-red-500/30 text-red-400 rounded-full text-xs font-semibold hover:border-red-500/50 hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
@@ -177,6 +212,24 @@ const breadcrumbs = [
             </a>
           )}
         </div>
+
+        {/* Especialidades */}
+        {especialidadesActivas.length > 0 && (
+          <div class="mt-4 flex flex-wrap gap-2 items-center">
+            <span class="text-xs text-neutral-450 font-medium mr-1 select-none">Especialidades:</span>
+            {especialidadesActivas.map(s => {
+              const isSelected = tag.toLowerCase() === s.toLowerCase();
+              return (
+                <a
+                  href={getFilterUrl({ tag: isSelected ? null : s })}
+                  class={`px-3.5 py-1 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-[11px] font-semibold hover:border-orange-500/40 hover:text-orange-450 transition cursor-pointer ${isSelected ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+                >
+                  🛠️ {s}
+                </a>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
 
@@ -319,6 +372,39 @@ const breadcrumbs = [
         </div>
       )}
     </section>
+
+    <!-- Índice por Localidad -->
+    {municipiosActivos.length > 0 && (
+      <section class="max-w-7xl mx-auto px-4 py-8 border-t border-neutral-900/60 mt-4 mb-8">
+        <h2 class="text-xl font-bold text-white mb-2">🔎 Índice por Localidad en {stateDb.name}</h2>
+        <p class="text-sm text-neutral-400 mb-6">Encuentra {serviceTitle.toLowerCase()} disponibles por municipio en {stateDb.name}:</p>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {municipiosActivos.map(m => {
+            const count = locales.filter(v => {
+              const matchDirect = v.municipalities?.slug === m.slug;
+              const areas = v.content?.semantic_data?.areas || [];
+              const matchMobile = areas.some((a: string) => a.toLowerCase() === m.slug || a.toLowerCase() === 'all');
+              return matchDirect || matchMobile;
+            }).length;
+            
+            const isSelected = municipioSlug === m.slug;
+            
+            return (
+              <a
+                href={getFilterUrl({ municipio: isSelected ? null : m.slug })}
+                class={`p-3 bg-neutral-900/40 border rounded-xl hover:border-orange-500/30 transition duration-200 text-center flex flex-col justify-center items-center gap-1 group ${isSelected ? 'border-orange-500 bg-orange-500/5 text-orange-400 font-bold' : 'border-neutral-800/80 text-neutral-300'}`}
+              >
+                <span class="text-xs font-semibold group-hover:text-orange-400 transition">{m.name}</span>
+                <span class="text-[10px] text-neutral-500 font-medium">
+                  {count} {count === 1 ? 'negocio' : 'negocios'}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    )}
 
     <!-- Sección de contenido SEO -->
     <section class="bg-neutral-900/30 border-t border-neutral-900/60 py-16 px-4">
