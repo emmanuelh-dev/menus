@@ -61,13 +61,41 @@ let placeTitle = '';
 let placeMetaDescription = '';
 let placeSchemaData: any = null;
 let placeBreadcrumbs: any[] = [];
+let baseMuniCount = 0;
+let matchedAreas: any[] = [];
+
+// Filtros desde los parámetros de URL
+const url = new URL(Astro.request.url);
+const horario = url.searchParams.get('horario') || '';
+const tag = url.searchParams.get('tag') || '';
+
+// Helper para generar URLs de filtros combinados
+const getFilterUrl = (params: { horario?: string | null; municipio?: string | null; tag?: string | null }) => {
+  const nextHorario = params.horario !== undefined ? params.horario : (horario || null);
+  const nextTag = params.tag !== undefined ? params.tag : (tag || null);
+  const nextMunicipio = params.municipio !== undefined ? params.municipio : (municipalityDb ? municipalityDb.slug : null);
+
+  let basePath = `/servicios/${servicio}/${state}`;
+  if (nextMunicipio) {
+    basePath += `/${nextMunicipio.toLowerCase()}`;
+  }
+
+  const searchParams = new URLSearchParams();
+  if (nextHorario) searchParams.set('horario', nextHorario);
+  if (nextTag) searchParams.set('tag', nextTag);
+
+  const searchStr = searchParams.toString();
+  return basePath + (searchStr ? `?${searchStr}` : '');
+};
+
+let especialidadesActivas: string[] = [];
 
 if (isMunicipality && municipalityDb) {
   // Cargar todos los locales de este servicio en el estado
   const locales = await getRestaurants({ type: serviceType, state_id: stateDb.id });
   
-  // Filtrar: coincidencia directa de municipio O negocios móviles con cobertura en el municipio
-  lista = locales.filter(v => {
+  // Filtrar por municipio primero
+  let filtrados = locales.filter(v => {
     const matchDirect = v.municipality_id === municipalityDb.id;
     
     const areas = v.content?.semantic_data?.areas || [];
@@ -79,6 +107,21 @@ if (isMunicipality && municipalityDb) {
     
     return matchDirect || matchMobile;
   });
+
+  // Extraer especialidades únicas de esta localidad
+  especialidadesActivas = Array.from(
+    new Set(filtrados.flatMap(loc => loc.specialties || []))
+  ).filter(Boolean);
+
+  // Aplicar filtros en memoria
+  if (horario === '24h') {
+    filtrados = filtrados.filter(v => v.hours?.toLowerCase().includes('24'));
+  }
+  if (tag) {
+    filtrados = filtrados.filter(v => v.specialties?.some((s: string) => s.toLowerCase() === tag.toLowerCase()));
+  }
+
+  lista = filtrados;
 } else {
   // No es un municipio. Podría ser un negocio individual
   const results = await getRestaurantByName({ name: slug });
@@ -142,6 +185,54 @@ if (isMunicipality && municipalityDb) {
         { label: placeStateName, href: `/servicios/${servicio}/${state}` },
         { label: place.name },
       ];
+
+      // Cargar municipios y locales de este servicio en el estado para calcular los conteos locales
+      const locales = await getRestaurants({ type: serviceType, state_id: stateDb.id });
+      const { data: municipalitiesDb } = await supabase
+        .from('municipalities')
+        .select('*')
+        .eq('state_id', stateDb.id);
+
+      baseMuniCount = 0; // Sin municipio base asignado
+
+      matchedAreas = (placeSemantic.areas || []).map((areaStr: string) => {
+        if (areaStr.toLowerCase() === 'all') {
+          return {
+            name: 'Todo el estado',
+            slug: '',
+            count: locales.length,
+            isAll: true
+          };
+        }
+        const mDb = municipalitiesDb?.find(m => 
+          m.slug.toLowerCase() === areaStr.toLowerCase() ||
+          m.name.toLowerCase() === areaStr.toLowerCase()
+        );
+        if (mDb) {
+          const count = locales.filter(v => {
+            const matchDirect = v.municipality_id === mDb.id;
+            const areas = v.content?.semantic_data?.areas || [];
+            const matchMobile = areas.some((a: string) => 
+              a.toLowerCase() === mDb.slug || 
+              a.toLowerCase() === mDb.name.toLowerCase() ||
+              a.toLowerCase() === 'all'
+            );
+            return matchDirect || matchMobile;
+          }).length;
+          return {
+            name: mDb.name,
+            slug: mDb.slug,
+            count: count,
+            isAll: false
+          };
+        }
+        return {
+          name: areaStr.split('-').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+          slug: areaStr.toLowerCase(),
+          count: 0,
+          isAll: false
+        };
+      });
     }
   }
 }
@@ -161,13 +252,37 @@ const serviceTitle = getServiceTitlePlural(serviceType);
 const serviceNameSingular = serviceType;
 
 // SEO de la Landing de Municipio
-const seoTitle = municipalityDb 
-  ? `${serviceTitle} en ${municipalityDb.name}, ${stateDb.name} 2026 | Servicio Local`
-  : 'Página no encontrada | BySMax';
+const seoData = (() => {
+  if (!municipalityDb) return {
+    title: 'Página no encontrada | BySMax',
+    description: 'El servicio o localidad solicitada no se encuentra disponible.',
+    h1: 'Página no encontrada',
+    sub: ''
+  };
 
-const seoDescription = municipalityDb
-  ? `Directorio verificado de ${serviceTitle.toLowerCase()} en ${municipalityDb.name}, ${stateDb.name}. Teléfonos directos, whatsapp y atención a domicilio las 24 horas.`
-  : 'El servicio o localidad solicitada no se encuentra disponible.';
+  const munName = municipalityDb.name;
+  if (tag) return {
+    title: `${serviceTitle} con ${tag} en ${munName}, ${stateDb.name} 2026 | Servicios`,
+    description: `Encuentra ${serviceTitle.toLowerCase()} con especialidad en ${tag} en ${munName}, ${stateDb.name}. Teléfonos, horarios y ubicación de talleres.`,
+    h1: `${serviceTitle} con ${tag} en ${munName}`,
+    sub: `Servicios especializados en ${tag} en la zona de ${munName}, ${stateDb.name}`
+  };
+  if (horario === '24h') return {
+    title: `${serviceTitle} 24 Horas en ${munName}, ${stateDb.name} 2026 | Emergencias`,
+    description: `${serviceTitle} abiertas las 24 horas en ${munName}, ${stateDb.name}. Servicio nocturno a domicilio, teléfonos verificados y ubicación de talleres.`,
+    h1: `${serviceTitle} 24 Horas en ${munName}`,
+    sub: `Servicio de emergencia disponible de noche y de madrugada en ${munName}`
+  };
+  return {
+    title: `${serviceTitle} en ${munName}, ${stateDb.name} 2026 | Teléfonos`,
+    description: `Directorio de ${serviceTitle.toLowerCase()} en ${munName}, ${stateDb.name}. Teléfonos, horarios y servicios verificados.`,
+    h1: `${serviceTitle} en ${munName}`,
+    sub: `Servicios de confianza en ${munName}, ${stateDb.name}`
+  };
+})();
+
+const seoTitle = seoData.title;
+const seoDescription = seoData.description;
 
 const breadcrumbs = municipalityDb ? [
   { label: 'Inicio', href: '/' },
@@ -220,17 +335,50 @@ const schemaData = municipalityDb ? {
             <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
             <span>Ubicación: {municipalityDb.name} · {stateDb.name}</span>
           </div>
-          <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">{serviceTitle} en {municipalityDb.name}</h1>
-          <p class="text-neutral-400 text-base md:text-lg mb-5 max-w-2xl leading-relaxed">
-            Encuentra técnicos locales y negocios de {serviceTitle.toLowerCase()} en {municipalityDb.name} con servicio a domicilio y atención de emergencias.
-          </p>
+          <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">{seoData.h1}</h1>
+          <p class="text-neutral-400 text-base md:text-lg mb-6 max-w-2xl leading-relaxed">{seoData.sub}</p>
 
-          <!-- Back button -->
-          <div class="mt-4">
-            <a href={`/servicios/${servicio}/${state}`} class="text-orange-500 hover:text-orange-400 text-sm font-semibold transition">
-              ← Ver todo {stateDb.name}
+          <!-- Filtros rápidos -->
+          <div class="flex flex-wrap gap-2">
+            <a
+              href={getFilterUrl({ horario: horario === '24h' ? null : '24h' })}
+              class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${horario === '24h' ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+            >
+              🕐 Solo 24 horas
             </a>
+            <a
+              href={getFilterUrl({ municipio: null })}
+              class="px-4 py-1.5 bg-orange-500/15 border border-orange-500/40 text-orange-400 rounded-full text-xs font-bold hover:border-orange-500/60 hover:text-orange-350 transition cursor-pointer flex items-center gap-1"
+            >
+              📍 {municipalityDb.name} <span class="text-[10px] text-orange-500/70 font-normal">✕</span>
+            </a>
+            {(horario || tag) && (
+              <a
+                href={getFilterUrl({ horario: null, tag: null })}
+                class="px-4 py-1.5 bg-neutral-900 border border-red-500/30 text-red-400 rounded-full text-xs font-semibold hover:border-red-500/50 hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
+              >
+                ✕ Limpiar filtros
+              </a>
+            )}
           </div>
+
+          {/* Especialidades */}
+          {especialidadesActivas.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-2 items-center">
+              <span class="text-xs text-neutral-450 font-medium mr-1 select-none">Especialidades:</span>
+              {especialidadesActivas.map(s => {
+                const isSelected = tag.toLowerCase() === s.toLowerCase();
+                return (
+                  <a
+                    href={getFilterUrl({ tag: isSelected ? null : s })}
+                    class={`px-3.5 py-1 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-[11px] font-semibold hover:border-orange-500/40 hover:text-orange-450 transition cursor-pointer ${isSelected ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+                  >
+                    🛠️ {s}
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -259,7 +407,6 @@ const schemaData = municipalityDb ? {
                 .filter(Boolean);
               const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.name + ' ' + (loc.address || ''))}`;
               const detailUrl = `/servicios/${servicio}/${state}/${municipalityDb.slug}/${loc.short_name}`;
-              const esMovil = loc.content?.semantic_data?.areas?.length > 0 && loc.municipality_id !== municipalityDb.id;
 
               return (
                 <article class={`bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-orange-500/30 transition duration-300 flex flex-col hover:shadow-lg hover:shadow-orange-950/5 relative ${loc.featured ? 'border-orange-500/25 bg-gradient-to-b from-orange-950/10 to-neutral-900/60' : ''}`}>
@@ -279,12 +426,6 @@ const schemaData = municipalityDb ? {
                       </div>
                     )}
 
-                    {esMovil && (
-                      <div class="absolute bottom-3 left-3 bg-orange-500/90 text-white text-[10px] font-extrabold tracking-wider px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
-                        🚚 Móvil / Domicilio
-                      </div>
-                    )}
-
                     {loc.featured && (
                       <div class="absolute top-3 right-3 bg-amber-500 text-neutral-950 text-[10px] font-black tracking-wider px-2.5 py-1 rounded-full shadow-sm">
                         ⭐ Destacado
@@ -294,6 +435,32 @@ const schemaData = municipalityDb ? {
 
                   <div class="p-5 flex-1 flex flex-col justify-between">
                     <div>
+                      {/* Badges de Localización/Tipo de Servicio */}
+                      <div class="flex flex-wrap gap-1.5 mb-2.5">
+                        {loc.municipalities && (
+                          <span class="text-[10px] bg-neutral-805 border border-neutral-800 text-neutral-300 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
+                            📍 {loc.municipalities.name}
+                          </span>
+                        )}
+                        {(() => {
+                          const areas = loc.content?.semantic_data?.areas || [];
+                          const isMobile = (loc.content?.semantic_data as any)?.is_mobile || (Array.isArray(areas) && areas.length > 0);
+                          if (isMobile) {
+                            const areaNames = areas.length === 1 && areas[0] === 'all' 
+                              ? 'Todo el estado' 
+                              : areas.map((a: string) => {
+                                  return a.split('-').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                                }).join(', ');
+                            return (
+                              <span class="text-[10px] bg-amber-500/10 border border-amber-500/25 text-amber-400 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
+                                🚚 Móvil {areaNames ? `(${areaNames})` : ''}
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+
                       <h2 class="text-lg font-bold text-white mb-2 leading-snug">
                         <a href={detailUrl} class="hover:text-orange-500 transition duration-150">{loc.name}</a>
                       </h2>
@@ -510,15 +677,31 @@ const schemaData = municipalityDb ? {
             </div>
 
             <!-- Cobertura Geográfica -->
-            {placeSemantic.areas && placeSemantic.areas.length > 0 && (
+            {matchedAreas && matchedAreas.length > 0 && (
               <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
                 <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">🚚 Zona de Cobertura</h2>
                 <div class="space-y-3">
-                  <p class="text-xs text-neutral-400">Este profesional ofrece servicio móvil a domicilio en las siguientes áreas:</p>
-                  <div class="flex flex-wrap gap-2">
-                    {placeSemantic.areas.map((area: string) => (
-                      <span class="text-xs bg-neutral-950/80 border border-neutral-800 text-orange-300 px-3 py-1.5 rounded-md font-medium">📍 {area}</span>
-                    ))}
+                  <p class="text-xs text-neutral-400">Este profesional ofrece servicio móvil a domicilio en las siguientes localidades (haz clic para ver todas las opciones):</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {matchedAreas.map((area: any) => {
+                      const href = area.isAll 
+                        ? `/servicios/${servicio}/${state}` 
+                        : `/servicios/${servicio}/${state}/${area.slug}`;
+                      return (
+                        <a 
+                          href={href}
+                          class="flex items-center justify-between p-2.5 rounded-lg bg-neutral-950/40 hover:bg-orange-500/5 border border-neutral-800 hover:border-orange-500/30 transition duration-200 group"
+                        >
+                          <div class="flex items-center gap-2">
+                            <span class="text-neutral-400 group-hover:text-orange-400 transition-colors">📍</span>
+                            <span class="text-xs font-semibold text-neutral-300 group-hover:text-neutral-100 transition-colors">{area.name}</span>
+                          </div>
+                          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 group-hover:border-orange-500/20 text-orange-400/90 group-hover:text-orange-400 transition-colors shrink-0">
+                            {area.count} {area.count === 1 ? 'negocio' : 'negocios'}
+                          </span>
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -573,9 +756,18 @@ const schemaData = municipalityDb ? {
               </div>
             )}
 
-            <a href={`/servicios/${servicio}/${state}`} class="block w-full py-3 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 font-bold text-xs rounded-xl transition duration-150 text-center uppercase tracking-wider">
-              ← Volver a {placeStateName}
-            </a>
+            {place.municipalities ? (
+              <a 
+                href={`/servicios/${servicio}/${state}/${place.municipalities.slug}`} 
+                class="block w-full py-3 bg-gradient-to-r from-neutral-900 to-neutral-900 hover:from-orange-950/20 hover:to-neutral-900 border border-neutral-800 hover:border-orange-500/30 text-neutral-400 hover:text-orange-400 font-bold text-xs rounded-xl transition duration-250 text-center uppercase tracking-wider active:scale-[0.98]"
+              >
+                ← Ver {baseMuniCount} {baseMuniCount === 1 ? 'vulka' : 'vulkas'} en {place.municipalities.name}
+              </a>
+            ) : (
+              <a href={`/servicios/${servicio}/${state}`} class="block w-full py-3 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 font-bold text-xs rounded-xl transition duration-150 text-center uppercase tracking-wider">
+                ← Volver a {placeStateName}
+              </a>
+            )}
 
             <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5 border-dashed border-orange-500/20">
               <p class="text-sm font-bold text-white mb-1.5">¿Eres el dueño del negocio?</p>

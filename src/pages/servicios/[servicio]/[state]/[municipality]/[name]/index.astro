@@ -8,7 +8,7 @@ Astro.response.headers.set(
 
 import ServiciosLayout from "../../../../../../layouts/ServiciosLayout.astro";
 import Breadcrumbs from "../../../../../../components/Breadcrumbs.astro";
-import { getRestaurantByName } from "../../../../../../lib/supabase";
+import { getRestaurantByName, getRestaurants, supabase } from "../../../../../../lib/supabase";
 import { getServiceTypeFromSlug, getServiceTitlePlural } from "../../../../../../lib/services";
 
 const { servicio, state, municipality, name } = Astro.params;
@@ -60,6 +60,64 @@ const stateName = place.states?.name || 'Nuevo León';
 const municipalityName = place.municipalities?.name || 'General';
 
 const serviceTitle = getServiceTitlePlural(serviceType);
+
+// Cargar locales del estado y todos los municipios del estado para calcular los conteos locales
+const locales = await getRestaurants({ type: serviceType, state_id: place.states?.id || place.state_id });
+const { data: municipalitiesDb } = await supabase
+  .from('municipalities')
+  .select('*')
+  .eq('state_id', place.states?.id || place.state_id);
+
+const placeMuni = place.municipalities;
+const baseMuniCount = placeMuni ? locales.filter((v: any) => {
+  const matchDirect = v.municipality_id === placeMuni.id;
+  const areas = v.content?.semantic_data?.areas || [];
+  const matchMobile = areas.some((a: string) => 
+    a.toLowerCase() === placeMuni.slug || 
+    a.toLowerCase() === placeMuni.name.toLowerCase() ||
+    a.toLowerCase() === 'all'
+  );
+  return matchDirect || matchMobile;
+}).length : 0;
+
+const matchedAreas = (semantic.areas || []).map((areaStr: string) => {
+  if (areaStr.toLowerCase() === 'all') {
+    return {
+      name: 'Todo el estado',
+      slug: '',
+      count: locales.length,
+      isAll: true
+    };
+  }
+  const mDb = municipalitiesDb?.find(m => 
+    m.slug.toLowerCase() === areaStr.toLowerCase() ||
+    m.name.toLowerCase() === areaStr.toLowerCase()
+  );
+  if (mDb) {
+    const count = locales.filter((v: any) => {
+      const matchDirect = v.municipality_id === mDb.id;
+      const areas = v.content?.semantic_data?.areas || [];
+      const matchMobile = areas.some((a: string) => 
+        a.toLowerCase() === mDb.slug || 
+        a.toLowerCase() === mDb.name.toLowerCase() ||
+        a.toLowerCase() === 'all'
+      );
+      return matchDirect || matchMobile;
+    }).length;
+    return {
+      name: mDb.name,
+      slug: mDb.slug,
+      count: count,
+      isAll: false
+    };
+  }
+  return {
+    name: areaStr.split('-').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+    slug: areaStr.toLowerCase(),
+    count: 0,
+    isAll: false
+  };
+});
 
 // SEO optimizado
 const title = `${place.name} en ${municipalityName}, ${stateName} | Teléfono ${es24h ? '· Servicio 24h' : ''}`;
@@ -247,15 +305,31 @@ const breadcrumbs = [
           </div>
 
           <!-- Cobertura Geográfica -->
-          {semantic.areas && semantic.areas.length > 0 && (
+          {matchedAreas && matchedAreas.length > 0 && (
             <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5">
               <h2 class="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider mb-4 border-b border-neutral-800 pb-2">🚚 Zona de Cobertura</h2>
               <div class="space-y-3">
-                <p class="text-xs text-neutral-400">Este profesional ofrece servicio móvil a domicilio en las siguientes áreas:</p>
-                <div class="flex flex-wrap gap-2">
-                  {semantic.areas.map((area: string) => (
-                    <span class="text-xs bg-neutral-950/80 border border-neutral-800 text-orange-300 px-3 py-1.5 rounded-md font-medium">📍 {area}</span>
-                  ))}
+                <p class="text-xs text-neutral-400">Este profesional ofrece servicio móvil a domicilio en las siguientes localidades (haz clic para ver todas las opciones):</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {matchedAreas.map((area: any) => {
+                    const href = area.isAll 
+                      ? `/servicios/${servicio}/${state}` 
+                      : `/servicios/${servicio}/${state}/${area.slug}`;
+                    return (
+                      <a 
+                        href={href}
+                        class="flex items-center justify-between p-2.5 rounded-lg bg-neutral-950/40 hover:bg-orange-500/5 border border-neutral-800 hover:border-orange-500/30 transition duration-200 group"
+                      >
+                        <div class="flex items-center gap-2">
+                          <span class="text-neutral-400 group-hover:text-orange-400 transition-colors">📍</span>
+                          <span class="text-xs font-semibold text-neutral-300 group-hover:text-neutral-100 transition-colors">{area.name}</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 group-hover:border-orange-500/20 text-orange-400/90 group-hover:text-orange-400 transition-colors shrink-0">
+                          {area.count} {area.count === 1 ? 'negocio' : 'negocios'}
+                        </span>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -308,8 +382,11 @@ const breadcrumbs = [
             ></iframe>
           </div>
 
-          <a href={`/servicios/${servicio}/${state}/${municipality}`} class="block w-full py-3 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 font-bold text-xs rounded-xl transition duration-150 text-center uppercase tracking-wider">
-            ← Volver a {municipalityName}
+          <a 
+            href={`/servicios/${servicio}/${state}/${municipality}`} 
+            class="block w-full py-3 bg-gradient-to-r from-neutral-900 to-neutral-900 hover:from-orange-950/20 hover:to-neutral-900 border border-neutral-800 hover:border-orange-500/30 text-neutral-400 hover:text-orange-400 font-bold text-xs rounded-xl transition duration-250 text-center uppercase tracking-wider active:scale-[0.98]"
+          >
+            ← Ver {baseMuniCount} {baseMuniCount === 1 ? 'vulka' : 'vulkas'} en {municipalityName}
           </a>
 
           <div class="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5 border-dashed border-orange-500/20">
