@@ -27,8 +27,20 @@ const results = await getRestaurantByName({ name });
 const place = results[0];
 
 // Validar que el negocio exista y sea del tipo de servicio adecuado
-if (!place || place.type !== serviceType) {
+const dbType = serviceType === 'vulka_movil' ? 'vulcanizadora' : serviceType;
+if (!place || place.type !== dbType) {
   return Astro.redirect(`/servicios/${servicio}/${state}`);
+}
+
+// Redirección canónica si la ruta del municipio no coincide con la del negocio
+const correctMuniSlug = place.municipalities?.slug;
+if (correctMuniSlug) {
+  if (municipality.toLowerCase() !== correctMuniSlug.toLowerCase()) {
+    return Astro.redirect(`/servicios/${servicio}/${state}/${correctMuniSlug}/${name}`, 301);
+  }
+} else {
+  // El negocio no tiene municipio asignado, debe ir sin municipio en la URL
+  return Astro.redirect(`/servicios/${servicio}/${state}/${name}`, 301);
 }
 
 const semantic = place.content?.semantic_data || {};

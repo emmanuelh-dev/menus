@@ -4,6 +4,7 @@
  */
 export const SERVICES_MAP: Record<string, string> = {
   'vulcanizadoras': 'vulcanizadora',
+  'vulka-movil': 'vulka_movil',
   'plomeros': 'plomero',
   'electricistas': 'electricista',
   'cerrajeros': 'cerrajero',
@@ -40,6 +41,7 @@ export function getServiceTitle(type: string): string {
   if (!type) return '';
   const titles: Record<string, string> = {
     'vulcanizadora': 'Vulcanizadora',
+    'vulka_movil': 'Vulcanizadora Móvil',
     'plomero': 'Plomero',
     'electricista': 'Electricista',
     'cerrajero': 'Cerrajero',
@@ -58,6 +60,7 @@ export function getServiceTitlePlural(type: string): string {
   if (!type) return '';
   const titlesPlural: Record<string, string> = {
     'vulcanizadora': 'Vulcanizadoras',
+    'vulka_movil': 'Vulcanizadoras Móviles',
     'plomero': 'Plomeros',
     'electricista': 'Electricistas',
     'cerrajero': 'Cerrajeros',
@@ -82,6 +85,7 @@ export function getServiceTitlePlural(type: string): string {
 export function getServiceEmoji(type: string): string {
   const emojis: Record<string, string> = {
     'vulcanizadora': '🔧',
+    'vulka_movil': '🚚',
     'plomero': '🪠',
     'electricista': '⚡',
     'cerrajero': '🔑',

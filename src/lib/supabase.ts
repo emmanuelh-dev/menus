@@ -71,8 +71,11 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
     .from('places')
     .select('*, states(*), municipalities(*)')
 
-  if (type){
-    query = query.eq('type', type);
+  const isVulkaMovil = type === 'vulka_movil';
+  const dbType = isVulkaMovil ? 'vulcanizadora' : type;
+
+  if (dbType){
+    query = query.eq('type', dbType);
   }
 
   if (state_id) {
@@ -88,8 +91,19 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
   // Si no hay lugares, retornamos vacío pronto
   if (!data || data.length === 0) return [];
 
+  // Filtrar en memoria por móvil si es vulka_movil
+  let filteredData = data;
+  if (isVulkaMovil) {
+    filteredData = data.filter((p: any) => {
+      const areas = p.content?.semantic_data?.areas || [];
+      return Array.isArray(areas) && areas.length > 0;
+    });
+  }
+
+  if (filteredData.length === 0) return [];
+
   // Obtenemos los ratings para los lugares encontrados en una sola consulta
-  const placeIds = data.map(p => p.id);
+  const placeIds = filteredData.map(p => p.id);
   const { data: reviewsData } = await supabase
     .from('reviews')
     .select('place_id, rate')
@@ -114,7 +128,7 @@ export async function getRestaurants({type, state_id}: {type: string | null, sta
     });
   }
 
-  return (data as any[]).map(place => {
+  return (filteredData as any[]).map(place => {
     const stats = statsMap[place.id];
     return {
       ...place,

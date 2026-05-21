@@ -27,14 +27,24 @@ if (!serviceType) {
 const serviceTitle = getServiceTitlePlural(serviceType);
 const serviceEmoji = getServiceEmoji(serviceType);
 
+const dbType = serviceType === 'vulka_movil' ? 'vulcanizadora' : serviceType;
+
 // Consultamos los lugares del servicio para extraer los estados activos dinámicamente
-const { data: places, error } = await supabase
+const { data: placesData, error } = await supabase
   .from('places')
-  .select('id, state_id, states(*), municipalities(*)')
-  .eq('type', serviceType);
+  .select('id, state_id, states(*), municipalities(*), content')
+  .eq('type', dbType);
 
 if (error) {
   console.error(`Error al consultar lugares para el servicio ${serviceType}:`, error);
+}
+
+let places = placesData;
+if (serviceType === 'vulka_movil' && places) {
+  places = places.filter((p: any) => {
+    const areas = p.content?.semantic_data?.areas || [];
+    return Array.isArray(areas) && areas.length > 0;
+  });
 }
 
 // Agrupar estados y obtener municipios con negocios registrados de este tipo
