@@ -62,7 +62,8 @@ const {
 					<Fragment set:html={subtitle} />
 				) : (
 					<>
-						Recibe pedidos y atiende a tus clientes por WhatsApp más rápido y{" "}
+						Recibe pedidos y atiende a tus clientes por WhatsApp más
+						rápido y{" "}
 						<span class="text-slate-900 border-b-2 border-emerald-400">
 							sin pagar comisiones
 						</span>
@@ -80,6 +81,15 @@ const {
 				class="group inline-flex items-center px-10 py-5 bg-slate-900 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-slate-200 uppercase tracking-widest text-xs active:scale-95"
 			>
 				Inicia gratis
+				<ArrowRight
+					className="ml-3 h-4 w-4 group-hover:translate-x-1 transition-transform"
+				/>
+			</a>
+			<a
+				href="/servicios"
+				class="group inline-flex items-center px-10 py-5 bg-green-500 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-slate-200 uppercase tracking-widest text-xs active:scale-95"
+			>
+				Directorio de servicios
 				<ArrowRight
 					className="ml-3 h-4 w-4 group-hover:translate-x-1 transition-transform"
 				/>
@@ -125,7 +135,9 @@ const {
 								</p>
 							</div>
 						</div>
-						<div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+						<div
+							class="h-2 w-full bg-slate-100 rounded-full overflow-hidden"
+						>
 							<div class="h-full bg-emerald-500 w-3/4"></div>
 						</div>
 					</div>
