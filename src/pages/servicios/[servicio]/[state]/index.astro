@@ -218,9 +218,9 @@ const breadcrumbs = [
 >
   <main class="bg-neutral-950 min-h-screen text-neutral-200">
     <!-- Hero -->
-    <section class="bg-gradient-to-br from-orange-950/25 via-neutral-950 to-neutral-950 border-b border-orange-500/10 py-12 px-4">
+    <section class="bg-gradient-to-br from-orange-950/25 via-neutral-950 to-neutral-950 py-12 px-4">
       <div class="max-w-4xl mx-auto">
-        <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider mb-5">
+        <div class="inline-flex items-center gap-2 bg-orange-500/10 text-orange-400 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider mb-5">
           <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
           <span>Directorio verificado · {stateDb.name}</span>
         </div>
@@ -231,14 +231,14 @@ const breadcrumbs = [
         <div class="flex flex-wrap gap-2">
           <a
             href={getFilterUrl({ horario: horario === '24h' ? null : '24h' })}
-            class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${horario === '24h' ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+            class={`px-4 py-1.5 bg-neutral-900 text-neutral-400 rounded-full text-xs font-semibold hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${horario === '24h' ? 'bg-orange-500/10 text-orange-400 font-bold' : ''}`}
           >
             🕐 Solo 24 horas
           </a>
           {municipiosActivos.map(m => (
             <a
               href={getFilterUrl({ municipio: municipioSlug === m.slug ? null : m.slug })}
-              class={`px-4 py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-xs font-semibold hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${municipioSlug === m.slug ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+              class={`px-4 py-1.5 bg-neutral-900 text-neutral-400 rounded-full text-xs font-semibold hover:text-orange-400 hover:bg-orange-500/5 transition cursor-pointer ${municipioSlug === m.slug ? 'bg-orange-500/10 text-orange-400 font-bold' : ''}`}
             >
               📍 {m.name}
             </a>
@@ -246,7 +246,7 @@ const breadcrumbs = [
           {(horario || municipioSlug || tag) && (
             <a
               href={`/servicios/${servicio}/${state}`}
-              class="px-4 py-1.5 bg-neutral-900 border border-red-500/30 text-red-400 rounded-full text-xs font-semibold hover:border-red-500/50 hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
+              class="px-4 py-1.5 bg-neutral-900 text-red-400 rounded-full text-xs font-semibold hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
             >
               ✕ Limpiar
             </a>
@@ -262,7 +262,7 @@ const breadcrumbs = [
               return (
                 <a
                   href={getFilterUrl({ tag: isSelected ? null : s })}
-                  class={`px-3.5 py-1 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-full text-[11px] font-semibold hover:border-orange-500/40 hover:text-orange-450 transition cursor-pointer ${isSelected ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 font-bold' : ''}`}
+                  class={`px-3.5 py-1 bg-neutral-900 text-neutral-400 rounded-full text-[11px] font-semibold hover:text-orange-450 transition cursor-pointer ${isSelected ? 'bg-orange-500/10 text-orange-400 font-bold' : ''}`}
                 >
                   🛠️ {s}
                 </a>
@@ -302,7 +302,7 @@ const breadcrumbs = [
               : `/servicios/${servicio}/${state}/${loc.short_name}`;
             
             return (
-              <article class={`bg-neutral-900/60 border border-neutral-800/80 rounded-2xl overflow-hidden hover:border-orange-500/30 transition duration-300 flex flex-col hover:shadow-lg hover:shadow-orange-950/5 relative ${loc.featured ? 'border-orange-500/25 bg-gradient-to-b from-orange-950/10 to-neutral-900/60' : ''}`}>
+              <article class={`bg-neutral-900/60 rounded-2xl overflow-hidden transition duration-300 flex flex-col hover:shadow-lg hover:shadow-orange-950/5 relative ${loc.featured ? 'bg-gradient-to-b from-orange-950/10 to-neutral-900/60' : ''}`}>
                 {/* Imagen */}
                 <div class="relative h-40 overflow-hidden bg-neutral-950">
                   <img
@@ -333,7 +333,7 @@ const breadcrumbs = [
                     {/* Badges de Localización/Tipo de Servicio */}
                     <div class="flex flex-wrap gap-1.5 mb-2.5">
                       {loc.municipalities && (
-                        <span class="text-[10px] bg-neutral-805 border border-neutral-800 text-neutral-300 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
+                        <span class="text-[10px] bg-neutral-805 text-neutral-300 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
                           📍 {loc.municipalities.name}
                         </span>
                       )}
@@ -347,14 +347,13 @@ const breadcrumbs = [
                                 return a.split('-').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                               }).join(', ');
                           return (
-                            <span class="text-[10px] bg-amber-500/10 border border-amber-500/25 text-amber-400 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
+                            <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-md font-semibold flex items-center gap-1">
                               🚚 Móvil {areaNames ? `(${areaNames})` : ''}
                             </span>
                           );
                         }
                         return null;
                       })()}
-
                     </div>
 
                     <h2 class="text-lg font-bold text-white mb-2 leading-snug">
@@ -382,7 +381,7 @@ const breadcrumbs = [
 
                     {/* Teléfonos */}
                     {phones.length > 0 && (
-                      <div class="flex flex-col gap-1.5 mb-4 border-t border-neutral-800/60 pt-3">
+                      <div class="flex flex-col gap-1.5 mb-4 pt-3">
                         {phones.map((phone: string, idx: number) => (
                           <a href={`tel:${phone.trim().replace(/\D/g, '')}`} class={`flex items-center gap-1.5 text-xs font-semibold hover:text-white transition duration-150 ${idx === 0 ? 'text-orange-500' : 'text-neutral-300'}`}>
                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -399,7 +398,7 @@ const breadcrumbs = [
                     {loc.specialties && loc.specialties.length > 0 && (
                       <div class="flex flex-wrap gap-1.5 mb-4">
                         {loc.specialties.slice(0, 4).map((s: string) => (
-                          <span class="text-[10px] bg-orange-500/5 border border-orange-500/15 text-orange-300/90 px-2 py-0.5 rounded font-medium">{s}</span>
+                          <span class="text-[10px] bg-orange-500/5 text-orange-300/90 px-2 py-0.5 rounded font-medium">{s}</span>
                         ))}
                       </div>
                     )}
@@ -415,7 +414,7 @@ const breadcrumbs = [
                         Llamar
                       </a>
                     )}
-                    <a href={detailUrl} class="inline-flex items-center justify-center gap-1 py-2 px-3 bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white font-semibold text-xs rounded-lg transition duration-150">
+                    <a href={detailUrl} class="inline-flex items-center justify-center gap-1 py-2 px-3 bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white font-semibold text-xs rounded-lg transition duration-150">
                       Ver Ficha
                     </a>
                   </div>
@@ -442,7 +441,7 @@ const breadcrumbs = [
 
     <!-- Índice por Localidad -->
     {municipiosActivos.length > 0 && (
-      <section class="max-w-7xl mx-auto px-4 py-8 border-t border-neutral-900/60 mt-4 mb-8">
+      <section class="max-w-7xl mx-auto px-4 py-8 mt-4 mb-8">
         <h2 class="text-xl font-bold text-white mb-2">🔎 Índice por Localidad en {stateDb.name}</h2>
         <p class="text-sm text-neutral-400 mb-6">Encuentra {serviceTitle.toLowerCase()} disponibles por municipio en {stateDb.name}:</p>
         
@@ -460,7 +459,7 @@ const breadcrumbs = [
             return (
               <a
                 href={getFilterUrl({ municipio: isSelected ? null : m.slug })}
-                class={`p-3 bg-neutral-900/40 border rounded-xl hover:border-orange-500/30 transition duration-200 text-center flex flex-col justify-center items-center gap-1 group ${isSelected ? 'border-orange-500 bg-orange-500/5 text-orange-400 font-bold' : 'border-neutral-800/80 text-neutral-300'}`}
+                class={`p-3 bg-neutral-900/40 rounded-xl hover:bg-orange-500/5 transition duration-200 text-center flex flex-col justify-center items-center gap-1 group ${isSelected ? 'bg-orange-500/5 text-orange-400 font-bold' : 'text-neutral-300'}`}
               >
                 <span class="text-xs font-semibold group-hover:text-orange-400 transition">{m.name}</span>
                 <span class="text-[10px] text-neutral-500 font-medium">
@@ -474,31 +473,31 @@ const breadcrumbs = [
     )}
 
     <!-- Sección de contenido SEO -->
-    <section class="bg-neutral-900/30 border-t border-neutral-900/60 py-16 px-4">
+    <section class="bg-neutral-900/30 py-16 px-4">
       <div class="max-w-4xl mx-auto">
         <h2 class="text-2xl font-bold text-orange-500 mb-4">¿Por qué usar el directorio BySMax en {stateDb.name}?</h2>
-        <p class="text-neutral-400 text-base leading-relaxed mb-10 max-w-3xl">
+        <p class="text-neutral-450 text-base leading-relaxed mb-10 max-w-3xl">
           En BySMax agrupamos a los mejores prestadores de servicio locales en {stateDb.name} para que tengas acceso a sus datos de contacto de forma inmediata.
           Verificamos los números telefónicos y horarios para ahorrarte tiempo en situaciones de emergencia.
         </p>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+          <div class="bg-neutral-900/60 rounded-xl p-5 text-center">
             <span class="text-3xl block mb-3">🕐</span>
             <h3 class="text-sm font-bold text-white mb-2">Atención 24h</h3>
             <p class="text-xs text-neutral-400 leading-relaxed">Filtra fácilmente aquellos establecimientos abiertos por la noche.</p>
           </div>
-          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+          <div class="bg-neutral-900/60 rounded-xl p-5 text-center">
             <span class="text-3xl block mb-3">📞</span>
             <h3 class="text-sm font-bold text-white mb-2">Contacto directo</h3>
             <p class="text-xs text-neutral-400 leading-relaxed">Comunícate por llamada o WhatsApp directamente al taller o técnico.</p>
           </div>
-          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+          <div class="bg-neutral-900/60 rounded-xl p-5 text-center">
             <span class="text-3xl block mb-3">📍</span>
             <h3 class="text-sm font-bold text-white mb-2">Ubicación</h3>
             <p class="text-xs text-neutral-400 leading-relaxed">Direcciones detalladas y enlaces a Google Maps para rutas rápidas.</p>
           </div>
-          <div class="bg-neutral-900/60 border border-neutral-850 rounded-xl p-5 text-center">
+          <div class="bg-neutral-900/60 rounded-xl p-5 text-center">
             <span class="text-3xl block mb-3">🏙️</span>
             <h3 class="text-sm font-bold text-white mb-2">Por municipio</h3>
             <p class="text-xs text-neutral-400 leading-relaxed">Filtros locales rápidos para tu ciudad o zona de cobertura.</p>

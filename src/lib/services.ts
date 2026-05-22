@@ -60,7 +60,7 @@ export function getServiceTitlePlural(type: string): string {
   if (!type) return '';
   const titlesPlural: Record<string, string> = {
     'vulcanizadora': 'Vulcanizadoras',
-    'vulka_movil': 'Vulcanizadoras Móviles',
+    'vulka_movil': 'Vulka Móviles',
     'plomero': 'Plomeros',
     'electricista': 'Electricistas',
     'cerrajero': 'Cerrajeros',
@@ -77,6 +77,16 @@ export function getServiceTitlePlural(type: string): string {
     return `${singular}es`;
   }
   return `${singular}s`;
+}
+
+export function getServiceSeoPhrase(type: string): string {
+  if (!type) return '';
+
+  const normalized = type.toLowerCase();
+  if (normalized === 'vulcanizadora') return 'Vulcanizadoras cerca de mí';
+  if (normalized === 'vulka_movil') return 'Vulka Móvil a domicilio';
+
+  return `${getServiceTitlePlural(type)} cerca de mí`;
 }
 
 /**

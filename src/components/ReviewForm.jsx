@@ -3,6 +3,13 @@ import { FaStar, FaRegStar, FaWhatsapp, FaCamera, FaReply } from "react-icons/fa
 import { supabase } from "../lib/supabase";
 import { ManualUploader } from "./ManualUploader";
 
+/**
+ * @param {object} props
+ * @param {string} [props.restaurantName]
+ * @param {number|string} props.id
+ * @param {any[]} [props.initialReviews]
+ * @param {boolean} [props.isAdmin]
+ */
 export default function ReviewForm({ restaurantName, id, initialReviews = [], isAdmin = false }) {
   const [reviews, setReviews] = useState(initialReviews);
   const [rating, setRating] = useState(0);
@@ -10,7 +17,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
   const [authorName, setAuthorName] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState(/** @type {any[]} */ ([]));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyText, setReplyText] = useState({});
   const [viewerImage, setViewerImage] = useState(null);
@@ -110,7 +117,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
   return (
     <div className="space-y-12 max-w-4xl mx-auto pb-20">
       {/* Formulario de Reseña */}
-      <form onSubmit={handleSubmit} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] border border-white/10 shadow-2xl text-white">
+      <form onSubmit={handleSubmit} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] shadow-2xl text-white">
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
           <div className="size-2 bg-red-500 rounded-full animate-pulse"></div>
           TU EXPERIENCIA
@@ -129,7 +136,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             placeholder="Tu Nombre"
             value={authorName}
             onChange={e => setAuthorName(e.target.value)}
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="p-4 bg-white/[0.03] rounded-2xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
           <input
             type="email"
@@ -137,7 +144,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             value={authorEmail}
             onChange={e => setAuthorEmail(e.target.value)}
             required
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="p-4 bg-white/[0.03] rounded-2xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
         </div>
         <div className="mb-4">
@@ -145,7 +152,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             placeholder="WhatsApp (opcional)"
             value={whatsapp}
             onChange={e => setWhatsapp(e.target.value)}
-            className="w-full p-4 bg-white/[0.03] rounded-2xl outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="w-full p-4 bg-white/[0.03] rounded-2xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 transition-all"
           />
         </div>
 
@@ -153,13 +160,13 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
           placeholder="¿Qué tal estuvo la visita? Cuéntanos los detalles..."
           value={comment}
           onChange={e => setComment(e.target.value)}
-          className="w-full p-6 bg-white/[0.03] rounded-2xl h-40 mb-6 outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-500 resize-none transition-all"
+          className="w-full p-6 bg-white/[0.03] rounded-2xl h-40 mb-6 outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 resize-none transition-all"
         />
 
         <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-8">
           {images.map((img, idx) => (
             <div key={idx} className="relative aspect-square group">
-              <img src={img} className="size-full object-cover rounded-2xl border border-white/10" />
+              <img src={img} className="size-full object-cover rounded-2xl" />
               <button
                 type="button"
                 onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
@@ -188,13 +195,13 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
         <h3 className="text-xs font-black uppercase tracking-[0.4em] text-stone-500 px-4 mb-4">Muro de Revoluciones ({reviews.length})</h3>
 
         {reviews.length === 0 && (
-          <div className="text-center py-20 bg-[#0c0c0c] rounded-[2.5rem] border border-dashed border-white/10">
+          <div className="text-center py-20 bg-[#0c0c0c] rounded-[2.5rem]">
             <p className="text-stone-500 italic">Sé el primero en compartir tu experiencia...</p>
           </div>
         )}
 
         {reviews.map((rev) => (
-          <div key={rev.id} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] border border-white/10 shadow-sm group hover:bg-[#111] transition-all text-white">
+          <div key={rev.id} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] shadow-sm group hover:bg-[#111] transition-all text-white">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
                 <div className="size-12 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white font-black text-xl  ring-4 ring-white/5">
@@ -223,7 +230,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
                     <img
                       src={img}
                       onClick={() => setViewerImage(img)}
-                      className="size-24 rounded-2xl object-cover ring-1 ring-white/10 cursor-pointer hover:ring-red-500 transition-all shadow-xl"
+                      className="size-24 rounded-2xl object-cover cursor-pointer hover:ring-2 hover:ring-red-500 transition-all shadow-xl"
                     />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center pointer-events-none">
                       <FaCamera className="text-white size-6" />
@@ -247,12 +254,12 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
 
             {/* OPCIÓN DE RESPONDER (Visible solo para Admin) */}
             {isAdmin && (
-              <div className="mt-8 flex gap-3 pt-6 border-t border-white/5">
+              <div className="mt-8 flex gap-3 pt-6">
                 <input
                   value={replyText[rev.id] || ""}
                   onChange={e => setReplyText({ ...replyText, [rev.id]: e.target.value })}
                   placeholder="Responder como administrador..."
-                  className="flex-1 bg-white/5 p-4 rounded-xl text-xs outline-none border border-white/10 focus:border-red-500/50 text-white placeholder:text-stone-600"
+                  className="flex-1 bg-white/5 p-4 rounded-xl text-xs outline-none focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-600"
                 />
                 <button onClick={() => handleReply(rev.id)} className="bg-red-600 text-white px-6 rounded-xl hover:bg-red-500 transition-all font-bold">
                   <FaReply />
