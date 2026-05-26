@@ -1,11 +1,4 @@
 ---
-export const prerender = false;
-
-Astro.response.headers.set(
-	"Cache-Control",
-	"public, s-maxage=300, stale-while-revalidate=60",
-);
-
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight, MapPin } from "lucide-react";
 import { getStates, supabase } from "../../lib/supabase";
@@ -78,7 +71,10 @@ let restaurantsData = restaurantsResult.data;
 let totalRestaurants = restaurantsResult.count;
 
 if (restaurantsResult.error) {
-	console.error("Error loading /menus with selected filters:", restaurantsResult.error);
+	console.error(
+		"Error loading /menus with selected filters:",
+		restaurantsResult.error,
+	);
 
 	const fallbackResult = await supabase
 		.from("places")
@@ -108,7 +104,10 @@ const totalPages = Math.max(1, Math.ceil((totalRestaurants || 0) / pageSize));
 const safeCurrentPage = Math.min(currentPage, totalPages);
 const summaryFrom = totalRestaurants ? (safeCurrentPage - 1) * pageSize + 1 : 0;
 const summaryTo = totalRestaurants
-	? Math.min((safeCurrentPage - 1) * pageSize + restaurants.length, totalRestaurants)
+	? Math.min(
+			(safeCurrentPage - 1) * pageSize + restaurants.length,
+			totalRestaurants,
+		)
 	: 0;
 
 const buildQueryString = (page: number) => {
@@ -120,7 +119,10 @@ const buildQueryString = (page: number) => {
 	return `/menus?${params.toString()}`;
 };
 
-const getPageItems = (pages: number, current: number): Array<number | "ellipsis"> => {
+const getPageItems = (
+	pages: number,
+	current: number,
+): Array<number | "ellipsis"> => {
 	if (pages <= 7) {
 		return Array.from({ length: pages }, (_, index) => index + 1);
 	}
@@ -149,7 +151,6 @@ const getPageItems = (pages: number, current: number): Array<number | "ellipsis"
 
 const pageItems = getPageItems(totalPages, safeCurrentPage);
 
-
 const seoData = {
 	title: "Ejemplos de Menús Digitales y Cartas QR Reales | BySMax",
 	description:
@@ -173,32 +174,53 @@ const seoData = {
 			</h2>
 
 			<div class="mb-8 flex flex-wrap gap-4 justify-center">
-				<form method="get" action="/menus" class="mb-8 flex flex-wrap gap-4 justify-center">
+				<form
+					method="get"
+					action="/menus"
+					class="mb-8 flex flex-wrap gap-4 justify-center"
+				>
 					<select
 						name="industry"
-					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+						class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
 					>
-					{
-						industries.map((industry) => (
-							<option value={industry} selected={selectedIndustry === industry}>{industry}</option>
-						))
-					}
+						{
+							industries.map((industry) => (
+								<option
+									value={industry}
+									selected={selectedIndustry === industry}
+								>
+									{industry}
+								</option>
+							))
+						}
 					</select>
 
 					<select
 						name="type"
-					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+						class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
 					>
-						{types.map((type) => <option value={type} selected={selectedType === type}>{type}</option>)}
+						{
+							types.map((type) => (
+								<option value={type} selected={selectedType === type}>
+									{type}
+								</option>
+							))
+						}
 					</select>
 
 					<select
 						name="sort"
-					class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+						class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
 					>
-						<option value="popular" selected={selectedSort === "popular"}>Más populares</option>
-						<option value="recent" selected={selectedSort === "recent"}>Más recientes</option>
-						<option value="rating" selected={selectedSort === "rating"}>Mejor calificados</option>
+						<option value="popular" selected={selectedSort === "popular"}
+							>Más populares</option
+						>
+						<option value="recent" selected={selectedSort === "recent"}
+							>Más recientes</option
+						>
+						<option value="rating" selected={selectedSort === "rating"}
+							>Mejor calificados</option
+						>
 					</select>
 
 					<button
@@ -264,11 +286,16 @@ const seoData = {
 											({restaurant.reviewCount} reseñas)
 										</span>
 									</div>
-									<p class="text-gray-500 text-[11px] sm:text-xs md:text-sm line-clamp-1">{restaurant.address}</p>
+									<p class="text-gray-500 text-[11px] sm:text-xs md:text-sm line-clamp-1">
+										{restaurant.address}
+									</p>
 								</div>
-								
+
 								{restaurant.short_name && (
-									<a href={restaurantUrl} class="group mt-3 block text-xs sm:text-sm text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
+									<a
+										href={restaurantUrl}
+										class="group mt-3 block text-xs sm:text-sm text-emerald-600 font-bold hover:text-emerald-700 transition-colors"
+									>
 										<span class="flex items-center justify-between">
 											Ver Menú
 											<div class="p-1 rounded-full border border-emerald-100 group-hover:border-emerald-200 bg-emerald-50/50 transition-all duration-300">
@@ -299,7 +326,9 @@ const seoData = {
 						{
 							pageItems.map((item) =>
 								item === "ellipsis" ? (
-									<span class="w-9 h-9 flex items-center justify-center text-gray-400 font-bold">…</span>
+									<span class="w-9 h-9 flex items-center justify-center text-gray-400 font-bold">
+										…
+									</span>
 								) : (
 									<a
 										href={buildQueryString(item)}
@@ -328,7 +357,11 @@ const seoData = {
 					id="pagination-summary"
 					class="text-xs font-bold uppercase tracking-widest text-gray-400"
 				>
-					{totalRestaurants ? `Mostrando ${summaryFrom}-${summaryTo} de ${totalRestaurants}` : "Sin resultados"}
+					{
+						totalRestaurants
+							? `Mostrando ${summaryFrom}-${summaryTo} de ${totalRestaurants}`
+							: "Sin resultados"
+					}
 				</p>
 			</div>
 
