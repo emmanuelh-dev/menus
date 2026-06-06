@@ -115,28 +115,28 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
   if (!id) return null;
 
   return (
-    <div className="space-y-12 max-w-4xl mx-auto pb-20">
+    <div className="space-y-6 max-w-2xl mx-auto pb-10">
       {/* Formulario de Reseña */}
-      <form onSubmit={handleSubmit} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] shadow-2xl text-white">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-          <div className="size-2 bg-red-500 rounded-full animate-pulse"></div>
-          TU EXPERIENCIA
+      <form onSubmit={handleSubmit} className="bg-[#0c0c0c] p-5 md:p-6 rounded-2xl shadow-xl border border-white/5 text-white">
+        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <div className="size-1.5 bg-red-500 rounded-full animate-pulse"></div>
+          COMPARTE TU EXPERIENCIA
         </h2>
 
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-1.5 mb-4">
           {[1, 2, 3, 4, 5].map((s) => (
-            <button key={s} type="button" onClick={() => setRating(s)} className="text-4xl transition-all hover:scale-125">
-              {rating >= s ? <FaStar className="text-amber-500" /> : <FaRegStar className="text-white/20" />}
+            <button key={s} type="button" onClick={() => setRating(s)} className="text-3xl transition-all hover:scale-110">
+              {rating >= s ? <FaStar className="text-amber-500" /> : <FaRegStar className="text-white/10" />}
             </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           <input
             placeholder="Tu Nombre"
             value={authorName}
             onChange={e => setAuthorName(e.target.value)}
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 transition-all"
           />
           <input
             type="email"
@@ -144,35 +144,35 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             value={authorEmail}
             onChange={e => setAuthorEmail(e.target.value)}
             required
-            className="p-4 bg-white/[0.03] rounded-2xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 transition-all"
           />
         </div>
-        <div className="mb-4">
+        <div className="mb-3">
           <input
             placeholder="WhatsApp (opcional)"
             value={whatsapp}
             onChange={e => setWhatsapp(e.target.value)}
-            className="w-full p-4 bg-white/[0.03] rounded-2xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 transition-all"
+            className="w-full p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 transition-all"
           />
         </div>
 
         <textarea
-          placeholder="¿Qué tal estuvo la visita? Cuéntanos los detalles..."
+          placeholder="¿Qué tal estuvo la visita? Cuéntanos..."
           value={comment}
           onChange={e => setComment(e.target.value)}
-          className="w-full p-6 bg-white/[0.03] rounded-2xl h-40 mb-6 outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-500 resize-none transition-all"
+          className="w-full p-4 bg-white/[0.03] border border-white/5 rounded-xl h-24 mb-4 outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 resize-none transition-all"
         />
 
-        <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-8">
+        <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-4">
           {images.map((img, idx) => (
             <div key={idx} className="relative aspect-square group">
-              <img src={img} className="size-full object-cover rounded-2xl" />
+              <img src={img} className="size-full object-cover rounded-xl" />
               <button
                 type="button"
                 onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
-                className="absolute -top-2 -right-2 bg-red-600 text-white size-6 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                className="absolute -top-1.5 -right-1.5 bg-red-600 text-white size-5 rounded-full flex items-center justify-center shadow-md hover:scale-105 transition-transform"
               >
-                <span className="text-[10px] font-bold">✕</span>
+                <span className="text-[9px] font-bold">✕</span>
               </button>
             </div>
           ))}
@@ -184,56 +184,56 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
         <button
           type="submit"
           disabled={rating === 0 || isSubmitting}
-          className="w-full bg-white text-black px-12 py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] disabled:opacity-20 hover:bg-red-600 hover:text-white transition-all transform active:scale-[0.98] shadow-xl shadow-white/5"
+          className="w-full bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-wider disabled:opacity-20 hover:bg-red-600 hover:text-white transition-all shadow-md active:scale-95"
         >
           {isSubmitting ? 'PUBLICANDO...' : 'PUBLICAR RESEÑA'}
         </button>
       </form>
 
       {/* Listado de Reseñas */}
-      <div className="space-y-6">
-        <h3 className="text-xs font-black uppercase tracking-[0.4em] text-stone-500 px-4 mb-4">Muro de Revoluciones ({reviews.length})</h3>
+      <div className="space-y-4">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-500 px-2">Muro de Revoluciones ({reviews.length})</h3>
 
         {reviews.length === 0 && (
-          <div className="text-center py-20 bg-[#0c0c0c] rounded-[2.5rem]">
-            <p className="text-stone-500 italic">Sé el primero en compartir tu experiencia...</p>
+          <div className="text-center py-10 bg-[#0c0c0c] border border-white/5 rounded-2xl">
+            <p className="text-stone-500 text-xs italic">Sé el primero en compartir tu experiencia...</p>
           </div>
         )}
 
         {reviews.map((rev) => (
-          <div key={rev.id} className="bg-[#0c0c0c] p-8 rounded-[2.5rem] shadow-sm group hover:bg-[#111] transition-all text-white">
-            <div className="flex justify-between items-start mb-6">
-              <div className="flex items-center gap-4">
-                <div className="size-12 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white font-black text-xl  ring-4 ring-white/5">
+          <div key={rev.id} className="bg-[#0c0c0c]/80 border border-white/5 p-5 rounded-2xl shadow-sm hover:bg-[#111] transition-all text-white">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-3">
+                <div className="size-9 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white font-black text-sm ring-2 ring-white/5">
                   {(rev.content?.author?.name || "A")[0].toUpperCase()}
                 </div>
                 <div>
-                  <span className="block font-bold text-white text-lg">{rev.content?.author?.name || "Anónimo"}</span>
-                  <div className="flex gap-0.5 text-amber-500 mt-1">
+                  <span className="block font-bold text-white text-sm leading-tight">{rev.content?.author?.name || "Anónimo"}</span>
+                  <div className="flex gap-0.5 text-amber-500 mt-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className={i < rev.rate ? "text-amber-500" : "text-white/10"} size={12} />
+                      <FaStar key={i} className={i < rev.rate ? "text-amber-500" : "text-white/10"} size={9} />
                     ))}
                   </div>
                 </div>
               </div>
-              <time className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold">
+              <time className="text-[9px] text-stone-500 uppercase tracking-widest font-semibold">
                 {new Date(rev.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </time>
             </div>
 
-            <p className="text-stone-300 leading-relaxed mb-6 text-base italic">"{rev.comment}"</p>
+            <p className="text-stone-300 leading-relaxed mb-3 text-xs italic">"{rev.comment}"</p>
 
             {rev.content?.images?.length > 0 && (
-              <div className="flex gap-3 mb-6 overflow-x-auto pb-4 scrollbar-hide">
+              <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-none">
                 {rev.content.images.map((img, idx) => (
                   <div key={idx} className="relative group shrink-0">
                     <img
                       src={img}
                       onClick={() => setViewerImage(img)}
-                      className="size-24 rounded-2xl object-cover cursor-pointer hover:ring-2 hover:ring-red-500 transition-all shadow-xl"
+                      className="size-16 rounded-xl object-cover cursor-pointer hover:ring-1 hover:ring-red-500 transition-all shadow-md"
                     />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center pointer-events-none">
-                      <FaCamera className="text-white size-6" />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center pointer-events-none">
+                      <FaCamera className="text-white size-4" />
                     </div>
                   </div>
                 ))}
@@ -242,27 +242,27 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
 
             {/* MUESTRA LA RESPUESTA SI EXISTE */}
             {rev.content?.reply && (
-              <div className="mt-8 p-6 bg-red-600/10 border-l-4 border-red-500 rounded-r-2xl relative ring-1 ring-white/5">
-                <span className="absolute -top-3 left-4 bg-red-500 text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest ">STAFF RESPONSE</span>
-                <p className="text-sm text-stone-200 leading-relaxed italic mt-2">"{rev.content.reply.text}"</p>
-                <div className="flex items-center gap-2 mt-4">
-                  <div className="size-1.5 bg-red-500 rounded-full"></div>
-                  <p className="text-[10px] text-stone-500 uppercase font-bold tracking-widest">{rev.content.reply.admin_name}</p>
+              <div className="mt-3 p-4 bg-red-600/5 border-l-2 border-red-500 rounded-r-xl relative ring-1 ring-white/5">
+                <span className="text-[8px] font-black text-red-400 uppercase tracking-widest block mb-1">STAFF RESPONSE</span>
+                <p className="text-xs text-stone-300 leading-relaxed italic">"{rev.content.reply.text}"</p>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <div className="size-1 bg-red-500 rounded-full"></div>
+                  <p className="text-[9px] text-stone-500 uppercase font-bold tracking-widest">{rev.content.reply.admin_name}</p>
                 </div>
               </div>
             )}
 
             {/* OPCIÓN DE RESPONDER (Visible solo para Admin) */}
             {isAdmin && (
-              <div className="mt-8 flex gap-3 pt-6">
+              <div className="mt-4 flex gap-2 pt-4 border-t border-white/5">
                 <input
                   value={replyText[rev.id] || ""}
                   onChange={e => setReplyText({ ...replyText, [rev.id]: e.target.value })}
                   placeholder="Responder como administrador..."
-                  className="flex-1 bg-white/5 p-4 rounded-xl text-xs outline-none focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-600"
+                  className="flex-1 bg-white/5 p-3 rounded-lg text-xs outline-none focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-600"
                 />
-                <button onClick={() => handleReply(rev.id)} className="bg-red-600 text-white px-6 rounded-xl hover:bg-red-500 transition-all font-bold">
-                  <FaReply />
+                <button onClick={() => handleReply(rev.id)} className="bg-red-600 text-white px-4 rounded-lg hover:bg-red-500 transition-all font-bold text-xs">
+                  <FaReply size={10} />
                 </button>
               </div>
             )}
