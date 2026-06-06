@@ -9,15 +9,59 @@ interface ImageData {
 interface ReactGalleryProps {
   images: ImageData[];
   altPrefix?: string;
+  layout?: 'grid' | 'scroll';
 }
 
 export const ReactGallery: React.FC<ReactGalleryProps> = ({ 
   images, 
-  altPrefix = 'Imagen' 
+  altPrefix = 'Imagen',
+  layout = 'scroll'
 }) => {
   if (!images || images.length === 0) return null;
 
   const galleryId = `gallery-${Math.random().toString(36).substr(2, 9)}`;
+
+  if (layout === 'scroll') {
+    return (
+      <div className="relative w-full">
+        <style>{`
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
+        <div className="flex overflow-x-auto gap-4 py-2 scroll-smooth snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:-mx-0 md:px-0" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {images.map((image, index) => {
+            const displayUrl = typeof image.src === 'string' ? image.src : (image.src as any)?.src || '';
+            return (
+              <div 
+                key={index}
+                className="relative flex-shrink-0 w-60 h-40 md:w-80 md:h-52 rounded-2xl overflow-hidden snap-start cursor-pointer group shadow-lg border border-white/5 bg-white/[0.02] transition-all duration-300"
+              >
+                <img
+                  src={displayUrl}
+                  alt={image.alt || `${altPrefix} ${index + 1}`}
+                  className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                  loading="lazy"
+                />
+                
+                {image.title && (
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 pt-8">
+                    <span className="text-[10px] uppercase tracking-[0.15em] text-white font-semibold">
+                      {image.title}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

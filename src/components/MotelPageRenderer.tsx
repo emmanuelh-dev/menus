@@ -120,17 +120,17 @@ export default function MotelPageRenderer({
     <div className={`min-h-screen ${config.bg} ${config.text} ${config.selection}`} style={{ fontFamily: config.customFont }}>
       <div className={`${isPreview ? 'p-4' : 'max-w-3xl mx-auto p-4 pt-0'}`}>
         {/* Header Estilo App Moderna */}
-        <header className="mb-16">
-          <div className="relative mb-10 overflow-hidden rounded-[2.5rem] shadow-2xl">
+        <header className="mb-8">
+          <div className="relative mb-6 overflow-hidden rounded-[2rem] shadow-2xl">
             <img
               src={place.image || "/placeholder.svg"}
               alt={place.name}
-              className="w-full aspect-[4/3] md:aspect-video object-cover transition-transform duration-1000 group-hover:scale-110"
+              className="w-full aspect-[16/10] md:aspect-[2.39/1] object-cover transition-transform duration-1000 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
-            <div className="absolute bottom-8 left-8 right-8">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
+            <div className="absolute bottom-6 left-6 right-6">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
                 {place.name}
               </h1>
 
@@ -161,8 +161,8 @@ export default function MotelPageRenderer({
             </div>
           </div>
 
-          <div className="space-y-8">
-            <p className="text-base text-stone-400 leading-relaxed max-w-2xl italic">
+          <div className="space-y-4">
+            <p className="text-sm text-stone-400 leading-relaxed max-w-2xl italic">
               "{semantic_data.description || place.description || place.name}"
             </p>
 
@@ -246,40 +246,40 @@ export default function MotelPageRenderer({
         </header>
 
         {/* Suites y Servicios */}
-        <div className="space-y-24">
+        <div className="space-y-12">
           {blocks.map((block: any, idx: number) => {
             if (block.type === "section") {
               return (
                 <section key={block.id || idx} className="relative">
-                  <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-3xl font-bold text-white tracking-tight">
+                  <div className="flex items-center gap-4 mb-3">
+                    <h2 className="text-2xl font-bold text-white tracking-tight">
                       {block.data.title}
                     </h2>
                     <div className="h-[1px] flex-1 bg-white/10"></div>
                   </div>
 
                   {block.data.image && (
-                    <div className="mb-10 overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+                    <div className="mb-6 overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
                       <img
                         src={block.data.image}
                         alt={block.data.title}
-                        className="w-full h-48 sm:h-80 object-cover"
+                        className="w-full h-36 sm:h-52 object-cover"
                       />
                     </div>
                   )}
 
                   {block.data.description && (
-                    <p className="text-stone-400 text-sm italic mb-10 px-4 border-l-2 border-stone-800">
+                    <p className="text-stone-400 text-sm italic mb-6 px-4 border-l-2 border-stone-800">
                       {block.data.description}
                     </p>
                   )}
 
-                  <div className="grid gap-8">
+                  <div className="grid gap-5">
                     {block.data.items?.map((item: any, iIdx: number) => (
-                      <div key={item.id || iIdx} className={`${config.cardBg} border border-white/5 rounded-[2rem] overflow-hidden ${config.cardHover} transition-all duration-500 group`}>
+                      <div key={item.id || iIdx} className={`${config.cardBg} border border-white/5 rounded-2xl overflow-hidden ${config.cardHover} transition-all duration-500 group`}>
                         <div className="flex flex-col md:flex-row">
                           {item.image && item.image.trim() !== "" && (
-                            <div className="w-full md:w-72 aspect-[4/3] md:aspect-square overflow-hidden">
+                            <div className="w-full md:w-56 aspect-[16/10] md:aspect-square overflow-hidden">
                               <img
                                 src={item.image}
                                 alt={item.name}
@@ -288,25 +288,25 @@ export default function MotelPageRenderer({
                             </div>
                           )}
 
-                          <div className="flex-1 p-8 flex flex-col justify-between">
+                          <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
                             <div>
-                              <div className="flex justify-between items-start mb-4">
-                                <h3 className={`text-2xl font-bold text-white group-hover:${config.accent.replace('text-', '')} transition-colors`}>
+                              <div className="flex justify-between items-start mb-2">
+                                <h3 className={`text-xl font-bold text-white group-hover:${config.accent.replace('text-', '')} transition-colors`}>
                                   {item.name}
                                 </h3>
-                                <span className={`text-xl font-bold ${config.accent}`}>
+                                <span className={`text-lg font-bold ${config.accent}`}>
                                   {view_settings.show_prices && `$${item.price}`}
                                 </span>
                               </div>
 
-                              <p className="text-stone-400 text-sm leading-relaxed mb-6 line-clamp-3">
+                              <p className="text-stone-400 text-xs leading-relaxed mb-4 line-clamp-3">
                                 {item.description}
                               </p>
 
                               {item.features && item.features.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mb-6">
+                                <div className="flex flex-wrap gap-2 mb-4">
                                   {item.features.map((feature: string, fIdx: number) => (
-                                    <span key={fIdx} className="px-3 py-1 bg-white/5 rounded-full text-[10px] uppercase tracking-wider text-stone-500 font-bold">
+                                    <span key={fIdx} className="px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-wider text-stone-500 font-bold">
                                       {feature}
                                     </span>
                                   ))}
@@ -315,7 +315,7 @@ export default function MotelPageRenderer({
                             </div>
 
                             {item.gallery && item.gallery.length > 0 && (
-                              <div className="pt-4 border-t border-white/5">
+                              <div className="pt-3 border-t border-white/5">
                                 <ReactGallery
                                   images={item.gallery.map((img: any) => ({
                                     src: img.src || img.url,
@@ -337,8 +337,8 @@ export default function MotelPageRenderer({
 
             if (block.type === "gallery") {
               return (
-                <div key={block.id || idx} className="py-20 border-y border-white/5">
-                  <p className="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-12">
+                <div key={block.id || idx} className="py-12 border-y border-white/5">
+                  <p className="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-6">
                     Instalaciones
                   </p>
                   <ReactGallery
@@ -357,13 +357,13 @@ export default function MotelPageRenderer({
         </div>
 
         {!isPreview && (
-          <div className="mt-24">
+          <div className="mt-12">
             <QuickFeed placeId={place.id} isInline />
           </div>
         )}
 
         {!isPreview && (
-          <section id="reviews" data-review-section className="mt-20 border-t border-white/5 pt-12">
+          <section id="reviews" data-review-section className="mt-10 border-t border-white/5 pt-6">
             {React.createElement(ReviewForm as any, {
               id: place.id,
               restaurantName: place.name,
@@ -374,7 +374,7 @@ export default function MotelPageRenderer({
         )}
 
         {!isPreview && (
-          <footer className="mt-40 pb-20 text-center px-6">
+          <footer className="mt-16 pb-10 text-center px-6">
             <p className="text-[10px] text-stone-600 uppercase tracking-[0.5em] mb-8">
               Privacy Guaranteed • {place.name} • 2026
             </p>
