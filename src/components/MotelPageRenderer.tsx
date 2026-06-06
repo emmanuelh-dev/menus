@@ -244,11 +244,7 @@ export default function MotelPageRenderer({
             data-ad-format="auto"
             data-full-width-responsive="true"></ins> */}
         </header>
-        {!isPreview && (
-          <div className="mt-32">
-            <QuickFeed placeId={place.id} isInline />
-          </div>
-        )}
+
         {/* Suites y Servicios */}
         <div className="space-y-24">
           {blocks.map((block: any, idx: number) => {
@@ -361,7 +357,13 @@ export default function MotelPageRenderer({
         </div>
 
         {!isPreview && (
-          <section id="reviews" data-review-section className="mt-40 border-t border-white/5 pt-20">
+          <div className="mt-24">
+            <QuickFeed placeId={place.id} isInline />
+          </div>
+        )}
+
+        {!isPreview && (
+          <section id="reviews" data-review-section className="mt-20 border-t border-white/5 pt-12">
             {React.createElement(ReviewForm as any, {
               id: place.id,
               restaurantName: place.name,

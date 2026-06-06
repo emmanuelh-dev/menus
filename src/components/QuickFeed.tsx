@@ -129,87 +129,90 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
     return (
       <div
         onPaste={handlePaste}
-        className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-10 mb-20 relative overflow-hidden group"
+        className="bg-zinc-950 border border-emerald-500/30 rounded-2xl p-5 md:p-6 mb-8 relative overflow-hidden group shadow-lg shadow-emerald-950/20"
       >
-        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-          <Upload size={120} />
+        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+          <Upload size={80} />
         </div>
 
-        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-800 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">
-              <Info size={12} className="text-zinc-500" />
-              Actualización rápida
+        <div className="relative z-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6">
+          <div className="flex-1 text-left">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[9px] font-black uppercase tracking-widest text-emerald-400 mb-3 animate-pulse">
+              <Sparkles size={10} />
+              Actualización rápida con IA
             </div>
-            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-4 italic serif">
-              Sube el Menú <br />Actualizado
-            </h2>
-            <p className="text-zinc-400 font-medium text-sm max-w-md leading-relaxed">
-              ¿Ves precios diferentes? Sube una foto del menú y nuestra IA lo actualizará al instante para toda la comunidad.
+            <h3 className="text-lg font-bold text-white mb-1 tracking-tight">
+              ¿Ves precios o habitaciones diferentes?
+            </h3>
+            <p className="text-zinc-400 text-xs leading-relaxed max-w-md">
+              Sube una foto del menú actual y nuestra IA actualizará el sitio al instante para todos.
             </p>
           </div>
 
-          <div className="w-full md:w-80 space-y-3">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onPaste={handlePaste}
-              placeholder="¿Qué platillo o precio cambió? (Puedes pegar imágenes aquí)"
-              className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-xs focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[80px] resize-none"
-            />
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="hidden"
-              accept="image/*"
-              multiple
-            />
-
-            <div className="flex justify-center my-2 transform scale-75 origin-center">
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={SITE_KEY}
-                onSuccess={(token) => setToken(token)}
-                onExpire={() => setToken(null)}
-                onError={() => setToken(null)}
-                options={{ theme: 'dark' }}
+          <div className="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="flex-1 sm:w-60">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onPaste={handlePaste}
+                placeholder="¿Qué cambió? (Puedes pegar imágenes aquí)"
+                className="w-full bg-black/60 border border-zinc-800 rounded-xl p-3 text-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all min-h-[44px] max-h-[80px] resize-none"
+              />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+                multiple
               />
             </div>
 
-            <button
-              onClick={() => {
-                if (images.length > 0 || text.trim() !== '') {
-                  handleSubmit();
-                } else {
-                  fileInputRef.current?.click();
-                }
-              }}
-              disabled={isProcessing || !token}
-              className="w-full bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3 active:scale-95 border-b-4 border-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="flex items-center justify-center gap-2">
+            <div className="flex flex-col items-center gap-2">
+              <div className="transform scale-75 origin-center -my-2.5">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={SITE_KEY}
+                  onSuccess={(token) => setToken(token)}
+                  onExpire={() => setToken(null)}
+                  onError={() => setToken(null)}
+                  options={{ theme: 'dark' }}
+                />
+              </div>
+
+              <button
+                onClick={() => {
+                  if (images.length > 0 || text.trim() !== '') {
+                    handleSubmit();
+                  } else {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                disabled={isProcessing || !token}
+                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-bold uppercase text-[9px] tracking-widest transition-all shadow-xl shadow-emerald-950/20 flex items-center justify-center gap-2 active:scale-95 border-b-2 border-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {isProcessing ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                     <span>Subiendo...</span>
                   </>
                 ) : (
                   <>
-                    {images.length > 0 ? <CheckCircle2 size={16} /> : <Camera size={16} />}
-                    <span>{images.length > 0 ? `Subir ${images.length} Fotos` : text.trim() !== '' ? 'Enviar solo texto' : 'Subir o Pegar Menú'}</span>
+                    {images.length > 0 ? <CheckCircle2 size={12} /> : <Camera size={12} />}
+                    <span>{images.length > 0 ? `Subir ${images.length} Fotos` : text.trim() !== '' ? 'Enviar Cambios' : 'Subir o Pegar Menú'}</span>
                   </>
                 )}
-              </div>
-            </button>
-            {images.length > 0 && (
-              <button
-                onClick={() => setImages([])}
-                className="w-full py-1 text-[9px] font-black uppercase tracking-tighter text-zinc-600 hover:text-red-500 transition-colors"
-              >
-                Limpiar fotos
               </button>
-            )}
+
+              {images.length > 0 && (
+                <button
+                  onClick={() => setImages([])}
+                  className="text-[9px] font-bold uppercase tracking-tighter text-zinc-500 hover:text-red-400 transition-colors"
+                >
+                  Limpiar fotos
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
