@@ -1,5 +1,5 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
 
 interface Props {
 	title: string;
@@ -9,7 +9,7 @@ interface Props {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
+const { title, description, image = "/blog-placeholder-1.jpg" } = Astro.props;
 ---
 
 <!-- Global Metadata -->
@@ -19,8 +19,20 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 <meta name="generator" content={Astro.generator} />
 
 <!-- Font preloads -->
-<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
-<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
+<link
+	rel="preload"
+	href="/fonts/atkinson-regular.woff"
+	as="font"
+	type="font/woff"
+	crossorigin
+/>
+<link
+	rel="preload"
+	href="/fonts/atkinson-bold.woff"
+	as="font"
+	type="font/woff"
+	crossorigin
+/>
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -43,9 +55,7 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
-
 <script
-defer
-src="https://cloud.umami.is/script.js"
-data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b">
-</script>
+	defer
+	src="https://umami.bysmax.com/script.js"
+	data-website-id="313460e1-c7b8-4330-b06b-f7e46e608c47"></script>
