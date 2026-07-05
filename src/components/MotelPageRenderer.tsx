@@ -1,4 +1,5 @@
 import React from 'react';
+import { DollarSign, ParkingCircle, Clock, Phone as PhoneIcon, CreditCard, Star as StarIcon, MapPin } from 'lucide-react';
 import { ReactGallery } from './ReactGallery';
 import ReviewForm from './ReviewForm';
 import QuickFeed from './QuickFeed';
@@ -11,15 +12,14 @@ interface MotelPageRendererProps {
 }
 
 const Icons = {
-  Price: () => <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>,
-  Parking: () => <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h3a2 2 0 110 4H8m0 0v4m0-4H7m11-8a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-  Hours: () => <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-  Phone: () => <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>,
-  Payment: () => <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
+  Price: () => <DollarSign className="size-4" />,
+  Parking: () => <ParkingCircle className="size-4" />,
+  Hours: () => <Clock className="size-4" />,
+  Phone: () => <PhoneIcon className="size-4" />,
+  Payment: () => <CreditCard className="size-4" />,
+  Location: ({ className }: { className?: string }) => <MapPin className={className || "size-4"} />,
   Star: ({ filled }: { filled?: boolean }) => (
-    <svg className="size-3.5" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-    </svg>
+    <StarIcon className="size-3.5" fill={filled ? "currentColor" : "none"} />
   )
 };
 
@@ -121,7 +121,7 @@ export default function MotelPageRenderer({
       <div className={`${isPreview ? 'p-4' : 'max-w-3xl mx-auto p-4 pt-0'}`}>
         {/* Header Estilo App Moderna */}
         <header className="mb-8">
-          <div className="relative mb-6 overflow-hidden rounded-[2rem] shadow-2xl">
+          <div className="relative mb-6 overflow-hidden rounded-2xl shadow-2xl">
             <img
               src={place.image || "/placeholder.svg"}
               alt={place.name}
@@ -140,7 +140,7 @@ export default function MotelPageRenderer({
                   {place.rating || "5.0"}
                 </div>
                 <span className="text-stone-400 text-xs uppercase tracking-widest font-medium">
-                  {place.count || 0} REVOLUCIONES
+                  {place.count || 0} OPINIONES
                 </span>
               </div>
 
@@ -151,10 +151,7 @@ export default function MotelPageRenderer({
                   rel="noopener noreferrer"
                   className="text-sm text-stone-300 hover:text-white transition-colors flex items-center gap-2"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className={`size-4 ${config.accent}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <Icons.Location className={`size-4 ${config.accent}`} />
                   {address}
                 </a>
               )}
@@ -162,8 +159,8 @@ export default function MotelPageRenderer({
           </div>
 
           <div className="space-y-4">
-            <p className="text-sm text-stone-400 leading-relaxed max-w-2xl italic">
-              "{semantic_data.description || place.description || place.name}"
+            <p className="text-sm text-stone-400 leading-relaxed max-w-2xl">
+              {semantic_data.description || place.description || place.name}
             </p>
 
             <div className="flex flex-wrap gap-2">
@@ -186,10 +183,7 @@ export default function MotelPageRenderer({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <Icons.Location className="size-4" />
                   Ubicación
                 </a>
               )}
@@ -237,12 +231,16 @@ export default function MotelPageRenderer({
             </div>
           </div>
 
-          {/* <ins className="adsbygoogle block h-48"
-
-            data-ad-client="ca-pub-3646138644530578"
-            data-ad-slot="7426120296"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins> */}
+          <div className="mt-8 flex flex-col items-center gap-1.5">
+            <span className="text-[9px] uppercase tracking-widest text-stone-600">Publicidad</span>
+            <ins className="adsbygoogle"
+              style={{ display: "inline-block", width: "320px", height: "90px" }}
+              data-ad-client="ca-pub-3646138644530578"
+              data-ad-slot="7914990909"></ins>
+            <script>
+              (adsbygoogle = window.adsbygoogle || []).push({ });
+            </script>
+          </div>
         </header>
 
         {/* Suites y Servicios */}
@@ -376,10 +374,10 @@ export default function MotelPageRenderer({
         {!isPreview && (
           <footer className="mt-16 pb-10 text-center px-6">
             <p className="text-[10px] text-stone-600 uppercase tracking-[0.5em] mb-8">
-              Privacy Guaranteed • {place.name} • 2026
+              Sitio verificado • {place.name} • {new Date().getFullYear()}
             </p>
 
-            <div className="inline-block bg-white/[0.02] border border-white/5 rounded-3xl p-8 max-w-sm">
+            <div className="inline-block bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-sm">
               <p className="text-xs font-bold text-white mb-2 uppercase tracking-tight">¿Administras un motel o restaurante?</p>
               <p className="text-[10px] text-stone-500 mb-6 leading-relaxed">Moderniza tu establecimiento con un menú digital interactivo. Sube tus habitaciones, precios y servicios gratis.</p>
               <a

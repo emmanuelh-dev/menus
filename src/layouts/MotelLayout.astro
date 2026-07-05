@@ -20,7 +20,9 @@ function getMinPrice(place: any): number | null {
 					if (typeof item.price === "number" && item.price > 0) {
 						prices.push(item.price);
 					} else if (typeof item.price === "string") {
-						const num = parseFloat((item.price as string).replace(/[^0-9.]/g, ""));
+						const num = parseFloat(
+							(item.price as string).replace(/[^0-9.]/g, ""),
+						);
 						if (!isNaN(num) && num > 0) prices.push(num);
 					}
 				}
@@ -35,7 +37,9 @@ function getMinPrice(place: any): number | null {
 					if (typeof item.price === "number" && item.price > 0) {
 						prices.push(item.price);
 					} else if (typeof item.price === "string") {
-						const num = parseFloat((item.price as string).replace(/[^0-9.]/g, ""));
+						const num = parseFloat(
+							(item.price as string).replace(/[^0-9.]/g, ""),
+						);
 						if (!isNaN(num) && num > 0) prices.push(num);
 					}
 				}
@@ -75,7 +79,9 @@ function generateSEODescription(place: Place, description?: string): string {
 			? ` Con ${place.reviewCount} opiniones${place.rating ? ` y ${place.rating} estrellas.` : "."}`
 			: "";
 
-	const priceText = minPrice ? `habitaciones desde $${minPrice}` : "precios actualizados";
+	const priceText = minPrice
+		? `habitaciones desde $${minPrice}`
+		: "precios actualizados";
 	const jacuzziText = hasJacuzzi ? ", suites con jacuzzi" : "";
 
 	return `¿Buscas tarifas de Motel ${place.name} en ${city}? ➔ Entra y consulta tarifas de 12 horas, ${priceText}${jacuzziText}, fotos de las habitaciones y ubicación en mapa.${reviews}`;
@@ -437,10 +443,10 @@ if (reviewStats.reviewCount > 0) {
 			})(window, document, "clarity", "script", "s1a8gh6len");
 		</script>
 
-		<!-- <script
-			is:inline
+		<script
+			async
 			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3646138644530578"
-			crossorigin="anonymous"></script> -->
+			crossorigin="anonymous"></script>
 	</head>
 
 	<body class="motel-typography">
