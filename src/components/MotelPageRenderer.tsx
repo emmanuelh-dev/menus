@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { DollarSign, ParkingCircle, Clock, Phone as PhoneIcon, CreditCard, Star as StarIcon, MapPin } from 'lucide-react';
 import { ReactGallery } from './ReactGallery';
 import ReviewForm from './ReviewForm';
@@ -29,6 +29,18 @@ export default function MotelPageRenderer({
   isAdmin = false,
   initialReviews = [] as any[]
 }: MotelPageRendererProps) {
+  const adPushed = useRef(false);
+
+  useEffect(() => {
+    if (isPreview || !place || adPushed.current) return;
+    adPushed.current = true;
+    try {
+      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    } catch (error) {
+      console.error("adsbygoogle push failed:", error);
+    }
+  }, [isPreview, place]);
+
   if (!place) return null;
 
   const { blocks = [], view_settings = {} } = place.content || {};
@@ -231,16 +243,7 @@ export default function MotelPageRenderer({
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col items-center gap-1.5">
-            <span className="text-[9px] uppercase tracking-widest text-stone-600">Publicidad</span>
-            <ins className="adsbygoogle"
-              style={{ display: "inline-block", width: "320px", height: "90px" }}
-              data-ad-client="ca-pub-3646138644530578"
-              data-ad-slot="7914990909"></ins>
-            <script>
-              (adsbygoogle = window.adsbygoogle || []).push({ });
-            </script>
-          </div>
+
         </header>
 
         {/* Suites y Servicios */}
@@ -353,7 +356,15 @@ export default function MotelPageRenderer({
             return null;
           })}
         </div>
-
+        {!isPreview && (
+          <div className="mt-8 flex flex-col items-center gap-1.5">
+            <span className="text-[9px] uppercase tracking-widest text-stone-600">Publicidad</span>
+            <ins className="adsbygoogle"
+              style={{ display: "inline-block", width: "400px", height: "90px" }}
+              data-ad-client="ca-pub-3646138644530578"
+              data-ad-slot="7914990909"></ins>
+          </div>
+        )}
         {!isPreview && (
           <div className="mt-12">
             <QuickFeed placeId={place.id} isInline />
