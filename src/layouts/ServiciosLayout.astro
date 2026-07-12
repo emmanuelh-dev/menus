@@ -1,285 +1,328 @@
 ---
 import Footer from "../components/Footer.astro";
 import ScrollTopAndComment from "../components/ScrollTopAndComment";
-import { getSlugFromServiceType, getServiceTitlePlural, getServiceEmoji } from "../lib/services";
+import {
+	getSlugFromServiceType,
+	getServiceTitlePlural,
+	getServiceEmoji,
+} from "../lib/services";
 
 export interface Props {
-  title: string;
-  description: string;
-  canonical?: string;
-  ogUrl?: string;
-  ogImage?: string;
-  categoria?: string; // ej: "Vulcanizadoras"
-  estado?: string;    // ej: "Nuevo León"
-  schemaData?: any;
-  servicioActive?: string; // ej: "vulcanizadora" | "plomero" etc (type de la BD)
+	title: string;
+	description: string;
+	canonical?: string;
+	ogUrl?: string;
+	ogImage?: string;
+	categoria?: string; // ej: "Vulcanizadoras"
+	estado?: string; // ej: "Nuevo León"
+	schemaData?: any;
+	servicioActive?: string; // ej: "vulcanizadora" | "plomero" etc (type de la BD)
 }
 
 const {
-  title,
-  description,
-  canonical,
-  ogUrl,
-  ogImage,
-  categoria = "Servicios",
-  estado,
-  schemaData,
-  servicioActive,
+	title,
+	description,
+	canonical,
+	ogUrl,
+	ogImage,
+	categoria = "Servicios",
+	estado,
+	schemaData,
+	servicioActive,
 } = Astro.props;
 
-const serviceSlug = servicioActive ? getSlugFromServiceType(servicioActive) : '';
-const serviceTitle = servicioActive ? getServiceTitlePlural(servicioActive) : 'Servicios';
-const serviceEmoji = servicioActive ? getServiceEmoji(servicioActive) : '🛠️';
-const logoLink = serviceSlug ? `/servicios/${serviceSlug}` : '/servicios';
+const serviceSlug = servicioActive
+	? getSlugFromServiceType(servicioActive)
+	: "";
+const serviceTitle = servicioActive
+	? getServiceTitlePlural(servicioActive)
+	: "Servicios";
+const serviceEmoji = servicioActive ? getServiceEmoji(servicioActive) : "🛠️";
+const logoLink = serviceSlug ? `/servicios/${serviceSlug}` : "/servicios";
 ---
 
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical || Astro.url} />
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical || Astro.url} />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={ogUrl || Astro.url} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={ogUrl || Astro.url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		{ogImage && <meta property="og:image" content={ogImage} />}
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
 
-    <!-- Schema.org -->
-    {schemaData && (
-      <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
-    )}
+		<!-- Schema.org -->
+		{
+			schemaData && (
+				<script
+					type="application/ld+json"
+					set:html={JSON.stringify(schemaData)}
+				/>
+			)
+		}
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<script
+			defer
+			src="https://umami.bysmax.com/script.js"
+			data-website-id="313460e1-c7b8-4330-b06b-f7e46e608c47"></script>
+	</head>
 
-    <!-- Analytics (mismo que el resto del sitio) -->
-    <script
-      src="https://analytics.ahrefs.com/analytics.js"
-      data-key="tBLkU3Ea6HxUBHJiGObWig"
-      async></script>
-    <script
-      defer
-      src="https://cloud.umami.is/script.js"
-      data-website-id="b5a89fc6-d2ad-490e-b6f0-e608f3330d6b"></script>
-  </head>
+	<body class="servicios-body">
+		<!-- Header compacto para servicios -->
+		<header class="servicios-header">
+			<div class="header-inner">
+				<a href={logoLink} class="logo-link">
+					<div class="logo-icon">{serviceEmoji}</div>
+					<div>
+						<span class="logo-title">BySMax</span>
+						<div class="logo-sub">{serviceTitle}</div>
+					</div>
+				</a>
 
-  <body class="servicios-body">
-    <!-- Header compacto para servicios -->
-    <header class="servicios-header">
-      <div class="header-inner">
-        <a href={logoLink} class="logo-link">
-          <div class="logo-icon">{serviceEmoji}</div>
-          <div>
-            <span class="logo-title">BySMax</span>
-            <div class="logo-sub">{serviceTitle}</div>
-          </div>
-        </a>
+				<nav class="header-nav">
+					<a href="/servicios" class="nav-link">Servicios</a>
+					{
+						servicioActive && (
+							<a href={`/servicios/${serviceSlug}`} class="nav-link">
+								{serviceTitle}
+							</a>
+						)
+					}
+					<a href="/moteles" class="nav-link">Moteles</a>
+					<a href="/contact" class="nav-cta">Registrar negocio</a>
+				</nav>
 
-        <nav class="header-nav">
-          <a href="/servicios" class="nav-link">Servicios</a>
-          {servicioActive && (
-            <a href={`/servicios/${serviceSlug}`} class="nav-link">{serviceTitle}</a>
-          )}
-          <a href="/moteles" class="nav-link">Moteles</a>
-          <a href="/contact" class="nav-cta">Registrar negocio</a>
-        </nav>
+				<button id="mobileMenuBtn" class="mobile-btn" aria-label="Menú">
+					<svg
+						width="22"
+						height="22"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M4 6h16M4 12h16M4 18h16"></path>
+					</svg>
+				</button>
+			</div>
 
-        <button id="mobileMenuBtn" class="mobile-btn" aria-label="Menú">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
+			<!-- Mobile menu -->
+			<div id="mobileMenu" class="mobile-menu hidden">
+				<a href="/servicios" class="mobile-link">🛠️ Todos los Servicios</a>
+				{
+					servicioActive && (
+						<a href={`/servicios/${serviceSlug}`} class="mobile-link">
+							{serviceEmoji} {serviceTitle}
+						</a>
+					)
+				}
+				<a href="/moteles" class="mobile-link">🏨 Moteles</a>
+				<a href="/contact" class="mobile-link mobile-link-cta"
+					>Registrar mi negocio</a
+				>
+			</div>
+		</header>
 
-      <!-- Mobile menu -->
-      <div id="mobileMenu" class="mobile-menu hidden">
-        <a href="/servicios" class="mobile-link">🛠️ Todos los Servicios</a>
-        {servicioActive && (
-          <a href={`/servicios/${serviceSlug}`} class="mobile-link">{serviceEmoji} {serviceTitle}</a>
-        )}
-        <a href="/moteles" class="mobile-link">🏨 Moteles</a>
-        <a href="/contact" class="mobile-link mobile-link-cta">Registrar mi negocio</a>
-      </div>
-    </header>
+		<slot />
 
-    <slot />
+		<ScrollTopAndComment client:load />
+		<Footer textWhite={true} backgroundColor="bg-black" />
 
-    <ScrollTopAndComment client:load />
-    <Footer textWhite={true} backgroundColor="bg-black" />
+		<script>
+			const btn = document.getElementById("mobileMenuBtn");
+			const menu = document.getElementById("mobileMenu");
+			btn?.addEventListener("click", () => menu?.classList.toggle("hidden"));
+		</script>
 
-    <script>
-      const btn = document.getElementById("mobileMenuBtn");
-      const menu = document.getElementById("mobileMenu");
-      btn?.addEventListener("click", () => menu?.classList.toggle("hidden"));
-    </script>
+		<style>
+			:root {
+				--orange: #f97316;
+				--orange-dark: #ea580c;
+				--orange-light: #fed7aa;
+				--bg: #0a0a0a;
+				--surface: #111111;
+				--surface2: #1a1a1a;
+				--border: rgba(249, 115, 22, 0.15);
+				--text: #e5e7eb;
+				--text-muted: #9ca3af;
+			}
 
-    <style>
-      :root {
-        --orange: #f97316;
-        --orange-dark: #ea580c;
-        --orange-light: #fed7aa;
-        --bg: #0a0a0a;
-        --surface: #111111;
-        --surface2: #1a1a1a;
-        --border: rgba(249, 115, 22, 0.15);
-        --text: #e5e7eb;
-        --text-muted: #9ca3af;
-      }
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
 
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+			.servicios-body {
+				font-family: "Inter", system-ui, sans-serif;
+				background: var(--bg);
+				color: var(--text);
+				min-height: 100vh;
+			}
 
-      .servicios-body {
-        font-family: "Inter", system-ui, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-      }
+			/* ── Header ── */
+			.servicios-header {
+				position: sticky;
+				top: 0;
+				z-index: 50;
+				background: rgba(10, 10, 10, 0.95);
+				backdrop-filter: blur(12px);
+				border-bottom: 1px solid var(--border);
+			}
 
-      /* ── Header ── */
-      .servicios-header {
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        background: rgba(10, 10, 10, 0.95);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--border);
-      }
+			.header-inner {
+				max-width: 1280px;
+				margin: 0 auto;
+				padding: 0 1.25rem;
+				height: 60px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
 
-      .header-inner {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 0 1.25rem;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
+			.logo-link {
+				display: flex;
+				align-items: center;
+				gap: 0.6rem;
+				text-decoration: none;
+			}
 
-      .logo-link {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        text-decoration: none;
-      }
+			.logo-icon {
+				width: 36px;
+				height: 36px;
+				background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+				border-radius: 10px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 18px;
+			}
 
-      .logo-icon {
-        width: 36px;
-        height: 36px;
-        background: linear-gradient(135deg, var(--orange-dark), var(--orange));
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-      }
+			.logo-title {
+				font-weight: 800;
+				font-size: 1rem;
+				color: #fff;
+				display: block;
+			}
 
-      .logo-title {
-        font-weight: 800;
-        font-size: 1rem;
-        color: #fff;
-        display: block;
-      }
+			.logo-sub {
+				font-size: 0.65rem;
+				color: var(--orange);
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
 
-      .logo-sub {
-        font-size: 0.65rem;
-        color: var(--orange);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
+			.header-nav {
+				display: none;
+				align-items: center;
+				gap: 1.5rem;
+			}
 
-      .header-nav {
-        display: none;
-        align-items: center;
-        gap: 1.5rem;
-      }
+			@media (min-width: 768px) {
+				.header-nav {
+					display: flex;
+				}
+			}
 
-      @media (min-width: 768px) {
-        .header-nav { display: flex; }
-      }
+			.nav-link {
+				color: var(--text-muted);
+				text-decoration: none;
+				font-size: 0.875rem;
+				font-weight: 500;
+				transition: color 0.2s;
+			}
 
-      .nav-link {
-        color: var(--text-muted);
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: color 0.2s;
-      }
+			.nav-link:hover {
+				color: #fff;
+			}
 
-      .nav-link:hover { color: #fff; }
+			.nav-cta {
+				padding: 0.4rem 1rem;
+				background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+				color: #fff;
+				text-decoration: none;
+				border-radius: 8px;
+				font-size: 0.8rem;
+				font-weight: 700;
+				transition: opacity 0.2s;
+			}
 
-      .nav-cta {
-        padding: 0.4rem 1rem;
-        background: linear-gradient(135deg, var(--orange-dark), var(--orange));
-        color: #fff;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        transition: opacity 0.2s;
-      }
+			.nav-cta:hover {
+				opacity: 0.85;
+			}
 
-      .nav-cta:hover { opacity: 0.85; }
+			.mobile-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				color: var(--text-muted);
+				cursor: pointer;
+				padding: 0.25rem;
+			}
 
-      .mobile-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        padding: 0.25rem;
-      }
+			@media (min-width: 768px) {
+				.mobile-btn {
+					display: none;
+				}
+			}
 
-      @media (min-width: 768px) {
-        .mobile-btn { display: none; }
-      }
+			.mobile-menu {
+				border-top: 1px solid var(--border);
+				padding: 0.75rem 1.25rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+			}
 
-      .mobile-menu {
-        border-top: 1px solid var(--border);
-        padding: 0.75rem 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-      }
+			.mobile-menu.hidden {
+				display: none;
+			}
 
-      .mobile-menu.hidden { display: none; }
+			.mobile-link {
+				display: block;
+				padding: 0.6rem 0.75rem;
+				color: var(--text);
+				text-decoration: none;
+				font-size: 0.9rem;
+				border-radius: 8px;
+				transition: background 0.15s;
+			}
 
-      .mobile-link {
-        display: block;
-        padding: 0.6rem 0.75rem;
-        color: var(--text);
-        text-decoration: none;
-        font-size: 0.9rem;
-        border-radius: 8px;
-        transition: background 0.15s;
-      }
+			.mobile-link:hover {
+				background: var(--surface2);
+			}
 
-      .mobile-link:hover { background: var(--surface2); }
-
-      .mobile-link-cta {
-        margin-top: 0.25rem;
-        background: rgba(249, 115, 22, 0.15);
-        color: var(--orange);
-        font-weight: 700;
-      }
-    </style>
-  </body>
+			.mobile-link-cta {
+				margin-top: 0.25rem;
+				background: rgba(249, 115, 22, 0.15);
+				color: var(--orange);
+				font-weight: 700;
+			}
+		</style>
+	</body>
 </html>
