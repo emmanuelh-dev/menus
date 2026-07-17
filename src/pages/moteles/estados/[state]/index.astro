@@ -14,6 +14,18 @@ import { getRestaurants, getStates } from "../../../../lib/api";
 import { Waves, DollarSign, Clock, Car, BedDouble, MapPin } from "lucide-react";
 import type { SupabasePlace } from "../../../../types/app";
 
+// Guías del blog por estado (doc: se agregan a medida que se escriben, no
+// todos los estados tienen una todavía).
+const BLOG_GUIDE_BY_STATE: Record<string, string> = {
+	"nuevo-leon": "/blog/mejores-moteles-en-monterrey",
+	jalisco: "/blog/mejores-moteles-de-jalisco",
+	hidalgo: "/blog/mejores-moteles-de-hidalgo",
+	guanajuato: "/blog/mejores-moteles-de-guanajuato",
+	chiapas: "/blog/mejores-moteles-de-chiapas",
+	coahuila: "/blog/mejores-moteles-de-coahuila",
+	guerrero: "/blog/mejores-moteles-de-guerrero",
+};
+
 const { state } = Astro.params;
 const states = await getStates();
 
@@ -106,6 +118,19 @@ const schemaEnrichment = {
 
 		<section class="min-h-screen bg-black text-white py-12">
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				{
+					BLOG_GUIDE_BY_STATE[currentState.slug] && (
+						<a
+							href={BLOG_GUIDE_BY_STATE[currentState.slug]}
+							class="flex items-center justify-between gap-3 bg-pink-500/10 border border-pink-500/30 hover:border-pink-500/60 rounded-xl px-5 py-3 mb-6 transition-colors group"
+						>
+							<span class="text-pink-300 group-hover:text-pink-200 font-serif text-sm sm:text-base">
+								📖 Lee nuestra guía: <strong>Mejores Moteles de {currentState.name}</strong>
+							</span>
+							<span class="text-pink-400 group-hover:translate-x-1 transition-transform shrink-0">→</span>
+						</a>
+					)
+				}
 				<Breadcrumbs
 					items={[
 						{ label: "Inicio", href: "/" },

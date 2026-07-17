@@ -163,7 +163,6 @@ export default function MotelPageRenderer({
 
   const galleryImages = collectGalleryImages(place, blocks);
   const heroImage = galleryImages[0]?.src || place.image || "/placeholder.svg";
-  const extraImages = galleryImages.slice(1, 5);
   const minPrice = collectMinPrice(blocks);
   // Los precios siempre se muestran (decisión del negocio: nunca ocultarlos,
   // sin importar view_settings.show_prices) — antes de este cambio, places
@@ -228,37 +227,15 @@ export default function MotelPageRenderer({
             </div>
           </div>
 
-          {/* Galería estilo Airbnb: portada + hasta 4 miniaturas */}
+          {/* Carrusel compacto (antes: grid estilo Airbnb de hasta 420px de
+              alto + galería aparte debajo — mucho scroll para llegar al resto
+              de la ficha). Una sola fila deslizable, siempre baja altura. */}
           <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl">
-            {extraImages.length >= 4 ? (
-              <div className="grid grid-cols-4 grid-rows-2 gap-1 h-64 md:h-[420px]">
-                <div className="col-span-4 row-span-2 sm:col-span-2 relative overflow-hidden">
-                  <img src={heroImage} alt={place.name} className="w-full h-full object-cover" />
-                </div>
-                {extraImages.map((img, i) => (
-                  <div key={i} className="hidden sm:block relative overflow-hidden">
-                    <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <>
-                <img
-                  src={heroImage}
-                  alt={place.name}
-                  className="w-full aspect-[16/10] md:aspect-[2.39/1] object-cover"
-                />
-                {extraImages.length > 0 && (
-                  <div className="pt-2">
-                    <ReactGallery
-                      images={extraImages}
-                      altPrefix={place.name}
-                      layout="scroll"
-                    />
-                  </div>
-                )}
-              </>
-            )}
+            <ReactGallery
+              images={galleryImages.length > 0 ? galleryImages : [{ src: heroImage, alt: place.name }]}
+              altPrefix={place.name}
+              layout="scroll"
+            />
           </div>
 
           <div className="space-y-4">

@@ -253,7 +253,7 @@ const schemaEnrichment = {
             
             {states.length > 6 && (
               <div class="text-center mt-8">
-                <a 
+                <a
                   href="/moteles/estados"
                   class="inline-block px-8 py-3 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
                 >
@@ -261,6 +261,29 @@ const schemaEnrichment = {
                 </a>
               </div>
             )}
+          </div>
+
+          <!-- Guías: Mejores Moteles por Estado (blog) -->
+          <div class="mt-16">
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-8 text-center">Guías: Mejores Moteles por Estado</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { href: '/blog/mejores-moteles-en-monterrey', label: 'Mejores Moteles de Monterrey' },
+                { href: '/blog/mejores-moteles-de-jalisco', label: 'Mejores Moteles de Jalisco' },
+                { href: '/blog/mejores-moteles-de-hidalgo', label: 'Mejores Moteles de Hidalgo' },
+                { href: '/blog/mejores-moteles-de-guanajuato', label: 'Mejores Moteles de Guanajuato' },
+                { href: '/blog/mejores-moteles-de-chiapas', label: 'Mejores Moteles de Chiapas' },
+                { href: '/blog/mejores-moteles-de-coahuila', label: 'Mejores Moteles de Coahuila' },
+                { href: '/blog/mejores-moteles-de-guerrero', label: 'Mejores Moteles de Guerrero' },
+              ].map(guide => (
+                <a
+                  href={guide.href}
+                  class="bg-[#1E1E1E] border border-pink-500/20 hover:border-pink-500/50 rounded-xl p-4 text-center font-serif text-pink-300 hover:text-pink-200 transition-colors"
+                >
+                  {guide.label}
+                </a>
+              ))}
+            </div>
           </div>
 
           <!-- Guía de precios y consejos -->
