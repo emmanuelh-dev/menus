@@ -1,21 +1,5 @@
 ---
-import {
-	Utensils,
-	Menu,
-	X,
-	Zap,
-	ChevronDown,
-	ArrowUp,
-	ArrowRight,
-} from "lucide-react";
-import {
-	navItems,
-	navCategories,
-	platformLinks,
-	nicheLinks,
-	toolLinks,
-	exploreLinks,
-} from "../data/header-nav-links";
+import { Utensils, Menu, X, Zap, ArrowUp, ArrowRight } from "lucide-react";
 
 const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 
@@ -46,208 +30,16 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 			</a>
 
 			<div class="hidden lg:flex items-center space-x-7">
-				{/* Standalone Link: Menús */}
+				{/* El resto de los links (soluciones, herramientas, directorio, planes,
+				    nosotros, soporte) vive en el footer — este nav se queda solo con
+				    lo que la gente busca primero: ver ejemplos y el blog. */}
 				<a
 					href="/menus"
 					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
 				>
-					Ver ejemplo
+					Ver ejemplos
 				</a>
 
-				{/* Dropdown: Soluciones */}
-				<div class="relative group">
-					<button
-						class={`flex items-center space-x-1 py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
-					>
-						<span>Soluciones</span>
-						<ChevronDown
-							className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform"
-						/>
-					</button>
-
-					<div
-						class="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50 transition-delay-100"
-					>
-						<div
-							class="w-[580px] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-black/5"
-						>
-							<div class="grid grid-cols-2 gap-0">
-								<div class="p-6 bg-slate-50/50 border-r border-slate-100">
-									<p
-										class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-5"
-									>
-										Gestión y POS
-									</p>
-									<div class="space-y-5">
-										{
-											platformLinks.map((item) => (
-												<a
-													href={item.href}
-													class="flex items-start gap-4 group/item"
-												>
-													<div class="mt-1 p-1.5 bg-white rounded-lg border border-slate-200 text-slate-400 group-hover/item:text-emerald-600 group-hover/item:border-emerald-200 transition-all shadow-sm">
-														<Zap className="w-3.5 h-3.5" />
-													</div>
-													<div>
-														<p class="text-sm font-bold text-slate-900 group-hover/item:text-emerald-700 transition-colors">
-															{item.name}
-														</p>
-														<p class="text-[11px] text-slate-500 line-clamp-1 leading-relaxed">
-															{item.description}
-														</p>
-													</div>
-												</a>
-											))
-										}
-									</div>
-								</div>
-								<div class="p-6 bg-white">
-									<p
-										class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-5"
-									>
-										Especialidades
-									</p>
-									<div class="space-y-5">
-										{
-											nicheLinks.map((item) => (
-												<a
-													href={item.href}
-													class="flex items-start gap-4 group/item"
-												>
-													<div class="mt-1 p-1.5 bg-emerald-50 rounded-lg text-emerald-600 group-hover/item:bg-emerald-600 group-hover/item:text-white transition-all">
-														<Zap className="w-3.5 h-3.5" />
-													</div>
-													<div>
-														<p class="text-sm font-bold text-slate-900 group-hover/item:text-emerald-700 transition-colors">
-															{item.name}
-														</p>
-														<p class="text-[11px] text-slate-500 line-clamp-1 leading-relaxed">
-															{item.description}
-														</p>
-													</div>
-												</a>
-											))
-										}
-									</div>
-								</div>
-							</div>
-							<div
-								class="bg-slate-900 p-4 flex items-center justify-between px-6"
-							>
-								<p class="text-[11px] text-slate-400 font-medium">
-									¿Llevas prisa?
-								</p>
-								<a
-									href="https://admin-menus.bysmax.com"
-									class="text-emerald-400 text-[11px] font-black uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2"
-								>
-									Pruébalo gratis de inmediato <Zap className="w-3 h-3" />
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{/* Dropdown: Herramientas */}
-				<div class="relative group">
-					<button
-						class={`flex items-center space-x-1 py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
-					>
-						<span>Herramientas</span>
-						<ChevronDown
-							className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform"
-						/>
-					</button>
-
-					<div
-						class="absolute top-full left-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50"
-					>
-						<div
-							class="w-72 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden p-2 ring-1 ring-black/5"
-						>
-							{
-								toolLinks.map((item) => (
-									<a
-										href={item.href}
-										class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-50 group/tool transition-all"
-									>
-										<div class="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover/tool:text-emerald-600 group-hover/tool:bg-white transition-all border border-transparent group-hover/tool:border-emerald-100">
-											<Zap className="w-3.5 h-3.5" />
-										</div>
-										<div>
-											<p class="text-xs font-bold text-slate-900 group-hover/tool:text-emerald-800">
-												{item.name}
-											</p>
-											<p class="text-[10px] text-slate-500">
-												Simplifica tu venta
-											</p>
-										</div>
-									</a>
-								))
-							}
-						</div>
-					</div>
-				</div>
-
-				{/* Dropdown: Directorio */}
-				<div class="relative group">
-					<button
-						class={`flex items-center space-x-1 py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
-					>
-						<span>Directorio</span>
-						<ChevronDown
-							className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform"
-						/>
-					</button>
-
-					<div
-						class="absolute top-full left-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-2 group-hover:translate-y-0 z-50 transition-delay-100"
-					>
-						<div
-							class="w-64 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden p-2 ring-1 ring-black/5"
-						>
-							{
-								exploreLinks.map((item) => (
-									<a
-										href={item.href}
-										class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-emerald-50 group/tool transition-all"
-									>
-										<div class="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover/tool:text-emerald-600 group-hover/tool:bg-white transition-all border border-transparent group-hover/tool:border-emerald-100">
-											<Zap className="w-3.5 h-3.5" />
-										</div>
-										<p class="text-xs font-bold text-slate-900 group-hover/tool:text-emerald-800">
-											{item.name}
-										</p>
-									</a>
-								))
-							}
-						</div>
-					</div>
-				</div>
-
-				{/* Standalone: Planes */}
-				<a
-					href="/planes"
-					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
-				>
-					Planes
-				</a>
-
-				<a
-					href="/nosotros"
-					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
-				>
-					Nosotros
-				</a>
-
-				<a
-					href="/soporte"
-					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
-				>
-					Soporte
-				</a>
-
-				{/* Standalone Link: Blog */}
 				<a
 					href="/blog"
 					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
@@ -291,135 +83,26 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 					>
 						Crea tu menú gratis <Zap className="w-4 h-4" />
 					</a>
-					<div class="grid grid-cols-1 gap-1">
-						{
-							[...platformLinks, ...nicheLinks].map((item) => (
-								<a
-									href={item.href}
-									class="flex items-center gap-4 py-3.5 px-4 rounded-2xl hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
-								>
-									<div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
-										<Zap className="w-5 h-5" />
-									</div>
-									<div class="flex flex-col">
-										<span class="text-sm font-black text-slate-900">
-											{item.name}
-										</span>
-										<span class="text-[11px] text-slate-500">
-											{item.description}
-										</span>
-									</div>
-								</a>
-							))
-						}
-					</div>
-					<div>
-						<h3
-							class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-6 border-b border-emerald-100 pb-2"
-						>
-							Herramientas y Recursos
-						</h3>
-						<div class="grid grid-cols-2 gap-3">
-							{
-								[...toolLinks, ...exploreLinks].map((item) => (
-									<a
-										href={item.href}
-										class="flex flex-col justify-center items-center py-6 px-4 rounded-2xl bg-slate-50 text-slate-900 border border-slate-100 text-center"
-									>
-										<Zap className="w-5 h-5 text-emerald-600 mb-3" />
-										<span class="text-[11px] font-black uppercase leading-tight">
-											{item.name}
-										</span>
-									</a>
-								))
-							}
-						</div>
-					</div>
-
-					<div class="pt-6 border-t border-slate-100 space-y-3">
+					{/* El resto de los links vive en el footer — ver nota arriba. */}
+					<div class="space-y-3">
 						<a
 							href="/menus"
 							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
 						>
-							<div class="flex items-center gap-3">
-								<div
-									class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
-								>
-									<Zap className="w-5 h-5" />
-								</div>
-								<span
-									class="text-sm font-black text-slate-900 uppercase tracking-widest"
-									>Ejemplos Reales</span
-								>
-							</div>
+							<span
+								class="text-sm font-black text-slate-900 uppercase tracking-widest"
+								>Ver ejemplos</span
+							>
 							<ArrowRight className="w-4 h-4 text-slate-300" />
 						</a>
 						<a
 							href="/blog"
 							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
 						>
-							<div class="flex items-center gap-3">
-								<div
-									class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
-								>
-									<Zap className="w-5 h-5" />
-								</div>
-								<span
-									class="text-sm font-black text-slate-900 uppercase tracking-widest"
-									>Blog Gastronómico</span
-								>
-							</div>
-							<ArrowRight className="w-4 h-4 text-slate-300" />
-						</a>
-						<a
-							href="/planes"
-							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
-						>
-							<div class="flex items-center gap-3">
-								<div
-									class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
-								>
-									<Zap className="w-5 h-5" />
-								</div>
-								<span
-									class="text-sm font-black text-slate-900 uppercase tracking-widest"
-									>Planes</span
-								>
-							</div>
-							<ArrowRight className="w-4 h-4 text-slate-300" />
-						</a>
-						<a
-							href="/nosotros"
-							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
-						>
-							<div class="flex items-center gap-3">
-								<div
-									class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
-								>
-									<Zap className="w-5 h-5" />
-								</div>
-								<span
-									class="text-sm font-black text-slate-900 uppercase tracking-widest"
-									>Nosotros</span
-								>
-							</div>
-							<ArrowRight className="w-4 h-4 text-slate-300" />
-						</a>
-						<a
-							href="/soporte"
-							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
-						>
-							<div class="flex items-center gap-3">
-								<div
-									class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-active:text-emerald-600 shadow-sm"
-								>
-									<Zap className="w-5 h-5" />
-								</div>
-								<span
-									class="text-sm font-black text-slate-900 uppercase tracking-widest"
-									>Soporte</span
-								>
-							</div>
+							<span
+								class="text-sm font-black text-slate-900 uppercase tracking-widest"
+								>Blog</span
+							>
 							<ArrowRight className="w-4 h-4 text-slate-300" />
 						</a>
 					</div>
