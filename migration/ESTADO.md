@@ -1,6 +1,32 @@
 # Estado de la migración
 
-Última actualización: 2026-07-17 (sesión 3).
+Última actualización: 2026-07-17 (sesión 3, continuación).
+
+## Fix de negocio: precios siempre visibles en moteles (commit `76bc29f`)
+`MotelPageRenderer.tsx` ocultaba el precio si `content.view_settings.show_prices` no estaba seteado explícitamente — y la mayoría de los 528 moteles nunca lo tiene (contenido original de Supabase, jamás recompilado por el compilador de Go, ver F2 más abajo: el backfill nunca reescribe `places.content`). Resultado real verificado: la ficha de "Motel Love" no mostraba NINGÚN precio, pero el `<title>`/meta de `MotelLayout.astro` sí decía "Precios desde $390" (ese cálculo nunca respetó el flag). Decisión del usuario: los precios se muestran siempre, se quitó el gate por completo (`showPrices = true`). Bundleado en el mismo commit con un rediseño en curso de Antigravity (galería estilo Airbnb, `MotelCard.astro`, amenidades derivadas de `services`) que estaba entrelazado línea a línea en los mismos archivos — no se pudo separar limpiamente, se probó el conjunto completo en vivo antes de subir.
+
+## F3 (adelantada parcialmente) · Places autenticado + switch de admin-menus
+
+Alcance acotado a pedido del usuario: que `admin-menus` (Next.js) pueda **ver y editar el contenido de un menú** vía Go; todo lo demás del dashboard (pedidos, POS, comanda, mesas, caja, arqueo, shipping, insights, clientes, contactos, reseñas, servicios, usuarios, historial IA, blog images) se queda en Supabase tal cual, con un punto ámbar de "en mantenimiento" en el sidebar (`components/dashboard/sidebar.tsx`) para que quede claro que no se tocó.
+
+### Hecho — `admin-menus-go` (commits `a46c739`, `c137adc`)
+- `internal/api/places.go`: `GET/POST /api/places`, `GET/PUT/DELETE /api/places/{id}` (doc03, paridad byte a byte con `admin-menus/app/api/places/**` — incluye el detalle de que `GET /api/places` sin sesión responde `200 {data:[],count:0}`, no 401). Ownership: admin ve/edita todo, no-admin solo `user_id` propio.
+- El PUT de `content` pasa por `internal/content` (Parse → WriteDoc → ReadDoc → Compile, una transacción) — reutiliza el compilador de F2 tal cual, así `catalog_*` y `places.content` quedan consistentes en el mismo commit. `name`/`image` son un UPDATE aparte.
+- **Fix necesario en auth**: `POST /api/auth/register` ahora acepta un `id` opcional. Sin esto, el registro dual de admin-menus (ver abajo) generaría un UUID en Go distinto al que Supabase ya asignó, y el `places.user_id` (creado por Supabase en el signup) nunca haría match con el usuario de la sesión de Go — el usuario no podría ver su propio place recién creado. `CreateUser` ahora recibe `explicitID *string`.
+- Probado end-to-end contra Supabase real: create→get→put(content+name+image, confirmado que pobló `catalog_items`)→delete→cascade, límites de ownership (no-admin no ve place ajeno, 404 correcto), y register con `id` explícito respetado tal cual.
+
+### Hecho — `admin-menus` (commit `8e53159`)
+- Sesión dual (doc08): `app/auth/actions.ts` — `login()`/`signup()` autentican también contra Go y guardan `bm_session` (parseado del `Set-Cookie` real de Go), sin bloquear el login/registro de Supabase si Go falla (try/catch, solo se loguea). `signup()` manda el `id` de Supabase al registro de Go (ver fix de arriba).
+- `lib/api/go.ts` (`goFetch`, doc06): reenvía la cookie entrante a `GO_API_URL` server-to-server.
+- `lib/api/places.ts` (`getPlaces`/`getPlace`): ahora hacen fetch a Go en vez de query directa a Supabase — los 4 archivos que las consumen (`place/[id]/layout.tsx`, `page.tsx`, `menu/page.tsx`, `insights/page.tsx`) no se tocaron, tal como preveía el doc06.
+- `app/api/places/[id]/route.ts`: pasó de tener la lógica de Supabase inline a ser un proxy delgado a Go (lo llama `ContentEditor.tsx` directo desde el navegador para guardar/borrar).
+- **Probado end-to-end de verdad, sin datos de producción**: se creó un usuario Supabase desechable con la service-role key + `@supabase/ssr` (para generar la cookie de sesión real sin poder resolver el Turnstile real de forma headless), se registró el mismo `id` en Go, se pegó a `/place/{id}/menu` con la cookie combinada a través del middleware real de Next → `getPlace` vía Go → 200 con los datos correctos; se guardó un cambio real vía `PUT /api/places/{id}` (el proxy real) y se confirmó leyendo directo de Go que el contenido quedó compilado y `catalog_items` poblado. Todo el usuario/place/sesión de prueba se borró al terminar.
+
+### Qué falta para que esto sirva en producción
+- [ ] **`admin-menus-go` (adminm.bysmax.com) necesita redeploy** — verificado en vivo que production todavía no tiene las rutas `/api/places/*` (404). Sin esto, `admin-menus` en producción cae en el catch de error y esas páginas muestran vacío/404, no crashea, pero tampoco sirve.
+- [ ] Confirmar que `admin-menus` (dondequiera que esté desplegado) tenga `GO_API_URL=https://adminm.bysmax.com` en sus env vars — no se tocó nada de infraestructura de deploy de ese repo en esta sesión, solo el código.
+- [ ] `/gallery` y `/settings` (tabs del mismo place) siguen leyendo por `GET /api/admin/place/{id}` (Supabase, sin tocar) aunque **ya guardan vía Go** (comparten `ContentEditor`) — funciona, pero es una inconsistencia de lectura que vale la pena resolver cuando se migre esa ruta también.
+- [ ] `GET /api/restaurants/{id}` y `PUT /api/restaurants/{id}` (doc03, legacy) no se tocaron — si algo del dashboard los usa todavía, siguen en Supabase.
 
 ### Nota de reconciliación (commit `f41b779`)
 Antigravity trabajó en paralelo sobre moteles y pusheó su propio `src/lib/api.ts` (commit `f41b779`, "feat: migrate motels pages to use public Go API client"). Al hacer merge se resolvió a favor de la versión de esta sesión para `src/lib/api.ts` y las 5 páginas de moteles: la de Antigravity pedía `GET /api/public/places?limit=200` fijo, que trunca (el inventario de moteles ya son 528 — justo el bug que se encontró y arregló en esta misma sesión, ver "Hallazgo real #3" más abajo). El resto de esta sesión (restaurantes, servicios, tienda, cafeterías, menus-digitales, sitemaps, qr, manifest, contacto) no tenía equivalente en el commit de Antigravity, así que no hubo conflicto ahí.
