@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { FaStar, FaRegStar, FaWhatsapp, FaCamera, FaReply } from "react-icons/fa";
 import { supabase } from "../lib/supabase";
+import { getReviews } from "../lib/api";
 import { ManualUploader } from "./ManualUploader";
 
 /**
@@ -26,12 +27,8 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
 
   const loadReviews = useCallback(async () => {
     if (!id) return;
-    const { data } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("place_id", id)
-      .order("created_at", { ascending: false });
-    if (data) setReviews(data);
+    const data = await getReviews(id, 100);
+    setReviews(data);
   }, [id]);
 
   useEffect(() => {
