@@ -1,7 +1,6 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { createClient } from "@supabase/supabase-js";
 import { resend } from "../../../lib/resend";
 
 export const POST: APIRoute = async ({ request }) => {
@@ -15,24 +14,21 @@ export const POST: APIRoute = async ({ request }) => {
     // Verificar Turnstile token
     const { verifyTurnstileToken } = await import("../../../lib/turnstile");
     const verifyData = await verifyTurnstileToken(token);
-    
+
     if (!verifyData.success) {
       return new Response(JSON.stringify({ error: "Verificación de CAPTCHA fallida" }), { status: 400 });
     }
 
-    const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+    // Guardar en el backend compartido (bysmax-backend), igual que bysmax y anaconda-tracking
+    const name = email.split("@")[0]?.slice(0, 50) || "Menús";
+    const backendRes = await fetch("https://admin.bysmax.com/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message, source: "menus" }),
+    });
 
-    // 1. Guardar en la base de datos (Usando admin para bypass RLS)
-    const { data: contact, error: insertError } = await supabaseAdmin
-      .from("contact")
-      .insert([{ email, message }])
-      .select()
-      .single();
-
-    if (insertError) {
-      return new Response(JSON.stringify({ error: insertError.message }), { status: 400 });
+    if (!backendRes.ok) {
+      return new Response(JSON.stringify({ error: "Error al guardar el mensaje" }), { status: 400 });
     }
 
     // 2. Enviar email de notificación al Administrador
@@ -89,7 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    return new Response(JSON.stringify({ success: true, contact }), { status: 200 });
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
 
   } catch (error: any) {
     console.error("Contact submit error:", error);
