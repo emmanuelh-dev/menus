@@ -1,4 +1,5 @@
 import { getStates, getRestaurants } from '../lib/api';
+import { escapeXml } from '../lib/xml';
 
 export async function GET({ params }: { params: { state: string } }) {
   const baseUrl = 'https://menus.bysmax.com';
@@ -21,7 +22,7 @@ export async function GET({ params }: { params: { state: string } }) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${motelUrls.map(url => `
   <url>
-    <loc>${baseUrl}${url}</loc>
+    <loc>${escapeXml(baseUrl + url)}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
