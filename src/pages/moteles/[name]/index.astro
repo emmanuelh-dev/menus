@@ -2,7 +2,7 @@
 export const prerender = false;
 
 const { name } = Astro.params;
-import { getRestaurantByName } from "../../../lib/supabase";
+import { getRestaurantByName } from "../../../lib/api";
 
 if (!name) {
 	return Astro.redirect("/moteles");
