@@ -50,14 +50,16 @@ function featureIcon(feature: string) {
   return null;
 }
 
-// Recolecta hasta 5 fotos únicas (portada + habitaciones + galería de
-// instalaciones) para armar el grid de fotos estilo Airbnb del header.
+// Recolecta fotos únicas (portada + habitaciones + galería de instalaciones)
+// para el carrusel principal del header — la sección "Instalaciones" ya no
+// se muestra por separado más abajo, así que sus fotos viven solo aquí.
 function collectGalleryImages(place: any, blocks: any[]) {
   const images: { src: string; alt?: string }[] = [];
   const seen = new Set<string>();
+  const MAX_IMAGES = 20;
 
   const push = (src?: string, alt?: string) => {
-    if (!src || seen.has(src) || images.length >= 5) return;
+    if (!src || seen.has(src) || images.length >= MAX_IMAGES) return;
     seen.add(src);
     images.push({ src, alt: alt || place.name });
   };
@@ -65,16 +67,16 @@ function collectGalleryImages(place: any, blocks: any[]) {
   push(place.image, place.name);
 
   for (const block of blocks) {
-    if (images.length >= 5) break;
+    if (images.length >= MAX_IMAGES) break;
     if (block.type === "section" && block.data?.items) {
       for (const item of block.data.items) {
-        if (images.length >= 5) break;
+        if (images.length >= MAX_IMAGES) break;
         push(item.image, item.name);
       }
     }
     if (block.type === "gallery" && block.data?.images) {
       for (const img of block.data.images) {
-        if (images.length >= 5) break;
+        if (images.length >= MAX_IMAGES) break;
         push(img.src || img.url, img.alt);
       }
     }
@@ -436,23 +438,6 @@ export default function MotelPageRenderer({
               );
             }
 
-            if (block.type === "gallery") {
-              return (
-                <div key={block.id || idx} className="py-12 border-y border-white/5">
-                  <p className="text-center text-[10px] uppercase tracking-[0.5em] text-stone-600 mb-6">
-                    Instalaciones
-                  </p>
-                  <ReactGallery
-                    images={(block.data.images || []).map((img: any) => ({
-                      src: img.src || img.url,
-                      alt: img.alt || `${place.name} Instalaciones`,
-                      title: img.title
-                    }))}
-                    altPrefix={`${place.name} Instalaciones`}
-                  />
-                </div>
-              );
-            }
             return null;
           })}
         </div>
