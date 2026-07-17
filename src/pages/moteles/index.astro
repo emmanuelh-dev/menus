@@ -1,13 +1,12 @@
 ---
-import { Image } from "astro:assets";
 import MotelLayout from "../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../components/MotelBusinessSchema.astro";
 import MotelBreadcrumbSchema from "../../components/MotelBreadcrumbSchema.astro";
+import MotelCard from "../../components/MotelCard.astro";
 import Card from "../../components/Card.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { getRestaurants, getStates } from "../../lib/api";
-import { Bed, MapPin, Clock, Star, DollarSign, Phone, ArrowRight, Wifi, Car, Snowflake, Waves, Utensils, Martini } from "lucide-react";
-import type { SupabasePlace } from "../../types/app";
+import { Star, DollarSign } from "lucide-react";
 
 
 const [motelesList, states] = await Promise.all([
@@ -198,227 +197,32 @@ const schemaEnrichment = {
             <p class="text-base md:text-lg text-gray-300 max-w-3xl">{seoData.subheading}. Guía con precios actualizados, fotos de habitaciones y ubicaciones en mapa.</p>
           </div>
           
-          <!-- Filtros interactivos -->
-          <!-- <div class="mb-12 space-y-4">
-            <div class="flex flex-wrap justify-center gap-4">
-              <button id="filter-all" class="filter-btn px-6 py-2 bg-pink-500 text-white rounded-full font-serif hover:bg-pink-400 transition-colors" data-filter="all">Todos</button>
-              <button id="filter-premium" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="premium">Premium</button>
-              <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="rated">Mejor calificados</button>
-              <button id="filter-amenities" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-pink-500 hover:text-white transition-colors" data-filter="amenities">Con amenidades</button>
-            </div>
-            
-            <div class="flex flex-wrap justify-center gap-3 text-sm">
-              <Card 
-                href="?tipo=baratos"
-                title="💰 Moteles Baratos"
-                bgColor="bg-green-900/30"
-                textColor="text-green-400"
-                borderColor="border-green-500/30"
-                hoverBgColor="hover:bg-green-500"
-              />
-              <Card 
-                href="?tipo=jacuzzi"
-                title="🛁 Con Jacuzzi"
-                bgColor="bg-blue-900/30"
-                textColor="text-blue-400"
-                borderColor="border-blue-500/30"
-                hoverBgColor="hover:bg-blue-500"
-              />
-              <Card 
-                href="?tipo=12-horas"
-                title="⏰ 12 Horas"
-                bgColor="bg-purple-900/30"
-                textColor="text-purple-400"
-                borderColor="border-purple-500/30"
-                hoverBgColor="hover:bg-purple-500"
-              />
-              <Card 
-                href="?zona=centro"
-                title="🏛️ Centro"
-                bgColor="bg-orange-900/30"
-                textColor="text-orange-400"
-                borderColor="border-orange-500/30"
-                hoverBgColor="hover:bg-orange-500"
-              />
-              <Card 
-                href="?zona=universidad"
-                title="🎓 Universidad"
-                bgColor="bg-yellow-900/30"
-                textColor="text-yellow-400"
-                borderColor="border-yellow-500/30"
-                hoverBgColor="hover:bg-yellow-500"
-              />
-              <Card 
-                href="?zona=cumbres"
-                title="🏔️ Cumbres"
-                bgColor="bg-indigo-900/30"
-                textColor="text-indigo-400"
-                borderColor="border-indigo-500/30"
-                hoverBgColor="hover:bg-indigo-500"
-              />
-            </div>
-          </div> -->
-
           <!-- Banner: Califica y ayuda a otros -->
           <div class="mb-8 bg-[#1a0a1a] border border-pink-500/20 rounded-xl px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-              <div class="text-2xl">⭐</div>
+              <div class="p-2 bg-pink-500/10 rounded-full">
+                <Star className="w-5 h-5 text-pink-400" fill="currentColor" />
+              </div>
               <div>
                 <p class="text-white font-bold text-sm">¿Ya fuiste a un motel? Deja tu calificación</p>
                 <p class="text-gray-400 text-xs mt-0.5">Tus reseñas ayudan a otros usuarios a elegir mejor</p>
               </div>
             </div>
             <p class="text-pink-400 text-xs font-semibold tracking-wide text-center sm:text-right shrink-0">
-              Entra al motel y<br class="hidden sm:block" /> califica abajo 👇
+              Entra al motel y<br class="hidden sm:block" /> califica dentro de la página
             </p>
           </div>
 
           <!-- Grid de moteles -->
           <div id="moteles-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {motelesList.sort((a, b) => {
-              if (a.featured !== b.featured) {
-                  return a.featured ? -1 : 1; 
-              }
-              return b.rating - a.rating;
-            }).sort((a,b) => a.featured < b.featured ? 1 : -1).map((motel) => (
-              <div 
-                class={`motel-card group relative overflow-hidden rounded-xl bg-[#1E1E1E] shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${motel.highlight ? '  bg-gradient-to-br from-pink-900/20 to-purple-900/20' : 'border-pink-500/20'} hover:border-pink-500/50`}
-                data-rating={motel.rating}
-                data-price-range={motel.priceRange}
-                data-has-amenities={motel.amenities.length > 3 ? "true" : "false"}
-              >
-                <!-- Imagen con overlay -->
-                <div class="relative h-32 sm:h-48 overflow-hidden">
-                  <Image
-                    src={motel.image || '/motel.png'} 
-                    alt={motel.name}
-                    width={500}
-                    height={300}
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
-                  
-                  <!-- Calificación y precio -->
-                  <div class="absolute bottom-2.5 left-2.5 flex items-center space-x-1.5">
-                    <div class="flex items-center bg-black/90 px-1.5 py-0.5 rounded-full">
-                      <Star className="w-3 h-3 text-pink-400 mr-0.5" />
-                      <span class="text-[11px] font-medium text-white">{motel.rating}</span>
-                      <span class="text-[9px] text-gray-400 ml-0.5">({motel.reviewCount})</span>
-                    </div>
-                    <div class="bg-black/90 px-1.5 py-0.5 rounded-full">
-                      <span class="text-[11px] font-medium text-white">{motel.priceRange}</span>
-                    </div>
-                  </div>
-    
-                  <!-- Destacado -->
-                  {motel.highlight && (
-                    <div class="absolute top-2 left-2 bg-pink-500 text-white px-1.5 py-0.5 rounded-full text-[9px] font-semibold animate-pulse">
-                      ⭐ Recomendado
-                    </div>
-                  )}
-                </div>
-    
-                <!-- Contenido de la tarjeta -->
-                <div class="p-3 sm:p-5 flex flex-col justify-between h-[calc(100%-8rem)] sm:h-[calc(100%-12rem)]">
-                  <div>
-                    <h3 class="font-serif text-[15px] sm:text-lg font-bold text-pink-400 mb-1.5 group-hover:text-pink-300 transition-colors line-clamp-1">
-                      {motel.name}
-                    </h3>
-                    
-                    <!-- Estado (24 horas) -->
-                    <div class="flex items-center mb-1.5">
-                      <Clock className="w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0" />
-                      <span class="text-xs text-green-400">Abierto 24h</span>
-                    </div>
-                    
-                    <!-- Dirección -->
-                    <div class="flex items-start mb-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0" />
-                      <span class="text-xs text-gray-300 line-clamp-1">{motel.address}</span>
-                    </div>
-  
-                    <!-- Teléfono -->
-                    {motel.phone && (
-                      <div class="flex items-center mb-2">
-                        <Phone className="w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0" />
-                        <a href={`tel:${motel.phone}`} class="text-xs text-pink-400 hover:text-pink-300 transition-colors truncate">
-                          {motel.phone}
-                        </a>
-                      </div>
-                    )}
-      
-                    <!-- Especialidades -->
-                    {motel.specialties && motel.specialties.length > 0 && (
-                      <div class="flex flex-wrap gap-1 mt-1.5 mb-1.5">
-                        {motel.specialties.slice(0, 2).map((specialty) => (
-                          <span class="text-[9px] sm:text-xs bg-[#2A2A2A] text-pink-400 px-1.5 py-0.5 rounded-full">{specialty}</span>
-                        ))}
-                      </div>
-                    )}
-      
-                    <!-- Amenidades disponibles con iconos (Ocultas en móviles para minimalismo) -->
-                    <div class="hidden sm:grid grid-cols-2 gap-1.5 mt-3">
-                      {motel.amenities && motel.amenities.slice(0, 4).map((amenity) => (
-                        <div class="flex items-center text-[11px] text-gray-300">
-                          {amenity.toLowerCase().includes('wifi') && <Wifi className="w-3 h-3 mr-1 text-blue-400" />}
-                          {amenity.toLowerCase().includes('estacionamiento') && <Car className="w-3 h-3 mr-1 text-green-400" />}
-                          {amenity.toLowerCase().includes('aire') && <Snowflake className="w-3 h-3 mr-1 text-cyan-400" />}
-                          {amenity.toLowerCase().includes('alberca') && <Waves className="w-3 h-3 mr-1 text-blue-400" />}
-                          {amenity.toLowerCase().includes('restaurante') && <Utensils className="w-3 h-3 mr-1 text-orange-400" />}
-                          {amenity.toLowerCase().includes('bar') && <Martini className="w-3 h-3 mr-1 text-purple-400" />}
-                          <span class="truncate">{amenity}</span>
-                        </div>
-                      ))}
-                    </div>
-      
-                    <!-- Información adicional -->
-                    {motel.distance && (
-                      <div class="mt-2 p-1.5 bg-[#2A2A2A] rounded-lg hidden sm:block">
-                        <p class="text-[10px] text-yellow-400">ℹ️ {motel.distance}</p>
-                      </div>
-                    )}
-                  </div>
-    
-                  <!-- Botón de acción -->
-                  <div class="mt-3.5">
-                    {motel.short_name ? (
-                      <a 
-                        data-astro-prefetch="hover"
-                        href={`/moteles/estados/${motel.state_slug}/${motel.short_name}`}
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-3 py-1.5 rounded-lg font-serif text-xs sm:text-sm font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
-                      >
-                        Habitaciones
-                        <ArrowRight className="ml-1 w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </a>
-                    ) : motel.menu ? (
-                      <a 
-                        href={motel.menu} 
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="inline-block w-full text-center py-1.5 bg-pink-500 text-white rounded-lg font-serif text-xs sm:text-sm hover:bg-pink-400 transition-colors"
-                      >
-                        Información
-                      </a>
-                    ) : motel.phone ? (
-                      <a 
-                        href={`tel:${motel.phone}`}
-                        data-umami-event={'/moteles/' + motel.short_name + ' button'}
-                        class="w-full bg-pink-500 text-white px-3 py-1.5 rounded-lg font-serif text-xs sm:text-sm font-bold hover:bg-pink-400 transition-colors flex items-center justify-center group"
-                      >
-                        <Phone className="mr-1 w-3.5 h-3.5" />
-                        Llamar
-                      </a>
-                    ) : (
-                      <button 
-                        class="w-full py-1.5 bg-[#2A2A2A] text-pink-400 rounded-lg font-serif text-xs sm:text-sm hover:bg-[#3A3A3A] transition-colors"
-                      >
-                        Ver más
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+            {motelesList
+              .sort((a, b) => {
+                if (a.featured !== b.featured) {
+                  return a.featured ? -1 : 1;
+                }
+                return b.rating - a.rating;
+              })
+              .map((motel) => <MotelCard motel={motel} />)}
           </div>
     
           <div class="mt-20 mb-16">
@@ -465,7 +269,10 @@ const schemaEnrichment = {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 class="text-xl font-semibold text-pink-300 mb-4">💰 Rangos de Precios</h3>
+                <h3 class="text-xl font-semibold text-pink-300 mb-4 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-pink-400" />
+                  Rangos de Precios
+                </h3>
                 <ul class="space-y-2 text-gray-300">
                   <li><span class="text-green-400">$</span> - $300-450 por 4 horas</li>
                   <li><span class="text-yellow-400">$$</span> - $450-600 por 4 horas</li>
@@ -473,9 +280,9 @@ const schemaEnrichment = {
                   <li><span class="text-red-400">$$$$</span> - $800+ por sesión premium</li>
                 </ul>
               </div>
-              
+
               <div>
-                <h3 class="text-xl font-semibold text-pink-300 mb-4">💡 Consejos Útiles</h3>
+                <h3 class="text-xl font-semibold text-pink-300 mb-4">Consejos Útiles</h3>
                 <ul class="space-y-2 text-gray-300 text-sm">
                   <li>• Los fines de semana suele haber más demanda</li>
                   <li>• Algunos moteles permiten reservaciones entre semana</li>
@@ -542,67 +349,7 @@ const schemaEnrichment = {
 </main>
 </MotelLayout>
 
-<script>
-// Funcionalidad de filtros
-document.addEventListener('DOMContentLoaded', function() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  const motelCards = document.querySelectorAll('.motel-card');
-
-  filterButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const filter = this.getAttribute('data-filter');
-      
-      // Actualizar botones activos
-      filterButtons.forEach(btn => {
-        btn.classList.remove('bg-pink-500', 'text-white');
-        btn.classList.add('bg-[#1E1E1E]', 'text-gray-300');
-      });
-      
-      this.classList.remove('bg-[#1E1E1E]', 'text-gray-300');
-      this.classList.add('bg-pink-500', 'text-white');
-
-      // Filtrar tarjetas
-      motelCards.forEach(card => {
-        let shouldShow = true;
-
-        if (filter === 'premium') {
-          const priceRange = card.getAttribute('data-price-range');
-          shouldShow = priceRange === '$$$$' || priceRange === '$$$';
-        } else if (filter === 'rated') {
-          const ratingAttr = card.getAttribute('data-rating');
-          const rating = ratingAttr ? parseFloat(ratingAttr) : 0;
-          shouldShow = rating >= 4.3;
-        } else if (filter === 'amenities') {
-          const hasAmenities = card.getAttribute('data-has-amenities') === 'true';
-          shouldShow = hasAmenities;
-        }
-
-        if (shouldShow) {
-          (card as HTMLElement).style.display = 'block';
-          (card as HTMLElement).style.opacity = '1';
-        } else {
-          (card as HTMLElement).style.display = 'none';
-          (card as HTMLElement).style.opacity = '0';
-        }
-      });
-    });
-  });
-});
-</script>
-
 <style>
-  .motel-card {
-    transition: all 0.3s ease;
-  }
-  
-  .motel-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .filter-btn {
-    transition: all 0.3s ease;
-  }
-
   .font-serif {
     font-family: "Playfair Display", serif;
   }

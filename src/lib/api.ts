@@ -26,7 +26,14 @@ function enrichPlace(place: any): any {
     priceRange: place.priceRange || '$$',
     address: place.address || '',
     hours: place.hours || '24 horas',
-    amenities: place.amenities || [],
+    // El backend expone las amenidades como "services" (string separado por
+    // comas), no como arreglo — de ahí que las pills de amenidades salieran
+    // vacías en toda la vertical de moteles (listados, ficha, schema.org).
+    amenities: Array.isArray(place.amenities) && place.amenities.length > 0
+      ? place.amenities
+      : (typeof place.services === 'string'
+          ? place.services.split(',').map((s: string) => s.trim()).filter(Boolean)
+          : []),
     specialties: [
       ...(place.content?.semantic_data?.additional_features || []),
       ...(place.content?.semantic_data?.specialties || []),

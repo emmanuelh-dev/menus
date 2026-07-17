@@ -1,5 +1,5 @@
 ---
-import { Bed, Menu, X, Heart, ChevronDown } from "lucide-react";
+import { Menu, X, Heart, ChevronDown, DollarSign, Waves, Clock, Landmark, GraduationCap, Mountain } from "lucide-react";
 
 const { textWhite, backgroundColor } = Astro.props;
 
@@ -66,21 +66,24 @@ const motelNavItems = [
 								<div class="mt-1">
 									<a
 										href="/moteles?tipo=baratos"
-										class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+										class={`flex items-center gap-2 px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
 									>
-										💰 Moteles Baratos
+										<DollarSign className="h-4 w-4 text-pink-400" />
+										Moteles Baratos
 									</a>
 									<a
 										href="/moteles?tipo=jacuzzi"
-										class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+										class={`flex items-center gap-2 px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
 									>
-										🛁 Con Jacuzzi
+										<Waves className="h-4 w-4 text-pink-400" />
+										Con Jacuzzi
 									</a>
 									<a
 										href="/moteles?tipo=12-horas"
-										class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+										class={`flex items-center gap-2 px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
 									>
-										⏰ 12 Horas
+										<Clock className="h-4 w-4 text-pink-400" />
+										12 Horas
 									</a>
 								</div>
 							</div>
@@ -95,21 +98,24 @@ const motelNavItems = [
 								<div class="mt-1">
 									<a
 										href="/moteles?zona=centro"
-										class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+										class={`flex items-center gap-2 px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
 									>
-										🏛️ Centro
+										<Landmark className="h-4 w-4 text-pink-400" />
+										Centro
 									</a>
 									<a
 										href="/moteles?zona=universidad"
-										class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+										class={`flex items-center gap-2 px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
 									>
-										🎓 Universidad
+										<GraduationCap className="h-4 w-4 text-pink-400" />
+										Universidad
 									</a>
 									<a
 										href="/moteles?zona=cumbres"
-										class={`block px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
+										class={`flex items-center gap-2 px-4 py-2 text-sm ${textWhite ? "text-slate-200 hover:text-white hover:bg-white/10" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"} transition-colors duration-200 rounded-lg mx-2`}
 									>
-										🏔️ Cumbres
+										<Mountain className="h-4 w-4 text-pink-400" />
+										Cumbres
 									</a>
 								</div>
 							</div>
