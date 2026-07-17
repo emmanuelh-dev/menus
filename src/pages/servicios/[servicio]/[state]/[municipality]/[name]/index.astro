@@ -8,7 +8,7 @@ Astro.response.headers.set(
 
 import ServiciosLayout from "../../../../../../layouts/ServiciosLayout.astro";
 import Breadcrumbs from "../../../../../../components/Breadcrumbs.astro";
-import { getRestaurantByName, getRestaurants, supabase } from "../../../../../../lib/supabase";
+import { getRestaurantByName, getRestaurants, getMunicipalities, getReviews } from "../../../../../../lib/api";
 import { getServiceTypeFromSlug, getServiceTitlePlural, getServiceSeoPhrase } from "../../../../../../lib/services";
 import ReviewForm from "../../../../../../components/ReviewForm";
 
@@ -28,11 +28,7 @@ const results = await getRestaurantByName({ name });
 const place = results[0];
 
 // Cargar comentarios
-const { data: initialReviews } = await supabase
-  .from("reviews")
-  .select("*")
-  .eq("place_id", place?.id)
-  .order("created_at", { ascending: false });
+const initialReviews = place ? await getReviews(place.id, 100) : [];
 
 // Validar que el negocio exista y sea del tipo de servicio adecuado
 const dbType = serviceType === 'vulka_movil' ? 'vulcanizadora' : serviceType;
@@ -73,10 +69,7 @@ const priceRange = place.priceRange || '$$';
 
 // Cargar locales del estado y todos los municipios del estado para calcular los conteos locales
 const locales = await getRestaurants({ type: serviceType, state_id: place.states?.id || place.state_id });
-const { data: municipalitiesDb } = await supabase
-  .from('municipalities')
-  .select('*')
-  .eq('state_id', place.states?.id || place.state_id);
+const municipalitiesDb = await getMunicipalities(place.states?.id || place.state_id);
 
 const placeMuni = place.municipalities;
 const baseMuniCount = placeMuni ? locales.filter((v: any) => {

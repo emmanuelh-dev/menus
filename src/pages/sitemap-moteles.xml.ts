@@ -1,4 +1,4 @@
-import { getStates } from '../lib/supabase';
+import { getStates } from '../lib/api';
 
 export async function GET() {
   const baseUrl = 'https://menus.bysmax.com';

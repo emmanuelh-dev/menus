@@ -7,18 +7,12 @@ Astro.response.headers.set(
 );
 
 import DefaultLayout from "../../layouts/DefaultLayout.astro";
-import { supabase } from "../../lib/supabase";
+import { getRestaurants } from "../../lib/api";
 
-const { data: placesRaw } = await supabase
-  .from("places")
-  .select("id, name, short_name, image, address, content")
-  .not("short_name", "is", null)
-  .order("name");
-
-const places = (placesRaw || []).filter((place: any) => {
-  const template = place?.content?.view_settings?.template;
-  return template === "tienda";
-});
+const allPlaces = await getRestaurants({ type: null });
+const places = allPlaces
+  .filter((place: any) => place.short_name && place.content?.view_settings?.template === "tienda")
+  .sort((a: any, b: any) => a.name.localeCompare(b.name));
 ---
 
 <DefaultLayout

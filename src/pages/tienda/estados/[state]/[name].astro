@@ -9,17 +9,13 @@ Astro.response.headers.set(
 const { name, state } = Astro.params;
 
 import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
-import { supabase } from "../../../../lib/supabase";
+import { getRestaurantByName } from "../../../../lib/api";
 
 if (!name) {
   throw new Error("No se ha especificado el nombre de la tienda");
 }
 
-const { data: place } = await supabase
-  .from("places")
-  .select("*, states(*)")
-  .eq("short_name", name)
-  .single();
+const [place] = await getRestaurantByName({ name });
 
 if (!place) {
   return Astro.redirect("/tienda");

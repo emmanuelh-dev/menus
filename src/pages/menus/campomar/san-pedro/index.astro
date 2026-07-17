@@ -2,13 +2,9 @@
 import RecommendationButton from "../../../../components/RecommendationButton";
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import CategoryNavigation from "../../../../components/CategoryNavigation";
-import { supabase } from "../../../../lib/supabase";
+import { getRestaurantByName } from "../../../../lib/api";
 
-const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", "campomar")
-	.single();
+const [place] = await getRestaurantByName({ name: "campomar" });
 
 const categoryColors = [
 	"text-blue-400",

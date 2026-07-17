@@ -9,14 +9,10 @@ Astro.response.headers.set(
 import Gallery from "../../../components/Gallery.astro";
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import InfoChips from "../../../components/InfoChips.astro";
-import { supabase } from "../../../lib/supabase";
+import { getRestaurantByName } from "../../../lib/api";
 import { Image } from "astro:assets";
 
-const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", "quesabirrias.laregia.mty")
-	.single();
+const [place] = await getRestaurantByName({ name: "quesabirrias.laregia.mty" });
 const {
 	blocks: rawBlocks = [],
 	sections: oldSections = [],

@@ -19,12 +19,8 @@ Astro.response.headers.set('Vercel-Cache-Tag', placeTag);
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
 import Gallery from "../../../../components/Gallery.astro";
 import WhatsappButton from "../../../../components/WhatsappButton";
-import { supabase } from "../../../../lib/supabase";
-const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", name)
-	.single();
+import { getRestaurantByName } from "../../../../lib/api";
+const [place] = await getRestaurantByName({ name });
 
 if (!place) {
 	throw new Error(`No se encontró el restaurante: ${name}`);

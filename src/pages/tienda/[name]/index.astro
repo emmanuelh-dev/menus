@@ -16,13 +16,9 @@ const placeTag = `place-${name}`;
 Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 
 import MenuPageRenderer from "../../../components/templates/MenuPageRenderer.astro";
-import { supabase } from "../../../lib/supabase";
+import { getRestaurantByName } from "../../../lib/api";
 
-const { data: place } = await supabase
-  .from("places")
-  .select("*, states(*)")
-  .eq("short_name", name)
-  .single();
+const [place] = await getRestaurantByName({ name });
 
 if (!place) {
   throw new Error(`No se encontró la tienda: ${name}`);

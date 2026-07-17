@@ -3,15 +3,13 @@ export const prerender = false;
 
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { Star, MapPin, Clock, ArrowRight } from "lucide-react";
-import { supabase } from "../../lib/supabase";
+import { getRestaurants } from "../../lib/api";
 import { Image } from "astro:assets";
 
 // Fetching simplificado: Solo lo que necesitamos
-const { data: cafeterias } = await supabase
-	.from("places")
-	.select("*")
-	.eq("type", "cafeteria")
-	.order("rating", { ascending: false });
+const cafeterias = (await getRestaurants({ type: "cafeteria" })).sort(
+	(a, b) => b.rating - a.rating,
+);
 
 const seoData = {
 	title: "Mejores Cafeterías en Monterrey 2026 | Menús y Ubicaciones",

@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { supabase } from "../lib/supabase";
+import { getRestaurantByName } from "../lib/api";
 
 export const GET: APIRoute = async ({ url }) => {
 	const slug = url.searchParams.get("slug");
@@ -22,14 +22,9 @@ export const GET: APIRoute = async ({ url }) => {
 		themeColor = "#10b981";
 	} else if (slug) {
 		// Búsqueda en la tabla places para obtener metadatos reales
-		const { data: places, error } = await supabase
-			.from("places")
-			.select("name, type, image, menu, short_name, states(slug)")
-			.eq("short_name", slug);
+		const [place] = await getRestaurantByName({ name: slug });
 
-		const place = places?.[0];
-
-		if (!error && place) {
+		if (place) {
 			name = place.name;
 			shortName = place.name;
 			

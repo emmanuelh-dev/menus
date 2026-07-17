@@ -16,14 +16,10 @@ const placeTag = `place-${name}`;
 Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 
 import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
-import { supabase } from "../../../../lib/supabase";
+import { getRestaurantByName } from "../../../../lib/api";
 
 // Buscamos el lugar asegurándonos que el estado coincida para SEO
-const { data: place } = await supabase
-	.from("places")
-	.select("*, states(*)")
-	.eq("short_name", name)
-	.single();
+const [place] = await getRestaurantByName({ name });
 
 // Validación de estado para consistencia de URL
 if (!place || !place.states || place.states.slug !== state) {

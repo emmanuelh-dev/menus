@@ -6,16 +6,12 @@ import { Facebook, Instagram } from "lucide-react";
 import CopyClabe from "../../../components/CopyClabe";
 import WhatsappButton from "../../../components/WhatsappButton";
 import RecommendationButton from "../../../components/RecommendationButton";
-import { supabase } from "../../../lib/supabase";
+import { getRestaurantByName } from "../../../lib/api";
 import Gallery from "../../../components/Gallery.astro";
 import CartManager from "../../../components/CartManager.tsx";
 import CategoryNav from "../../../components/CategoryNav.tsx";
 
-const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", "elpapirey")
-	.single();
+const [place] = await getRestaurantByName({ name: "elpapirey" });
 
 if (!place) {
 	return Astro.redirect("/404");

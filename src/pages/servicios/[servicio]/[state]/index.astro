@@ -8,7 +8,7 @@ Astro.response.headers.set(
 
 import ServiciosLayout from "../../../../layouts/ServiciosLayout.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
-import { getRestaurants, supabase } from "../../../../lib/supabase";
+import { getRestaurants, getStates, getMunicipalities } from "../../../../lib/api";
 import { getServiceTypeFromSlug, getServiceTitlePlural } from "../../../../lib/services";
 
 const { servicio, state } = Astro.params;
@@ -23,11 +23,8 @@ if (!serviceType) {
 }
 
 // Consultar los datos del estado por slug
-const { data: stateDb } = await supabase
-  .from('states')
-  .select('*')
-  .eq('slug', state.toLowerCase())
-  .single();
+const states = await getStates();
+const stateDb = states.find((s) => s.slug === state.toLowerCase());
 
 if (!stateDb) {
   return Astro.redirect(`/servicios/${servicio}`);
@@ -37,10 +34,7 @@ if (!stateDb) {
 const locales = await getRestaurants({ type: serviceType, state_id: stateDb.id });
 
 // Cargar todos los municipios del estado para poder mapear los nombres/slugs de las áreas móviles
-const { data: municipalitiesDb } = await supabase
-  .from('municipalities')
-  .select('*')
-  .eq('state_id', stateDb.id);
+const municipalitiesDb = await getMunicipalities(stateDb.id);
 
 // Extraer municipios que tienen negocios de este tipo registrados o con cobertura móvil en este estado
 const municipiosConNegociosMap = new Map();

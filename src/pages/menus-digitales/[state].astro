@@ -2,11 +2,7 @@
 export const prerender = false;
 
 import DefaultLayout from "../../layouts/DefaultLayout.astro";
-import {
-	getStates,
-	getRestaurants,
-	getAllPlaceRatings,
-} from "../../lib/supabase";
+import { getStates, getRestaurants } from "../../lib/api";
 
 // Modular Landing Components
 import HeroSection from "../../components/landing/HeroSection.astro";
@@ -20,10 +16,7 @@ import StateRestaurants from "../../components/landing/StateRestaurants.astro";
 
 const { state: stateSlug } = Astro.params;
 
-const [states, allRatings] = await Promise.all([
-	getStates(),
-	getAllPlaceRatings(),
-]);
+const states = await getStates();
 
 const currentState = states.find((s) => s.slug === stateSlug);
 
@@ -31,17 +24,12 @@ if (!currentState) {
 	return Astro.redirect("/menus-digitales");
 }
 
-// Obtener todos los negocios para este estado (sin filtrar por tipo)
-const restaurantsData = await getRestaurants({
+// Obtener todos los negocios para este estado (sin filtrar por tipo) —
+// getRestaurants ya trae rating/reviewCount calculados server-side.
+const restaurants = await getRestaurants({
 	type: null,
 	state_id: currentState.id,
 });
-
-const restaurants = restaurantsData.map((res) => ({
-	...res,
-	rating: allRatings[res.id]?.rating || res.rating || 4.5,
-	reviewCount: allRatings[res.id]?.count || res.reviewCount || 0,
-}));
 
 const pageData = {
 	title: `Menú Digital QR en ${currentState.name} | Carta Digital para Restaurantes`,

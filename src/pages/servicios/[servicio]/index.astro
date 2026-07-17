@@ -9,7 +9,7 @@ Astro.response.headers.set(
 import ServiciosLayout from "../../../layouts/ServiciosLayout.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import { getServiceTypeFromSlug, getServiceTitlePlural, getServiceEmoji, getServiceSeoPhrase } from "../../../lib/services";
-import { supabase } from "../../../lib/supabase";
+import { getRestaurants } from "../../../lib/api";
 
 const { servicio } = Astro.params;
 
@@ -28,25 +28,9 @@ const serviceTitle = getServiceTitlePlural(serviceType);
 const serviceEmoji = getServiceEmoji(serviceType);
 const serviceSeoPhrase = getServiceSeoPhrase(serviceType);
 
-const dbType = serviceType === 'vulka_movil' ? 'vulcanizadora' : serviceType;
-
-// Consultamos los lugares del servicio para extraer los estados activos dinámicamente
-const { data: placesData, error } = await supabase
-  .from('places')
-  .select('id, state_id, states(*), municipalities(*), content')
-  .eq('type', dbType);
-
-if (error) {
-  console.error(`Error al consultar lugares para el servicio ${serviceType}:`, error);
-}
-
-let places = placesData;
-if (serviceType === 'vulka_movil' && places) {
-  places = places.filter((p: any) => {
-    const areas = p.content?.semantic_data?.areas || [];
-    return Array.isArray(areas) && areas.length > 0;
-  });
-}
+// getRestaurants ya aplica el mapeo vulka_movil→vulcanizadora y el filtro por
+// areas internamente (doc11) — mismo comportamiento que antes, menos código.
+const places = await getRestaurants({ type: serviceType });
 
 // Agrupar estados y obtener municipios con negocios registrados de este tipo
 const estadosMap = new Map();

@@ -16,23 +16,15 @@ const placeTag = `place-${name}`;
 Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 
 import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
-import {
-	supabase,
-	getStates,
-	getPlaceRating,
-} from "../../../../../lib/supabase";
+import { getStates, getRestaurantByName, getReviews } from "../../../../../lib/api";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
 import { isAuthenticated } from "../../../../../middleware/auth";
 
 const isAdmin = await isAuthenticated(Astro.request, Astro.cookies);
 
-const { data: places } = await supabase
-	.from("places")
-	.select("*, states(*)")
-	.eq("short_name", name);
-
-const place = places?.find((p) => p.states?.slug === state) || places?.[0];
+const places = await getRestaurantByName({ name });
+const place = places[0];
 
 if (!place) {
 	return Astro.redirect("/404");
@@ -44,15 +36,11 @@ if (place.states?.slug && place.states.slug !== state) {
 	return Astro.redirect(`/moteles/estados/${place.states.slug}/${name}`);
 }
 
-const stats = await getPlaceRating(place.id);
-const { data: initialReviews } = await supabase
-	.from("reviews")
-	.select("*")
-	.eq("place_id", place.id)
-	.order("created_at", { ascending: false })
-	.limit(10);
+// getRestaurantByName ya trae rating/reviewCount (+ alias .count) calculados
+// server-side — no hace falta una consulta de stats aparte.
+const initialReviews = await getReviews(place.id, 10);
 
-const placeWithStats = { ...place, ...stats };
+const placeWithStats = place;
 
 const states = await getStates();
 const currentState = states.find((s) => s.slug === state);
@@ -92,17 +80,6 @@ const currentState = states.find((s) => s.slug === state);
 			initialReviews={initialReviews || []}
 			client:load
 		/>
-
-		<ins
-			class="adsbygoogle h-48"
-			style="display:block"
-			data-ad-client="ca-pub-3646138644530578"
-			data-ad-slot="5585876237"
-			data-ad-format="auto"
-			data-full-width-responsive="true"></ins>
-		<script>
-			(adsbygoogle = window.adsbygoogle || []).push({});
-		</script>
 	</div>
 
 	<!-- <QuickFeed placeId={place.id} client:load /> -->

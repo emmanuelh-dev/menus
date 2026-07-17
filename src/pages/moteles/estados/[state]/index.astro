@@ -10,11 +10,7 @@ import MotelLayout from "../../../../layouts/MotelLayout.astro";
 import MotelBusinessSchema from "../../../../components/MotelBusinessSchema.astro";
 import Card from "../../../../components/Card.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
-import {
-	getRestaurants,
-	getStates,
-	getAllPlaceRatings,
-} from "../../../../lib/supabase";
+import { getRestaurants, getStates } from "../../../../lib/api";
 import {
 	Bed,
 	MapPin,
@@ -33,10 +29,7 @@ import {
 import type { SupabasePlace } from "../../../../types/app";
 
 const { state } = Astro.params;
-const [states, allRatings] = await Promise.all([
-	getStates(),
-	getAllPlaceRatings(),
-]);
+const states = await getStates();
 
 const currentState = states.find((s) => s.slug === state);
 
@@ -44,25 +37,12 @@ if (!currentState) {
 	return Astro.redirect("/moteles/estados");
 }
 
-const motelesData: SupabasePlace[] = await getRestaurants({
+// getRestaurants ya trae rating/reviewCount/priceRange/address/hours/etc.
+// enriquecidos (internal/api/public.go los calcula server-side) — no hace
+// falta una segunda consulta de ratings ni el .map() manual que había antes.
+const motelesList: SupabasePlace[] = await getRestaurants({
 	type: "motel",
 	state_id: currentState.id,
-});
-
-const motelesList: SupabasePlace[] = motelesData.map((motel) => {
-	const stats = allRatings[motel.id];
-
-	return {
-		...motel,
-		rating: stats?.rating || motel.rating || 4.0,
-		reviewCount: stats?.count || motel.reviewCount || 0,
-		priceRange: motel.priceRange || "$$",
-		address: motel.address || "",
-		hours: motel.hours || "24 horas",
-		amenities: motel.amenities || [],
-		specialties: [],
-		destacado: motel.featured,
-	};
 });
 
 const seoData = {

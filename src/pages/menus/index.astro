@@ -1,7 +1,7 @@
 ---
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight, MapPin } from "lucide-react";
-import { getStates, supabase } from "../../lib/supabase";
+import { getStates, getPlacesPage } from "../../lib/api";
 import { formater } from "../../types/app";
 import { Image } from "astro:assets";
 
@@ -26,79 +26,32 @@ const selectedIndustry = (searchParams.get("industry") || "Todos") as Industry;
 const selectedType = (searchParams.get("type") || "Todos") as BusinessType;
 const selectedSort = searchParams.get("sort") || "popular";
 
-let restaurantsQuery = supabase
-	.from("places")
-	.select("*, states(*)", { count: "exact" })
-	.neq("type", "motel");
-
-if (selectedIndustry !== "Todos") {
-	restaurantsQuery = restaurantsQuery.eq("category", selectedIndustry);
-}
-
-if (selectedType !== "Todos") {
-	if (selectedType === "Casual") {
-		restaurantsQuery = restaurantsQuery.eq("type", "restaurant");
-	} else {
-		restaurantsQuery = restaurantsQuery.eq("type", selectedType);
-	}
-}
-
-if (selectedSort === "recent") {
-	restaurantsQuery = restaurantsQuery.order("created_at", { ascending: false });
-} else if (selectedSort === "rating") {
-	restaurantsQuery = restaurantsQuery
-		.order("rating", { ascending: false })
-		.order("created_at", { ascending: false });
-} else {
-	restaurantsQuery = restaurantsQuery
-		.order("rating", { ascending: false })
-		.order("created_at", { ascending: false });
-}
+// selectedSort solo tiene 2 modos reales en el código original: "recent" y
+// todo lo demás (default "popular", cae en rating+created_at desc) — no hay
+// un tercer modo aunque exista un valor "rating" en teoría.
+const sort = selectedSort === "recent" ? "recent" : "rating";
+const dbType =
+	selectedType === "Todos"
+		? undefined
+		: selectedType === "Casual"
+			? "restaurant"
+			: selectedType;
 
 const from = (currentPage - 1) * pageSize;
-const to = from + pageSize - 1;
 
-restaurantsQuery = restaurantsQuery.range(from, to);
-
-const [restaurantsResult, states] = await Promise.all([
-	restaurantsQuery,
+const [{ data: restaurants, total: totalRestaurants }, states] = await Promise.all([
+	getPlacesPage({
+		type: dbType,
+		exclude_type: dbType ? undefined : "motel",
+		category: selectedIndustry === "Todos" ? undefined : selectedIndustry,
+		sort,
+		limit: pageSize,
+		offset: from,
+	}),
 	getStates().then((list) =>
 		list.filter((s) => s.total_places > 0 || s.slug === "nuevo-leon"),
 	),
 ]);
-
-let restaurantsData = restaurantsResult.data;
-let totalRestaurants = restaurantsResult.count;
-
-if (restaurantsResult.error) {
-	console.error(
-		"Error loading /menus with selected filters:",
-		restaurantsResult.error,
-	);
-
-	const fallbackResult = await supabase
-		.from("places")
-		.select("*, states(*)", { count: "exact" })
-		.neq("type", "motel")
-		.order("created_at", { ascending: false })
-		.range(from, to);
-
-	restaurantsData = fallbackResult.data;
-	totalRestaurants = fallbackResult.count;
-}
-
-const restaurants = (restaurantsData || []).map((place: any) => ({
-	...place,
-	state_slug: place.states?.slug || "nuevo-leon",
-	rating: place.rating || 4.0,
-	reviewCount: place.reviewCount || 0,
-	priceRange: place.priceRange || "$$",
-	address: place.address || "",
-	hours: place.hours || "24 horas",
-	amenities: place.amenities || [],
-	specialties: place.specialties || [],
-	destacado: place.featured,
-}));
 
 const totalPages = Math.max(1, Math.ceil((totalRestaurants || 0) / pageSize));
 const safeCurrentPage = Math.min(currentPage, totalPages);

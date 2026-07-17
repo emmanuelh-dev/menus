@@ -8,12 +8,8 @@ Astro.response.headers.set(
 
 
 import MenuPageRenderer from "../../../../components/templates/MenuPageRenderer.astro";
-import { supabase } from "../../../../lib/supabase";
-const { data: place } = await supabase
-.from("places")
-.select("*")
-.eq("short_name", "rock&billy")
-.single();
+import { getRestaurantByName } from "../../../../lib/api";
+const [place] = await getRestaurantByName({ name: "rock&billy" });
 const placeTag = `place-${place.name}`;
 Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 

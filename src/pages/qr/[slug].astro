@@ -7,14 +7,14 @@ const url = new URL(Astro.request.url);
 const userId = url.searchParams.get("u") || "anonymous";
 const tableId = url.searchParams.get("t") || "";
 
-import { supabase } from "../../lib/supabase";
+import { getRestaurantByName } from "../../lib/api";
+
+if (!slug) {
+	return Astro.redirect("/404");
+}
 
 // 1. Obtener datos del lugar
-const { data: place } = await supabase
-	.from("places")
-	.select("id, name, short_name")
-	.eq("short_name", slug)
-	.single();
+const [place] = await getRestaurantByName({ name: slug });
 
 if (!place) {
 	return Astro.redirect("/404");

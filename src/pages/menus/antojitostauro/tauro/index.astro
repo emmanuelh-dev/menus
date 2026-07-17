@@ -6,14 +6,10 @@ import Gallery from "../../../../components/Gallery.astro";
 import Carousel from "../../../../components/Carousel";
 import WhatsappButton from "../../../../components/WhatsappButton";
 import CopyClabe from "../../../../components/CopyClabe";
-import { supabase } from "../../../../lib/supabase";
+import { getRestaurantByName } from "../../../../lib/api";
 import { Facebook, Instagram } from "lucide-react";
 
-const { data: place } = await supabase
-	.from("places")
-	.select("*")
-	.eq("short_name", "antojitos-tauro-comida-mexicana")
-	.single();
+const [place] = await getRestaurantByName({ name: "antojitos-tauro-comida-mexicana" });
 
 const { blocks = [], view_settings = {} } = place.content || {};
 ---

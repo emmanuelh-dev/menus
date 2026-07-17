@@ -10,7 +10,7 @@ import { Image } from 'astro:assets';
 import RestaurantLayout from '../../../../layouts/RestaurantLayout.astro';
 import CartManager from '../../../../components/CartManager';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
-import { supabase } from '../../../../lib/supabase';
+import { getRestaurantByName } from '../../../../lib/api';
 
 const { name, category, product } = Astro.params;
 
@@ -37,11 +37,7 @@ const categoryTag = `place-${name}-cat-${decodedCategory}`;
 const productTag = `place-${name}-product-${decodedProduct}`;
 Astro.response.headers.set('Vercel-Cache-Tag', `${placeTag},${categoryTag},${productTag}`);
 
-const { data: place } = await supabase
-  .from('places')
-  .select('*, states(*)')
-  .eq('short_name', name)
-  .single();
+const [place] = await getRestaurantByName({ name });
 
 if (!place) {
   return Astro.redirect('/tienda');

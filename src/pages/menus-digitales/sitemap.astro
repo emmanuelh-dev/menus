@@ -1,6 +1,6 @@
 ---
 import DefaultLayout from "../../layouts/DefaultLayout.astro";
-import { getStates } from "../../lib/supabase";
+import { getStates } from "../../lib/api";
 import { MapPin, ChevronRight, Globe, Utensils } from "lucide-react";
 
 const states = await getStates();

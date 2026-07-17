@@ -8,7 +8,7 @@ Astro.response.headers.set(
 
 import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
-import { getStates } from "../../../lib/supabase";
+import { getStates } from "../../../lib/api";
 import { MapPin, ArrowRight, Utensils } from "lucide-react";
 
 const states = (await getStates()).filter(

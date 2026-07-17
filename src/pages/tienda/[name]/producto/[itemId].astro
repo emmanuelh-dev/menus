@@ -6,7 +6,7 @@ Astro.response.headers.set(
   'public, s-maxage=300, stale-while-revalidate=60',
 );
 
-import { supabase } from '../../../../lib/supabase';
+import { getRestaurantByName } from '../../../../lib/api';
 
 const { name, itemId } = Astro.params;
 
@@ -28,11 +28,7 @@ const toSlug = (value: string) =>
 
 const decodedItemId = decodeURIComponent(itemId);
 
-const { data: place } = await supabase
-  .from('places')
-  .select('content')
-  .eq('short_name', name)
-  .single();
+const [place] = await getRestaurantByName({ name });
 
 if (!place) {
   return Astro.redirect('/tienda');
