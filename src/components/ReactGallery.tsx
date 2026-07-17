@@ -39,7 +39,7 @@ export const ReactGallery: React.FC<ReactGalleryProps> = ({
             return (
               <div 
                 key={index}
-                className="relative flex-shrink-0 w-60 h-40 md:w-80 md:h-52 rounded-2xl overflow-hidden snap-start cursor-pointer group shadow-lg border border-white/5 bg-white/[0.02] transition-all duration-300"
+                className="relative flex-shrink-0 w-60 h-[260px] md:w-80 md:h-[308px] rounded-2xl overflow-hidden snap-start cursor-pointer group shadow-lg border border-white/5 bg-white/[0.02] transition-all duration-300"
               >
                 <img
                   src={displayUrl}

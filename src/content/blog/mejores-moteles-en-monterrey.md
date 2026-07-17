@@ -15,7 +15,7 @@ Monterrey y su zona metropolitana cuentan con una amplia oferta de moteles que v
 
 ### 1. Motel Love - El Favorito de Monterrey
 
-El **Motel Love** se ha posicionado como el número uno en preferencia entre los regios. Destaca por:
+El **[Motel Love](https://menus.bysmax.com/moteles/estados/nuevo-leon/motel-love)** se ha posicionado como el número uno en preferencia entre los regios. Destaca por:
 
 - **Habitaciones amplias y modernas** con excelente mantenimiento
 - **Sistema de reservaciones** disponible entre semana
