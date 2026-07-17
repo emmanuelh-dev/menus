@@ -414,6 +414,7 @@ export default function MotelPageRenderer({
                                     title: img.title
                                   }))}
                                   altPrefix={`${place.name} - ${item.name}`}
+                                  size="sm"
                                 />
                               </div>
                             )}

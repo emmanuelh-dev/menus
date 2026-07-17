@@ -10,18 +10,23 @@ interface ReactGalleryProps {
   images: ImageData[];
   altPrefix?: string;
   layout?: 'grid' | 'scroll';
+  size?: 'sm' | 'md';
 }
 
-export const ReactGallery: React.FC<ReactGalleryProps> = ({ 
-  images, 
+export const ReactGallery: React.FC<ReactGalleryProps> = ({
+  images,
   altPrefix = 'Imagen',
-  layout = 'scroll'
+  layout = 'scroll',
+  size = 'md'
 }) => {
   if (!images || images.length === 0) return null;
 
   const galleryId = `gallery-${Math.random().toString(36).substr(2, 9)}`;
 
   if (layout === 'scroll') {
+    const sizeClasses = size === 'sm'
+      ? 'w-32 h-24 md:w-40 md:h-28'
+      : 'w-60 h-[260px] md:w-80 md:h-[308px]';
     return (
       <div className="relative w-full">
         <style>{`
@@ -37,9 +42,9 @@ export const ReactGallery: React.FC<ReactGalleryProps> = ({
           {images.map((image, index) => {
             const displayUrl = typeof image.src === 'string' ? image.src : (image.src as any)?.src || '';
             return (
-              <div 
+              <div
                 key={index}
-                className="relative flex-shrink-0 w-60 h-[260px] md:w-80 md:h-[308px] rounded-2xl overflow-hidden snap-start cursor-pointer group shadow-lg border border-white/5 bg-white/[0.02] transition-all duration-300"
+                className={`relative flex-shrink-0 ${sizeClasses} rounded-2xl overflow-hidden snap-start cursor-pointer group shadow-lg border border-white/5 bg-white/[0.02] transition-all duration-300`}
               >
                 <img
                   src={displayUrl}

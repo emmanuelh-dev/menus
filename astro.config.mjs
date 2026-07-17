@@ -11,7 +11,14 @@ import vercel from '@astrojs/vercel';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://menus.bysmax.com',
-  integrations: [mdx(), sitemap(), tailwind(), react()],
+  integrations: [
+    mdx(),
+    sitemap({
+      filter: (page) => !page.includes('/admin/') && !page.includes('/auth/'),
+    }),
+    tailwind(),
+    react(),
+  ],
   output: 'static',
   adapter: vercel({
     webAnalytics: {

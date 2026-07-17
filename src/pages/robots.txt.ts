@@ -9,11 +9,18 @@ Allow: /cafeterias
 Allow: /cafeterias?zona=*
 Allow: /cafeterias?tipo=*
 
+# Paneles internos, no deben indexarse
+Disallow: /admin
+Disallow: /auth
+
 # Sitemap
 Sitemap: ${baseUrl}/sitemap-index.xml
 Sitemap: ${baseUrl}/sitemap-moteles.xml
 Sitemap: ${baseUrl}/sitemap-moteles-all.xml
+Sitemap: ${baseUrl}/sitemap-menus.xml
 Sitemap: ${baseUrl}/sitemap-menus-digitales.xml
+Sitemap: ${baseUrl}/sitemap-tienda.xml
+Sitemap: ${baseUrl}/sitemap-servicios.xml
 Sitemap: ${baseUrl}/sitemap-cafeterias.xml
 
 # Crawl-delay para bots agresivos
