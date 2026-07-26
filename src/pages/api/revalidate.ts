@@ -25,6 +25,29 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const body = await request.json();
+
+    // Camino nuevo: admin-menus-go manda los tags ya formados
+    // ({ tags: ["place-foo", "places-all"] }). Es el camino correcto para las
+    // escrituras del dashboard, y a propósito NO pasa por toSlug(): esa
+    // función corrompe los short_name con puntos — "quesabirrias.laregia.mty"
+    // se vuelve "quesabirriaslaregiamty" — y purgaría un tag que ninguna
+    // página emite, dejando la ficha stale con un TTL de un año.
+    if (Array.isArray(body?.tags)) {
+      const rawTags = body.tags as unknown[];
+      const tags: string[] = [...new Set(
+        rawTags.filter((t): t is string => typeof t === 'string' && t.length > 0)
+      )];
+      if (tags.length > 0) {
+        await Promise.all(tags.map((tag) => invalidateByTag(tag)));
+      }
+      return new Response(JSON.stringify({ revalidated: true, tags }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Camino legacy: webhook con forma de Supabase, que deriva el slug de
+    // record.short_name/name. Se conserva por si algo lo sigue llamando.
     const table = body?.table || body?.type?.table;
     if (table && table !== 'places') {
       return new Response(JSON.stringify({ skipped: true, reason: 'Only places table is supported' }), {

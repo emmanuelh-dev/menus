@@ -30,7 +30,8 @@ export async function GET() {
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+      'Cache-Control': 'public, s-maxage=31536000, stale-while-revalidate=86400',
+      'Vercel-Cache-Tag': 'places-all'
     },
   });
 }

@@ -2,6 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { createClient } from "@supabase/supabase-js";
+import { invalidateByTag } from "@vercel/functions";
 import { resend } from "../../../lib/resend";
 
 export const POST: APIRoute = async ({ request }) => {
@@ -31,6 +32,21 @@ export const POST: APIRoute = async ({ request }) => {
       .select("name, user_id, short_name, type")
       .eq("id", payload.place_id)
       .single();
+
+    // Una reseña cambia el rating y el conteo que se pintan en la ficha y en
+    // los listados. Sin este purge, con el s-maxage de un año la reseña no se
+    // vería nunca. El tag usa short_name tal cual (es el slug de la URL).
+    if (place?.short_name) {
+      try {
+        await Promise.all([
+          invalidateByTag(`place-${place.short_name}`),
+          invalidateByTag("places-all"),
+        ]);
+      } catch (purgeError) {
+        // Best-effort: la reseña ya quedó guardada, no se revierte por esto.
+        console.error("submit-review: falló el purge de cache", purgeError);
+      }
+    }
 
     if (place && place.user_id && resend) {
       // 3. Obtener el email del dueño desde Auth
