@@ -120,9 +120,20 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
           COMPARTE TU EXPERIENCIA
         </h2>
 
-        <div className="flex gap-1.5 mb-4">
+        {/* Las estrellas eran cinco botones cuyo único contenido era un icono:
+            un lector de pantalla anunciaba "botón" cinco veces y no había forma
+            de calificar sin ver. El aria-label dice cuántas estrellas es cada
+            uno y aria-pressed cuáles quedaron marcadas. */}
+        <div className="flex gap-1.5 mb-4" role="group" aria-label="Calificación">
           {[1, 2, 3, 4, 5].map((s) => (
-            <button key={s} type="button" onClick={() => setRating(s)} className="text-3xl transition-all hover:scale-110">
+            <button
+              key={s}
+              type="button"
+              onClick={() => setRating(s)}
+              aria-label={s === 1 ? '1 estrella' : `${s} estrellas`}
+              aria-pressed={rating >= s}
+              className="text-3xl transition-all hover:scale-110"
+            >
               {rating >= s ? <FaStar className="text-amber-500" /> : <FaRegStar className="text-white/10" />}
             </button>
           ))}

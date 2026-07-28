@@ -627,8 +627,16 @@ export default function CartManager({
       )}
 
       <div className="fixed bottom-6 right-6 z-40">
+        {/* El contador va en el aria-label y no sólo en la burbuja: para quien
+            no ve el número, "carrito, botón" no dice si lleva algo dentro. */}
         <button
           onClick={() => setShowCart(!showCart)}
+          aria-label={
+            totalItems > 0
+              ? `Ver pedido, ${totalItems} ${totalItems === 1 ? 'producto' : 'productos'}`
+              : 'Ver pedido, vacío'
+          }
+          aria-expanded={showCart}
           className={`relative text-white p-3 rounded-full transition-all hover:scale-105 ${totalItems > 0 ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-red-600 hover:bg-red-700'}`}
         >
           <ShoppingCart className="w-5 h-5" />

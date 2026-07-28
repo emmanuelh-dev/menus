@@ -404,7 +404,7 @@ const toCategorySlug = (value: string) =>
 	    menús distintos podrían convivir en una misma página sin pisarse los
 	    colores, y el tema queda inspeccionable en el DOM. */}
 	<div
-		class:list={["min-h-[100dvh]", config.bg, config.text]}
+		class:list={["vitrina", "min-h-[100dvh]", config.bg, config.text]}
 		style={[
 			`--m-bg:${themeColors.bg}`,
 			`--m-surface:${themeColors.surface}`,
@@ -828,6 +828,48 @@ const toCategorySlug = (value: string) =>
 		/* Quita la flecha nativa de details en Safari/Chrome */
 		summary::-webkit-details-marker {
 			display: none;
+		}
+
+	</style>
+
+	{/* Global y no scoped a propósito: los botones que necesitan foco visible
+	    viven en MenuItem.astro y CategoryNav.tsx, que son otros componentes, y
+	    el scoping de Astro no los alcanza. Todo cuelga de .vitrina para que no
+	    se escape a otras páginas del sitio. */}
+	<style is:global>
+		/* Foco visible para quien navega con teclado.
+		 *
+		 * No había ninguno: se dependía del anillo por defecto del navegador,
+		 * que es azul fijo y sobre un fondo oscuro personalizado se pierde. Aquí
+		 * se dibuja con el color de texto del tema, que por definición contrasta
+		 * con el fondo — si no contrastara, el menú sería ilegible de todos
+		 * modos.
+		 *
+		 * Va sobre :focus-visible y no :focus para que el anillo salga al
+		 * navegar con teclado pero no al tocar un botón con el dedo.
+		 *
+		 * Sólo outline, sin un segundo anillo con box-shadow: las utilidades de
+		 * sombra de Tailwind que ya traen los botones ganaban el cascade y lo
+		 * dejaban en cero. El offset basta para despegarlo del borde. */
+		.vitrina :focus-visible {
+			outline: 3px solid var(--m-text);
+			outline-offset: 3px;
+		}
+
+		/* Respetar a quien pidió menos movimiento en su sistema. La vitrina
+		 * tiene carruseles, escalados al pasar el cursor y transiciones de 700ms;
+		 * para alguien con sensibilidad vestibular eso marea. Se deja un tiempo
+		 * mínimo en vez de 0 para no romper transiciones cuyo evento de fin
+		 * espera algún script. */
+		@media (prefers-reduced-motion: reduce) {
+			.vitrina *,
+			.vitrina *::before,
+			.vitrina *::after {
+				animation-duration: 0.01ms !important;
+				animation-iteration-count: 1 !important;
+				transition-duration: 0.01ms !important;
+				scroll-behavior: auto !important;
+			}
 		}
 	</style>
 </RestaurantLayout>
