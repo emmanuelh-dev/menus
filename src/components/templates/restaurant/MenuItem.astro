@@ -10,6 +10,19 @@ interface Props {
 	enableCart: boolean;
 	whatsappNumber: string;
 	placeName?: string;
+	/**
+	 * "tile" apila foto cuadrada, nombre y precio. "row" es la lista compacta
+	 * de nombre y precio para secciones sin fotos, tipo "Complementos". Lo
+	 * decide la sección, no el producto: mezclar las dos formas en la misma
+	 * rejilla se ve roto.
+	 */
+	layout?: "tile" | "row";
+	/** Forma de las esquinas. Va aparte de la plantilla: el tema decide el
+	 *  color, no la forma, para no multiplicar plantillas por combinación. */
+	corners?: "redondo" | "cuadrado";
+	/** Efecto heredado del lugar. `item.effect` lo pisa: es el nivel más
+	 *  específico, y sirve para destacar un platillo sin tocar los demás. */
+	effect?: string;
 }
 
 import MarkdownBlock from "../../MarkdownBlock";
@@ -23,6 +36,9 @@ const {
 	enableCart,
 	whatsappNumber,
 	placeName = "",
+	layout = "row",
+	corners = "redondo",
+	effect = "ninguno",
 } = Astro.props;
 
 const isVibrant = false;
@@ -33,6 +49,22 @@ const isMariscos = false;
 const isCafesoso = false;
 const hasImage = typeof item?.image === "string" && item.image.trim() !== "";
 const showCartButton = enableCart && item.price > 0;
+const isTile = layout === "tile" && hasImage;
+const cornerClass = corners === "cuadrado" ? "rounded-none" : "rounded-xl";
+
+// Los efectos se declaran con las variables del tema, nunca con colores fijos:
+// un vidrio con `bg-white/10` quemado se ve bien en oscuro y desaparece en
+// claro. Así el mismo efecto funciona en las tres plantillas.
+const EFFECTS: Record<string, string> = {
+	ninguno: "",
+	vidrio: "bg-[var(--m-glass)] backdrop-blur-md ring-1 ring-[var(--m-border)]",
+	sombra: "bg-[var(--m-surface)] shadow-lg shadow-black/10",
+	borde: "ring-1 ring-[var(--m-border)]",
+};
+// El producto pisa al lugar. Si trae un efecto que no existe, se ignora en vez
+// de romper: un nombre mal escrito en el editor no debe vaciar la vitrina.
+const effectKey = item?.effect || effect;
+const effectClass = EFFECTS[effectKey] ?? "";
 const toItemSlug = (value: string) =>
 	(value || "")
 		.toString()
@@ -484,26 +516,39 @@ const tiendaItemUrl =
 		!isCafesoso && (
 			<div
 				class:list={[
-					"grid gap-3 md:gap-5 py-4 md:py-5 items-start",
-					hasImage &&
-						showCartButton &&
-						"grid-cols-[6rem_1fr_auto] md:grid-cols-[7.5rem_1fr_auto]",
-					hasImage &&
-						!showCartButton &&
-						"grid-cols-[6rem_1fr] md:grid-cols-[7.5rem_1fr]",
-					!hasImage && showCartButton && "grid-cols-[1fr_auto]",
-					!hasImage && !showCartButton && "grid-cols-1",
+					// Mosaico: foto cuadrada arriba, nombre y precio debajo.
+					isTile && "flex flex-col gap-2",
+					// Sin efecto la pieza va suelta sobre el fondo. Con efecto necesita
+					// caja: relleno para que el vidrio o la sombra se vean, y el mismo
+					// radio que la foto para que no queden dos formas distintas.
+					isTile && !effectClass && "pb-4",
+					isTile && effectClass && ["p-2", cornerClass, effectClass],
+					// Renglón: sin foto son dos líneas de texto, y darles el alto de un
+					// mosaico deja huecos enormes — una sección como "Complementos"
+					// termina flotando en la pantalla.
+					!isTile && "grid gap-3 md:gap-4 py-2 items-baseline",
+					!isTile && showCartButton && "grid-cols-[1fr_auto]",
+					!isTile && !showCartButton && "grid-cols-1",
 				]}
 				data-item-id={item.id}
 			>
-				{hasImage && (
-						<div class="order-1 overflow-hidden w-full md:w-[7.5rem] max-w-[250px] max-h-[250px]">
+				{isTile && (
+					<div
+					class:list={[
+						// El fondo importa ahora que la imagen no recorta: es lo que se ve
+						// en las bandas que deja object-contain, y como casi todas las fotos
+						// de producto vienen sobre blanco, --m-surface las hace ver como si
+						// flotaran en la tarjeta.
+						"order-1 w-full aspect-square overflow-hidden bg-[var(--m-surface)]",
+						cornerClass,
+					]}
+				>
 						<Image
 							src={item.image}
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
 							width={500}
 							height={500}
-							class="w-full h-24 md:h-[7.5rem] object-cover transition-all duration-700 hover:scale-110 rounded-md"
+							class="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
 							loading="lazy"
 							format="webp"
 							quality={85}
@@ -514,10 +559,12 @@ const tiendaItemUrl =
 				<div class="order-2 min-w-0">
 					<h3
 						class:list={[
-							"text-base md:text-lg font-bold tracking-tight mb-1 line-clamp-2",
-							template === "elegant" || template === "uber"
-								? "text-white"
-								: "text-[#2F2A25]",
+							// El nombre manda y el precio lo acompaña. Al quitarle la
+							// descripción al mosaico, nombre y precio quedaron pegados con el
+							// mismo tamaño y color, y el precio además en font-bold: se leían
+							// como dos renglones sueltos, no como producto + precio.
+							"text-[15px] md:text-base font-medium tracking-tight line-clamp-2 leading-snug",
+							"text-[var(--m-text)]",
 						]}
 					>
 						{item.name}
@@ -528,17 +575,13 @@ const tiendaItemUrl =
 								<div
 									class:list={[
 										"text-[11px] italic",
-										template === "elegant" || template === "uber"
-											? "text-gray-400"
-											: "text-stone-600",
+										"text-[var(--m-muted)]",
 									]}
 								>
 									<span
 										class:list={[
 											"font-bold not-italic capitalize",
-											template === "elegant" || template === "uber"
-												? "text-gray-300"
-												: "text-stone-700",
+											"text-[var(--m-text)]",
 										]}
 									>
 										{opt.name}:
@@ -548,15 +591,18 @@ const tiendaItemUrl =
 							))}
 						</div>
 					) : (
+						!isTile &&
 						item.description && (
-							<div class="mb-2">
+							// El mosaico va sin descripción a propósito. Fuera de él se
+							// recorta a dos líneas: las descripciones scrapeadas llegan a
+							// tener tres renglones y empujan el precio fuera de vista. El
+							// texto completo sigue en el DOM para SEO.
+							<div class="mb-2 overflow-hidden max-h-[2.85rem]">
 								<MarkdownBlock
 									client:load
 									content={item.description}
 									className={
-										template === "elegant" || template === "uber"
-											? "text-gray-300 text-sm font-light leading-relaxed !m-0"
-											: "text-stone-600 text-sm font-light leading-relaxed !m-0"
+										"text-[var(--m-muted)] text-sm font-light leading-relaxed !m-0"
 									}
 								/>
 							</div>
@@ -565,10 +611,10 @@ const tiendaItemUrl =
 					{item.price > 0 && showPrices && (
 						<span
 							class:list={[
-								"block text-sm font-bold mb-3",
-								template === "elegant" || template === "uber"
-									? "text-white"
-									: "text-[#4A433B]",
+								// Atenuado y un punto más chico: es el dato secundario de la
+								// pieza. Así la jerarquía es foto → nombre → precio.
+								"block mt-1 text-[13px] md:text-sm font-semibold tracking-tight",
+								"text-[var(--m-muted)]",
 							]}
 						>
 							${item.price}

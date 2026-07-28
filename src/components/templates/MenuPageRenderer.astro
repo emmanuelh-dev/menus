@@ -188,163 +188,146 @@ const buildMenuImageSlices = (
 // Find first carousel block for hero
 const heroCarousel = blocks.find((block: any) => block.type === "carrusel");
 
-const template = view_settings.template || "default";
+// Tres plantillas visuales, no nueve. Las que había (default, modern, vibrant,
+// mariscos, didi, uber, elegant, cafesoso) sólo se distinguían por el color de
+// fondo: todas declaraban una fontFamily propia — Montserrat, Nunito, Outfit —
+// que nunca llegó a cargarse por el @import roto, así que las nueve se veían con
+// la fuente del sistema. `tienda` se queda fuera de la cuenta a propósito: no es
+// un tema, es otro tipo de página, con carrito y rejilla de cuatro.
+const TEMPLATE_ALIASES: Record<string, string> = {
+	default: "clasica",
+	modern: "clasica",
+	vibrant: "clasica",
+	mariscos: "clasica",
+	didi: "clasica",
+	elegant: "elegante",
+	uber: "elegante",
+	cafesoso: "cafeteria",
+};
 
-const templateConfigs: Record<string, any> = {
-	default: {
-		bg: "bg-[#f6f3f3]",
-		text: "text-[#2E2A25]",
-		navColors: {
-			bg: "bg-[#f6f3f3]/90",
-			text: "text-[#3A342E]",
-			active: "bg-[#3A342E] text-[#f6f3f3]",
-		},
-		headerClass: "text-center",
-		titleClass: "text-4xl md:text-6xl font-bold serif drop-shadow-2xl",
-		sectionTitleClass:
-			"text-xl uppercase tracking-[0.3em] font-black text-stone-700 transition-all group-open:text-stone-900",
-		itemTitleClass:
-			"text-lg font-medium tracking-tight group-hover/item:text-stone-900 transition-colors",
-		fontImport: "family=Montserrat:ital,wght@0,400;0,600;1,400;1,600",
-		fontFamily: "'Montserrat', system-ui, sans-serif",
+// Se traduce al vuelo en vez de migrar la base: los 480 lugares sin plantilla y
+// los que traen un nombre viejo siguen funcionando sin tocar un solo registro.
+const rawTemplate = view_settings.template || "default";
+const template = TEMPLATE_ALIASES[rawTemplate] || rawTemplate;
+
+// La forma va aparte del color a propósito. Si el radio de las esquinas viviera
+// dentro de la plantilla, cada combinación de tema y forma sería una plantilla
+// nueva y volveríamos a tener nueve. Separado, son tres temas por dos formas sin
+// añadir ni una línea de configuración.
+const corners: "redondo" | "cuadrado" =
+	view_settings.corners === "cuadrado" ? "cuadrado" : "redondo";
+
+// Cuarto eje: el efecto de la pieza. Se resuelve en cascada lugar → producto,
+// para poder destacar un platillo suelto sin cambiarle el efecto a los otros
+// 300. El item gana porque es el nivel más específico.
+const effect: string = view_settings.effect || "ninguno";
+
+// El tema son tokens de color, no clases. Cuando las nueve plantillas se
+// redujeron a tres quedó claro que entre ellas sólo cambiaba el color: repetir
+// las clases de estructura una vez por tema era el error de origen. Aquí la
+// estructura se declara una sola vez (más abajo) y el color entra por variable
+// CSS, así que añadir un tema es añadir cinco colores, no un bloque entero.
+type Theme = {
+	bg: string;
+	surface: string;
+	text: string;
+	muted: string;
+	accent: string;
+	onAccent: string;
+};
+
+const THEMES: Record<string, Theme> = {
+	clasica: {
+		// Blanco puro, igual que surface. Con las fotos en object-contain el
+		// contenedor blanco sí se ve, y contra un fondo cálido (#f6f3f3) cada
+		// tarjeta parecía un parche pegado sobre la página. Iguales, el producto
+		// flota sobre la hoja y la retícula desaparece.
+		bg: "#ffffff",
+		surface: "#ffffff",
+		text: "#2E2A25",
+		muted: "#7a716a",
+		accent: "#2E2A25",
+		onAccent: "#ffffff",
 	},
-	modern: {
-		bg: "bg-white",
-		text: "text-gray-900",
-		navColors: {
-			bg: "bg-white/80",
-			text: "text-gray-900",
-			active: "bg-blue-600 text-white",
-		},
-		headerClass: "text-left border-l-4 pl-6",
-		titleClass:
-			"text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none",
-		sectionTitleClass:
-			"text-3xl font-black tracking-tighter text-gray-900 group-open:text-blue-600",
-		itemTitleClass:
-			"text-xl font-bold tracking-tight group-hover/item:text-blue-600 transition-colors",
-		fontImport: "family=Inter:wght@400;700;900",
-		fontFamily: "'Inter', sans-serif",
+	elegante: {
+		bg: "#050505",
+		surface: "#141414",
+		text: "#f3f4f6",
+		muted: "#9ca3af",
+		accent: "#ffffff",
+		onAccent: "#000000",
 	},
-	elegant: {
-		bg: "bg-[#050505]", // Pure black/darkest gray
-		text: "text-gray-100", // Bright almost-white text for readability
-		navColors: {
-			bg: "bg-[#050505]/95",
-			text: "text-gray-300",
-			active: "bg-white text-black font-bold", // Maximum contrast
-		},
-		headerClass: "text-center py-20",
-		titleClass:
-			"text-5xl md:text-8xl font-thin serif tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]",
-		sectionTitleClass:
-			"text-3xl serif tracking-widest text-gray-300 group-open:text-white pb-2 w-full transition-all duration-500",
-		itemTitleClass:
-			"text-xl serif font-normal tracking-wide text-white group-hover/item:text-yellow-200 transition-colors",
-		fontImport:
-			"family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400",
-		fontFamily: "'Cormorant Garamond', serif",
-	},
-	cafesoso: {
-		bg: "bg-[#F8F3EC]",
-		text: "text-[#3E2723]",
-		navColors: {
-			bg: "bg-[#F8F3EC]/90",
-			text: "text-[#4E342E]",
-			active: "bg-[#6D4C41] text-white",
-		},
-		headerClass: "text-center py-10",
-		titleClass: "text-5xl md:text-7xl font-black tracking-tight text-[#4E342E]",
-		sectionTitleClass:
-			"text-xl md:text-2xl font-black tracking-wide text-[#5D4037] bg-[#EDE0D4] px-6 py-3 rounded-2xl w-full",
-		itemTitleClass:
-			"text-lg font-bold tracking-tight text-[#3E2723] group-hover/item:text-[#6D4C41] transition-colors",
-		fontImport: "family=Nunito:wght@400;700;900",
-		fontFamily: "'Nunito', sans-serif",
-	},
-	vibrant: {
-		bg: "bg-[#f4f7f4]",
-		text: "text-slate-900",
-		navColors: {
-			bg: "bg-[#f4f7f4]/80",
-			text: "text-slate-900",
-			active: "bg-green-600 text-white",
-		},
-		headerClass: "text-center py-10",
-		titleClass:
-			"text-5xl md:text-7xl font-black uppercase tracking-tighter text-green-700 drop-shadow-sm",
-		sectionTitleClass:
-			"text-xl font-black uppercase tracking-widest text-white bg-green-600 px-8 py-3 rounded-2xl inline-block shadow-lg group-open:bg-orange-500 transition-all w-full",
-		fontImport: "family=Outfit:wght@400;700;900",
-		fontFamily: "'Outfit', sans-serif",
-	},
-	mariscos: {
-		bg: "bg-[#F0F7FF]",
-		text: "text-[#002B5B]",
-		navColors: {
-			bg: "bg-[#F0F7FF]/90",
-			text: "text-[#002B5B]",
-			active: "bg-[#FF6F00] text-white shadow-orange-200 shadow-lg",
-		},
-		headerClass: "text-center py-12 px-6",
-		titleClass:
-			"text-6xl md:text-8xl font-black uppercase tracking-tighter text-[#004AAD] drop-shadow-xl italic",
-		sectionTitleClass:
-			"text-2xl font-black bg-[#004AAD] text-white px-8 py-4 rounded-[2rem] inline-flex items-center gap-3 shadow-xl group-open:bg-[#FF6F00] transition-colors w-full",
-		fontImport: "family=Montserrat:wght@400;700;900",
-		fontFamily: "'Montserrat', sans-serif",
-	},
-	uber: {
-		bg: "bg-[#121212]",
-		text: "text-white",
-		navColors: {
-			bg: "bg-[#121212]/80",
-			text: "text-white",
-			active: "bg-white !text-black",
-		},
-		headerClass:
-			"text-left py-12 px-6 bg-gradient-to-b from-[#1a1a1a] to-[#121212]",
-		titleClass: "text-4xl font-bold tracking-tight",
-		sectionTitleClass: "text-2xl font-bold pb-4 mb-4",
-		fontImport: "family=Inter:wght@400;700;900",
-		fontFamily: "'Inter', sans-serif",
-	},
-	didi: {
-		bg: "bg-[#F8F8F8]",
-		text: "text-gray-900",
-		navColors: {
-			bg: "bg-white/80",
-			text: "text-gray-900",
-			active: "bg-[#FF5B00] text-white",
-		},
-		headerClass: "text-center py-12 bg-white shadow-sm mb-6",
-		titleClass: "text-4xl font-black text-[#FF5B00]",
-		sectionTitleClass:
-			"text-xl font-bold text-gray-800 mb-6 bg-gray-100/50 px-6 py-3 rounded-2xl",
-		fontImport: "family=Outfit:wght@400;700;900",
+	cafeteria: {
+		bg: "#F8F3EC",
+		surface: "#ffffff",
+		text: "#3E2723",
+		muted: "#7a6a63",
+		accent: "#6D4C41",
+		onAccent: "#ffffff",
 	},
 	tienda: {
-		bg: "bg-[#1a1a1a]",
-		text: "text-white",
-		navColors: {
-			bg: "bg-[#1a1a1a]/80",
-			text: "text-white",
-			active: "bg-red-600",
-		},
-		headerClass: "text-center py-10",
-		titleClass:
-			"text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-xl",
-		sectionTitleClass:
-			"text-xl font-black uppercase tracking-widest text-white mb-6",
-		itemTitleClass:
-			"text-lg font-bold tracking-tight text-white group-hover/item:text-red-400 transition-colors",
-		fontImport: "family=Outfit:wght@400;700;900",
-		fontFamily: "'Outfit', sans-serif",
-		showCategoryCards: true,
+		bg: "#1a1a1a",
+		surface: "#242424",
+		text: "#ffffff",
+		muted: "#a3a3a3",
+		accent: "#dc2626",
+		onAccent: "#ffffff",
 	},
 };
 
-const config = templateConfigs[template] || templateConfigs.default;
+// Los colores del lugar pisan al preset, campo por campo: quien quiera cambiar
+// sólo el accent no tiene que redeclarar los otros cinco.
+//
+// Se leen clave por clave en vez de esparcir el objeto entero: lo que venga del
+// editor es JSON del usuario y termina interpolado en un atributo `style`, así
+// que una clave inventada no debe llegar al HTML. `on_accent` va en snake_case
+// como el resto de view_settings (show_prices, hide_category_images); el
+// camelCase se queda del lado del código.
+// Sólo hex. Estos valores se concatenan en el atributo `style` del contenedor,
+// así que un valor libre podría cerrar la declaración e inyectar CSS en la
+// página pública ("#fff;background:url(...)"). Que el autor sea el dueño del
+// lugar no lo hace confiable: el que ve la página es su cliente. Cualquier cosa
+// que no sea hex cae al preset.
+const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+const savedColors: Record<string, unknown> = view_settings.colors || {};
+const pick = (k: string, fallback: string): string => {
+	const v = savedColors[k];
+	return typeof v === "string" && HEX.test(v.trim()) ? v.trim() : fallback;
+};
+
+const preset: Theme = THEMES[template] || THEMES.clasica;
+const themeColors: Theme = {
+	bg: pick("bg", preset.bg),
+	surface: pick("surface", preset.surface),
+	text: pick("text", preset.text),
+	muted: pick("muted", preset.muted),
+	accent: pick("accent", preset.accent),
+	onAccent: pick("on_accent", preset.onAccent),
+};
+
+// Estructura compartida por los tres temas. El color nunca se escribe aquí: se
+// referencia. Si vuelve a aparecer un hex en estas clases, es que un tema se
+// está colando en la estructura otra vez.
+const config: Record<string, any> = {
+	bg: "bg-[var(--m-bg)]",
+	text: "text-[var(--m-text)]",
+	navColors: {
+		bg: "bg-[var(--m-veil)]",
+		text: "text-[var(--m-text)]",
+		active: "bg-[var(--m-accent)] text-[var(--m-on-accent)]",
+	},
+	headerClass: "text-center py-10",
+	titleClass:
+		"text-4xl md:text-6xl font-bold tracking-tight text-[var(--m-text)]",
+	sectionTitleClass:
+		"text-xl md:text-2xl font-bold tracking-tight text-[var(--m-text)] pb-2 w-full",
+	itemTitleClass:
+		"text-lg font-semibold tracking-tight text-[var(--m-text)] transition-colors",
+	fontFamily: "'Inter', system-ui, sans-serif",
+	showCategoryCards: template === "tienda",
+};
+
 const justifyClass = config.headerClass?.includes("text-left")
 	? "justify-start"
 	: "justify-center";
@@ -391,7 +374,27 @@ const toCategorySlug = (value: string) =>
 	place={place}
 	backgroundColor={config.bg}
 >
-	<div class:list={["min-h-[100dvh]", config.bg, config.text]}>
+	{/* Las variables se declaran en la raíz, no en un <style> global: así dos
+	    menús distintos podrían convivir en una misma página sin pisarse los
+	    colores, y el tema queda inspeccionable en el DOM. */}
+	<div
+		class:list={["min-h-[100dvh]", config.bg, config.text]}
+		style={[
+			`--m-bg:${themeColors.bg}`,
+			`--m-surface:${themeColors.surface}`,
+			`--m-text:${themeColors.text}`,
+			`--m-muted:${themeColors.muted}`,
+			`--m-accent:${themeColors.accent}`,
+			`--m-on-accent:${themeColors.onAccent}`,
+			// Las translúcidas se calculan aquí, no con el modificador `/60` de
+			// Tailwind: ese modificador necesita descomponer el color y una
+			// variable CSS es opaca para el compilador, así que el alfa se pierde
+			// y el vidrio saldría sólido.
+			`--m-glass:color-mix(in srgb, ${themeColors.surface} 62%, transparent)`,
+			`--m-veil:color-mix(in srgb, ${themeColors.bg} 88%, transparent)`,
+			`--m-border:color-mix(in srgb, ${themeColors.text} 14%, transparent)`,
+		].join(";")}
+	>
 		{
 			menuImageBlocks.length > 0 && (
 				<div class="max-w-7xl mx-auto xl:px-4 sm:px-6">
@@ -465,7 +468,7 @@ const toCategorySlug = (value: string) =>
 		{
 			shouldShowHero && !showCategoriesAtStart && (
 				<div>
-					{template === "elegant" || template === "uber" ? (
+					{template === "elegante" ? (
 						// "Mobile App" Style Header for Premium/Dark Templates
 						<header class="pb-4 flex flex-col xl:flex-row items-center justify-center text-center z-10 transition-all">
 							<div class="w-full mb-4 xl:w-1/2">
@@ -565,7 +568,7 @@ const toCategorySlug = (value: string) =>
 		}
 
 		{
-			template !== "elegant" && template !== "uber" && (
+			template !== "elegante" && (
 				<div
 					class:list={[
 						"max-w-2xl mx-auto px-4 sm:px-6 pt-4 pb-2",
@@ -612,6 +615,15 @@ const toCategorySlug = (value: string) =>
 									toCategorySlug(block.data?.title || "") || "categoria";
 								sectionCounter++;
 
+								// Secciones como "Complementos" no traen ni una foto: sus
+								// filas son nombre y precio, dos renglones. A una columna en
+								// móvil quedan flotando con huecos enormes, así que ahí
+								// caben más columnas.
+								const sectionHasImages = block.data.items?.some(
+									(i: any) =>
+										typeof i?.image === "string" && i.image.trim() !== "",
+								);
+
 								return (
 									<section id={block.id}>
 										<div class="mb-8">
@@ -645,9 +657,13 @@ const toCategorySlug = (value: string) =>
 
 											<div
 												class:list={[
+													// Dos columnas desde el teléfono: con la foto cuadrada
+													// arriba y sin descripción, la celda ya no compite por
+													// ancho con el texto.
+													"grid gap-x-3 gap-y-6 sm:gap-4",
 													template === "tienda"
-														? "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-														: "grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-4",
+														? "grid-cols-2 lg:grid-cols-4"
+														: "grid-cols-2 md:grid-cols-3 xl:grid-cols-4",
 												]}
 											>
 												{block.data.items?.map((item: any) => (
@@ -660,6 +676,9 @@ const toCategorySlug = (value: string) =>
 														enableCart={enableCart || enableDelivery}
 														whatsappNumber={whatsappNumber}
 														placeName={place.name}
+														layout={sectionHasImages ? "tile" : "row"}
+														corners={corners}
+														effect={effect}
 													/>
 												))}
 											</div>
@@ -746,7 +765,12 @@ const toCategorySlug = (value: string) =>
 	</div>
 
 	<style define:vars={{ fontFamily: config.fontFamily }}>
-		@import url(`https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&${config.fontImport}&display=swap`);
+		/* Aquí vivía un @import con backticks y ${config.fontImport} dentro. Un
+		   bloque <style> de Astro es CSS plano, no un template literal, así que
+		   eso se compilaba a `@import"`https://...${config.fontImport}...`"` —
+		   una regla inválida que nunca cargó nada. Los títulos llevaban meses
+		   pintándose en el serif por defecto del navegador. Las fuentes se
+		   cargan desde el <link> del layout; no las pidas desde aquí. */
 
 		body {
 			font-family: var(--fontFamily);

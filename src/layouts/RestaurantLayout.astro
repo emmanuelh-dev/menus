@@ -446,9 +446,13 @@ if (schemaEnrichment.suitableForDiet) {
 		<!-- Schema.org for Google -->
 		<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-		<!-- Google Fonts for Restaurant Feel -->
+		{/* Google Fonts. Sin Yeseva One ni Merriweather: la unica referencia a
+		    Yeseva vivia dentro de un bloque comentado y Merriweather no se usaba
+		    en ningun lado, pero se descargaban las dos en cada carga.
+		    Merriweather era la cara: variable 300-900 con italicas y optico
+		    18..144. El CSS de fuentes pasa de 48 KB a 13 KB. */}
 		<link
-			href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
 			rel="stylesheet"
 		/>
 
