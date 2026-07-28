@@ -90,7 +90,7 @@ const tiendaItemUrl =
 		>
 			<div class="flex flex-col sm:flex-row gap-8">
 				{item.image && (
-							<div class="relative shrink-0 w-full sm:w-48 h-48 sm:h-48 max-w-[250px] max-h-[250px] overflow-hidden bg-gray-50 flex items-center justify-center border-0 rounded-none">
+					<div class="relative shrink-0 w-full sm:w-48 h-48 sm:h-48 max-w-[250px] max-h-[250px] overflow-hidden bg-gray-50 flex items-center justify-center border-0 rounded-none">
 						<Image
 							src={item.image}
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
@@ -341,7 +341,7 @@ const tiendaItemUrl =
 
 			<div class="relative shrink-0 self-center">
 				{item.image ? (
-						<div class="w-32 h-32 sm:w-36 sm:h-36 max-w-[250px] max-h-[250px] rounded-3xl overflow-hidden shadow-inner border border-slate-50">
+					<div class="w-32 h-32 sm:w-36 sm:h-36 max-w-[250px] max-h-[250px] rounded-3xl overflow-hidden shadow-inner border border-slate-50">
 						<Image
 							src={item.image}
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
@@ -391,7 +391,7 @@ const tiendaItemUrl =
 						alt={placeName ? `${item.name} - ${placeName}` : item.name}
 						width={640}
 						height={640}
-							class="w-full h-full max-w-[250px] max-h-[250px] object-cover group-hover:scale-105 transition-transform duration-500"
+						class="w-full h-full max-w-[250px] max-h-[250px] object-cover group-hover:scale-105 transition-transform duration-500"
 						loading="lazy"
 						format="webp"
 						quality={85}
@@ -534,15 +534,15 @@ const tiendaItemUrl =
 			>
 				{isTile && (
 					<div
-					class:list={[
-						// El fondo importa ahora que la imagen no recorta: es lo que se ve
-						// en las bandas que deja object-contain, y como casi todas las fotos
-						// de producto vienen sobre blanco, --m-surface las hace ver como si
-						// flotaran en la tarjeta.
-						"order-1 w-full aspect-square overflow-hidden bg-[var(--m-surface)]",
-						cornerClass,
-					]}
-				>
+						class:list={[
+							// El fondo importa ahora que la imagen no recorta: es lo que se ve
+							// en las bandas que deja object-contain, y como casi todas las fotos
+							// de producto vienen sobre blanco, --m-surface las hace ver como si
+							// flotaran en la tarjeta.
+							"order-1 relative w-full aspect-square overflow-hidden bg-[var(--m-surface)]",
+							cornerClass,
+						]}
+					>
 						<Image
 							src={item.image}
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
@@ -553,6 +553,20 @@ const tiendaItemUrl =
 							format="webp"
 							quality={85}
 						/>
+						{item.price > 0 && showPrices && (
+							// El precio va sobre la foto, no debajo del nombre: libera un
+							// renglón por tarjeta y deja de disputarle al nombre la misma
+							// columna de texto. Cae en la banda que deja object-contain, que
+							// en estas fotos de producto casi siempre está vacía.
+							<span
+								class:list={[
+									"absolute top-2 right-2 px-2 py-1 rounded-full text-sm font-semibold tracking-tight",
+									"bg-[var(--m-accent)] text-[var(--m-on-accent)]",
+								]}
+							>
+								${item.price}
+							</span>
+						)}
 					</div>
 				)}
 
@@ -564,7 +578,7 @@ const tiendaItemUrl =
 							// mismo tamaño y color, y el precio además en font-bold: se leían
 							// como dos renglones sueltos, no como producto + precio.
 							"text-[15px] md:text-base font-medium tracking-tight line-clamp-2 leading-snug",
-							"text-[var(--m-text)]",
+							"text-[var(--m-text)] font-bold",
 						]}
 					>
 						{item.name}
@@ -573,10 +587,7 @@ const tiendaItemUrl =
 						<div class="mb-4 space-y-1">
 							{item.options.map((opt: any) => (
 								<div
-									class:list={[
-										"text-[11px] italic",
-										"text-[var(--m-muted)]",
-									]}
+									class:list={["text-[11px] italic", "text-[var(--m-muted)]"]}
 								>
 									<span
 										class:list={[
@@ -608,10 +619,10 @@ const tiendaItemUrl =
 							</div>
 						)
 					)}
-					{item.price > 0 && showPrices && (
+					{!isTile && item.price > 0 && showPrices && (
 						<span
 							class:list={[
-								// Atenuado y un punto más chico: es el dato secundario de la
+								// Solo en filas: en el mosaico el precio vive sobre la foto. Atenuado y un punto más chico: es el dato secundario de la
 								// pieza. Así la jerarquía es foto → nombre → precio.
 								"block mt-1 text-[13px] md:text-sm font-semibold tracking-tight",
 								"text-[var(--m-muted)]",
