@@ -367,10 +367,18 @@ const shouldShowHero =
 	(!showCategoriesAtStart &&
 		heroCarousel &&
 		heroCarousel.data?.items?.length > 0);
+// Sólo el primer bloque de galería, no la suma de todos.
+//
+// Antes se concatenaban con flatMap, y un lugar con dos bloques (La Santa: uno
+// curado de 5 fotos y otro con las 30 de producto) terminaba con una galería
+// que era en realidad dos pegadas, sin que nadie la hubiera pedido así. Cuál
+// se ve es decisión del editor —el bloque que ponga primero—, no del renderer.
+// Los demás bloques de galería siguen existiendo en el contenido; simplemente
+// no se dibujan.
 const heroGalleryImages =
 	place.content?.semantic_data?.gallery?.length > 0
 		? place.content.semantic_data.gallery
-		: galleryBlocks.flatMap((block: any) => block.data?.images || []);
+		: galleryBlocks[0]?.data?.images || [];
 const toCategorySlug = (value: string) =>
 	(value || "")
 		.toString()
