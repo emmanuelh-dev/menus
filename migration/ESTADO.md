@@ -1,6 +1,70 @@
 # Estado de la migración
 
-Última actualización: 2026-07-17 (sesión 3, continuación).
+Última actualización: 2026-07-27 (sesión 4).
+
+## Sesión 4 (2026-07-27) · hub de /menus, orden por visitas y listados ligeros
+
+### Hecho
+- **Duplicado real resuelto**: places `721` y `722` eran el mismo motel cargado dos
+  veces con 8 minutos de diferencia (idénticos salvo el texto de la descripción de
+  IA; ambos con 0 reseñas / 0 pedidos / 0 visitas / 0 historial). Se borró el `722`
+  y se corrigió el typo del nombre del `721` ("Agus" → "Aguas"). El `short_name`
+  **no** se tocó: `/moteles/estados/aguascalientes/motelrealdeaguascalientes`
+  aparece en el snapshot de Analytics, o sea es la única URL de ese motel que
+  Google conoce. Inventario: 1067 → 1066 places.
+- **`GET /api/public/places?type=` acepta lista** (`type=restaurant,cafe,cafeteria`
+  → `p.type = ANY(...)`). El hub `/menus` filtraba por descarte
+  (`exclude_type=motel`), así que mostraba 539 lugares incluyendo 11
+  vulcanizadoras y 2 catálogos de prueba. Ahora son 526 explícitos.
+- **`sort=visits`**: visitantes únicos (`count(DISTINCT visitor_id)`) de los
+  últimos 30 días. No visitas crudas (alguien recargando no debe subir) ni
+  histórico completo (favorecería a los places viejos). El join a
+  `place_menu_visits` solo se agrega en este modo. ~211 ms medidos contra la base
+  real. En la página, "Más populares" y "Mejor calificados" caían las dos en
+  rating: daban el mismo listado.
+- **Listados sin `blocks`**: `contentSlim` en los LISTADOS emite solo
+  `view_settings` + `semantic_data` (menos `clabe`); el detalle sigue completo.
+  Los 526 places de `/menus` pasan de **6.7 MB a 143 KB (2.1%)**.
+- **`/menus` pasó a SSR** (`prerender = false` + `s-maxage=31536000` +
+  `Vercel-Cache-Tag: places-all`, igual que las otras 31 públicas). Era estática,
+  así que Astro descartaba los query params: el selector de orden, los filtros y
+  la paginación nunca funcionaron en producción y solo 9 de 526 lugares eran
+  alcanzables desde el hub.
+- `sitemap-menus.xml.ts` usa los mismos 3 tipos que el hub (antes solo
+  `restaurant`, así que las 7 cafeterías se veían en el listado pero no existían
+  para Google).
+
+### Nota: `clabe` NO es una fuga
+Quedó anotado antes como pendiente de seguridad ("no exponer `clabe`", doc 11).
+Revisado: `CartManager.tsx` la muestra a propósito cuando el cliente elige pagar
+por transferencia — es la cuenta del negocio para recibir el pago, es contenido
+público por diseño. Solo un place la tiene poblada (`2334`). Aun así se quita de
+los listados (nadie la lee ahí); la ficha la sigue devolviendo porque el carrito
+la necesita.
+
+### Pendientes que salieron de esta sesión
+- [ ] **Retención de `place_menu_visits` + botón de limpieza en el admin**
+      (pedido del usuario). Hoy la tabla crece sin tope: 80,753 filas desde el
+      2026-02-13, ~25 mil cada 30 días. El orden `sort=visits` solo mira los
+      últimos 30 días, así que lo más viejo no aporta a nada salvo peso — pero
+      **ojo antes de borrar**: `/api/admin/place/{id}/insights` sí lee histórico,
+      hay que confirmar qué ventana necesita ese dashboard antes de definir la
+      retención. Propuesta: purga por edad (ej. > 90 o > 180 días) + un botón en
+      el admin que la dispare bajo demanda, y decidir si además va por cron.
+- [ ] Los filtros **Restaurante / Café / Bar / Hotel** del hub filtran por
+      `category`, que está en `NULL` en 1049 de 1066 places → cualquiera devuelve
+      0 resultados. Los filtros **Formal / Fast Food / Buffet** se mandan como
+      `type` y esos valores no existen en la base → también 0. Solo "Casual"
+      (→ `restaurant`) funciona.
+- [ ] Places de prueba en producción: `1288` (`catalogo`) y `2339`
+      (`restaurant`, aparece en `/menus?sort=recent` como "prueba").
+- [ ] 27 `short_name` de moteles siguen repetidos entre estados distintos. No
+      rompen nada mientras moteles use la URL anidada (que es la que tiene
+      tráfico: 107 rutas anidadas vs 0 planas en el snapshot de Analytics), pero
+      la URL plana `/moteles/[name]` deja 37 moteles inalcanzables.
+- [ ] Ninguna página de detalle pasa `canonical`, así que cae en `Astro.url` y
+      cada URL se declara canónica de sí misma: el mismo place se sirve en dos
+      URLs (plana y anidada) en menus, moteles y tienda.
 
 ## Fix de negocio: precios siempre visibles en moteles (commit `76bc29f`)
 `MotelPageRenderer.tsx` ocultaba el precio si `content.view_settings.show_prices` no estaba seteado explícitamente — y la mayoría de los 528 moteles nunca lo tiene (contenido original de Supabase, jamás recompilado por el compilador de Go, ver F2 más abajo: el backfill nunca reescribe `places.content`). Resultado real verificado: la ficha de "Motel Love" no mostraba NINGÚN precio, pero el `<title>`/meta de `MotelLayout.astro` sí decía "Precios desde $390" (ese cálculo nunca respetó el flag). Decisión del usuario: los precios se muestran siempre, se quitó el gate por completo (`showPrices = true`). Bundleado en el mismo commit con un rediseño en curso de Antigravity (galería estilo Airbnb, `MotelCard.astro`, amenidades derivadas de `services`) que estaba entrelazado línea a línea en los mismos archivos — no se pudo separar limpiamente, se probó el conjunto completo en vivo antes de subir.

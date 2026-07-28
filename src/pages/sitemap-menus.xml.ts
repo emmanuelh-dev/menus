@@ -5,7 +5,9 @@ export async function GET() {
   const baseUrl = 'https://menus.bysmax.com';
 
   const states = await getStates();
-  const restaurantes = await getRestaurants({ type: 'restaurant' });
+  // Mismos tipos que muestra el hub /menus, para que no haya fichas visibles
+  // en el listado y ausentes del sitemap.
+  const restaurantes = await getRestaurants({ type: 'restaurant,cafe,cafeteria' });
 
   const menuUrls: string[] = [
     '/menus',

@@ -1,4 +1,16 @@
 ---
+// SSR: esta página era estática, así que Astro descartaba los query params y
+// el selector de orden, los filtros y la paginación no hacían nada (se servían
+// siempre los mismos 9 lugares de los 526). Mismo Cache-Control y tag que las
+// otras páginas públicas: la frescura viene del purge, no del TTL.
+export const prerender = false;
+
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, s-maxage=31536000, stale-while-revalidate=86400",
+);
+Astro.response.headers.set("Vercel-Cache-Tag", "places-all");
+
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import { ArrowRight, MapPin } from "lucide-react";
 import { getStates, getPlacesPage } from "../../lib/api";
@@ -26,13 +38,24 @@ const selectedIndustry = (searchParams.get("industry") || "Todos") as Industry;
 const selectedType = (searchParams.get("type") || "Todos") as BusinessType;
 const selectedSort = searchParams.get("sort") || "popular";
 
-// selectedSort solo tiene 2 modos reales en el código original: "recent" y
-// todo lo demás (default "popular", cae en rating+created_at desc) — no hay
-// un tercer modo aunque exista un valor "rating" en teoría.
-const sort = selectedSort === "recent" ? "recent" : "rating";
+// El selector ofrece 3 opciones pero antes solo había 2 modos reales:
+// "Más populares" y "Mejor calificados" caían ambos en rating, así que daban
+// exactamente el mismo listado. Ahora "populares" ordena por visitantes únicos
+// de los últimos 30 días (sort=visits), que es lo que la etiqueta promete.
+const sort =
+	selectedSort === "recent"
+		? "recent"
+		: selectedSort === "rating"
+			? "rating"
+			: "visits";
+// Este hub es solo de restaurantes y cafeterías. Antes filtraba por descarte
+// (exclude_type=motel), lo que dejaba entrar vulcanizadoras y catálogos de
+// prueba; ahora la lista de tipos es explícita.
+const MENU_TYPES = "restaurant,cafe,cafeteria";
+
 const dbType =
 	selectedType === "Todos"
-		? undefined
+		? MENU_TYPES
 		: selectedType === "Casual"
 			? "restaurant"
 			: selectedType;
@@ -42,7 +65,6 @@ const from = (currentPage - 1) * pageSize;
 const [{ data: restaurants, total: totalRestaurants }, states] = await Promise.all([
 	getPlacesPage({
 		type: dbType,
-		exclude_type: dbType ? undefined : "motel",
 		category: selectedIndustry === "Todos" ? undefined : selectedIndustry,
 		sort,
 		limit: pageSize,
