@@ -222,6 +222,15 @@ const corners: "redondo" | "cuadrado" =
 // 300. El item gana porque es el nivel más específico.
 const effect: string = view_settings.effect || "ninguno";
 
+// Quinto eje: cómo llena la foto su marco. No hay un default bueno para todos.
+// Medido sobre el catálogo real: hay lugares con producto recortado sobre
+// blanco (El Pollo Loco), donde `cover` corta el plato, y lugares con
+// fotografía a sangre (Spikes), donde `contain` deja bandas y desperdicia el
+// marco. Elegible por lugar; `contain` de default porque nunca corta comida,
+// que es el error más caro de los dos.
+const imageFit: "contain" | "cover" =
+	view_settings.image_fit === "cover" ? "cover" : "contain";
+
 // El tema son tokens de color, no clases. Cuando las nueve plantillas se
 // redujeron a tres quedó claro que entre ellas sólo cambiaba el color: repetir
 // las clases de estructura una vez por tema era el error de origen. Aquí la
@@ -234,6 +243,7 @@ type Theme = {
 	muted: string;
 	accent: string;
 	onAccent: string;
+	imageBg: string;
 };
 
 const THEMES: Record<string, Theme> = {
@@ -304,6 +314,11 @@ const themeColors: Theme = {
 	muted: pick("muted", preset.muted),
 	accent: pick("accent", preset.accent),
 	onAccent: pick("on_accent", preset.onAccent),
+	// El marco de la foto es su propio color: con `contain` es lo que se ve en
+	// las bandas, y no siempre conviene que sea el mismo de las tarjetas. Un
+	// producto recortado sobre blanco necesita marco blanco aunque el tema sea
+	// oscuro, o se le ve el recorte.
+	imageBg: pick("image_bg", preset.surface),
 };
 
 // Estructura compartida por los tres temas. El color nunca se escribe aquí: se
@@ -382,6 +397,7 @@ const toCategorySlug = (value: string) =>
 		style={[
 			`--m-bg:${themeColors.bg}`,
 			`--m-surface:${themeColors.surface}`,
+			`--m-image-bg:${themeColors.imageBg}`,
 			`--m-text:${themeColors.text}`,
 			`--m-muted:${themeColors.muted}`,
 			`--m-accent:${themeColors.accent}`,
@@ -679,6 +695,7 @@ const toCategorySlug = (value: string) =>
 														layout={sectionHasImages ? "tile" : "row"}
 														corners={corners}
 														effect={effect}
+														imageFit={imageFit}
 													/>
 												))}
 											</div>

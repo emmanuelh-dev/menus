@@ -23,6 +23,7 @@ interface Props {
 	/** Efecto heredado del lugar. `item.effect` lo pisa: es el nivel más
 	 *  específico, y sirve para destacar un platillo sin tocar los demás. */
 	effect?: string;
+	imageFit?: "contain" | "cover";
 }
 
 import MarkdownBlock from "../../MarkdownBlock";
@@ -39,6 +40,7 @@ const {
 	layout = "row",
 	corners = "redondo",
 	effect = "ninguno",
+	imageFit = "contain",
 } = Astro.props;
 
 const isVibrant = false;
@@ -64,6 +66,15 @@ const EFFECTS: Record<string, string> = {
 // El producto pisa al lugar. Si trae un efecto que no existe, se ignora en vez
 // de romper: un nombre mal escrito en el editor no debe vaciar la vitrina.
 const effectKey = item?.effect || effect;
+
+// Misma cascada que el efecto: el producto puede pisar al lugar. Sirve para el
+// caso real de un menú con fotografía a sangre que trae dos o tres productos
+// recortados sobre blanco, o al revés.
+const fitKey: "contain" | "cover" =
+	item?.image_fit === "cover" || item?.image_fit === "contain"
+		? item.image_fit
+		: imageFit;
+const fitClass = fitKey === "cover" ? "object-cover" : "object-contain";
 const effectClass = EFFECTS[effectKey] ?? "";
 const toItemSlug = (value: string) =>
 	(value || "")
@@ -539,7 +550,7 @@ const tiendaItemUrl =
 							// en las bandas que deja object-contain, y como casi todas las fotos
 							// de producto vienen sobre blanco, --m-surface las hace ver como si
 							// flotaran en la tarjeta.
-							"order-1 relative w-full aspect-square overflow-hidden bg-[var(--m-surface)]",
+							"order-1 relative w-full aspect-square overflow-hidden bg-[var(--m-image-bg)]",
 							cornerClass,
 						]}
 					>
@@ -548,7 +559,7 @@ const tiendaItemUrl =
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
 							width={500}
 							height={500}
-							class="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
+							class:list={[fitClass, "w-full h-full transition-transform duration-500 hover:scale-105"]}
 							loading="lazy"
 							format="webp"
 							quality={85}
