@@ -9,7 +9,9 @@ export async function GET() {
 
   const tiendaUrls: string[] = [
     '/tienda',
-    '/tienda/estados',
+    // Ojo: NO existe una página índice en /tienda/estados (solo
+    // /tienda/estados/[state]). Anunciarla mandaba a Google a un 500, porque
+    // la ruta cae en /tienda/[name] y ese template revienta si no hay place.
     ...states.map((state) => `/tienda/estados/${state.slug}`),
     ...restaurantes
       .filter((place: any) => {
