@@ -243,7 +243,10 @@ type Theme = {
 	muted: string;
 	accent: string;
 	onAccent: string;
-	imageBg: string;
+	// El marco de la foto. Opcional en los presets: si un tema no lo declara
+	// cae a su propio `surface`, que es lo que hacía antes de que el marco
+	// fuera su propio color. Sólo se declara donde deba diferir.
+	imageBg?: string;
 };
 
 const THEMES: Record<string, Theme> = {
@@ -318,7 +321,7 @@ const themeColors: Theme = {
 	// las bandas, y no siempre conviene que sea el mismo de las tarjetas. Un
 	// producto recortado sobre blanco necesita marco blanco aunque el tema sea
 	// oscuro, o se le ve el recorte.
-	imageBg: pick("image_bg", preset.surface),
+	imageBg: pick("image_bg", preset.imageBg || preset.surface),
 };
 
 // Estructura compartida por los tres temas. El color nunca se escribe aquí: se
