@@ -15,10 +15,10 @@ interface Props {
 const { stateName } = Astro.props;
 ---
 
-<section class="py-32 bg-slate-900 text-white relative overflow-hidden">
+<section class="py-32 bg-neutral-900 text-white relative overflow-hidden">
 	<!-- Background Graphic -->
 	<div
-		class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/5 to-transparent"
+		class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-marca-500/5 to-transparent"
 	>
 	</div>
 
@@ -27,23 +27,23 @@ const { stateName } = Astro.props;
 			class="text-4xl md:text-7xl font-black mb-20 tracking-tighter uppercase leading-[0.9]"
 		>
 			Funciones del <br />
-			<span class="text-emerald-400">Menú Digital</span>
+			<span class="text-marca-400">Menú Digital</span>
 		</h2>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 			<!-- WhatsApp Feature -->
 			<div
-				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-emerald-500/50 transition-all duration-500"
+				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-marca-500/50 transition-all duration-500"
 			>
 				<div
-					class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10"
+					class="w-14 h-14 bg-marca-500/10 text-marca-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-marca-500 group-hover:text-white transition-all shadow-lg shadow-marca-500/10"
 				>
 					<MessageCircle className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
 					Pedidos por WhatsApp en {stateName || "tu zona"}
 				</h3>
-				<p class="text-slate-400 font-medium leading-relaxed">
+				<p class="text-neutral-400 font-medium leading-relaxed">
 					Sin apps ni descargas. Los clientes de <strong
 						>{stateName || "tu localidad"}</strong
 					> escanean tu QR y te envían su pedido directo a tu chat.
@@ -52,17 +52,17 @@ const { stateName } = Astro.props;
 
 			<!-- Manage Feature -->
 			<div
-				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-emerald-500/50 transition-all duration-500"
+				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-marca-500/50 transition-all duration-500"
 			>
 				<div
-					class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10"
+					class="w-14 h-14 bg-marca-500/10 text-marca-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-marca-500 group-hover:text-white transition-all shadow-lg shadow-marca-500/10"
 				>
 					<BarChart3 className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
 					Gestión Local {stateName ? `en ${stateName}` : ""}
 				</h3>
-				<p class="text-slate-400 font-medium leading-relaxed">
+				<p class="text-neutral-400 font-medium leading-relaxed">
 					Actualiza precios de <strong>{stateName || "tu negocio"}</strong> al instante,
 					revisa qué es lo más vendido en tu zona y optimiza tu operación.
 				</p>
@@ -70,17 +70,17 @@ const { stateName } = Astro.props;
 
 			<!-- Link Feature -->
 			<div
-				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-emerald-500/50 transition-all duration-500"
+				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-marca-500/50 transition-all duration-500"
 			>
 				<div
-					class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10"
+					class="w-14 h-14 bg-marca-500/10 text-marca-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-marca-500 group-hover:text-white transition-all shadow-lg shadow-marca-500/10"
 				>
 					<Globe className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
 					Presencia Web en {stateName || "México"}
 				</h3>
-				<p class="text-slate-400 font-medium leading-relaxed">
+				<p class="text-neutral-400 font-medium leading-relaxed">
 					Tener un Menú Digital QR te da visibilidad en Google cuando busquen
 					comida <strong>{stateName ? `en ${stateName}` : "cerca de ti"}</strong
 					>.
@@ -89,17 +89,17 @@ const { stateName } = Astro.props;
 
 			<!-- POS Feature -->
 			<div
-				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-emerald-500/50 transition-all duration-500"
+				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-marca-500/50 transition-all duration-500"
 			>
 				<div
-					class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10"
+					class="w-14 h-14 bg-marca-500/10 text-marca-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-marca-500 group-hover:text-white transition-all shadow-lg shadow-marca-500/10"
 				>
 					<Monitor className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
 					Punto de Venta (POS)
 				</h3>
-				<p class="text-slate-400 font-medium leading-relaxed">
+				<p class="text-neutral-400 font-medium leading-relaxed">
 					Ideal para meseros y atención en mesa en <strong
 						>{stateName || "tu establecimiento"}</strong
 					>. Toma órdenes 3 veces más rápido.
@@ -108,17 +108,17 @@ const { stateName } = Astro.props;
 
 			<!-- Inventory Feature -->
 			<div
-				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-emerald-500/50 transition-all duration-500"
+				class="group bg-white/5 backdrop-blur-sm p-10 rounded-[40px] border border-white/10 hover:border-marca-500/50 transition-all duration-500"
 			>
 				<div
-					class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10"
+					class="w-14 h-14 bg-marca-500/10 text-marca-400 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-marca-500 group-hover:text-white transition-all shadow-lg shadow-marca-500/10"
 				>
 					<ShoppingBag className="w-6 h-6" />
 				</div>
 				<h3 class="text-2xl font-black mb-4 uppercase tracking-tight">
 					Inventario Digital
 				</h3>
-				<p class="text-slate-400 font-medium leading-relaxed">
+				<p class="text-neutral-400 font-medium leading-relaxed">
 					Lleva el control de tus insumos y productos sin complicaciones,
 					directamente desde tu panel de BySMax <strong
 						>{stateName ? `en ${stateName}` : ""}</strong
@@ -128,14 +128,14 @@ const { stateName } = Astro.props;
 
 			<!-- More Feature -->
 			<div
-				class="bg-gradient-to-br from-emerald-600 to-teal-700 p-10 rounded-[40px] flex flex-col justify-center items-center text-center shadow-2xl"
+				class="bg-gradient-to-br from-marca-600 to-marca-700 p-10 rounded-[40px] flex flex-col justify-center items-center text-center shadow-2xl"
 			>
 				<h3 class="text-3xl font-black mb-4 uppercase tracking-tighter">
 					y más...
 				</h3>
 				<a
 					href="/admin/register"
-					class="bg-white text-slate-900 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all active:scale-95"
+					class="bg-white text-neutral-900 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-neutral-100 transition-all active:scale-95"
 				>
 					Empieza ahora
 				</a>

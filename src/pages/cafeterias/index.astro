@@ -46,7 +46,7 @@ const seoData = {
 						const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cafe.name} ${address}`)}`;
 
 						return (
-							<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden border border-stone-200">
+							<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden border border-neutral-200">
 								<div class="relative aspect-video">
 									{cafe.image ? (
 										<Image
@@ -60,15 +60,15 @@ const seoData = {
 										// Sin este guard, un place con image vacío tumba el render:
 										// <Image src=""> lanza ExpectedImage y la respuesta se corta
 										// a media página, con status 200 y sin cerrar el <html>.
-										<div class="w-full h-full bg-stone-200 flex items-center justify-center">
-											<span class="text-3xl font-serif text-stone-400">
+										<div class="w-full h-full bg-neutral-200 flex items-center justify-center">
+											<span class="text-3xl font-serif text-neutral-400">
 												{(cafe.name || "?").trim().charAt(0).toUpperCase()}
 											</span>
 										</div>
 									)}
 									<div class="absolute bottom-3 left-3 flex gap-2">
 										<div class="bg-white/95 backdrop-blur px-2 py-1 rounded text-xs font-bold flex items-center">
-											<Star className="w-3 h-3 text-yellow-500 mr-1 fill-yellow-500" />
+											<Star className="w-3 h-3 text-neutral-500 mr-1 fill-neutral-500" />
 											{cafe.rating}
 										</div>
 									</div>
@@ -80,13 +80,13 @@ const seoData = {
 									</h3>
 
 									<div class="space-y-2 mb-6">
-										<div class="flex items-start text-sm text-stone-600">
+										<div class="flex items-start text-sm text-neutral-600">
 											<MapPin className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-[#A67C52]" />
 											<a href={mapsUrl} target="_blank" class="hover:underline">
 												{address}
 											</a>
 										</div>
-										<div class="flex items-center text-sm text-stone-600">
+										<div class="flex items-center text-sm text-neutral-600">
 											<Clock className="w-4 h-4 mr-2 shrink-0 text-[#A67C52]" />
 											<span>
 												{cafe.content?.semantic_data?.hours ||
@@ -99,7 +99,7 @@ const seoData = {
 										{cafe.content?.semantic_data?.features
 											?.slice(0, 3)
 											.map((f) => (
-												<span class="text-[10px] uppercase tracking-wider bg-stone-100 text-stone-500 px-2 py-0.5 rounded font-bold">
+												<span class="text-[10px] uppercase tracking-wider bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded font-bold">
 													{f}
 												</span>
 											))}

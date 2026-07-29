@@ -96,12 +96,12 @@ const tiendaItemUrl =
 {
 	isMariscos && (
 		<div
-			class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-blue-900/5 mb-8 relative overflow-hidden group"
+			class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-neutral-900/5 mb-8 relative overflow-hidden group"
 			data-item-id={item.id}
 		>
 			<div class="flex flex-col sm:flex-row gap-8">
 				{item.image && (
-					<div class="relative shrink-0 w-full sm:w-48 h-48 sm:h-48 max-w-[250px] max-h-[250px] overflow-hidden bg-gray-50 flex items-center justify-center border-0 rounded-none">
+					<div class="relative shrink-0 w-full sm:w-48 h-48 sm:h-48 max-w-[250px] max-h-[250px] overflow-hidden bg-neutral-50 flex items-center justify-center border-0 rounded-none">
 						<Image
 							src={item.image}
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
@@ -122,7 +122,7 @@ const tiendaItemUrl =
 								{item.name}
 							</h3>
 							{showPrices && item.price > 0 && (
-								<div class="bg-[#FF6F00] text-white px-4 py-1.5 font-black text-xl shadow-lg shadow-orange-100">
+								<div class="bg-[#FF6F00] text-white px-4 py-1.5 font-black text-xl shadow-lg shadow-neutral-100">
 									${item.price}
 								</div>
 							)}
@@ -133,7 +133,7 @@ const tiendaItemUrl =
 								<MarkdownBlock
 									client:load
 									content={item.description}
-									className="text-slate-500 text-sm font-medium leading-relaxed !m-0"
+									className="text-neutral-500 text-sm font-medium leading-relaxed !m-0"
 								/>
 							</div>
 						)}
@@ -141,7 +141,7 @@ const tiendaItemUrl =
 						{item.options && item.options.length > 0 && (
 							<div class="mb-5 flex flex-wrap gap-2">
 								{item.options.map((opt: any) => (
-									<div class="bg-blue-50 text-[10px] text-[#004AAD] px-3 py-1 font-black uppercase tracking-wider border border-blue-100">
+									<div class="bg-neutral-50 text-[10px] text-[#004AAD] px-3 py-1 font-black uppercase tracking-wider border border-neutral-100">
 										{opt.name}: {opt.values.join(", ")}
 									</div>
 								))}
@@ -152,7 +152,7 @@ const tiendaItemUrl =
 					{enableCart && whatsappNumber && item.price > 0 && (
 						<div class="flex justify-end pt-4">
 							<button
-								class="cart-add-btn group/btn px-8 py-3 bg-[#004AAD] text-white text-xs font-black uppercase tracking-[0.2em] transition-all hover:bg-[#FF6F00] active:scale-95 shadow-xl shadow-blue-100 hover:shadow-orange-100 flex items-center gap-3 rounded-[2rem]"
+								class="cart-add-btn group/btn px-8 py-3 bg-[#004AAD] text-white text-xs font-black uppercase tracking-[0.2em] transition-all hover:bg-[#FF6F00] active:scale-95 shadow-xl shadow-neutral-100 hover:shadow-neutral-100 flex items-center gap-3 rounded-[2rem]"
 								aria-label={`Agregar ${item.name} al pedido`}
 								data-item={JSON.stringify(item)}
 							>
@@ -167,7 +167,7 @@ const tiendaItemUrl =
 			</div>
 
 			{/* Decorative Elements - Subtle */}
-			<div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 -mr-16 -mt-16 -z-10" />
+			<div class="absolute top-0 right-0 w-32 h-32 bg-neutral-50/50 -mr-16 -mt-16 -z-10" />
 			<div class="absolute bottom-0 left-0 w-24 h-24 bg-[#FF6F00]/5 -ml-12 -mb-12 -z-10" />
 		</div>
 	)
@@ -176,12 +176,12 @@ const tiendaItemUrl =
 {
 	isVibrant && (
 		<div
-			class="bg-white p-6 rounded-[32px] shadow-sm border border-emerald-50 mb-6 relative overflow-hidden group hover:shadow-md transition-shadow"
+			class="bg-white p-6 rounded-[32px] shadow-sm border border-marca-50 mb-6 relative overflow-hidden group hover:shadow-md transition-shadow"
 			data-item-id={item.id}
 		>
 			<div class="flex justify-between items-center gap-6">
 				<div class="flex-1 min-w-0">
-					<h3 class="text-xl font-black tracking-tight text-slate-800 mb-2">
+					<h3 class="text-xl font-black tracking-tight text-neutral-800 mb-2">
 						{item.name}
 					</h3>
 					{item.description && (
@@ -189,7 +189,7 @@ const tiendaItemUrl =
 							<MarkdownBlock
 								client:load
 								content={item.description}
-								className="text-slate-500 text-sm font-light leading-relaxed !m-0"
+								className="text-neutral-500 text-sm font-light leading-relaxed !m-0"
 							/>
 						</div>
 					)}
@@ -197,7 +197,7 @@ const tiendaItemUrl =
 					{item.options && item.options.length > 0 && (
 						<div class="mb-4 flex flex-wrap gap-1.5">
 							{item.options.map((opt: any) => (
-								<div class="bg-emerald-50 text-[10px] text-emerald-700 px-2 py-1 rounded-lg font-bold uppercase tracking-tight border border-emerald-100">
+								<div class="bg-marca-50 text-[10px] text-marca-700 px-2 py-1 rounded-lg font-bold uppercase tracking-tight border border-marca-100">
 									{opt.name}: {opt.values.join(", ")}
 								</div>
 							))}
@@ -222,13 +222,13 @@ const tiendaItemUrl =
 
 				<div class="flex flex-col items-end gap-4 shrink-0">
 					{showPrices && item.price > 0 && (
-						<div class="bg-[#FF4D00] text-white px-5 py-2 rounded-2xl font-black text-2xl shadow-xl shadow-orange-100 italic transform transition-transform group-hover:scale-110">
+						<div class="bg-[#FF4D00] text-white px-5 py-2 rounded-2xl font-black text-2xl shadow-xl shadow-neutral-100 italic transform transition-transform group-hover:scale-110">
 							${item.price}
 						</div>
 					)}
 					{enableCart && item.price > 0 && (
 						<button
-							class="cart-add-btn px-6 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-200"
+							class="cart-add-btn px-6 py-2 bg-neutral-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-neutral-200"
 							aria-label={`Agregar ${item.name} al pedido`}
 							data-item={JSON.stringify(item)}
 						>
@@ -254,14 +254,14 @@ const tiendaItemUrl =
 						<MarkdownBlock
 							client:load
 							content={item.description}
-							className="text-gray-400 text-sm !m-0"
+							className="text-neutral-400 text-sm !m-0"
 						/>
 					</div>
 				)}
 				{item.options && item.options.length > 0 && (
 					<div class="mb-3 space-y-1">
 						{item.options.map((opt: any) => (
-							<div class="text-[10px] text-gray-500 uppercase tracking-wider font-medium">
+							<div class="text-[10px] text-neutral-500 uppercase tracking-wider font-medium">
 								<span class="text-white/40">{opt.name}:</span>{" "}
 								{opt.values.join(", ")}
 							</div>
@@ -274,7 +274,7 @@ const tiendaItemUrl =
 					)}
 					{enableCart && item.price > 0 && (
 						<button
-							class="cart-add-btn text-[10px] uppercase font-black tracking-widest text-emerald-400 hover:text-emerald-300"
+							class="cart-add-btn text-[10px] uppercase font-black tracking-widest text-marca-400 hover:text-marca-300"
 							aria-label={`Agregar ${item.name} al pedido`}
 							data-item={JSON.stringify(item)}
 						>
@@ -315,25 +315,25 @@ const tiendaItemUrl =
 {
 	isDidi && (
 		<div
-			class="bg-white p-4 rounded-2xl shadow-sm border border-orange-50 mb-4 flex gap-4 hover:shadow-md transition-all group"
+			class="bg-white p-4 rounded-2xl shadow-sm border border-neutral-50 mb-4 flex gap-4 hover:shadow-md transition-all group"
 			data-item-id={item.id}
 		>
 			<div class="flex-1 min-w-0 flex flex-col justify-between">
 				<div>
-					<h3 class="font-black text-slate-800 text-lg mb-1">{item.name}</h3>
+					<h3 class="font-black text-neutral-800 text-lg mb-1">{item.name}</h3>
 					{item.description && (
 						<div class="line-clamp-2 leading-relaxed">
 							<MarkdownBlock
 								client:load
 								content={item.description}
-								className="text-slate-500 text-xs !m-0"
+								className="text-neutral-500 text-xs !m-0"
 							/>
 						</div>
 					)}
 					{item.options && item.options.length > 0 && (
 						<div class="mt-2 flex flex-wrap gap-1">
 							{item.options.map((opt: any) => (
-								<div class="bg-orange-50 text-[9px] text-[#FF5B00] px-2 py-0.5 rounded-full font-black uppercase border border-orange-100">
+								<div class="bg-neutral-50 text-[9px] text-[#FF5B00] px-2 py-0.5 rounded-full font-black uppercase border border-neutral-100">
 									{opt.name}: {opt.values.join(", ")}
 								</div>
 							))}
@@ -346,7 +346,7 @@ const tiendaItemUrl =
 							<span class="text-[#FF5B00] font-black text-xl italic">
 								${item.price}
 							</span>
-							<span class="text-xs text-slate-300 line-through font-bold">
+							<span class="text-xs text-neutral-300 line-through font-bold">
 								${(item.price * 1.2).toFixed(0)}
 							</span>
 						</>
@@ -356,7 +356,7 @@ const tiendaItemUrl =
 
 			<div class="relative shrink-0 self-center">
 				{item.image ? (
-					<div class="w-32 h-32 sm:w-36 sm:h-36 max-w-[250px] max-h-[250px] rounded-3xl overflow-hidden shadow-inner border border-slate-50">
+					<div class="w-32 h-32 sm:w-36 sm:h-36 max-w-[250px] max-h-[250px] rounded-3xl overflow-hidden shadow-inner border border-neutral-50">
 						<Image
 							src={item.image}
 							alt={placeName ? `${item.name} - ${placeName}` : item.name}
@@ -369,7 +369,7 @@ const tiendaItemUrl =
 						/>
 					</div>
 				) : (
-					<div class="w-28 h-28 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-200">
+					<div class="w-28 h-28 rounded-3xl bg-neutral-50 flex items-center justify-center text-neutral-200">
 						<span class="text-4xl">+</span>
 					</div>
 				)}
@@ -427,7 +427,7 @@ const tiendaItemUrl =
 						<MarkdownBlock
 							client:load
 							content={item.description}
-							className="text-gray-400 text-[11px] leading-relaxed !m-0"
+							className="text-neutral-400 text-[11px] leading-relaxed !m-0"
 						/>
 					</div>
 				)}

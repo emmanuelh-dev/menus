@@ -204,13 +204,13 @@ const schemaEnrichment = {
 					<p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
 						Experimenta el arte de café en cada taza.
 					</p>
-					<button class="bg-white text-gray-900 hover:bg-gray-100 p-4">
+					<button class="bg-white text-neutral-900 hover:bg-neutral-100 p-4">
 						Explore Nuestro Menú
 					</button>
 				</div>
 			</div>
 		</section>
-		<section id="menu" class="py-20 bg-gray-50">
+		<section id="menu" class="py-20 bg-neutral-50">
 			<div class="container mx-auto px-4">
 				<h2 class="font-serif text-4xl text-center mb-12">
 					Platillos populares
@@ -228,7 +228,7 @@ const schemaEnrichment = {
 								</div>
 								<div class="p-6">
 									<h3 class="font-serif text-xl mb-2">{item.name}</h3>
-									<p class="text-gray-600 mb-4">{item.description}</p>
+									<p class="text-neutral-600 mb-4">{item.description}</p>
 									<p class="text-lg font-semibold">{item.price}</p>
 								</div>
 							</div>
@@ -277,7 +277,7 @@ const schemaEnrichment = {
 			<div class="container mx-auto px-4">
 				<div class="max-w-3xl mx-auto text-center">
 					<h2 class="font-serif text-4xl mb-6">Nuestra pasión por el café</h2>
-					<p class="text-gray-600 mb-12">
+					<p class="text-neutral-600 mb-12">
 						Cada taza nos cuenta una historia. Desde los beans seleccionados
 						cuidadosamente hasta las bebidas meticulosamente creadas, nosotros
 						nos entrenamos en crear momentos de alegría y calor para nuestra
@@ -287,36 +287,36 @@ const schemaEnrichment = {
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 						<div class="text-center">
 							<div
-								class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full"
+								class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-neutral-100 rounded-full"
 							>
 								<Coffee className="h-6 w-6" />
 							</div>
 							<h3 class="font-serif text-xl mb-2">Calidad Artisanal</h3>
-							<p class="text-gray-600">
+							<p class="text-neutral-600">
 								Ingredientes de alta calidad y creaciones meticulosas
 							</p>
 						</div>
 
 						<div class="text-center">
 							<div
-								class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full"
+								class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-neutral-100 rounded-full"
 							>
 								<Heart className="h-6 w-6" />
 							</div>
 							<h3 class="font-serif text-xl mb-2">Hecho con amor</h3>
-							<p class="text-gray-600">
+							<p class="text-neutral-600">
 								Cada ingrediente es creado con cuidado y atención a detalles
 							</p>
 						</div>
 
 						<div class="text-center">
 							<div
-								class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gray-100 rounded-full"
+								class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-neutral-100 rounded-full"
 							>
 								<Star className="h-6 w-6" />
 							</div>
 							<h3 class="font-serif text-xl mb-2">Experiencia Única</h3>
-							<p class="text-gray-600">
+							<p class="text-neutral-600">
 								Creando momentos memorables con cada visita
 							</p>
 						</div>
@@ -330,7 +330,7 @@ const schemaEnrichment = {
 				href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.name} ${schemaEnrichment.address.streetAddress}`)}`}
 				target="_blank"
 				rel="noopener noreferrer"
-				class="text-gray-600 mb-12 hover:text-black transition-colors underline decoration-gray-200 underline-offset-8"
+				class="text-neutral-600 mb-12 hover:text-black transition-colors underline decoration-neutral-200 underline-offset-8"
 			>
 				{schemaEnrichment.address.streetAddress}
 			</a>

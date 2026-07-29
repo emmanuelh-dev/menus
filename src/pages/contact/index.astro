@@ -96,7 +96,7 @@ import DefaultLayout from "../../layouts/DefaultLayout.astro";
 
       form.reset();
       status.textContent = "¡Mensaje enviado con éxito! Te contactaremos pronto.";
-      status.className = "px-4 py-3 rounded mb-4 bg-green-100 border border-green-400 text-green-700";
+      status.className = "px-4 py-3 rounded mb-4 bg-marca-100 border border-marca-400 text-marca-700";
 
       if ((window as any).umami) {
         (window as any).umami.track("contact_form_submit", { source: "menus" });

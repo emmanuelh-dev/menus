@@ -51,9 +51,9 @@ const schemaData = {
 >
   <main class="bg-neutral-950 min-h-screen text-neutral-200">
     <!-- Hero -->
-    <section class="bg-gradient-to-br from-orange-950/25 via-neutral-950 to-neutral-950 py-16 px-4 text-center">
+    <section class="bg-gradient-to-br from-neutral-950/25 via-neutral-950 to-neutral-950 py-16 px-4 text-center">
       <div class="max-w-3xl mx-auto">
-        <div class="inline-block bg-orange-500/10 text-orange-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider mb-5">
+        <div class="inline-block bg-neutral-500/10 text-neutral-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider mb-5">
           🛠️ Red de Profesionales
         </div>
         <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">{seoData.h1}</h1>
@@ -65,15 +65,15 @@ const schemaData = {
         <!-- Stats rápidas -->
         <div class="flex justify-center gap-8 md:gap-12">
           <div class="text-center">
-            <span class="block text-xl md:text-2xl font-black text-orange-500 mb-0.5">24h</span>
+            <span class="block text-xl md:text-2xl font-black text-neutral-500 mb-0.5">24h</span>
             <span class="text-[10px] md:text-xs text-neutral-400 uppercase tracking-widest font-medium">Emergencias</span>
           </div>
           <div class="text-center">
-            <span class="block text-xl md:text-2xl font-black text-orange-500 mb-0.5">100%</span>
+            <span class="block text-xl md:text-2xl font-black text-neutral-500 mb-0.5">100%</span>
             <span class="text-[10px] md:text-xs text-neutral-400 uppercase tracking-widest font-medium">Verificados</span>
           </div>
           <div class="text-center">
-            <span class="block text-xl md:text-2xl font-black text-orange-500 mb-0.5">Gratuito</span>
+            <span class="block text-xl md:text-2xl font-black text-neutral-500 mb-0.5">Gratuito</span>
             <span class="text-[10px] md:text-xs text-neutral-400 uppercase tracking-widest font-medium">Sin intermediarios</span>
           </div>
         </div>
@@ -92,14 +92,14 @@ const schemaData = {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {servicios.map(serv => (
-          <a href={`/servicios/${serv.slug}`} class="flex items-start gap-4 p-5 bg-neutral-900/60 rounded-2xl hover:shadow-lg hover:shadow-orange-950/5 hover:-translate-y-0.5 transition duration-200 group">
-            <div class="text-3xl shrink-0 p-3 bg-orange-500/5 rounded-xl group-hover:bg-orange-500/10 transition duration-200">{serv.emoji}</div>
+          <a href={`/servicios/${serv.slug}`} class="flex items-start gap-4 p-5 bg-neutral-900/60 rounded-2xl hover:shadow-lg hover:shadow-neutral-950/5 hover:-translate-y-0.5 transition duration-200 group">
+            <div class="text-3xl shrink-0 p-3 bg-neutral-500/5 rounded-xl group-hover:bg-neutral-500/10 transition duration-200">{serv.emoji}</div>
             <div class="flex-1 min-w-0">
               <h3 class="text-base font-bold text-white mb-1">{serv.title}</h3>
               <p class="text-xs text-neutral-400 leading-normal mb-3">
                 Técnicos a domicilio, servicio de emergencia y presupuestos en tu localidad.
               </p>
-              <span class="text-xs font-semibold text-orange-400 group-hover:text-white transition duration-200">Ver directorio →</span>
+              <span class="text-xs font-semibold text-neutral-400 group-hover:text-white transition duration-200">Ver directorio →</span>
             </div>
           </a>
         ))}
@@ -135,7 +135,7 @@ const schemaData = {
       <div class="max-w-xl mx-auto">
         <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-3">¿Ofreces algún servicio local?</h2>
         <p class="text-sm text-neutral-400 leading-relaxed mb-6">Agrégate a nuestro directorio de forma 100% gratuita y empieza a recibir llamadas de clientes locales hoy mismo.</p>
-        <a href="/contact" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-orange-500/20 hover:opacity-95 hover:-translate-y-0.5 transition duration-150">Registrar mi servicio gratis</a>
+        <a href="/contact" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-neutral-600 to-neutral-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-neutral-500/20 hover:opacity-95 hover:-translate-y-0.5 transition duration-150">Registrar mi servicio gratis</a>
       </div>
     </section>
   </main>

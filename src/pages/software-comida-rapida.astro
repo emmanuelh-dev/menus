@@ -35,8 +35,8 @@ const features = [
 			"Pago rápido pre-configurado",
 		],
 		icon: FastForward,
-		color: "text-orange-600",
-		bgColor: "bg-orange-50",
+		color: "text-neutral-600",
+		bgColor: "bg-neutral-50",
 	},
 	{
 		title: "Monitor de Cocina (KDS)",
@@ -49,8 +49,8 @@ const features = [
 			"Histórico de eficiencia por chef",
 		],
 		icon: ChefHat,
-		color: "text-emerald-600",
-		bgColor: "bg-emerald-50",
+		color: "text-marca-600",
+		bgColor: "bg-marca-50",
 	},
 	{
 		title: "Dominios y Delivery",
@@ -63,8 +63,8 @@ const features = [
 			"Zonas de entrega programables",
 		],
 		icon: Clock,
-		color: "text-blue-600",
-		bgColor: "bg-blue-50",
+		color: "text-neutral-600",
+		bgColor: "bg-neutral-50",
 	},
 ];
 ---
@@ -87,26 +87,26 @@ const features = [
 				<div class="flex flex-col lg:flex-row items-center gap-16">
 					<div class="flex-1 text-center lg:text-left">
 						<div
-							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 mb-6"
+							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-50 border border-neutral-100 mb-6"
 						>
 							<span
-								class="text-xs font-bold text-orange-800 uppercase tracking-wider"
+								class="text-xs font-bold text-neutral-800 uppercase tracking-wider"
 								>ESPECIAL PARA FAST FOOD</span
 							>
 						</div>
 
 						<h1
-							class="text-5xl lg:text-7xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight"
+							class="text-5xl lg:text-7xl font-black text-neutral-900 mb-6 leading-[1.1] tracking-tight"
 						>
 							Software para <br />
 							<span
-								class="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"
+								class="text-neutral-600"
 								>Comida Rápida.</span
 							>
 						</h1>
 
 						<p
-							class="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+							class="text-xl text-neutral-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
 						>
 							Diseñado para Pizzerías, Hamburgueserías, Taquerías y más. Menos
 							espera, más ventas.
@@ -117,7 +117,7 @@ const features = [
 						>
 							<a
 								href="/admin/register"
-								class="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
+								class="inline-flex items-center justify-center px-8 py-4 bg-neutral-900 text-white font-bold rounded-2xl hover:bg-neutral-800 transition-all shadow-xl shadow-neutral-900/20 group"
 							>
 								¡Empezar Ya!
 								<ArrowRight
@@ -129,11 +129,11 @@ const features = [
 
 					<div class="flex-1 relative w-full max-w-2xl">
 						<div
-							class="absolute -inset-4 bg-gradient-to-tr from-orange-500/10 to-red-500/10 blur-3xl rounded-full"
+							class="absolute -inset-4 bg-gradient-to-tr from-neutral-500/10 to-red-500/10 blur-3xl rounded-full"
 						>
 						</div>
 						<div
-							class="relative bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+							class="relative bg-white rounded-3xl border border-neutral-200 shadow-2xl overflow-hidden"
 						>
 							<Image
 								src={main_menu}
@@ -147,30 +147,30 @@ const features = [
 		</section>
 
 		<!-- Solutions -->
-		<section class="py-24 bg-slate-50">
+		<section class="py-24 bg-neutral-50">
 			<div class="max-w-7xl mx-auto px-6">
 				<h2
-					class="text-3xl lg:text-5xl font-black text-slate-900 mb-16 text-center"
+					class="text-3xl lg:text-5xl font-black text-neutral-900 mb-16 text-center"
 				>
 					Todo lo que tu negocio necesita
 				</h2>
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 					{
 						features.map((f) => (
-							<div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+							<div class="bg-white p-8 rounded-[32px] border border-neutral-200 shadow-sm hover:shadow-xl transition-all duration-300">
 								<div
 									class={`w-14 h-14 ${f.bgColor} ${f.color} rounded-2xl flex items-center justify-center mb-8`}
 								>
 									<f.icon className="w-7 h-7" />
 								</div>
-								<h3 class="text-2xl font-bold text-slate-900 mb-4">
+								<h3 class="text-2xl font-bold text-neutral-900 mb-4">
 									{f.title}
 								</h3>
-								<p class="text-slate-600 mb-8">{f.description}</p>
+								<p class="text-neutral-600 mb-8">{f.description}</p>
 								<ul class="space-y-3">
 									{f.items.map((item) => (
-										<li class="flex items-center gap-3 text-sm font-medium text-slate-700">
-											<Check className="w-4 h-4 text-orange-500" />
+										<li class="flex items-center gap-3 text-sm font-medium text-neutral-700">
+											<Check className="w-4 h-4 text-neutral-500" />
 											{item}
 										</li>
 									))}

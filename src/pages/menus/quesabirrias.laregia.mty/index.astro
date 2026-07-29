@@ -104,17 +104,17 @@ const gallery =
 								class={index === 0 ? "grid md:grid-cols-2 gap-8" : "space-y-6"}
 							>
 								{section.items.map((item) => (
-									<div class="border-b border-gray-300 pb-4">
+									<div class="border-b border-neutral-300 pb-4">
 										<div class="flex justify-between items-start">
 											<div class="flex-1">
 												<h3 class="font-oswald font-bold text-xl uppercase">
 													{item.name}
 												</h3>
-												<p class="text-gray-600 text-sm leading-tight mt-1">
+												<p class="text-neutral-600 text-sm leading-tight mt-1">
 													{item.description}
 												</p>
 												{item.note && (
-													<p class="text-xs italic text-gray-400 mt-1">
+													<p class="text-xs italic text-neutral-400 mt-1">
 														{item.note}
 													</p>
 												)}

@@ -251,22 +251,22 @@ const schemaEnrichment = {
           <!-- Filtros interactivos -->
           <div class="mb-12 flex flex-wrap justify-center gap-4">
             <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4AF37] text-black rounded-full font-serif hover:bg-[#B8860B] transition-colors" data-filter="all">Todos</button>
-            <button id="filter-nearby" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="nearby">Cerca de mí</button>
-            <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="rated">Mejor calificados</button>
-            <button id="filter-open" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="open">Abiertos ahora</button>
-            <button id="filter-menu" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="menu">Menú digital</button>
+            <button id="filter-nearby" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="nearby">Cerca de mí</button>
+            <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="rated">Mejor calificados</button>
+            <button id="filter-open" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="open">Abiertos ahora</button>
+            <button id="filter-menu" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="menu">Menú digital</button>
           </div>
     
           <!-- Mapa visual de churrascarías (representación estilizada) -->
           <div class="relative mb-16 overflow-hidden rounded-xl bg-[#1E1E1E] p-4">
             <div class="absolute top-4 left-4 bg-black/90 px-4 py-2 rounded-lg shadow-md z-10">
               <h3 class="font-serif text-lg font-semibold text-[#D4AF37]">Mapa de Churrascarías</h3>
-              <p class="text-sm text-gray-300">Explora visualmente las churrascarías cercanas</p>
+              <p class="text-sm text-neutral-300">Explora visualmente las churrascarías cercanas</p>
             </div>
             <div class="h-[300px] md:h-[400px] bg-[#1E1E1E] rounded-lg relative overflow-hidden">
               <!-- Aquí iría un mapa real, por ahora es decorativo -->
               <div class="absolute inset-0 flex items-center justify-center">
-                <p class="font-serif text-gray-400 text-lg">Mapa interactivo (próximamente)</p>
+                <p class="font-serif text-neutral-400 text-lg">Mapa interactivo (próximamente)</p>
               </div>
               <!-- Puntos decorativos representando churrascarías -->
               {churrascariasList.map((churrascaria, index) => (
@@ -305,7 +305,7 @@ const schemaEnrichment = {
                     <div class="flex items-center bg-black/90 px-2 py-1 rounded-full">
                       <Star className="w-4 h-4 text-[#D4AF37] mr-1" />
                       <span class="text-sm font-medium text-white">{churrascaria.rating}</span>
-                      <span class="text-xs text-gray-400 ml-1">({churrascaria.reviewCount})</span>
+                      <span class="text-xs text-neutral-400 ml-1">({churrascaria.reviewCount})</span>
                     </div>
                     <div class="bg-black/90 px-2 py-1 rounded-full">
                       <span class="text-sm font-medium text-white">{churrascaria.priceRange}</span>
@@ -342,19 +342,19 @@ const schemaEnrichment = {
     
                   <!-- Estado (abierto/cerrado) -->
                   <div class="flex items-center mb-3">
-                    <Clock className="w-4 h-4 text-gray-400 mr-2" />
+                    <Clock className="w-4 h-4 text-neutral-400 mr-2" />
                     {churrascaria.closed ? (
                       <span class="text-sm text-red-400">Cerrado · Abre {churrascaria.openingTime}</span>
                     ) : (
-                      <span class="text-sm text-green-400">Abierto · {churrascaria.hours}</span>
+                      <span class="text-sm text-emerald-400">Abierto · {churrascaria.hours}</span>
                     )}
                   </div>
     
                   <!-- Dirección con botón para ver en Google Maps -->
                   <div class="flex items-start mb-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                    <MapPin className="w-4 h-4 text-neutral-400 mr-2 mt-0.5" />
                     <div class="flex flex-col">
-                      <span class="text-sm text-gray-300">{churrascaria.address}</span>
+                      <span class="text-sm text-neutral-300">{churrascaria.address}</span>
                       <a 
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(churrascaria.address)}`} 
                         target="_blank" 
@@ -377,7 +377,7 @@ const schemaEnrichment = {
                   <!-- Servicios disponibles -->
                   <div class="flex flex-wrap gap-2 mt-4">
                     {churrascaria.services && churrascaria.services.map((service) => (
-                      <span class="text-xs bg-[#2A2A2A] text-gray-300 px-2 py-1 rounded-full">{service}</span>
+                      <span class="text-xs bg-[#2A2A2A] text-neutral-300 px-2 py-1 rounded-full">{service}</span>
                     ))}
                   </div>
     
@@ -428,14 +428,14 @@ const schemaEnrichment = {
                 </div>
                 <div class="md:w-3/5 p-6">
                   <h3 class="font-serif text-2xl font-bold text-[#D4AF37] mb-2">Fogo de Brasil</h3>
-                  <p class="text-gray-300 mb-4">La auténtica experiencia brasileña en Monterrey. Disfruta de los mejores cortes de carne servidos directamente en tu mesa por expertos pasadores de espadas.</p>
+                  <p class="text-neutral-300 mb-4">La auténtica experiencia brasileña en Monterrey. Disfruta de los mejores cortes de carne servidos directamente en tu mesa por expertos pasadores de espadas.</p>
                   <div class="flex items-center mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">Av. Lázaro Cárdenas 2424, Monterrey</span>
+                    <MapPin className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">Av. Lázaro Cárdenas 2424, Monterrey</span>
                   </div>
                   <div class="flex items-center mb-4">
-                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">$600–800 por persona</span>
+                    <DollarSign className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">$600–800 por persona</span>
                   </div>
                   <a 
                     href="/menus/fogodebrasil" 
@@ -466,14 +466,14 @@ const schemaEnrichment = {
                 </div>
                 <div class="md:w-3/5 p-6">
                   <h3 class="font-serif text-2xl font-bold text-[#D4AF37] mb-2">Fogón do Brasil</h3>
-                  <p class="text-gray-300 mb-4">Una experiencia gastronómica premium con los mejores cortes brasileños. Disfruta de un ambiente elegante y un servicio excepcional mientras saboreas carnes de primera calidad.</p>
+                  <p class="text-neutral-300 mb-4">Una experiencia gastronómica premium con los mejores cortes brasileños. Disfruta de un ambiente elegante y un servicio excepcional mientras saboreas carnes de primera calidad.</p>
                   <div class="flex items-center mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">Av. Gómez Morín 908, San Pedro Garza García</span>
+                    <MapPin className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">Av. Gómez Morín 908, San Pedro Garza García</span>
                   </div>
                   <div class="flex items-center mb-4">
-                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">$700–900 por persona</span>
+                    <DollarSign className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">$700–900 por persona</span>
                   </div>
                   <a 
                     href="/menus/fogondobrasil" 
@@ -489,7 +489,7 @@ const schemaEnrichment = {
           <!-- Sección de registro de restaurante -->
           <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-[#D4AF37]/20">
             <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-4 text-center">¿Tienes un Restaurante de Espadas Brasileñas?</h2>
-            <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">
+            <p class="text-center text-neutral-300 max-w-2xl mx-auto mb-6">
               📈 Registra tu churrascaría en nuestra plataforma y muestra tu menú digital a miles de amantes de la buena carne. 
               Aumenta tu visibilidad y atrae más clientes buscando "restaurantes de espadas brasileñas en monterrey".
             </p>
@@ -512,22 +512,22 @@ const schemaEnrichment = {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué es un restaurante de espadas brasileñas?</h3>
-                <p class="text-gray-300 text-sm">Un restaurante de espadas brasileñas, también conocido como churrascaría, ofrece el sistema rodizio donde los meseros pasan por las mesas sirviendo diferentes cortes de carne asada directamente de las espadas.</p>
+                <p class="text-neutral-300 text-sm">Un restaurante de espadas brasileñas, también conocido como churrascaría, ofrece el sistema rodizio donde los meseros pasan por las mesas sirviendo diferentes cortes de carne asada directamente de las espadas.</p>
               </div>
               
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Cuánto cuesta comer en Las Espadas?</h3>
-                <p class="text-gray-300 text-sm">Los precios en restaurantes de espadas brasileñas en Monterrey van desde $400 hasta $900 por persona, dependiendo del restaurante y los cortes incluidos en el rodizio.</p>
+                <p class="text-neutral-300 text-sm">Los precios en restaurantes de espadas brasileñas en Monterrey van desde $400 hasta $900 por persona, dependiendo del restaurante y los cortes incluidos en el rodizio.</p>
               </div>
               
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Dónde están las mejores churrascarías en Monterrey?</h3>
-                <p class="text-gray-300 text-sm">Las mejores churrascarías están ubicadas en Lázaro Cárdenas, San Pedro Garza García, y Paseo de los Leones. Todas ofrecen auténtica comida brasileña y sistema rodizio.</p>
+                <p class="text-neutral-300 text-sm">Las mejores churrascarías están ubicadas en Lázaro Cárdenas, San Pedro Garza García, y Paseo de los Leones. Todas ofrecen auténtica comida brasileña y sistema rodizio.</p>
               </div>
               
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué incluye el buffet brasileño?</h3>
-                <p class="text-gray-300 text-sm">El buffet brasileño incluye barra de ensaladas, acompañamientos, cortes de carne ilimitados servidos en rodizio, y muchas veces postres y bebidas.</p>
+                <p class="text-neutral-300 text-sm">El buffet brasileño incluye barra de ensaladas, acompañamientos, cortes de carne ilimitados servidos en rodizio, y muchas veces postres y bebidas.</p>
               </div>
             </div>
           </div>
@@ -545,15 +545,15 @@ const schemaEnrichment = {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-black/30 rounded-lg p-6 text-center hover:bg-black/40 transition-colors">
                     <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-2">🥩 Restaurante de Espadas</h3>
-                    <p class="text-gray-300 text-sm">Los mejores cortes brasileños servidos directamente en tu mesa</p>
+                    <p class="text-neutral-300 text-sm">Los mejores cortes brasileños servidos directamente en tu mesa</p>
                 </div>
                 <div class="bg-black/30 rounded-lg p-6 text-center hover:bg-black/40 transition-colors">
                     <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-2">🇧🇷 Restaurantes Brasileños</h3>
-                    <p class="text-gray-300 text-sm">Auténtica experiencia gastronómica brasileña en Monterrey</p>
+                    <p class="text-neutral-300 text-sm">Auténtica experiencia gastronómica brasileña en Monterrey</p>
                 </div>
                 <div class="bg-black/30 rounded-lg p-6 text-center hover:bg-black/40 transition-colors">
                     <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-2">🍽️ Rodizio y Buffet</h3>
-                    <p class="text-gray-300 text-sm">Sistema rodizio con barra de ensaladas y carnes ilimitadas</p>
+                    <p class="text-neutral-300 text-sm">Sistema rodizio con barra de ensaladas y carnes ilimitadas</p>
                 </div>
             </div>
 
@@ -578,22 +578,22 @@ const schemaEnrichment = {
           <!-- Filtros interactivos -->
           <div class="mb-12 flex flex-wrap justify-center gap-4">
             <button id="filter-all" class="filter-btn px-6 py-2 bg-[#D4AF37] text-black rounded-full font-serif hover:bg-[#B8860B] transition-colors" data-filter="all">Todos</button>
-            <button id="filter-nearby" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="nearby">Cerca de mí</button>
-            <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="rated">Mejor calificados</button>
-            <button id="filter-open" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="open">Abiertos ahora</button>
-            <button id="filter-menu" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-gray-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="menu">Menú digital</button>
+            <button id="filter-nearby" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="nearby">Cerca de mí</button>
+            <button id="filter-rated" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="rated">Mejor calificados</button>
+            <button id="filter-open" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="open">Abiertos ahora</button>
+            <button id="filter-menu" class="filter-btn px-6 py-2 bg-[#1E1E1E] text-neutral-300 rounded-full font-serif hover:bg-[#D4AF37] hover:text-black transition-colors" data-filter="menu">Menú digital</button>
           </div>
     
           <!-- Mapa visual de churrascarías (representación estilizada) -->
           <div class="relative mb-16 overflow-hidden rounded-xl bg-[#1E1E1E] p-4">
             <div class="absolute top-4 left-4 bg-black/90 px-4 py-2 rounded-lg shadow-md z-10">
               <h3 class="font-serif text-lg font-semibold text-[#D4AF37]">Mapa de Churrascarías</h3>
-              <p class="text-sm text-gray-300">Explora visualmente las churrascarías cercanas</p>
+              <p class="text-sm text-neutral-300">Explora visualmente las churrascarías cercanas</p>
             </div>
             <div class="h-[300px] md:h-[400px] bg-[#1E1E1E] rounded-lg relative overflow-hidden">
               <!-- Aquí iría un mapa real, por ahora es decorativo -->
               <div class="absolute inset-0 flex items-center justify-center">
-                <p class="font-serif text-gray-400 text-lg">Mapa interactivo (próximamente)</p>
+                <p class="font-serif text-neutral-400 text-lg">Mapa interactivo (próximamente)</p>
               </div>
               <!-- Puntos decorativos representando churrascarías -->
               {churrascariasList.map((churrascaria, index) => (
@@ -632,7 +632,7 @@ const schemaEnrichment = {
                     <div class="flex items-center bg-black/90 px-2 py-1 rounded-full">
                       <Star className="w-4 h-4 text-[#D4AF37] mr-1" />
                       <span class="text-sm font-medium text-white">{churrascaria.rating}</span>
-                      <span class="text-xs text-gray-400 ml-1">({churrascaria.reviewCount})</span>
+                      <span class="text-xs text-neutral-400 ml-1">({churrascaria.reviewCount})</span>
                     </div>
                     <div class="bg-black/90 px-2 py-1 rounded-full">
                       <span class="text-sm font-medium text-white">{churrascaria.priceRange}</span>
@@ -669,19 +669,19 @@ const schemaEnrichment = {
     
                   <!-- Estado (abierto/cerrado) -->
                   <div class="flex items-center mb-3">
-                    <Clock className="w-4 h-4 text-gray-400 mr-2" />
+                    <Clock className="w-4 h-4 text-neutral-400 mr-2" />
                     {churrascaria.closed ? (
                       <span class="text-sm text-red-400">Cerrado · Abre {churrascaria.openingTime}</span>
                     ) : (
-                      <span class="text-sm text-green-400">Abierto · {churrascaria.hours}</span>
+                      <span class="text-sm text-emerald-400">Abierto · {churrascaria.hours}</span>
                     )}
                   </div>
     
                   <!-- Dirección con botón para ver en Google Maps -->
                   <div class="flex items-start mb-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                    <MapPin className="w-4 h-4 text-neutral-400 mr-2 mt-0.5" />
                     <div class="flex flex-col">
-                      <span class="text-sm text-gray-300">{churrascaria.address}</span>
+                      <span class="text-sm text-neutral-300">{churrascaria.address}</span>
                       <a 
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(churrascaria.address)}`} 
                         target="_blank" 
@@ -704,7 +704,7 @@ const schemaEnrichment = {
                   <!-- Servicios disponibles -->
                   <div class="flex flex-wrap gap-2 mt-4">
                     {churrascaria.services && churrascaria.services.map((service) => (
-                      <span class="text-xs bg-[#2A2A2A] text-gray-300 px-2 py-1 rounded-full">{service}</span>
+                      <span class="text-xs bg-[#2A2A2A] text-neutral-300 px-2 py-1 rounded-full">{service}</span>
                     ))}
                   </div>
     
@@ -755,14 +755,14 @@ const schemaEnrichment = {
                 </div>
                 <div class="md:w-3/5 p-6">
                   <h3 class="font-serif text-2xl font-bold text-[#D4AF37] mb-2">Fogo de Brasil</h3>
-                  <p class="text-gray-300 mb-4">La auténtica experiencia brasileña en Monterrey. Disfruta de los mejores cortes de carne servidos directamente en tu mesa por expertos pasadores de espadas.</p>
+                  <p class="text-neutral-300 mb-4">La auténtica experiencia brasileña en Monterrey. Disfruta de los mejores cortes de carne servidos directamente en tu mesa por expertos pasadores de espadas.</p>
                   <div class="flex items-center mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">Av. Lázaro Cárdenas 2424, Monterrey</span>
+                    <MapPin className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">Av. Lázaro Cárdenas 2424, Monterrey</span>
                   </div>
                   <div class="flex items-center mb-4">
-                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">$600–800 por persona</span>
+                    <DollarSign className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">$600–800 por persona</span>
                   </div>
                   <a 
                     href="/menus/fogodebrasil" 
@@ -793,14 +793,14 @@ const schemaEnrichment = {
                 </div>
                 <div class="md:w-3/5 p-6">
                   <h3 class="font-serif text-2xl font-bold text-[#D4AF37] mb-2">Fogón do Brasil</h3>
-                  <p class="text-gray-300 mb-4">Una experiencia gastronómica premium con los mejores cortes brasileños. Disfruta de un ambiente elegante y un servicio excepcional mientras saboreas carnes de primera calidad.</p>
+                  <p class="text-neutral-300 mb-4">Una experiencia gastronómica premium con los mejores cortes brasileños. Disfruta de un ambiente elegante y un servicio excepcional mientras saboreas carnes de primera calidad.</p>
                   <div class="flex items-center mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">Av. Gómez Morín 908, San Pedro Garza García</span>
+                    <MapPin className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">Av. Gómez Morín 908, San Pedro Garza García</span>
                   </div>
                   <div class="flex items-center mb-4">
-                    <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                    <span class="text-sm text-gray-300">$700–900 por persona</span>
+                    <DollarSign className="w-4 h-4 text-neutral-400 mr-2" />
+                    <span class="text-sm text-neutral-300">$700–900 por persona</span>
                   </div>
                   <a 
                     href="/menus/fogondobrasil" 
@@ -816,7 +816,7 @@ const schemaEnrichment = {
           <!-- Sección de registro de restaurante -->
           <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-[#D4AF37]/20">
             <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37] mb-4 text-center">¿Tienes un Restaurante de Espadas Brasileñas?</h2>
-            <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">
+            <p class="text-center text-neutral-300 max-w-2xl mx-auto mb-6">
               📈 Registra tu churrascaría en nuestra plataforma y muestra tu menú digital a miles de amantes de la buena carne. 
               Aumenta tu visibilidad y atrae más clientes buscando "restaurantes de espadas brasileñas en monterrey".
             </p>
@@ -839,22 +839,22 @@ const schemaEnrichment = {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué es un restaurante de espadas brasileñas?</h3>
-                <p class="text-gray-300 text-sm">Un restaurante de espadas brasileñas, también conocido como churrascaría, ofrece el sistema rodizio donde los meseros pasan por las mesas sirviendo diferentes cortes de carne asada directamente de las espadas.</p>
+                <p class="text-neutral-300 text-sm">Un restaurante de espadas brasileñas, también conocido como churrascaría, ofrece el sistema rodizio donde los meseros pasan por las mesas sirviendo diferentes cortes de carne asada directamente de las espadas.</p>
               </div>
               
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Cuánto cuesta comer en Las Espadas?</h3>
-                <p class="text-gray-300 text-sm">Los precios en restaurantes de espadas brasileñas en Monterrey van desde $400 hasta $900 por persona, dependiendo del restaurante y los cortes incluidos en el rodizio.</p>
+                <p class="text-neutral-300 text-sm">Los precios en restaurantes de espadas brasileñas en Monterrey van desde $400 hasta $900 por persona, dependiendo del restaurante y los cortes incluidos en el rodizio.</p>
               </div>
               
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Dónde están las mejores churrascarías en Monterrey?</h3>
-                <p class="text-gray-300 text-sm">Las mejores churrascarías están ubicadas en Lázaro Cárdenas, San Pedro Garza García, y Paseo de los Leones. Todas ofrecen auténtica comida brasileña y sistema rodizio.</p>
+                <p class="text-neutral-300 text-sm">Las mejores churrascarías están ubicadas en Lázaro Cárdenas, San Pedro Garza García, y Paseo de los Leones. Todas ofrecen auténtica comida brasileña y sistema rodizio.</p>
               </div>
               
               <div class="bg-[#1E1E1E] rounded-lg p-6 border border-[#D4AF37]/20">
                 <h3 class="font-serif text-lg font-semibold text-[#D4AF37] mb-3">¿Qué incluye el buffet brasileño?</h3>
-                <p class="text-gray-300 text-sm">El buffet brasileño incluye barra de ensaladas, acompañamientos, cortes de carne ilimitados servidos en rodizio, y muchas veces postres y bebidas.</p>
+                <p class="text-neutral-300 text-sm">El buffet brasileño incluye barra de ensaladas, acompañamientos, cortes de carne ilimitados servidos en rodizio, y muchas veces postres y bebidas.</p>
               </div>
             </div>
           </div>
@@ -892,14 +892,14 @@ const schemaEnrichment = {
       filterButtons.forEach(button => {
         if (button === activeButton) {
           button.classList.remove('bg-[#1E1E1E]');
-          button.classList.remove('text-gray-300');
+          button.classList.remove('text-neutral-300');
           button.classList.add('bg-[#D4AF37]');
           button.classList.add('text-black');
         } else {
           button.classList.remove('bg-[#D4AF37]');
           button.classList.remove('text-black');
           button.classList.add('bg-[#1E1E1E]');
-          button.classList.add('text-gray-300');
+          button.classList.add('text-neutral-300');
         }
       });
     }

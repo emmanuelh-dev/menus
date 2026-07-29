@@ -35,8 +35,8 @@ const features = [
 			"Personalización de Marca",
 		],
 		icon: Globe,
-		color: "text-emerald-600",
-		bgColor: "bg-emerald-50",
+		color: "text-marca-600",
+		bgColor: "bg-marca-50",
 	},
 	{
 		title: "Pedidos por WhatsApp",
@@ -49,8 +49,8 @@ const features = [
 			"Historial de Conversaciones",
 		],
 		icon: MessageSquare,
-		color: "text-green-600",
-		bgColor: "bg-green-50",
+		color: "text-marca-600",
+		bgColor: "bg-marca-50",
 	},
 	{
 		title: "Gestión de Repartidores",
@@ -63,8 +63,8 @@ const features = [
 			"Reporte de Eficiencia",
 		],
 		icon: Truck,
-		color: "text-blue-600",
-		bgColor: "bg-blue-50",
+		color: "text-neutral-600",
+		bgColor: "bg-neutral-50",
 	},
 ];
 ---
@@ -82,26 +82,26 @@ const features = [
 				<div class="flex flex-col lg:flex-row items-center gap-16">
 					<div class="flex-1 text-center lg:text-left">
 						<div
-							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 mb-6"
+							class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marca-50 border border-marca-100 mb-6"
 						>
 							<span
-								class="text-xs font-bold text-emerald-800 uppercase tracking-wider"
+								class="text-xs font-bold text-marca-800 uppercase tracking-wider"
 								>GANA MÁS CON REPARTO PROPIO</span
 							>
 						</div>
 
 						<h1
-							class="text-5xl lg:text-7xl font-black text-slate-900 mb-6 leading-[1.1] tracking-tight"
+							class="text-5xl lg:text-7xl font-black text-neutral-900 mb-6 leading-[1.1] tracking-tight"
 						>
 							Delivery para <br />
 							<span
-								class="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent"
+								class="text-marca-600"
 								>Restaurantes.</span
 							>
 						</h1>
 
 						<p
-							class="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
+							class="text-xl text-neutral-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0"
 						>
 							Libérate de las comisiones altas. Toma el control total de tus
 							pedidos a domicilio y fideliza a tus clientes.
@@ -112,7 +112,7 @@ const features = [
 						>
 							<a
 								href="/admin/register"
-								class="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
+								class="inline-flex items-center justify-center px-8 py-4 bg-neutral-900 text-white font-bold rounded-2xl hover:bg-neutral-800 transition-all shadow-xl shadow-neutral-900/20 group"
 							>
 								Crear Mi Tienda Online
 								<ArrowRight
@@ -124,11 +124,11 @@ const features = [
 
 					<div class="flex-1 relative w-full max-w-2xl">
 						<div
-							class="absolute -inset-4 bg-gradient-to-tr from-emerald-500/10 to-green-500/10 blur-3xl rounded-full"
+							class="bg-marca-500/10 absolute -inset-4 blur-3xl rounded-full"
 						>
 						</div>
 						<div
-							class="relative bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+							class="relative bg-white rounded-3xl border border-neutral-200 shadow-2xl overflow-hidden"
 						>
 							<Image
 								src={main_menu}
@@ -142,32 +142,32 @@ const features = [
 		</section>
 
 		<!-- Features -->
-		<section class="py-24 bg-slate-50">
+		<section class="py-24 bg-neutral-50">
 			<div class="max-w-7xl mx-auto px-6">
 				<h2
-					class="text-3xl lg:text-5xl font-black text-slate-900 mb-20 text-center"
+					class="text-3xl lg:text-5xl font-black text-neutral-900 mb-20 text-center"
 				>
 					Todo bajo tu control
 				</h2>
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 					{
 						features.map((f) => (
-							<div class="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+							<div class="bg-white p-8 rounded-[40px] border border-neutral-200 shadow-sm hover:shadow-xl transition-all duration-300">
 								<div
 									class={`w-14 h-14 ${f.bgColor} ${f.color} rounded-2xl flex items-center justify-center mb-8`}
 								>
 									<f.icon className="w-7 h-7" />
 								</div>
-								<h3 class="text-2xl font-bold text-slate-900 mb-4">
+								<h3 class="text-2xl font-bold text-neutral-900 mb-4">
 									{f.title}
 								</h3>
-								<p class="text-slate-600 mb-8 text-sm leading-relaxed">
+								<p class="text-neutral-600 mb-8 text-sm leading-relaxed">
 									{f.description}
 								</p>
 								<ul class="space-y-3">
 									{f.items.map((item) => (
-										<li class="flex items-center gap-3 text-sm font-medium text-slate-700">
-											<Check className="w-4 h-4 text-emerald-500" />
+										<li class="flex items-center gap-3 text-sm font-medium text-neutral-700">
+											<Check className="w-4 h-4 text-marca-500" />
 											{item}
 										</li>
 									))}

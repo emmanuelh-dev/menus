@@ -11,10 +11,10 @@ interface Props {
 
 const { items, theme = 'dark' } = Astro.props;
 
-const textColor = theme === 'light' ? 'text-gray-700' : 'text-gray-300';
-const hoverColor = theme === 'light' ? 'hover:text-pink-600' : 'hover:text-pink-400';
-const currentColor = theme === 'light' ? 'text-pink-600' : 'text-pink-400';
-const separatorColor = theme === 'light' ? 'text-gray-400' : 'text-gray-500';
+const textColor = theme === 'light' ? 'text-neutral-700' : 'text-neutral-300';
+const hoverColor = theme === 'light' ? 'hover:text-neutral-600' : 'hover:text-neutral-400';
+const currentColor = theme === 'light' ? 'text-neutral-600' : 'text-neutral-400';
+const separatorColor = theme === 'light' ? 'text-neutral-400' : 'text-neutral-500';
 ---
 
 <nav aria-label="Breadcrumb" class="mb-6">

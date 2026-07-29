@@ -79,11 +79,11 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
         if (isFav) {
           svg.setAttribute("fill", "currentColor");
           svg.classList.add("text-red-500");
-          svg.classList.remove("text-stone-400");
+          svg.classList.remove("text-neutral-400");
         } else {
           svg.setAttribute("fill", "none");
           svg.classList.remove("text-red-500");
-          svg.classList.add("text-stone-400");
+          svg.classList.add("text-neutral-400");
         }
       }
     });
@@ -127,10 +127,10 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
         <div className="fixed bottom-[72px] right-6 z-40">
           <button
             onClick={() => setShowFavorites(!showFavorites)}
-            className="relative bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-full  transition-all hover:scale-105"
+            className="relative bg-neutral-500 hover:bg-neutral-600 text-white p-3 rounded-full  transition-all hover:scale-105"
           >
             <Heart className="w-5 h-5" fill="currentColor" />
-            <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+            <span className="absolute -top-1 -right-1 bg-white text-neutral-600 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
               {favorites.length}
             </span>
           </button>
@@ -145,19 +145,19 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
           }}
         >
           <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80dvh] flex flex-col">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-pink-500" fill="currentColor" />
+                <Heart className="w-6 h-6 text-neutral-500" fill="currentColor" />
                 <h2 className="text-xl font-bold">Favoritos</h2>
               </div>
               <button onClick={() => setShowFavorites(false)}>
-                <X className="w-6 h-6 text-gray-400" />
+                <X className="w-6 h-6 text-neutral-400" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
               {favorites.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">
+                <p className="text-center text-neutral-400 py-8">
                   No tienes favoritos
                 </p>
               ) : (
@@ -178,12 +178,12 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
                     return (
                       <div
                         key={fav.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-3"
+                        className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg gap-3"
                       >
                         <div className="flex-1">
                           <span className="font-medium block">{fav.name}</span>
                           {itemData?.price && (
-                            <span className="text-sm text-gray-600">${itemData.price}</span>
+                            <span className="text-sm text-neutral-600">${itemData.price}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
                           )}
                           <button
                             onClick={() => toggleFavorite(fav)}
-                            className="text-pink-500 hover:text-pink-600"
+                            className="text-neutral-500 hover:text-neutral-600"
                           >
                             <Heart className="w-5 h-5" fill="currentColor" />
                           </button>

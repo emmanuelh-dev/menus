@@ -8,10 +8,10 @@ interface BadgeProps {
 
 export const Badge = ({ children, variant = "slate", className = "" }: BadgeProps) => {
   const variants = {
-    slate: "bg-slate-50 text-slate-500 border-slate-200",
-    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    amber: "bg-amber-50 text-amber-600 border-amber-100",
-    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    slate: "bg-neutral-50 text-neutral-500 border-neutral-200",
+    emerald: "bg-marca-50 text-marca-600 border-marca-100",
+    amber: "bg-neutral-50 text-neutral-600 border-neutral-100",
+    blue: "bg-neutral-50 text-neutral-600 border-neutral-100",
     red: "bg-red-50 text-red-600 border-red-100",
   };
 

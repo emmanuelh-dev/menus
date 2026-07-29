@@ -35,12 +35,12 @@ const { blocks = [], view_settings = {} } = place.content || {};
 					{place.name}
 				</h1>
 				<p
-					class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-semibold mb-8"
+					class="text-[10px] uppercase tracking-[0.4em] text-neutral-400 font-semibold mb-8"
 				>
 					Mesa Tradicional • San Nicolás
 				</p>
 
-				<div class="h-[1px] w-12 bg-stone-200"></div>
+				<div class="h-[1px] w-12 bg-neutral-200"></div>
 			</header>
 
 			{/* Menú Refinado */}
@@ -50,8 +50,8 @@ const { blocks = [], view_settings = {} } = place.content || {};
 						if (block.type === "section") {
 							return (
 								<section class="relative">
-									<div class="sticky top-0 bg-[#FCFCFC]/80 backdrop-blur-md z-10 py-4 border-b border-stone-100 tex-2xl">
-										<h2 class="text-2xl uppercase tracking-[0.3em] font-black text-stone-800">
+									<div class="sticky top-0 bg-[#FCFCFC]/80 backdrop-blur-md z-10 py-4 border-b border-neutral-100 tex-2xl">
+										<h2 class="text-2xl uppercase tracking-[0.3em] font-black text-neutral-800">
 											{block.data.title}
 										</h2>
 									</div>
@@ -65,7 +65,7 @@ const { blocks = [], view_settings = {} } = place.content || {};
 											/>
 										)}
 										{block.data.description && (
-											<p class="text-stone-400 text-sm font-light mt-2">
+											<p class="text-neutral-400 text-sm font-light mt-2">
 												{block.data.description}
 											</p>
 										)}
@@ -76,12 +76,12 @@ const { blocks = [], view_settings = {} } = place.content || {};
 														<h3 class="text-lg font-medium tracking-tight group-hover:text-red-900 transition-colors">
 															{item.name}
 														</h3>
-														<span class="text-sm font-light text-stone-400 ml-4">
+														<span class="text-sm font-light text-neutral-400 ml-4">
 															{view_settings.show_prices && `$${item.price}`}
 														</span>
 													</div>
 													{item.description && (
-														<p class="text-stone-400 text-sm font-light leading-relaxed">
+														<p class="text-neutral-400 text-sm font-light leading-relaxed">
 															{item.description}
 														</p>
 													)}
@@ -124,7 +124,7 @@ const { blocks = [], view_settings = {} } = place.content || {};
 			</div>
 
 			<footer class="mt-32 pb-16 text-center">
-				<p class="text-[10px] text-stone-300 uppercase tracking-widest">
+				<p class="text-[10px] text-neutral-300 uppercase tracking-widest">
 					{place.name} • 2026
 				</p>
 			</footer>

@@ -134,7 +134,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
               aria-pressed={rating >= s}
               className="text-3xl transition-all hover:scale-110"
             >
-              {rating >= s ? <FaStar className="text-amber-500" /> : <FaRegStar className="text-white/10" />}
+              {rating >= s ? <FaStar className="text-neutral-500" /> : <FaRegStar className="text-white/10" />}
             </button>
           ))}
         </div>
@@ -144,7 +144,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             placeholder="Tu Nombre"
             value={authorName}
             onChange={e => setAuthorName(e.target.value)}
-            className="p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 transition-all"
+            className="p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-neutral-500 transition-all"
           />
           <input
             type="email"
@@ -152,7 +152,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             value={authorEmail}
             onChange={e => setAuthorEmail(e.target.value)}
             required
-            className="p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 transition-all"
+            className="p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-neutral-500 transition-all"
           />
         </div>
         <div className="mb-3">
@@ -160,7 +160,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             placeholder="WhatsApp (opcional)"
             value={whatsapp}
             onChange={e => setWhatsapp(e.target.value)}
-            className="w-full p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 transition-all"
+            className="w-full p-3 bg-white/[0.03] border border-white/5 rounded-xl outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-neutral-500 transition-all"
           />
         </div>
 
@@ -168,7 +168,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
           placeholder="¿Qué tal estuvo la visita? Cuéntanos..."
           value={comment}
           onChange={e => setComment(e.target.value)}
-          className="w-full p-4 bg-white/[0.03] border border-white/5 rounded-xl h-24 mb-4 outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-stone-500 resize-none transition-all"
+          className="w-full p-4 bg-white/[0.03] border border-white/5 rounded-xl h-24 mb-4 outline-none focus:bg-white/[0.06] focus:ring-1 focus:ring-red-500/50 text-xs text-white placeholder:text-neutral-500 resize-none transition-all"
         />
 
         <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-4">
@@ -200,11 +200,11 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
 
       {/* Listado de Reseñas */}
       <div className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-500 px-2">Muro de Revoluciones ({reviews.length})</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-500 px-2">Muro de Revoluciones ({reviews.length})</h3>
 
         {reviews.length === 0 && (
           <div className="text-center py-10 bg-[#0c0c0c] border border-white/5 rounded-2xl">
-            <p className="text-stone-500 text-xs italic">Sé el primero en compartir tu experiencia...</p>
+            <p className="text-neutral-500 text-xs italic">Sé el primero en compartir tu experiencia...</p>
           </div>
         )}
 
@@ -217,19 +217,19 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
                 </div>
                 <div>
                   <span className="block font-bold text-white text-sm leading-tight">{rev.content?.author?.name || "Anónimo"}</span>
-                  <div className="flex gap-0.5 text-amber-500 mt-0.5">
+                  <div className="flex gap-0.5 text-neutral-500 mt-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className={i < rev.rate ? "text-amber-500" : "text-white/10"} size={9} />
+                      <FaStar key={i} className={i < rev.rate ? "text-neutral-500" : "text-white/10"} size={9} />
                     ))}
                   </div>
                 </div>
               </div>
-              <time className="text-[9px] text-stone-500 uppercase tracking-widest font-semibold">
+              <time className="text-[9px] text-neutral-500 uppercase tracking-widest font-semibold">
                 {new Date(rev.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </time>
             </div>
 
-            <p className="text-stone-300 leading-relaxed mb-3 text-xs italic">"{rev.comment}"</p>
+            <p className="text-neutral-300 leading-relaxed mb-3 text-xs italic">"{rev.comment}"</p>
 
             {rev.content?.images?.length > 0 && (
               <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-none">
@@ -252,10 +252,10 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
             {rev.content?.reply && (
               <div className="mt-3 p-4 bg-red-600/5 border-l-2 border-red-500 rounded-r-xl relative ring-1 ring-white/5">
                 <span className="text-[8px] font-black text-red-400 uppercase tracking-widest block mb-1">STAFF RESPONSE</span>
-                <p className="text-xs text-stone-300 leading-relaxed italic">"{rev.content.reply.text}"</p>
+                <p className="text-xs text-neutral-300 leading-relaxed italic">"{rev.content.reply.text}"</p>
                 <div className="flex items-center gap-1.5 mt-2">
                   <div className="size-1 bg-red-500 rounded-full"></div>
-                  <p className="text-[9px] text-stone-500 uppercase font-bold tracking-widest">{rev.content.reply.admin_name}</p>
+                  <p className="text-[9px] text-neutral-500 uppercase font-bold tracking-widest">{rev.content.reply.admin_name}</p>
                 </div>
               </div>
             )}
@@ -267,7 +267,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
                   value={replyText[rev.id] || ""}
                   onChange={e => setReplyText({ ...replyText, [rev.id]: e.target.value })}
                   placeholder="Responder como administrador..."
-                  className="flex-1 bg-white/5 p-3 rounded-lg text-xs outline-none focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-stone-600"
+                  className="flex-1 bg-white/5 p-3 rounded-lg text-xs outline-none focus:ring-1 focus:ring-red-500/50 text-white placeholder:text-neutral-600"
                 />
                 <button onClick={() => handleReply(rev.id)} className="bg-red-600 text-white px-4 rounded-lg hover:bg-red-500 transition-all font-bold text-xs">
                   <FaReply size={10} />
@@ -285,7 +285,7 @@ export default function ReviewForm({ restaurantName, id, initialReviews = [], is
         >
           <button
             onClick={() => setViewerImage(null)}
-            className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 transition-colors"
+            className="absolute top-4 right-4 text-white text-4xl hover:text-neutral-300 transition-colors"
           >
             ×
           </button>

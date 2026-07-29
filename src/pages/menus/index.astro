@@ -138,12 +138,12 @@ const seoData = {
 <RestaurantLayout
 	title={seoData.title}
 	description={seoData.description}
-	backgroundColor="bg-gray-50"
+	backgroundColor="bg-neutral-50"
 >
-	<div class="bg-gradient-to-b from-gray-50 to-white min-h-screen py-16">
+	<div class="bg-gradient-to-b from-neutral-50 to-white min-h-screen py-16">
 		<div class="max-w-[85%] mx-auto">
 			<h2
-				class="text-4xl font-bold text-gray-900 mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600"
+				class="text-neutral-900 text-4xl font-bold text-neutral-900 mb-12 text-center"
 			>
 				Los restaurantes que usan nuestros menús.
 			</h2>
@@ -156,7 +156,7 @@ const seoData = {
 				>
 					<select
 						name="industry"
-						class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+						class="px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-200"
 					>
 						{
 							industries.map((industry) => (
@@ -172,7 +172,7 @@ const seoData = {
 
 					<select
 						name="type"
-						class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+						class="px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-200"
 					>
 						{
 							types.map((type) => (
@@ -185,7 +185,7 @@ const seoData = {
 
 					<select
 						name="sort"
-						class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-200"
+						class="px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-200"
 					>
 						<option value="popular" selected={selectedSort === "popular"}
 							>Más populares</option
@@ -200,7 +200,7 @@ const seoData = {
 
 					<button
 						type="submit"
-						class="px-4 py-2 border border-gray-900 bg-gray-900 text-white rounded-md text-sm font-bold hover:bg-black"
+						class="px-4 py-2 border border-neutral-900 bg-neutral-900 text-white rounded-md text-sm font-bold hover:bg-black"
 					>
 						Aplicar
 					</button>
@@ -221,7 +221,7 @@ const seoData = {
 
 						return (
 							<div
-								class="restaurant-card p-3 sm:p-5 border border-gray-100 hover:border-gray-200 transition-all duration-300 bg-white shadow-sm hover:shadow-md rounded-xl flex flex-col justify-between"
+								class="restaurant-card p-3 sm:p-5 border border-neutral-100 hover:border-neutral-200 transition-all duration-300 bg-white shadow-sm hover:shadow-md rounded-xl flex flex-col justify-between"
 								data-industry={restaurant.category || "Restaurante"}
 								data-type={restaurant.type || "Casual"}
 								data-rating={restaurant.rating || 0}
@@ -250,18 +250,18 @@ const seoData = {
 											/>
 										)}
 									</div>
-									<h2 class="text-sm sm:text-lg md:text-xl font-bold text-gray-800 mb-1 sm:mb-1.5 line-clamp-1">
+									<h2 class="text-sm sm:text-lg md:text-xl font-bold text-neutral-800 mb-1 sm:mb-1.5 line-clamp-1">
 										<a href={restaurantUrl}>{restaurant.name}</a>
 									</h2>
 									<div class="flex items-center gap-1.5 mb-1.5">
-										<span class="text-amber-500 text-xs sm:text-sm font-bold">
+										<span class="text-neutral-500 text-xs sm:text-sm font-bold">
 											★ {restaurant.rating}
 										</span>
-										<span class="text-gray-400 text-[10px] sm:text-xs">
+										<span class="text-neutral-400 text-[10px] sm:text-xs">
 											({restaurant.reviewCount} reseñas)
 										</span>
 									</div>
-									<p class="text-gray-500 text-[11px] sm:text-xs md:text-sm line-clamp-1">
+									<p class="text-neutral-500 text-[11px] sm:text-xs md:text-sm line-clamp-1">
 										{restaurant.address}
 									</p>
 								</div>
@@ -269,11 +269,11 @@ const seoData = {
 								{restaurant.short_name && (
 									<a
 										href={restaurantUrl}
-										class="group mt-3 block text-xs sm:text-sm text-emerald-600 font-bold hover:text-emerald-700 transition-colors"
+										class="group mt-3 block text-xs sm:text-sm text-marca-600 font-bold hover:text-marca-700 transition-colors"
 									>
 										<span class="flex items-center justify-between">
 											Ver Menú
-											<div class="p-1 rounded-full border border-emerald-100 group-hover:border-emerald-200 bg-emerald-50/50 transition-all duration-300">
+											<div class="p-1 rounded-full border border-marca-100 group-hover:border-marca-200 bg-marca-50/50 transition-all duration-300">
 												<ArrowRight className="w-3.5 h-3.5" />
 											</div>
 										</span>
@@ -292,7 +292,7 @@ const seoData = {
 				<div class="flex items-center gap-2">
 					<a
 						href={buildQueryString(Math.max(1, safeCurrentPage - 1))}
-						class={`px-4 py-2 border border-gray-300 rounded-md text-sm font-bold text-gray-700 hover:bg-gray-50 ${safeCurrentPage <= 1 ? "pointer-events-none opacity-40" : ""}`}
+						class={`px-4 py-2 border border-neutral-300 rounded-md text-sm font-bold text-neutral-700 hover:bg-neutral-50 ${safeCurrentPage <= 1 ? "pointer-events-none opacity-40" : ""}`}
 					>
 						Anterior
 					</a>
@@ -301,7 +301,7 @@ const seoData = {
 						{
 							pageItems.map((item) =>
 								item === "ellipsis" ? (
-									<span class="w-9 h-9 flex items-center justify-center text-gray-400 font-bold">
+									<span class="w-9 h-9 flex items-center justify-center text-neutral-400 font-bold">
 										…
 									</span>
 								) : (
@@ -309,8 +309,8 @@ const seoData = {
 										href={buildQueryString(item)}
 										class={`w-9 h-9 rounded-md text-sm font-bold transition-colors flex items-center justify-center ${
 											item === safeCurrentPage
-												? "bg-gray-900 text-white"
-												: "border border-gray-300 text-gray-700 hover:bg-gray-50"
+												? "bg-neutral-900 text-white"
+												: "border border-neutral-300 text-neutral-700 hover:bg-neutral-50"
 										}`}
 									>
 										{item}
@@ -322,7 +322,7 @@ const seoData = {
 
 					<a
 						href={buildQueryString(Math.min(totalPages, safeCurrentPage + 1))}
-						class={`px-4 py-2 border border-gray-300 rounded-md text-sm font-bold text-gray-700 hover:bg-gray-50 ${safeCurrentPage >= totalPages ? "pointer-events-none opacity-40" : ""}`}
+						class={`px-4 py-2 border border-neutral-300 rounded-md text-sm font-bold text-neutral-700 hover:bg-neutral-50 ${safeCurrentPage >= totalPages ? "pointer-events-none opacity-40" : ""}`}
 					>
 						Siguiente
 					</a>
@@ -330,7 +330,7 @@ const seoData = {
 
 				<p
 					id="pagination-summary"
-					class="text-xs font-bold uppercase tracking-widest text-gray-400"
+					class="text-xs font-bold uppercase tracking-widest text-neutral-400"
 				>
 					{
 						totalRestaurants
@@ -343,23 +343,23 @@ const seoData = {
 			<!-- Nueva sección: Menús por Estado -->
 			<div class="mt-32 mb-16 px-4 md:px-0">
 				<div
-					class="flex items-end justify-between mb-10 pb-6 border-b border-gray-100 max-w-7xl mx-auto"
+					class="flex items-end justify-between mb-10 pb-6 border-b border-neutral-100 max-w-7xl mx-auto"
 				>
 					<div>
 						<h2
-							class="text-3xl font-black text-gray-900 tracking-tighter uppercase leading-none mb-2"
+							class="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none mb-2"
 						>
-							Explora por <span class="text-emerald-600">Estado</span>
+							Explora por <span class="text-marca-600">Estado</span>
 						</h2>
 						<p
-							class="text-gray-400 text-sm font-bold uppercase tracking-widest leading-none"
+							class="text-neutral-400 text-sm font-bold uppercase tracking-widest leading-none"
 						>
 							Encuentra restaurantes cerca de ti
 						</p>
 					</div>
 					<a
 						href="/menus/estados"
-						class="hidden md:flex items-center gap-2 text-emerald-600 font-bold uppercase tracking-widest text-xs hover:text-emerald-700 transition-colors"
+						class="hidden md:flex items-center gap-2 text-marca-600 font-bold uppercase tracking-widest text-xs hover:text-marca-700 transition-colors"
 					>
 						Ver todos los estados
 						<ArrowRight className="w-4 h-4" />
@@ -373,20 +373,20 @@ const seoData = {
 						states.slice(0, 8).map((state) => (
 							<a
 								href={`/menus/estados/${state.slug}`}
-								class="group p-6 bg-white border border-gray-100 hover:border-emerald-200 rounded-[2rem] transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/5"
+								class="group p-6 bg-white border border-neutral-100 hover:border-marca-200 rounded-[2rem] transition-all duration-300 hover:shadow-xl hover:shadow-marca-900/5"
 							>
 								<div class="flex items-center justify-between mb-4">
-									<div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 transition-colors duration-300">
-										<MapPin className="w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" />
+									<div class="w-10 h-10 bg-marca-50 rounded-xl flex items-center justify-center group-hover:bg-marca-600 transition-colors duration-300">
+										<MapPin className="w-5 h-5 text-marca-600 group-hover:text-white transition-colors" />
 									</div>
-									<span class="text-2xl font-black text-gray-900 leading-none">
+									<span class="text-2xl font-black text-neutral-900 leading-none">
 										{state.total_places}
 									</span>
 								</div>
-								<h3 class="text-lg font-black text-gray-900 tracking-tighter uppercase group-hover:text-emerald-600 transition-colors">
+								<h3 class="text-lg font-black text-neutral-900 tracking-tighter uppercase group-hover:text-marca-600 transition-colors">
 									{state.name}
 								</h3>
-								<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+								<p class="text-[10px] text-neutral-400 font-bold uppercase tracking-widest mt-1">
 									Negocios Activos
 								</p>
 							</a>
@@ -399,7 +399,7 @@ const seoData = {
 						<div class="text-center mt-12 md:hidden">
 							<a
 								href="/menus/estados"
-								class="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-full font-black uppercase tracking-widest text-xs shadow-lg shadow-emerald-900/20"
+								class="inline-flex items-center gap-2 px-8 py-3 bg-marca-600 text-white rounded-full font-black uppercase tracking-widest text-xs shadow-lg shadow-marca-900/20"
 							>
 								Ver todos los estados
 							</a>

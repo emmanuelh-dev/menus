@@ -129,7 +129,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
     return (
       <div
         onPaste={handlePaste}
-        className="bg-zinc-950 border border-emerald-500/30 rounded-2xl p-5 md:p-6 mb-8 relative overflow-hidden group shadow-lg shadow-emerald-950/20"
+        className="bg-neutral-950 border border-marca-500/30 rounded-2xl p-5 md:p-6 mb-8 relative overflow-hidden group shadow-lg shadow-marca-950/20"
       >
         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
           <Upload size={80} />
@@ -137,14 +137,14 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
 
         <div className="relative z-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6">
           <div className="flex-1 text-left">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[9px] font-black uppercase tracking-widest text-emerald-400 mb-3 animate-pulse">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-marca-500/10 border border-marca-500/20 rounded-full text-[9px] font-black uppercase tracking-widest text-marca-400 mb-3 animate-pulse">
               <Sparkles size={10} />
               Actualización rápida con IA
             </div>
             <h3 className="text-lg font-bold text-white mb-1 tracking-tight">
               ¿Ves precios o habitaciones diferentes?
             </h3>
-            <p className="text-zinc-400 text-xs leading-relaxed max-w-md">
+            <p className="text-neutral-400 text-xs leading-relaxed max-w-md">
               Sube una foto del menú actual y nuestra IA actualizará el sitio al instante para todos.
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                 onChange={(e) => setText(e.target.value)}
                 onPaste={handlePaste}
                 placeholder="¿Qué cambió? (Puedes pegar imágenes aquí)"
-                className="w-full bg-black/60 border border-zinc-800 rounded-xl p-3 text-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all min-h-[44px] max-h-[80px] resize-none"
+                className="w-full bg-black/60 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none focus:ring-1 focus:ring-marca-500/50 transition-all min-h-[44px] max-h-[80px] resize-none"
               />
               <input
                 type="file"
@@ -189,7 +189,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                   }
                 }}
                 disabled={isProcessing || !token}
-                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-bold uppercase text-[9px] tracking-widest transition-all shadow-xl shadow-emerald-950/20 flex items-center justify-center gap-2 active:scale-95 border-b-2 border-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-marca-600 hover:bg-marca-500 text-white px-5 py-2.5 rounded-xl font-bold uppercase text-[9px] tracking-widest transition-all shadow-xl shadow-marca-950/20 flex items-center justify-center gap-2 active:scale-95 border-b-2 border-marca-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? (
                   <>
@@ -207,7 +207,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
               {images.length > 0 && (
                 <button
                   onClick={() => setImages([])}
-                  className="text-[9px] font-bold uppercase tracking-tighter text-zinc-500 hover:text-red-400 transition-colors"
+                  className="text-[9px] font-bold uppercase tracking-tighter text-neutral-500 hover:text-red-400 transition-colors"
                 >
                   Limpiar fotos
                 </button>
@@ -223,10 +223,10 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-[100] bg-white text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 group border border-zinc-200"
+        className="fixed bottom-6 right-6 z-[100] bg-white text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 group border border-neutral-200"
         title="Actualizar Menú"
       >
-        <Upload size={20} className="text-zinc-800" />
+        <Upload size={20} className="text-neutral-800" />
         <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest">Subir Menú</span>
       </button>
 
@@ -235,10 +235,10 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
           onPaste={handlePaste}
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm px-6"
         >
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md p-8 rounded-[32px] shadow-2xl text-zinc-300 relative">
+          <div className="bg-neutral-900 border border-neutral-800 w-full max-w-md p-8 rounded-[32px] shadow-2xl text-neutral-300 relative">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
+              className="absolute top-6 right-6 text-neutral-500 hover:text-white transition-colors"
             >
               <X size={24} />
             </button>
@@ -248,7 +248,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
             </div>
 
             <h2 className="text-2xl font-black uppercase tracking-tighter text-white mb-2">Subir Menú</h2>
-            <p className="text-zinc-500 text-sm font-medium mb-8">
+            <p className="text-neutral-500 text-sm font-medium mb-8">
               Sube fotos del menú o habitaciones para actualizar la información. También puedes pegar imágenes directamente.
             </p>
 
@@ -258,7 +258,7 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
                 onChange={(e) => setText(e.target.value)}
                 onPaste={handlePaste}
                 placeholder="Describe los cambios aquí... (Puedes pegar imágenes)"
-                className="w-full bg-black/40 border border-zinc-800 rounded-2xl p-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[100px] resize-none"
+                className="w-full bg-black/40 border border-neutral-800 rounded-2xl p-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all min-h-[100px] resize-none"
               />
               <input
                 type="file"
@@ -270,9 +270,9 @@ export default function QuickFeed({ placeId, isInline = false }: QuickFeedProps)
               />
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group"
+                className="border-2 border-dashed border-neutral-800 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group"
               >
-                <span className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">
+                <span className="text-neutral-500 font-bold uppercase text-[10px] tracking-widest">
                   {images.length > 0 ? `${images.length} archivos añadidos` : 'Añadir o Pegar Fotos'}
                 </span>
               </div>

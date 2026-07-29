@@ -7,23 +7,23 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 ---
 
 <header
-	class={`${backgroundColor || "bg-white"} ${textWhite ? "text-white" : "text-slate-900"}  transition-all duration-300`}
+	class={`${backgroundColor || "bg-white"} ${textWhite ? "text-white" : "text-neutral-900"}  transition-all duration-300`}
 >
 	<div class="max-w-7xl mx-auto px-4 sm:px-6">
 		<div class="flex py-3 items-center justify-between">
 			<a class="flex items-center space-x-2 group shrink-0" href="/">
 				<div
-					class="p-1.5 bg-gradient-to-br from-emerald-600 to-emerald-400 rounded-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform"
+					class="p-1.5 bg-gradient-to-br from-marca-600 to-marca-400 rounded-lg shadow-marca-500/20 group-hover:scale-105 transition-transform"
 				>
 					<Utensils className="h-5 w-5 text-white" />
 				</div>
 				<div class="flex flex-col leading-none">
 					<span
-						class={`font-black tracking-tight ${textWhite ? "text-white" : "text-slate-900"} text-lg sm:text-xl`}
+						class={`font-black tracking-tight ${textWhite ? "text-white" : "text-neutral-900"} text-lg sm:text-xl`}
 						>BySMax</span
 					>
 					<span
-						class="text-[9px] font-black text-emerald-600 tracking-tighter uppercase"
+						class="text-[9px] font-black text-marca-600 tracking-tighter uppercase"
 						>Menús IA</span
 					>
 				</div>
@@ -35,14 +35,14 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 				    lo que la gente busca primero: ver ejemplos y el blog. */}
 				<a
 					href="/menus"
-					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
+					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-neutral-200 hover:text-white" : "text-neutral-600 hover:text-marca-600"} transition-colors`}
 				>
 					Ver ejemplos
 				</a>
 
 				<a
 					href="/blog"
-					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-emerald-600"} transition-colors`}
+					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-neutral-200 hover:text-white" : "text-neutral-600 hover:text-marca-600"} transition-colors`}
 				>
 					Blog
 				</a>
@@ -51,7 +51,7 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 			<div class="flex items-center space-x-2 sm:space-x-4 shrink-0">
 				<a
 					href="https://admin-menus.bysmax.com"
-					class="inline-flex items-center px-4 py-2 sm:px-6 sm:py-2.5 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-700 active:scale-95 transition-all shadow-emerald-500/20 text-[11px] uppercase tracking-widest border border-emerald-500/50"
+					class="inline-flex items-center px-4 py-2 sm:px-6 sm:py-2.5 bg-marca-600 text-white font-black rounded-xl hover:bg-marca-700 active:scale-95 transition-all shadow-marca-500/20 text-[11px] uppercase tracking-widest border border-marca-500/50"
 				>
 					<span class="sm:hidden">Crear Menú Gratis</span>
 					<span class="hidden sm:inline">Crear Menú Gratis</span>
@@ -59,7 +59,7 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 
 				<button
 					id="menuButton"
-					class={`lg:hidden p-2 rounded-xl ${textWhite ? "bg-white/10 text-white" : "bg-slate-100 text-slate-900"} transition-colors relative z-[110] border border-slate-200 active:scale-90`}
+					class={`lg:hidden p-2 rounded-xl ${textWhite ? "bg-white/10 text-white" : "bg-neutral-100 text-neutral-900"} transition-colors relative z-[110] border border-neutral-200 active:scale-90`}
 					aria-label="Menu"
 				>
 					<Menu className="h-6 w-6" id="menuIcon" />
@@ -79,7 +79,7 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 				<div>
 					<a
 						href="https://admin-menus.bysmax.com"
-						class="mb-4 flex items-center justify-center gap-3 w-full py-5 bg-emerald-600 text-white text-center rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-emerald-500/40 active:scale-[0.98] transition-all"
+						class="mb-4 flex items-center justify-center gap-3 w-full py-5 bg-marca-600 text-white text-center rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-marca-500/40 active:scale-[0.98] transition-all"
 					>
 						Crea tu menú gratis <Zap className="w-4 h-4" />
 					</a>
@@ -87,23 +87,23 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 					<div class="space-y-3">
 						<a
 							href="/menus"
-							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
+							class="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl group active:bg-marca-50 transition-colors"
 						>
 							<span
-								class="text-sm font-black text-slate-900 uppercase tracking-widest"
+								class="text-sm font-black text-neutral-900 uppercase tracking-widest"
 								>Ver ejemplos</span
 							>
-							<ArrowRight className="w-4 h-4 text-slate-300" />
+							<ArrowRight className="w-4 h-4 text-neutral-300" />
 						</a>
 						<a
 							href="/blog"
-							class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group active:bg-emerald-50 transition-colors"
+							class="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl group active:bg-marca-50 transition-colors"
 						>
 							<span
-								class="text-sm font-black text-slate-900 uppercase tracking-widest"
+								class="text-sm font-black text-neutral-900 uppercase tracking-widest"
 								>Blog</span
 							>
-							<ArrowRight className="w-4 h-4 text-slate-300" />
+							<ArrowRight className="w-4 h-4 text-neutral-300" />
 						</a>
 					</div>
 				</div>
@@ -112,12 +112,12 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 			<div class="px-6 mt-16 pb-12">
 				<button
 					id="backToTopMobile"
-					class="w-full py-4 bg-slate-100 text-slate-900 rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 active:scale-95 transition-all"
+					class="w-full py-4 bg-neutral-100 text-neutral-900 rounded-2xl font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 active:scale-95 transition-all"
 				>
 					<ArrowUp className="w-4 h-4" />
 					Volver arriba
 				</button>
-				<div class="mt-12 text-center text-slate-400">
+				<div class="mt-12 text-center text-neutral-400">
 					<p class="text-[10px] font-bold uppercase tracking-[0.3em]">
 						BySMax Menús IA
 					</p>

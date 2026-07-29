@@ -52,8 +52,8 @@ const schemaEnrichment = {
       <div class="absolute inset-0 bg-cover bg-center bg-gradient-to-r from-[#4a5568] to-[#553c7b]"></div>
       
       <div class="relative z-10 max-w-6xl mx-auto px-4 py-24 md:py-32 text-center">
-        <span class="inline-block bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">📍 Explora por Ubicación</span>
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-pink-300 font-serif tracking-tight">{seoData.heading}</h1>
+        <span class="inline-block bg-neutral-500 text-white px-4 py-1 rounded-full text-sm font-medium mb-6 animate-pulse">📍 Explora por Ubicación</span>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-neutral-300 font-serif tracking-tight">{seoData.heading}</h1>
         <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">{seoData.subheading}</p>
         <p class="text-lg text-white/80 max-w-2xl mx-auto">Selecciona tu estado para descubrir los mejores moteles con información verificada, precios actualizados y recomendaciones locales.</p>
       </div>
@@ -71,31 +71,31 @@ const schemaEnrichment = {
         />
         
         <div class="mb-12 text-center">
-          <h2 class="text-3xl md:text-4xl font-serif font-bold text-pink-400 mb-4">Selecciona tu Estado</h2>
-          <p class="text-gray-300 max-w-2xl mx-auto">Explora moteles con jacuzzi, precios verificados, ubicaciones exactas y amenidades especiales en cada estado de México.</p>
+          <h2 class="text-3xl md:text-4xl font-serif font-bold text-neutral-400 mb-4">Selecciona tu Estado</h2>
+          <p class="text-neutral-300 max-w-2xl mx-auto">Explora moteles con jacuzzi, precios verificados, ubicaciones exactas y amenidades especiales en cada estado de México.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {states.map(state => (
             <a 
               href={`/moteles/estados/${state.slug}`}
-              class="group bg-[#1E1E1E] rounded-xl p-6 border border-pink-500/20 hover:border-pink-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              class="group bg-[#1E1E1E] rounded-xl p-6 border border-neutral-500/20 hover:border-neutral-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center">
-                  <MapPin className="w-6 h-6 text-pink-400 mr-3" />
-                  <h3 class="text-xl font-serif font-bold text-pink-300 group-hover:text-pink-200 transition-colors">
+                  <MapPin className="w-6 h-6 text-neutral-400 mr-3" />
+                  <h3 class="text-xl font-serif font-bold text-neutral-300 group-hover:text-neutral-200 transition-colors">
                     {state.name}
                   </h3>
                 </div>
-                <span class="text-pink-400 transform group-hover:translate-x-1 transition-transform">→</span>
+                <span class="text-neutral-400 transform group-hover:translate-x-1 transition-transform">→</span>
               </div>
               
               {state.description && (
-                <p class="text-sm text-gray-400 mb-3">{state.description}</p>
+                <p class="text-sm text-neutral-400 mb-3">{state.description}</p>
               )}
               
-              <div class="flex items-center text-sm text-gray-500">
+              <div class="flex items-center text-sm text-neutral-500">
                 <span>Explora {state.total_places} moteles con precios y ubicaciones</span>
               </div>
             </a>
@@ -104,51 +104,51 @@ const schemaEnrichment = {
 
         {states.length === 0 && (
           <div class="text-center py-16">
-            <p class="text-gray-400 text-lg">Próximamente agregaremos más estados.</p>
-            <p class="text-gray-500 mt-2">Estamos trabajando para expandir nuestra cobertura nacional.</p>
+            <p class="text-neutral-400 text-lg">Próximamente agregaremos más estados.</p>
+            <p class="text-neutral-500 mt-2">Estamos trabajando para expandir nuestra cobertura nacional.</p>
           </div>
         )}
 
-        <div class="mt-16 bg-[#1E1E1E] rounded-xl p-8 shadow-md border border-pink-500/20">
-          <h2 class="text-2xl md:text-3xl font-serif font-bold text-pink-400 mb-6 text-center">Características Populares</h2>
+        <div class="mt-16 bg-[#1E1E1E] rounded-xl p-8 shadow-md border border-neutral-500/20">
+          <h2 class="text-2xl md:text-3xl font-serif font-bold text-neutral-400 mb-6 text-center">Características Populares</h2>
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">🛁</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Con Jacuzzi</h3>
-              <p class="text-gray-400 text-sm">Habitaciones con jacuzzi privado en múltiples estados</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Con Jacuzzi</h3>
+              <p class="text-neutral-400 text-sm">Habitaciones con jacuzzi privado en múltiples estados</p>
             </div>
             
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">💰</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Precios Verificados</h3>
-              <p class="text-gray-400 text-sm">Tarifas actualizadas por hora, 12 horas y noche completa</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Precios Verificados</h3>
+              <p class="text-neutral-400 text-sm">Tarifas actualizadas por hora, 12 horas y noche completa</p>
             </div>
             
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">📍</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Ubicaciones Exactas</h3>
-              <p class="text-gray-400 text-sm">Direcciones completas y mapas de cada motel</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Ubicaciones Exactas</h3>
+              <p class="text-neutral-400 text-sm">Direcciones completas y mapas de cada motel</p>
             </div>
 
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">⭐</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Recomendaciones</h3>
-              <p class="text-gray-400 text-sm">Opiniones y reseñas de usuarios locales</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Recomendaciones</h3>
+              <p class="text-neutral-400 text-sm">Opiniones y reseñas de usuarios locales</p>
             </div>
           </div>
 
-          <div class="bg-black/30 rounded-lg p-6 border border-pink-500/10">
-            <h3 class="text-xl font-serif font-bold text-pink-300 mb-4 text-center">Búsquedas Populares por Estado</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+          <div class="bg-black/30 rounded-lg p-6 border border-neutral-500/10">
+            <h3 class="text-xl font-serif font-bold text-neutral-300 mb-4 text-center">Búsquedas Populares por Estado</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-neutral-300">
               <ul class="space-y-2">
                 <li>✓ Moteles con jacuzzi en Nuevo León</li>
                 <li>✓ Moteles baratos en CDMX</li>
@@ -165,43 +165,43 @@ const schemaEnrichment = {
           </div>
         </div>
 
-        <div class="mt-16 bg-[#1E1E1E] rounded-xl p-8 shadow-md border border-pink-500/20">
-          <h2 class="text-2xl md:text-3xl font-serif font-bold text-pink-400 mb-6 text-center">¿Por qué buscar por estado?</h2>
+        <div class="mt-16 bg-[#1E1E1E] rounded-xl p-8 shadow-md border border-neutral-500/20">
+          <h2 class="text-2xl md:text-3xl font-serif font-bold text-neutral-400 mb-6 text-center">¿Por qué buscar por estado?</h2>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">🎯</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Información Local</h3>
-              <p class="text-gray-400 text-sm">Descubre moteles con detalles específicos de tu región y recomendaciones locales.</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Información Local</h3>
+              <p class="text-neutral-400 text-sm">Descubre moteles con detalles específicos de tu región y recomendaciones locales.</p>
             </div>
             
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">💰</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Precios Regionales</h3>
-              <p class="text-gray-400 text-sm">Compara precios adaptados al mercado local de cada estado.</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Precios Regionales</h3>
+              <p class="text-neutral-400 text-sm">Compara precios adaptados al mercado local de cada estado.</p>
             </div>
             
             <div class="text-center">
-              <div class="w-16 h-16 bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-neutral-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl">⭐</span>
               </div>
-              <h3 class="text-lg font-semibold text-pink-300 mb-2">Recomendaciones</h3>
-              <p class="text-gray-400 text-sm">Accede a reseñas y recomendaciones de usuarios locales.</p>
+              <h3 class="text-lg font-semibold text-neutral-300 mb-2">Recomendaciones</h3>
+              <p class="text-neutral-400 text-sm">Accede a reseñas y recomendaciones de usuarios locales.</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-pink-500/20">
-          <h2 class="text-2xl md:text-3xl font-serif font-bold text-pink-400 mb-4 text-center">¿Tienes un motel?</h2>
-          <p class="text-center text-gray-300 max-w-2xl mx-auto mb-6">Registra tu motel en nuestra plataforma y llega a miles de personas que buscan opciones en su estado.</p>
+        <div class="bg-[#1E1E1E] rounded-xl p-8 shadow-md mt-16 border border-neutral-500/20">
+          <h2 class="text-2xl md:text-3xl font-serif font-bold text-neutral-400 mb-4 text-center">¿Tienes un motel?</h2>
+          <p class="text-center text-neutral-300 max-w-2xl mx-auto mb-6">Registra tu motel en nuestra plataforma y llega a miles de personas que buscan opciones en su estado.</p>
           <div class="text-center">
             <a 
               href="/contact" 
-              class="inline-block px-8 py-3 bg-pink-500 text-white rounded-lg font-serif hover:bg-pink-400 transition-colors"
+              class="inline-block px-8 py-3 bg-neutral-500 text-white rounded-lg font-serif hover:bg-neutral-400 transition-colors"
             >
               Registrar mi Motel
             </a>

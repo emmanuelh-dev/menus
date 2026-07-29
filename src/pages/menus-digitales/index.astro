@@ -23,7 +23,7 @@ const pageData = {
 		"menú digital qr, carta digital restaurante, menú qr méxico, software para restaurantes, pedidos whatsapp restaurante",
 };
 
-const customTitle = `Crea tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Menú Digital QR</span> y Carta Digital en México`;
+const customTitle = `Crea tu <span class="text-marca-600">Menú Digital QR</span> y Carta Digital en México`;
 const customSubtitle = `Explora cientos de restaurantes que ya usan nuestra tecnología de <strong>Carta QR</strong> para recibir pedidos por WhatsApp sin pagar comisiones.`;
 ---
 
@@ -38,24 +38,24 @@ const customSubtitle = `Explora cientos de restaurantes que ya usan nuestra tecn
 		<TrustShowcase />
 
 		<!-- States Selector Section -->
-		<section class="py-24 bg-slate-50/50">
+		<section class="py-24 bg-neutral-50/50">
 			<div class="max-w-7xl mx-auto px-6">
 				<div
 					class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
 				>
 					<div class="max-w-2xl">
 						<h2
-							class="text-4xl md:text-6xl font-black text-slate-900 mb-4 tracking-tighter uppercase leading-[0.9]"
+							class="text-4xl md:text-6xl font-black text-neutral-900 mb-4 tracking-tighter uppercase leading-[0.9]"
 						>
-							Explora por <span class="text-emerald-600">Estado</span>
+							Explora por <span class="text-marca-600">Estado</span>
 						</h2>
-						<p class="text-slate-600 font-medium text-lg">
+						<p class="text-neutral-600 font-medium text-lg">
 							Selecciona tu ubicación para descubrir la transformación digital
 							cerca de ti.
 						</p>
 					</div>
 					<div
-						class="flex items-center gap-2 text-sm font-bold text-emerald-600 bg-emerald-50 px-6 py-3 rounded-full border border-emerald-100"
+						class="flex items-center gap-2 text-sm font-bold text-marca-600 bg-marca-50 px-6 py-3 rounded-full border border-marca-100"
 					>
 						<MapPin className="w-5 h-5" />
 						{states.length} Estados Disponibles
@@ -67,20 +67,20 @@ const customSubtitle = `Explora cientos de restaurantes que ya usan nuestra tecn
 						states.map((state) => (
 							<a
 								href={`/menus-digitales/${state.slug}`}
-								class="group relative bg-white border border-slate-200/60 rounded-[32px] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 overflow-hidden"
+								class="group relative bg-white border border-neutral-200/60 rounded-[32px] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-marca-500/10 hover:-translate-y-2 overflow-hidden"
 							>
 								<div class="relative z-10">
-									<div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+									<div class="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-marca-500 group-hover:text-white transition-all duration-300">
 										<Utensils className="w-6 h-6" />
 									</div>
-									<h3 class="text-xl font-black text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">
+									<h3 class="text-xl font-black text-neutral-900 mb-2 group-hover:text-marca-600 transition-colors uppercase tracking-tight">
 										{state.name}
 									</h3>
 									<div class="flex items-center justify-between">
-										<p class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+										<p class="text-xs font-bold text-neutral-400 uppercase tracking-widest">
 											{state.total_places} Restaurantes
 										</p>
-										<ArrowRight className="w-4 h-4 text-emerald-500 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
+										<ArrowRight className="w-4 h-4 text-marca-500 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" />
 									</div>
 								</div>
 							</a>

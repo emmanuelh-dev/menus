@@ -140,7 +140,7 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
                 <button
                   key={section.id}
                   onClick={() => handleCategoryAction(section.id, section.data.title || '')}
-                  className={`group relative overflow-hidden flex-none w-[calc(45%-0.375rem)] h-auto snap-start border border-white/10 ${isFeatured ? 'ring-2 ring-amber-400/80' : ''}`}
+                  className={`group relative overflow-hidden flex-none w-[calc(45%-0.375rem)] h-auto snap-start border border-white/10 ${isFeatured ? 'ring-2 ring-neutral-400/80' : ''}`}
                 >
                   {section.data.image ? (
                     <img
@@ -149,7 +149,7 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
                       className='w-full'
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900" />
                   )}
 
                   <div className="">
@@ -183,13 +183,13 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
               <button
                 key={section.id}
                 onClick={() => handleCategoryAction(section.id, section.data.title || '')}
-                className={`group relative overflow-hidden aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isFeatured
-                    ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#1a1a1a] hover:shadow-amber-500/30'
+                className={`group relative overflow-hidden aspect-[4/3] bg-gradient-to-br from-neutral-800 to-neutral-900 shadow-2xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isFeatured
+                    ? 'ring-2 ring-neutral-400 ring-offset-2 ring-offset-[#1a1a1a] hover:shadow-neutral-500/30'
                     : 'hover:shadow-red-500/20'
                   }`}
               >
                 {isFeatured && (
-                  <div className="absolute top-3 right-3 z-20 bg-amber-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-1 shadow-lg">
+                  <div className="absolute top-3 right-3 z-20 bg-neutral-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-1 shadow-lg">
                     Popular
                   </div>
                 )}
@@ -201,7 +201,7 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
                     className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-110 transition-all duration-700"
                   />
                 ) : (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${isFeatured ? 'from-amber-600/30 to-orange-600/30' : 'from-red-600/20 to-purple-600/20'}`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${isFeatured ? 'from-neutral-600/30 to-neutral-600/30' : 'from-red-600/20 to-neutral-600/20'}`} />
                 )}
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
@@ -221,7 +221,7 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
                 </div>
 
                 <div className={`absolute inset-0 border-2 transition-all duration-300 ${isFeatured
-                    ? 'border-amber-400/50 group-hover:border-amber-400'
+                    ? 'border-neutral-400/50 group-hover:border-neutral-400'
                     : 'border-white/0 group-hover:border-white/30'
                   }`} />
               </button>

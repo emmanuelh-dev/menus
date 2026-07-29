@@ -46,16 +46,16 @@ interface Category {
 export default function MenuLoader({
   menuSlug,
   categoryColors = [
-    "text-orange-500",
-    "text-cyan-400",
+    "text-neutral-500",
+    "text-neutral-400",
     "text-red-500",
-    "text-purple-500",
-    "text-green-400",
-    "text-pink-400",
-    "text-blue-500",
-    "text-yellow-500",
+    "text-neutral-500",
+    "text-marca-400",
+    "text-neutral-400",
+    "text-neutral-500",
+    "text-neutral-500",
     "text-black -500",
-    "text-teal-500"
+    "text-marca-500"
   ],
   whatsappPhone,
   restaurantName,
@@ -64,7 +64,7 @@ export default function MenuLoader({
   showWhatsApp = true,
   showRecommendation = true,
   backgroundColor = "bg-white",
-  textColor = "text-gray-900"
+  textColor = "text-neutral-900"
 }: MenuLoaderProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -202,7 +202,7 @@ export default function MenuLoader({
                       </span>
                     </div>
                     {category.description && (
-                      <p className="text-gray-400 text-sm mt-1">{category.description}</p>
+                      <p className="text-neutral-400 text-sm mt-1">{category.description}</p>
                     )}
                   </div>
                 </div>
@@ -221,13 +221,13 @@ export default function MenuLoader({
                           </span>
                           <div className="flex gap-1">
                             {item.is_vegetarian && (
-                              <span className="text-green-400 text-xs" title="Vegetariano">🌱</span>
+                              <span className="text-marca-400 text-xs" title="Vegetariano">🌱</span>
                             )}
                             {item.is_vegan && (
-                              <span className="text-green-500 text-xs" title="Vegano">🌿</span>
+                              <span className="text-marca-500 text-xs" title="Vegano">🌿</span>
                             )}
                             {item.is_gluten_free && (
-                              <span className="text-blue-400 text-xs" title="Sin Gluten">🚫🌾</span>
+                              <span className="text-neutral-400 text-xs" title="Sin Gluten">🚫🌾</span>
                             )}
                             {item.is_spicy && (
                               <span className="text-red-400 text-xs" title="Picante">🌶️</span>
@@ -235,20 +235,20 @@ export default function MenuLoader({
                           </div>
                         </div>
                         {item.description && (
-                          <p className="text-gray-400 text-sm mt-1">{item.description}</p>
+                          <p className="text-neutral-400 text-sm mt-1">{item.description}</p>
                         )}
                         {item.ingredients && (
-                          <p className="text-gray-500 text-xs mt-1">
+                          <p className="text-neutral-500 text-xs mt-1">
                             Ingredientes: {item.ingredients}
                           </p>
                         )}
                         {item.allergens && (
-                          <p className="text-orange-400 text-xs mt-1">
+                          <p className="text-neutral-400 text-xs mt-1">
                             ⚠️ Contiene: {item.allergens}
                           </p>
                         )}
                       </div>
-                      <span className="text-yellow-400 text-xl font-bold ml-4">
+                      <span className="text-neutral-400 text-xl font-bold ml-4">
                         {item.base_price ? `$${item.base_price}` : null}
                       </span>
                     </div>
@@ -265,7 +265,7 @@ export default function MenuLoader({
             <div key={category.id} className="max-w-6xl mx-auto lg:px-4">
               {category.image && (!category.menu_items || category.menu_items.length === 0) && (
                 <div className="mb-8">
-                  <h3 className="text-3xl font-bold mb-4 text-center text-gray-900">
+                  <h3 className="text-3xl font-bold mb-4 text-center text-neutral-900">
                     {category.name}
                   </h3>
                   <div className="w-full">
@@ -282,11 +282,11 @@ export default function MenuLoader({
               {category.menu_items && category.menu_items.length > 0 && (
                 <div className="mb-12 px-4 max-w-4xl mx-auto">
                   <div className="text-center mb-8">
-                    <h3 className={`text-4xl font-extrabold mb-2 ${restaurantType === "cafeteria" ? "text-amber-800" : "text-gray-900"}`}>
+                    <h3 className={`text-4xl font-extrabold mb-2 ${restaurantType === "cafeteria" ? "text-neutral-800" : "text-neutral-900"}`}>
                       {category.name}
                     </h3>
                     {category.description && (
-                      <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                      <p className="text-neutral-600 text-lg max-w-2xl mx-auto">
                         {category.description}
                       </p>
                     )}
@@ -319,7 +319,7 @@ export default function MenuLoader({
                                   onClick={() => openImageModal(item.image!, item.name)}
                                 />
                                 {item.is_featured && (
-                                  <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold ">
+                                  <div className="absolute top-3 right-3 bg-neutral-400 text-neutral-900 px-2 py-1 rounded-full text-xs font-bold ">
                                     ⭐ Destacado
                                   </div>
                                 )}
@@ -328,18 +328,18 @@ export default function MenuLoader({
 
                             <div className="p-2">
                               <div className="flex justify-between items-start mb-2">
-                                <h4 className="text-xl font-bold text-gray-900 flex-1 pr-2">
+                                <h4 className="text-xl font-bold text-neutral-900 flex-1 pr-2">
                                   {item.name}
                                 </h4>
                                 <div className="text-right">
-                                  <span className="text-2xl font-bold text-amber-700">
+                                  <span className="text-2xl font-bold text-neutral-700">
                                     ${item.base_price}
                                   </span>
                                 </div>
                               </div>
 
                               {item.description && (
-                                <p className="text-gray-600 text-sm line-clamp-3">
+                                <p className="text-neutral-600 text-sm line-clamp-3">
                                   {item.description}
                                 </p>
                               )}
@@ -351,24 +351,24 @@ export default function MenuLoader({
                                   </span>
                                 )}
                                 {item.is_vegan && (
-                                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
+                                  <span className="bg-marca-100 text-marca-800 text-xs px-2 py-1 rounded-full font-semibold">
                                     🌱 Vegano
                                   </span>
                                 )}
                                 {item.is_vegetarian && !item.is_vegan && (
-                                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
+                                  <span className="bg-marca-100 text-marca-800 text-xs px-2 py-1 rounded-full font-semibold">
                                     🥬 Vegetariano
                                   </span>
                                 )}
                                 {item.is_gluten_free && (
-                                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold">
+                                  <span className="bg-neutral-100 text-neutral-800 text-xs px-2 py-1 rounded-full font-semibold">
                                     🌾 Sin Gluten
                                   </span>
                                 )}
                               </div>
 
                               {(item.calories || item.preparation_time) && (
-                                <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
+                                <div className="flex justify-between items-center text-sm text-neutral-500 mb-3">
                                   {item.calories && (
                                     <span>🔥 {item.calories} cal</span>
                                   )}
@@ -379,16 +379,16 @@ export default function MenuLoader({
                               )}
 
                               {item.ingredients && (
-                                <div className="mt-3 pt-3 border-t border-gray-100">
-                                  <p className="text-xs text-gray-500">
+                                <div className="mt-3 pt-3 border-t border-neutral-100">
+                                  <p className="text-xs text-neutral-500">
                                     <strong>Ingredientes:</strong> {item.ingredients}
                                   </p>
                                 </div>
                               )}
 
                               {item.allergens && (
-                                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                                  <p className="text-yellow-800">
+                                <div className="mt-2 p-2 bg-neutral-50 border border-neutral-200 rounded text-xs">
+                                  <p className="text-neutral-800">
                                     <strong>⚠️ Alérgenos:</strong> {item.allergens}
                                   </p>
                                 </div>
@@ -409,11 +409,11 @@ export default function MenuLoader({
           {categories.map((category, categoryIndex) => (
             <div key={category.id} className="mb-12 px-4 max-w-4xl mx-auto">
               <div className="text-center mb-8">
-                <h3 className={`text-4xl font-extrabold mb-2 ${restaurantType === "cafeteria" ? "text-amber-800" : textColor}`}>
+                <h3 className={`text-4xl font-extrabold mb-2 ${restaurantType === "cafeteria" ? "text-neutral-800" : textColor}`}>
                   {category.name}
                 </h3>
                 {category.description && (
-                  <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                  <p className="text-neutral-600 text-lg max-w-2xl mx-auto">
                     {category.description}
                   </p>
                 )}
@@ -430,7 +430,7 @@ export default function MenuLoader({
                           {item.name}
                         </h3>
                         {item.description && (
-                          <p className="text-sm text-gray-600 mb-1">
+                          <p className="text-sm text-neutral-600 mb-1">
                             {item.description}
                           </p>
                         )}

@@ -22,11 +22,11 @@ const {
 	<div class="max-w-7xl mx-auto px-6 text-center">
 		<!-- Badge -->
 		<div
-			class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 rounded-full mb-10"
+			class="inline-flex items-center gap-2 px-4 py-2 bg-neutral-50 border border-neutral-100 rounded-full mb-10"
 		>
-			<Zap className="w-4 h-4 text-emerald-500 fill-emerald-500" />
+			<Zap className="w-4 h-4 text-marca-500 fill-marca-500" />
 			<p
-				class="text-[11px] font-black uppercase tracking-widest text-slate-600"
+				class="text-[11px] font-black uppercase tracking-widest text-neutral-600"
 			>
 				{
 					stateName
@@ -37,7 +37,7 @@ const {
 		</div>
 
 		<h1
-			class="text-5xl md:text-8xl font-black text-slate-900 mb-8 leading-[0.85] tracking-tighter uppercase max-w-5xl mx-auto"
+			class="text-5xl md:text-8xl font-black text-neutral-900 mb-8 leading-[0.85] tracking-tighter uppercase max-w-5xl mx-auto"
 		>
 			{
 				title ? (
@@ -45,7 +45,7 @@ const {
 				) : (
 					<>
 						Crea tu{" "}
-						<span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
+						<span class="text-marca-600">
 							Menú Digital QR
 						</span>{" "}
 						y recibe pedidos por WhatsApp
@@ -55,7 +55,7 @@ const {
 		</h1>
 
 		<p
-			class="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl mx-auto font-medium leading-relaxed"
+			class="text-xl md:text-2xl text-neutral-500 mb-12 max-w-3xl mx-auto font-medium leading-relaxed"
 		>
 			{
 				subtitle ? (
@@ -64,7 +64,7 @@ const {
 					<>
 						Recibe pedidos y atiende a tus clientes por WhatsApp más
 						rápido y{" "}
-						<span class="text-slate-900 border-b-2 border-emerald-400">
+						<span class="text-neutral-900 border-b-2 border-marca-400">
 							sin pagar comisiones
 						</span>
 						.
@@ -78,7 +78,7 @@ const {
 		>
 			<a
 				href="/admin/register"
-				class="group inline-flex items-center px-10 py-5 bg-slate-900 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-slate-200 uppercase tracking-widest text-xs active:scale-95"
+				class="group inline-flex items-center px-10 py-5 bg-neutral-900 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-neutral-200 uppercase tracking-widest text-xs active:scale-95"
 			>
 				Inicia gratis
 				<ArrowRight
@@ -87,7 +87,7 @@ const {
 			</a>
 			<a
 				href="/servicios"
-				class="group inline-flex items-center px-10 py-5 bg-green-500 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-slate-200 uppercase tracking-widest text-xs active:scale-95"
+				class="group inline-flex items-center px-10 py-5 bg-marca-500 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-neutral-200 uppercase tracking-widest text-xs active:scale-95"
 			>
 				Directorio de servicios
 				<ArrowRight
@@ -96,7 +96,7 @@ const {
 			</a>
 			<a
 				href={stateName ? "#ejemplos" : "/menus"}
-				class="inline-flex items-center px-10 py-5 border border-slate-100 text-slate-900 font-black rounded-[24px] hover:bg-slate-50 transition-all text-xs uppercase tracking-widest active:scale-95"
+				class="inline-flex items-center px-10 py-5 border border-neutral-100 text-neutral-900 font-black rounded-[24px] hover:bg-neutral-50 transition-all text-xs uppercase tracking-widest active:scale-95"
 			>
 				{stateName ? "Ver ejemplos locales" : "Revisa un menú demo"}
 			</a>
@@ -105,10 +105,10 @@ const {
 		<!-- Product Visuals Mockup -->
 		<div class="relative max-w-6xl mx-auto">
 			<div
-				class="relative z-10 rounded-[40px] border-[12px] border-slate-900 overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] bg-slate-50 aspect-[16/9] group"
+				class="relative z-10 rounded-[40px] border-[12px] border-neutral-900 overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] bg-neutral-50 aspect-[16/9] group"
 			>
 				<div
-					class="absolute inset-0 flex items-center justify-center bg-slate-100"
+					class="absolute inset-0 flex items-center justify-center bg-neutral-100"
 				>
 					<img
 						src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=2000"
@@ -116,39 +116,39 @@ const {
 						class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-1000"
 					/>
 					<div
-						class="absolute top-10 right-10 w-64 bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 animate-float hidden md:block text-left"
+						class="absolute top-10 right-10 w-64 bg-white rounded-3xl p-6 shadow-2xl border border-neutral-100 animate-float hidden md:block text-left"
 					>
 						<div class="flex items-center gap-3 mb-4">
 							<div
-								class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"
+								class="w-10 h-10 bg-marca-100 rounded-full flex items-center justify-center text-marca-600"
 							>
 								<MessageCircle className="w-5 h-5" />
 							</div>
 							<div>
 								<p
-									class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+									class="text-[10px] font-black text-neutral-400 uppercase tracking-widest"
 								>
 									Nuevo Pedido
 								</p>
-								<p class="text-xs font-bold text-slate-900">
+								<p class="text-xs font-bold text-neutral-900">
 									1x Burger Special
 								</p>
 							</div>
 						</div>
 						<div
-							class="h-2 w-full bg-slate-100 rounded-full overflow-hidden"
+							class="h-2 w-full bg-neutral-100 rounded-full overflow-hidden"
 						>
-							<div class="h-full bg-emerald-500 w-3/4"></div>
+							<div class="h-full bg-marca-500 w-3/4"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div
-				class="absolute -top-10 -left-10 w-40 h-40 bg-emerald-100 rounded-full blur-[80px] opacity-60"
+				class="absolute -top-10 -left-10 w-40 h-40 bg-marca-100 rounded-full blur-[80px] opacity-60"
 			>
 			</div>
 			<div
-				class="absolute -bottom-20 -right-20 w-80 h-80 bg-teal-100 rounded-full blur-[100px] opacity-40"
+				class="absolute -bottom-20 -right-20 w-80 h-80 bg-marca-100 rounded-full blur-[100px] opacity-40"
 			>
 			</div>
 		</div>

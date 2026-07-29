@@ -80,10 +80,10 @@ const menuItems: Record<string, MenuSection> = {
 	title="Fast Food"
 	description="Fast food"
 	textWhite={true}
-	backgroundColor="bg-zinc-950"
+	backgroundColor="bg-neutral-950"
 >
 	<div
-		class="min-h-screen bg-zinc-950 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat p-4 md:p-8"
+		class="min-h-screen bg-neutral-950 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat p-4 md:p-8"
 	>
 		<div class="mx-auto max-w-3xl">
 			<div class="relative">
@@ -109,7 +109,7 @@ const menuItems: Record<string, MenuSection> = {
 					Object.values(menuItems).map((section) => (
 						<div class="mb-16">
 							<div class="mb-8 flex items-center justify-between">
-								<h2 class="text-4xl font-black text-orange-500">
+								<h2 class="text-4xl font-black text-neutral-500">
 									{section.title}
 								</h2>
 							</div>
@@ -118,8 +118,8 @@ const menuItems: Record<string, MenuSection> = {
 								{section.items.map((item) => (
 									<div class="flex items-center text-white">
 										<span class="text-2xl font-bold">{item.name}</span>
-										<div class="mx-4 flex-1 border-b-2 border-dashed border-gray-600" />
-										<span class="text-2xl font-bold text-orange-500">
+										<div class="mx-4 flex-1 border-b-2 border-dashed border-neutral-600" />
+										<span class="text-2xl font-bold text-neutral-500">
 											${item.price}
 										</span>
 									</div>

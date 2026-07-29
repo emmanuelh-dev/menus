@@ -20,15 +20,15 @@ if (!place) {
 const { blocks = [], view_settings = {} } = place.content || {};
 
 const categoryColors = [
-	"text-orange-500",
-	"text-cyan-400",
+	"text-neutral-500",
+	"text-neutral-400",
 	"text-red-500",
-	"text-purple-500",
-	"text-green-400",
-	"text-pink-400",
-	"text-blue-500",
-	"text-yellow-500",
-	"text-teal-500",
+	"text-neutral-500",
+	"text-marca-400",
+	"text-neutral-400",
+	"text-neutral-500",
+	"text-neutral-500",
+	"text-marca-500",
 ];
 
 const socialMedia = {
@@ -80,14 +80,14 @@ const enableCart = true;
 						href={socialMedia.instagram.url}
 						class="flex items-center gap-2 font-bold"
 					>
-						<Instagram className="text-pink-500" />
+						<Instagram className="text-neutral-500" />
 						{socialMedia.instagram.name}
 					</a>
 					<a
 						href={socialMedia.facebook.url}
 						class="flex items-center gap-2 font-bold"
 					>
-						<Facebook className="text-blue-500" />
+						<Facebook className="text-neutral-500" />
 						{socialMedia.facebook.name}
 					</a>
 				</div>
@@ -134,14 +134,14 @@ const enableCart = true;
 														{item.name}
 													</span>
 													{item.description && (
-														<p class="text-gray-400 text-sm mt-1">
+														<p class="text-neutral-400 text-sm mt-1">
 															{item.description}
 														</p>
 													)}
 												</div>
 												<div class="flex items-center gap-4">
 													{view_settings.show_prices && item.price > 0 && (
-														<span class="text-yellow-400 text-xl font-bold font-sans">
+														<span class="text-neutral-400 text-xl font-bold font-sans">
 															${item.price}
 														</span>
 													)}

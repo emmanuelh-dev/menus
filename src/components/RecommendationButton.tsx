@@ -29,12 +29,12 @@ const RecommendationModal: React.FC<RecommendationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md p-6 shadow-xl">
+      <div className="bg-white dark:bg-neutral-800 rounded-lg w-full max-w-md p-6 shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold dark:text-white">Recomendación de Platillos Beta</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+            className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-300 dark:hover:text-white"
           >
             ✕
           </button>
@@ -43,13 +43,13 @@ const RecommendationModal: React.FC<RecommendationModalProps> = ({
         {!recommendation ? (
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="preferences" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="preferences" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                 Cuéntanos tus preferencias o lo que te apetece comer hoy:
               </label>
               <textarea
                 id="preferences"
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-neutral-500 focus:border-neutral-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
                 placeholder="Ejemplo: Me gustaría algo picante, soy vegetariano, tengo antojo de algo dulce, platillos para niños..."
                 value={preferences}
                 onChange={(e) => setPreferences(e.target.value)}
@@ -59,20 +59,20 @@ const RecommendationModal: React.FC<RecommendationModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors disabled:bg-blue-400"
+              className="w-full bg-neutral-600 hover:bg-neutral-700 text-white font-bold py-2 px-4 rounded-md transition-colors disabled:bg-neutral-400"
             >
               {isLoading ? 'Pensando...' : 'Obtener Recomendación'}
             </button>
           </form>
         ) : (
           <div className="mb-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nuestra recomendación:</h3>
-            <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-md dark:text-white prose prose-sm dark:prose-invert max-w-none">
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">Nuestra recomendación:</h3>
+            <div className="bg-neutral-100 dark:bg-neutral-700 p-4 rounded-md dark:text-white prose prose-sm dark:prose-invert max-w-none">
               <ReactMarkdown>{recommendation}</ReactMarkdown>
             </div>
             <button
               onClick={() => onSubmit('')}
-              className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors"
+              className="w-full mt-4 bg-neutral-600 hover:bg-neutral-700 text-white font-bold py-2 px-4 rounded-md transition-colors"
             >
               Nueva Recomendación
             </button>
@@ -156,7 +156,7 @@ export default function RecommendationButton({ menuItems = null, menuText = null
     <>
       <button
         onClick={handleOpenModal}
-        className="rounded-full bg-blue-600 p-2 text-white transition-all hover:bg-blue-500 fixed bottom-[180px] right-7 z-[100]"
+        className="rounded-full bg-neutral-600 p-2 text-white transition-all hover:bg-neutral-500 fixed bottom-[180px] right-7 z-[100]"
         aria-label="Obtener recomendación de platillos"
       >
         <FaRobot className="size-5" />

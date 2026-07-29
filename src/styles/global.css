@@ -3,13 +3,17 @@
   https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
+/* Los grises de esta plantilla venían con tinte azul (96,115,159 es azul
+   pizarra, no gris) y el acento era un #2337ff que no es de nadie. Ahora son
+   grises de verdad y el acento es el de la marca, el mismo #1052BA que usa el
+   panel. */
 :root {
-  --accent: #2337ff;
-  --accent-dark: #000d8a;
-  --black: 15, 18, 25;
-  --gray: 96, 115, 159;
-  --gray-light: 229, 233, 240;
-  --gray-dark: 34, 41, 57;
+  --accent: #1052ba;
+  --accent-dark: #0c439a;
+  --black: 10, 10, 10;
+  --gray: 115, 115, 115;
+  --gray-light: 229, 229, 229;
+  --gray-dark: 38, 38, 38;
   --gray-gradient: rgba(var(--gray-light), 50%), #fff;
   --box-shadow: 0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
     0 16px 32px rgba(var(--gray), 33%);

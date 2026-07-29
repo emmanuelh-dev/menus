@@ -7,16 +7,16 @@ import { getRestaurantByName } from "../../../../lib/api";
 const [place] = await getRestaurantByName({ name: "campomar" });
 
 const categoryColors = [
-	"text-blue-400",
-	"text-orange-500",
-	"text-cyan-400",
+	"text-neutral-400",
+	"text-neutral-500",
+	"text-neutral-400",
 	"text-red-500",
-	"text-purple-500",
-	"text-green-400",
-	"text-pink-400",
-	"text-yellow-500",
-	"text-indigo-500",
-	"text-teal-500",
+	"text-neutral-500",
+	"text-marca-400",
+	"text-neutral-400",
+	"text-neutral-500",
+	"text-neutral-500",
+	"text-marca-500",
 ];
 
 // Mapear sections del content a menuItems
@@ -99,7 +99,7 @@ const schemaEnrichment = {
 	title={restaurantData.name}
 	description={restaurantData.description}
 	schemaEnrichment={schemaEnrichment}
-	backgroundColor="bg-gray-900"
+	backgroundColor="bg-neutral-900"
 	textWhite={true}
 >
 	<head>
@@ -144,7 +144,7 @@ const schemaEnrichment = {
 	<!-- <CategoryNavigation 
         client:load 
         categories={navigationCategories} 
-        backgroundColor="bg-gray-900" 
+        backgroundColor="bg-neutral-900" 
         textColor="text-white" 
     /> -->
 	<!-- HEADER -->
@@ -187,7 +187,7 @@ const schemaEnrichment = {
 																<br />
 															</h2>
 															{item.description && (
-																<p class="text-gray-600 text-sm mt-2">
+																<p class="text-neutral-600 text-sm mt-2">
 																	{item.description}
 																</p>
 															)}
@@ -230,7 +230,7 @@ const schemaEnrichment = {
 																		)}
 																		{item.ingredients && (
 																			<span
-																				class="font_5 text-gray-600"
+																				class="font_5 text-neutral-600"
 																				style="margin-top: -3px;"
 																			>
 																				<br />
@@ -241,7 +241,7 @@ const schemaEnrichment = {
 																		{item.allergens &&
 																			item.allergens.length > 0 && (
 																				<span
-																					class="font_5 text-orange-500"
+																					class="font_5 text-neutral-500"
 																					style="margin-top: -3px;"
 																				>
 																					<br />
@@ -256,7 +256,7 @@ const schemaEnrichment = {
 																			<div class="flex gap-1 justify-center mt-2">
 																				{item.is_vegetarian && (
 																					<span
-																						class="text-green-400 text-sm"
+																						class="text-marca-400 text-sm"
 																						title="Vegetariano"
 																					>
 																						🌱
@@ -264,7 +264,7 @@ const schemaEnrichment = {
 																				)}
 																				{item.is_vegan && (
 																					<span
-																						class="text-green-500 text-sm"
+																						class="text-marca-500 text-sm"
 																						title="Vegano"
 																					>
 																						🌿
@@ -272,7 +272,7 @@ const schemaEnrichment = {
 																				)}
 																				{item.is_gluten_free && (
 																					<span
-																						class="text-blue-400 text-sm"
+																						class="text-neutral-400 text-sm"
 																						title="Sin Gluten"
 																					>
 																						🚫🌾

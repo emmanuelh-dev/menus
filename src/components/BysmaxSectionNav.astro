@@ -7,14 +7,14 @@ const links = [
 ];
 ---
 
-<nav class="w-full border-y border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-20" aria-label="Navegación de sección">
+<nav class="w-full border-y border-neutral-200 bg-white/90 backdrop-blur sticky top-0 z-20" aria-label="Navegación de sección">
   <div class="max-w-7xl mx-auto px-6">
     <ul class="flex flex-wrap items-center gap-3 py-3">
       {links.map((link) => (
         <li>
           <a
             href={link.href}
-            class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+            class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-neutral-700 hover:text-marca-700 hover:bg-marca-50 transition-colors"
           >
             {link.label}
           </a>

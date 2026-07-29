@@ -50,18 +50,18 @@ const faqs = [
   <main>
     <section class="max-w-7xl mx-auto px-6 pt-14 pb-10">
       <div class="max-w-3xl">
-        <p class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700">Soporte</p>
-        <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mt-3 leading-[0.95]">Saber más acerca de BySMax</h1>
-        <p class="text-lg text-slate-600 mt-6 font-medium">Respondemos las preguntas clave para que abras tu tienda online con claridad.</p>
+        <p class="text-[11px] font-black uppercase tracking-[0.2em] text-marca-700">Soporte</p>
+        <h1 class="text-4xl md:text-6xl font-black text-neutral-900 tracking-tight mt-3 leading-[0.95]">Saber más acerca de BySMax</h1>
+        <p class="text-lg text-neutral-600 mt-6 font-medium">Respondemos las preguntas clave para que abras tu tienda online con claridad.</p>
       </div>
     </section>
 
     <section class="max-w-7xl mx-auto px-6 pb-14">
       <div class="space-y-3">
         {faqs.map((item) => (
-          <details class="group bg-white border border-slate-200 rounded-2xl p-5">
-            <summary class="list-none cursor-pointer font-black text-slate-900 text-base">{item.q}</summary>
-            <p class="text-sm text-slate-600 mt-3 leading-relaxed">{item.a}</p>
+          <details class="group bg-white border border-neutral-200 rounded-2xl p-5">
+            <summary class="list-none cursor-pointer font-black text-neutral-900 text-base">{item.q}</summary>
+            <p class="text-sm text-neutral-600 mt-3 leading-relaxed">{item.a}</p>
           </details>
         ))}
       </div>
@@ -69,15 +69,15 @@ const faqs = [
 
     <section class="max-w-7xl mx-auto px-6 pb-16">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <a href="/admin/register" class="block bg-emerald-600 text-white rounded-2xl p-6 hover:bg-emerald-700 transition-colors">
-          <p class="text-[11px] uppercase tracking-widest font-black text-emerald-100">Comenzar</p>
+        <a href="/admin/register" class="block bg-marca-600 text-white rounded-2xl p-6 hover:bg-marca-700 transition-colors">
+          <p class="text-[11px] uppercase tracking-widest font-black text-marca-100">Comenzar</p>
           <h2 class="text-xl font-black mt-2">Crear cuenta gratis</h2>
-          <p class="text-sm text-emerald-50 mt-2">Abre tu tienda online en minutos.</p>
+          <p class="text-sm text-marca-50 mt-2">Abre tu tienda online en minutos.</p>
         </a>
-        <a href="mailto:hola@bysmax.com" class="block bg-slate-900 text-white rounded-2xl p-6 hover:bg-black transition-colors">
-          <p class="text-[11px] uppercase tracking-widest font-black text-slate-400">Contacto</p>
+        <a href="mailto:hola@bysmax.com" class="block bg-neutral-900 text-white rounded-2xl p-6 hover:bg-black transition-colors">
+          <p class="text-[11px] uppercase tracking-widest font-black text-neutral-400">Contacto</p>
           <h2 class="text-xl font-black mt-2">Hablar con soporte</h2>
-          <p class="text-sm text-slate-300 mt-2">Escríbenos a hola@bysmax.com</p>
+          <p class="text-sm text-neutral-300 mt-2">Escríbenos a hola@bysmax.com</p>
         </a>
       </div>
     </section>

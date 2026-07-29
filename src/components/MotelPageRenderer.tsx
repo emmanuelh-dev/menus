@@ -124,18 +124,18 @@ export default function MotelPageRenderer({
   const templateConfigs: Record<string, any> = {
     default: {
       bg: "bg-[#0A0A0A]",
-      text: "text-stone-300",
-      accent: "text-pink-500",
-      accentBg: "bg-pink-600",
-      accentBorder: "border-pink-500/20",
+      text: "text-neutral-300",
+      accent: "text-neutral-500",
+      accentBg: "bg-neutral-600",
+      accentBorder: "border-neutral-500/20",
       cardBg: "bg-white/[0.03]",
       cardHover: "hover:bg-white/[0.05]",
-      selection: "selection:bg-pink-900 font-sans",
+      selection: "selection:bg-neutral-900 font-sans",
       customFont: "'Inter', sans-serif"
     },
     classic: {
       bg: "bg-[#050505]",
-      text: "text-stone-200",
+      text: "text-neutral-200",
       accent: "text-[#D4AF37]",
       accentBg: "bg-[#D4AF37] text-black",
       accentBorder: "border-[#D4AF37]/30",
@@ -146,13 +146,13 @@ export default function MotelPageRenderer({
     },
     night: {
       bg: "bg-black",
-      text: "text-pink-100",
-      accent: "text-pink-500",
-      accentBg: "bg-pink-600",
-      accentBorder: "border-pink-500/20",
-      cardBg: "bg-pink-500/[0.02]",
-      cardHover: "hover:bg-pink-500/[0.05]",
-      selection: "selection:bg-pink-900 font-sans",
+      text: "text-neutral-100",
+      accent: "text-neutral-500",
+      accentBg: "bg-neutral-600",
+      accentBorder: "border-neutral-500/20",
+      cardBg: "bg-neutral-500/[0.02]",
+      cardHover: "hover:bg-neutral-500/[0.05]",
+      selection: "selection:bg-neutral-900 font-sans",
       customFont: "'Inter', sans-serif"
     }
   };
@@ -188,7 +188,7 @@ export default function MotelPageRenderer({
           href={`https://wa.me/${cleanWA}?text=${encodeURIComponent(message || `Hola, me interesa obtener información sobre ${place.name}`)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-green-500/20"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-marca-500 hover:bg-marca-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-marca-500/20"
         >
           <svg className="w-4 h-4 pointer-events-none" fill="currentColor" viewBox="0 0 24 24">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
@@ -210,9 +210,9 @@ export default function MotelPageRenderer({
             </h1>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
               <div className="flex items-center gap-1.5 font-bold text-white">
-                <span className="text-amber-400"><Icons.Star filled /></span>
+                <span className="text-neutral-400"><Icons.Star filled /></span>
                 {place.rating || "5.0"}
-                <span className="text-stone-400 font-normal">({place.count || 0} opiniones)</span>
+                <span className="text-neutral-400 font-normal">({place.count || 0} opiniones)</span>
               </div>
 
               {address && (
@@ -220,7 +220,7 @@ export default function MotelPageRenderer({
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-stone-400 hover:text-white transition-colors flex items-center gap-1.5"
+                  className="text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5"
                 >
                   <Icons.Location className={`size-4 ${config.accent}`} />
                   {address}
@@ -259,7 +259,7 @@ export default function MotelPageRenderer({
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-500 hover:bg-neutral-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-neutral-500/20"
                 >
                   <Icons.Location className="size-4" />
                   Ubicación
@@ -267,35 +267,35 @@ export default function MotelPageRenderer({
               )}
             </div>
 
-            <p className="text-sm text-stone-400 leading-relaxed max-w-2xl">
+            <p className="text-sm text-neutral-400 leading-relaxed max-w-2xl">
               {semantic_data.description || place.description || place.name}
             </p>
 
             <div className="flex flex-wrap gap-2">
               {!!semantic_data.hours && (
-                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-stone-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                  <span className="text-blue-400"><Icons.Hours /></span>
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-neutral-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-neutral-400"><Icons.Hours /></span>
                   {semantic_data.hours}
                 </div>
               )}
 
               {!!semantic_data.price_range && (
-                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-stone-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-neutral-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
                   <span className={config.accent}><Icons.Price /></span>
                   {semantic_data.price_range}
                 </div>
               )}
 
               {!!semantic_data.parking && (
-                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-stone-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                  <span className="text-emerald-400"><Icons.Parking /></span>
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-neutral-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-marca-400"><Icons.Parking /></span>
                   {semantic_data.parking}
                 </div>
               )}
 
               {Array.isArray(semantic_data.payment_options) && semantic_data.payment_options.length > 0 && (
-                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-stone-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                  <span className="text-purple-400"><Icons.Payment /></span>
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-white/10 text-neutral-300 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-neutral-400"><Icons.Payment /></span>
                   {semantic_data.payment_options.join(", ")}
                 </div>
               )}
@@ -322,7 +322,7 @@ export default function MotelPageRenderer({
               {place.amenities.map((amenity: string, idx: number) => {
                 const Icon = amenityIcon(amenity);
                 return (
-                  <div key={idx} className="flex items-center gap-2.5 text-sm text-stone-300">
+                  <div key={idx} className="flex items-center gap-2.5 text-sm text-neutral-300">
                     <Icon className={`size-4 shrink-0 ${config.accent}`} />
                     <span className="truncate">{amenity}</span>
                   </div>
@@ -356,7 +356,7 @@ export default function MotelPageRenderer({
                   )}
 
                   {block.data.description && (
-                    <p className="text-stone-400 text-sm italic mb-6 px-4 border-l-2 border-stone-800">
+                    <p className="text-neutral-400 text-sm italic mb-6 px-4 border-l-2 border-neutral-800">
                       {block.data.description}
                     </p>
                   )}
@@ -388,7 +388,7 @@ export default function MotelPageRenderer({
                                 )}
                               </div>
 
-                              <p className="text-stone-400 text-xs leading-relaxed mb-4 line-clamp-3">
+                              <p className="text-neutral-400 text-xs leading-relaxed mb-4 line-clamp-3">
                                 {item.description}
                               </p>
 
@@ -397,7 +397,7 @@ export default function MotelPageRenderer({
                                   {item.features.map((feature: string, fIdx: number) => {
                                     const FeatIcon = featureIcon(feature);
                                     return (
-                                      <span key={fIdx} className="inline-flex items-center gap-1 px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-wider text-stone-400 font-bold">
+                                      <span key={fIdx} className="inline-flex items-center gap-1 px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-wider text-neutral-400 font-bold">
                                         {FeatIcon && <FeatIcon className="size-3" />}
                                         {feature}
                                       </span>
@@ -443,7 +443,7 @@ export default function MotelPageRenderer({
         </div>
         {!isPreview && (
           <div className="mt-8 flex flex-col items-center gap-1.5">
-            <span className="text-[9px] uppercase tracking-widest text-stone-600">Publicidad</span>
+            <span className="text-[9px] uppercase tracking-widest text-neutral-600">Publicidad</span>
             <ins className="adsbygoogle"
               style={{ display: "inline-block", width: "400px", height: "90px" }}
               data-ad-client="ca-pub-3646138644530578"
@@ -470,13 +470,13 @@ export default function MotelPageRenderer({
 
         {!isPreview && (
           <footer className="mt-16 pb-10 text-center px-6">
-            <p className="text-[10px] text-stone-600 uppercase tracking-[0.5em] mb-8">
+            <p className="text-[10px] text-neutral-600 uppercase tracking-[0.5em] mb-8">
               Sitio verificado • {place.name} • {new Date().getFullYear()}
             </p>
 
             <div className="inline-block bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-sm">
               <p className="text-xs font-bold text-white mb-2 uppercase tracking-tight">¿Administras un motel o restaurante?</p>
-              <p className="text-[10px] text-stone-500 mb-6 leading-relaxed">Moderniza tu establecimiento con un menú digital interactivo. Sube tus habitaciones, precios y servicios gratis.</p>
+              <p className="text-[10px] text-neutral-500 mb-6 leading-relaxed">Moderniza tu establecimiento con un menú digital interactivo. Sube tus habitaciones, precios y servicios gratis.</p>
               <a
                 href="/menu-digital-gratis"
                 className={`inline-flex items-center gap-2 px-6 py-3 ${config.accentBg} text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl`}

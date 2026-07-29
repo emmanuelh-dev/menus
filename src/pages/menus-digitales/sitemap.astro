@@ -15,18 +15,18 @@ const pageData = {
 <DefaultLayout title={pageData.title} description={pageData.description}>
 	<main class="bg-white min-h-screen">
 		<!-- Premium Header -->
-		<section class="py-24 bg-slate-900 relative overflow-hidden text-center">
+		<section class="py-24 bg-neutral-900 relative overflow-hidden text-center">
 			<div
-				class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"
+				class="absolute inset-0 bg-gradient-to-br from-marca-500/10 to-transparent"
 			>
 			</div>
 			<div class="max-w-4xl mx-auto px-6 relative z-10">
 				<h1
 					class="text-5xl md:text-7xl font-black text-white mb-6 uppercase tracking-tighter leading-none"
 				>
-					Mapa del <span class="text-emerald-400">Sitio Regional</span>
+					Mapa del <span class="text-marca-400">Sitio Regional</span>
 				</h1>
-				<p class="text-xl text-slate-400 font-medium max-w-2xl mx-auto">
+				<p class="text-xl text-neutral-400 font-medium max-w-2xl mx-auto">
 					Explora nuestra red nacional de menús digitales y cartas QR. <br
 						class="hidden md:block"
 					/>
@@ -41,7 +41,7 @@ const pageData = {
 					<!-- Column: Main Navigation -->
 					<div class="lg:col-span-1">
 						<h2
-							class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em] mb-10 border-b border-emerald-50 pb-4"
+							class="text-[10px] font-black text-marca-600 uppercase tracking-[0.4em] mb-10 border-b border-marca-50 pb-4"
 						>
 							Páginas de Venta
 						</h2>
@@ -64,16 +64,16 @@ const pageData = {
 								].map((link) => (
 									<a
 										href={link.href}
-										class={`flex items-center justify-between p-6 rounded-[24px] border transition-all group ${link.highlight ? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-200" : "bg-white border-slate-100 text-slate-900 hover:border-emerald-200 hover:bg-emerald-50/50"}`}
+										class={`flex items-center justify-between p-6 rounded-[24px] border transition-all group ${link.highlight ? "bg-neutral-900 border-neutral-900 text-white shadow-xl shadow-neutral-200" : "bg-white border-neutral-100 text-neutral-900 hover:border-marca-200 hover:bg-marca-50/50"}`}
 									>
 										<span class="font-black uppercase tracking-tight text-sm flex items-center gap-3">
 											<link.icon
-												className={`w-4 h-4 ${link.highlight ? "text-emerald-400" : "text-emerald-500"}`}
+												className={`w-4 h-4 ${link.highlight ? "text-marca-400" : "text-marca-500"}`}
 											/>
 											{link.name}
 										</span>
 										<ChevronRight
-											className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${link.highlight ? "text-emerald-400" : "text-slate-300"}`}
+											className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${link.highlight ? "text-marca-400" : "text-neutral-300"}`}
 										/>
 									</a>
 								))
@@ -84,7 +84,7 @@ const pageData = {
 					<!-- Column: States (The Core Sitemap) -->
 					<div class="lg:col-span-2">
 						<h2
-							class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.4em] mb-10 border-b border-emerald-50 pb-4"
+							class="text-[10px] font-black text-marca-600 uppercase tracking-[0.4em] mb-10 border-b border-marca-50 pb-4"
 						>
 							Directorios Estratégicos por Estado
 						</h2>
@@ -93,17 +93,17 @@ const pageData = {
 								states.map((state) => (
 									<a
 										href={`/menus-digitales/${state.slug}`}
-										class="flex items-center justify-between group py-3 border-b border-slate-50 hover:border-emerald-100 transition-all"
+										class="flex items-center justify-between group py-3 border-b border-neutral-50 hover:border-marca-100 transition-all"
 									>
 										<div class="flex items-center gap-4">
-											<div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+											<div class="w-8 h-8 rounded-lg bg-neutral-50 flex items-center justify-center text-neutral-400 group-hover:bg-marca-500 group-hover:text-white transition-all">
 												<MapPin className="w-4 h-4" />
 											</div>
-											<span class="font-bold text-slate-600 group-hover:text-emerald-600 transition-colors">
+											<span class="font-bold text-neutral-600 group-hover:text-marca-600 transition-colors">
 												Menús en {state.name}
 											</span>
 										</div>
-										<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-emerald-400">
+										<span class="text-[10px] font-black text-neutral-300 uppercase tracking-widest group-hover:text-marca-400">
 											Ir a landing
 										</span>
 									</a>
@@ -114,9 +114,9 @@ const pageData = {
 				</div>
 
 				<!-- Footer Note for SEO -->
-				<div class="mt-32 pt-10 border-t border-slate-100 text-center">
+				<div class="mt-32 pt-10 border-t border-neutral-100 text-center">
 					<p
-						class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em]"
+						class="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.3em]"
 					>
 						Estructura optimizada para rastreo de buscadores &bull; BySMax {
 							new Date().getFullYear()

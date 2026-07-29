@@ -156,8 +156,8 @@ export default function Carousel({ items, className = "", autoPlay = true, inter
               key={index}
               onClick={() => scrollTo(index)}
               className={`w-3 h-3 rounded-full transition-all border ${activeIndex === index
-                ? 'bg-emerald-500 scale-125 border-emerald-600'
-                : 'bg-stone-300 border-stone-400'
+                ? 'bg-marca-500 scale-125 border-marca-600'
+                : 'bg-neutral-300 border-neutral-400'
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />

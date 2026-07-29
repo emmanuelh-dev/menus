@@ -9,12 +9,12 @@ export const Input = ({ label, error, className = "", ...props }: InputProps) =>
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-tight ml-1">
+        <label className="text-[11px] font-bold text-neutral-500 uppercase tracking-tight ml-1">
           {label}
         </label>
       )}
       <input
-        className={`w-full bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all placeholder:text-slate-400 ${error ? "border-red-500 focus:ring-red-500/5 focus:border-red-500" : ""
+        className={`w-full bg-white border border-neutral-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-900/5 focus:border-neutral-900 transition-all placeholder:text-neutral-400 ${error ? "border-red-500 focus:ring-red-500/5 focus:border-red-500" : ""
           } ${className}`}
         {...props}
       />

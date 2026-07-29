@@ -39,13 +39,13 @@ if (error || !order) {
 		: "Orden no encontrada"}
 	description="Seguimiento de tu pedido en tiempo real"
 >
-	<div class="min-h-screen bg-slate-50 pt-4 px-4">
+	<div class="min-h-screen bg-neutral-50 pt-4 px-4">
 		<div class="max-w-xl mx-auto">
 			{
 				order ? (
 					<OrderTracker client:load orderId={id} initialOrder={order} />
 				) : (
-					<div class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl">
+					<div class="text-center py-20 bg-white rounded-3xl border border-neutral-100 shadow-xl">
 						<div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -65,16 +65,16 @@ if (error || !order) {
 								</>
 							</svg>
 						</div>
-						<h1 class="text-2xl font-black text-slate-900 mb-2">
+						<h1 class="text-2xl font-black text-neutral-900 mb-2">
 							Orden no encontrada
 						</h1>
-						<p class="text-slate-500 mb-8 px-6">
+						<p class="text-neutral-500 mb-8 px-6">
 							El enlace que intentas abrir no existe o el pedido ha sido
 							eliminado.
 						</p>
 						<a
 							href="/"
-							class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
+							class="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white rounded-2xl font-bold hover:bg-neutral-800 transition-all"
 						>
 							Ir al inicio
 						</a>

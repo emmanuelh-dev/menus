@@ -119,10 +119,10 @@ export const ReactGallery: React.FC<ReactGalleryProps> = ({
           className="gallery-footer flex justify-center mt-12 cursor-pointer"
         >
           <div className="group flex flex-col items-center gap-2 outline-none">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-stone-300 group-hover:text-white transition-colors">
+            <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-300 group-hover:text-white transition-colors">
               Ver Galería Completa
             </span>
-            <div className="h-[1px] w-8 bg-stone-700 group-hover:w-16 group-hover:bg-white transition-all duration-500"></div>
+            <div className="h-[1px] w-8 bg-neutral-700 group-hover:w-16 group-hover:bg-white transition-all duration-500"></div>
           </div>
         </label>
       )}

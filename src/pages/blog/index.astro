@@ -44,7 +44,7 @@ const posts = (await getCollection("blog")).sort(
 				<div class="flex flex-wrap justify-center gap-4 mt-8">
 					<a
 						href="#posts"
-						class="bg-white text-gray-900 hover:bg-gray-100 px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center"
+						class="bg-white text-neutral-900 hover:bg-neutral-100 px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center"
 					>
 						Explorar Artículos <ArrowRight className="ml-2 w-5 h-5" />
 					</a>
@@ -86,7 +86,7 @@ const posts = (await getCollection("blog")).sort(
 				<h2 class="text-3xl md:text-4xl font-bold mb-4">
 					Categorías Destacadas
 				</h2>
-				<p class="text-gray-600 max-w-2xl mx-auto">
+				<p class="text-neutral-600 max-w-2xl mx-auto">
 					Explora nuestras categorías gastronómicas y descubre contenido que te
 					encantará
 				</p>
@@ -194,11 +194,11 @@ const posts = (await getCollection("blog")).sort(
 									</div>
 									<div class="p-6 flex flex-col h-[calc(100%-320px)]">
 										<h2
-											class={`${index === 0 ? "text-3xl md:text-4xl" : "text-2xl"} font-bold text-gray-800 mb-3 line-clamp-2`}
+											class={`${index === 0 ? "text-3xl md:text-4xl" : "text-2xl"} font-bold text-neutral-800 mb-3 line-clamp-2`}
 										>
 											{post.data.title}
 										</h2>
-										<p class="text-gray-600 mb-4 line-clamp-3 flex-grow">
+										<p class="text-neutral-600 mb-4 line-clamp-3 flex-grow">
 											{post.data.description}
 										</p>
 										<div class="flex items-center text-accent font-medium mt-auto">
@@ -215,7 +215,7 @@ const posts = (await getCollection("blog")).sort(
 		</section>
 
 		<!-- Newsletter Section -->
-		<section class="bg-gray-100 py-16">
+		<section class="bg-neutral-100 py-16">
 			<div class="max-w-6xl mx-auto px-4">
 				<div class="bg-white rounded-2xl shadow-xl overflow-hidden">
 					<div class="grid md:grid-cols-2 gap-0">
@@ -223,7 +223,7 @@ const posts = (await getCollection("blog")).sort(
 							<h2 class="text-3xl font-bold mb-4">
 								Suscríbete a nuestro newsletter
 							</h2>
-							<p class="text-gray-600 mb-6">
+							<p class="text-neutral-600 mb-6">
 								Recibe las últimas actualizaciones sobre restaurantes, recetas y
 								experiencias gastronómicas directamente en tu correo.
 							</p>
@@ -232,7 +232,7 @@ const posts = (await getCollection("blog")).sort(
 								<input
 									type="email"
 									placeholder="Tu correo electrónico"
-									class="flex-grow px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+									class="flex-grow px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
 									required
 								/>
 								<button
@@ -243,7 +243,7 @@ const posts = (await getCollection("blog")).sort(
 								</button>
 							</form>
 
-							<p class="text-sm text-gray-500 mt-4">
+							<p class="text-sm text-neutral-500 mt-4">
 								No enviamos spam. Puedes darte de baja en cualquier momento.
 							</p>
 						</div>
@@ -268,19 +268,19 @@ const posts = (await getCollection("blog")).sort(
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
 				<div class="p-6">
 					<p class="text-4xl md:text-5xl font-bold text-accent mb-2">50+</p>
-					<p class="text-gray-600">Restaurantes Reseñados</p>
+					<p class="text-neutral-600">Restaurantes Reseñados</p>
 				</div>
 				<div class="p-6">
 					<p class="text-4xl md:text-5xl font-bold text-accent mb-2">120+</p>
-					<p class="text-gray-600">Recetas Compartidas</p>
+					<p class="text-neutral-600">Recetas Compartidas</p>
 				</div>
 				<div class="p-6">
 					<p class="text-4xl md:text-5xl font-bold text-accent mb-2">15k+</p>
-					<p class="text-gray-600">Lectores Mensuales</p>
+					<p class="text-neutral-600">Lectores Mensuales</p>
 				</div>
 				<div class="p-6">
 					<p class="text-4xl md:text-5xl font-bold text-accent mb-2">4.9</p>
-					<p class="text-gray-600">Valoración Promedio</p>
+					<p class="text-neutral-600">Valoración Promedio</p>
 				</div>
 			</div>
 		</section>

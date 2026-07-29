@@ -112,7 +112,7 @@ export default function CategoryNav({
   blocks,
   variant = 'icons',
   backgroundClass = 'bg-white/80',
-  textClass = 'text-gray-700',
+  textClass = 'text-neutral-700',
   activeColorClass = 'bg-red-500'
 }: Props) {
   const [activeId, setActiveId] = useState<string>('');

@@ -18,10 +18,10 @@ export const Button = ({
   const baseStyles = "inline-flex items-center justify-center font-semibold transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-colors";
 
   const variants = {
-    primary: "bg-slate-900 text-white hover:bg-slate-800 shadow-sm",
-    secondary: "bg-slate-50 text-slate-700 hover:bg-slate-100",
-    outline: "bg-transparent border border-slate-200 text-slate-700 hover:bg-slate-50",
-    ghost: "bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+    primary: "bg-neutral-900 text-white hover:bg-neutral-800 shadow-sm",
+    secondary: "bg-neutral-50 text-neutral-700 hover:bg-neutral-100",
+    outline: "bg-transparent border border-neutral-200 text-neutral-700 hover:bg-neutral-50",
+    ghost: "bg-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900",
     danger: "bg-red-50 text-red-600 hover:bg-red-100",
   };
 

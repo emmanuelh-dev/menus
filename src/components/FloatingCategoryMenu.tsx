@@ -16,7 +16,7 @@ interface FloatingCategoryMenuProps {
 export default function FloatingCategoryMenu({
   categories,
   backgroundColor = 'bg-white',
-  textColor = 'text-gray-700'
+  textColor = 'text-neutral-700'
 }: FloatingCategoryMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -64,7 +64,7 @@ export default function FloatingCategoryMenu({
                 </h3>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className={`${textColor} hover:bg-gray-100 p-2 rounded-lg transition-colors`}
+                  className={`${textColor} hover:bg-neutral-100 p-2 rounded-lg transition-colors`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -77,7 +77,7 @@ export default function FloatingCategoryMenu({
                   <button
                     key={category.id}
                     onClick={() => scrollToCategory(category.id)}
-                    className={`w-full text-left px-3 py-3 rounded-lg transition-all duration-200 hover:bg-gray-50 hover:shadow-sm border border-gray-100 ${textColor}`}
+                    className={`w-full text-left px-3 py-3 rounded-lg transition-all duration-200 hover:bg-neutral-50 hover:shadow-sm border border-neutral-100 ${textColor}`}
                   >
                     <div className="flex items-center space-x-3">
                       <div
@@ -89,7 +89,7 @@ export default function FloatingCategoryMenu({
                       <div>
                         <div className="font-medium">{category.name}</div>
                         {category.description && (
-                          <div className="text-sm text-gray-500 truncate">
+                          <div className="text-sm text-neutral-500 truncate">
                             {category.description}
                           </div>
                         )}

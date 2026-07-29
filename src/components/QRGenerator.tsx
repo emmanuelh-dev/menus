@@ -23,18 +23,18 @@ export default function QRGenerator() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-xl border border-neutral-100 overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Controls */}
-        <div className="p-8 bg-slate-50 border-r border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
-            <SettingsIcon className="w-5 h-5 mr-2 text-slate-500" />
+        <div className="p-8 bg-neutral-50 border-r border-neutral-100">
+          <h2 className="text-xl font-bold text-neutral-900 mb-6 flex items-center">
+            <SettingsIcon className="w-5 h-5 mr-2 text-neutral-500" />
             Personalizar QR
           </h2>
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center">
+              <label className="block text-sm font-medium text-neutral-700 mb-2 flex items-center">
                 <Link className="w-4 h-4 mr-2" />
                 URL o Texto
               </label>
@@ -42,20 +42,20 @@ export default function QRGenerator() {
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-marca-500 focus:ring-2 focus:ring-marca-200 outline-none transition-all"
                 placeholder="https://tu-restaurante.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center">
+              <label className="block text-sm font-medium text-neutral-700 mb-2 flex items-center">
                 <Palette className="w-4 h-4 mr-2" />
                 Colores
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-xs text-slate-500 mb-1 block">Color QR</span>
-                  <div className="flex items-center bg-white border border-slate-200 rounded-lg p-2">
+                  <span className="text-xs text-neutral-500 mb-1 block">Color QR</span>
+                  <div className="flex items-center bg-white border border-neutral-200 rounded-lg p-2">
                     <input
                       type="color"
                       value={fgColor}
@@ -66,8 +66,8 @@ export default function QRGenerator() {
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-500 mb-1 block">Fondo</span>
-                  <div className="flex items-center bg-white border border-slate-200 rounded-lg p-2">
+                  <span className="text-xs text-neutral-500 mb-1 block">Fondo</span>
+                  <div className="flex items-center bg-white border border-neutral-200 rounded-lg p-2">
                     <input
                       type="color"
                       value={bgColor}
@@ -86,7 +86,7 @@ export default function QRGenerator() {
         <div className="p-8 flex flex-col items-center justify-center bg-white relative">
           <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
 
-          <div className="relative z-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
+          <div className="relative z-10 bg-white p-6 rounded-2xl shadow-sm border border-neutral-100 mb-8">
             <div ref={qrRef}>
               <QRCodeCanvas
                 value={url}
@@ -101,7 +101,7 @@ export default function QRGenerator() {
 
           <button
             onClick={downloadQR}
-            className="flex items-center px-8 py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all  hover:shadow-xl active:scale-95"
+            className="flex items-center px-8 py-3 bg-neutral-900 text-white font-semibold rounded-xl hover:bg-neutral-800 transition-all  hover:shadow-xl active:scale-95"
           >
             <Download className="w-5 h-5 mr-2" />
             Descargar PNG

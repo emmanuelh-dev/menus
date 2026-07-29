@@ -2,9 +2,9 @@
 
 /* Variables de colores */
 :root {
-  --blog-accent: var(--accent, #2337ff);
-  --blog-accent-light: #4d5dff;
-  --blog-accent-dark: var(--accent-dark, #000d8a);
+  --blog-accent: var(--accent, #1052ba);
+  --blog-accent-light: #4b8bee;
+  --blog-accent-dark: var(--accent-dark, #0c439a);
 }
 
 /* Estilos para las tarjetas de blog */

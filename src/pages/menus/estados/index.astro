@@ -28,15 +28,15 @@ const seoData = {
 <RestaurantLayout
 	title={seoData.title}
 	description={seoData.description}
-	backgroundColor="bg-gray-50"
+	backgroundColor="bg-neutral-50"
 >
 	<main class="min-h-screen">
 		<!-- Hero Section -->
 		<section
-			class="bg-gradient-to-br from-emerald-600 to-emerald-800 py-24 px-6 overflow-hidden relative"
+			class="bg-gradient-to-br from-marca-600 to-marca-800 py-24 px-6 overflow-hidden relative"
 		>
 			<div
-				class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full -mr-20 -mt-20 blur-3xl"
+				class="absolute top-0 right-0 w-96 h-96 bg-marca-500/20 rounded-full -mr-20 -mt-20 blur-3xl"
 			>
 			</div>
 			<div
@@ -53,10 +53,10 @@ const seoData = {
 				<h1
 					class="text-4xl md:text-7xl font-black text-white mb-8 tracking-tighter uppercase leading-[0.9]"
 				>
-					Menús Digitales <br /><span class="text-emerald-300">por Estado</span>
+					Menús Digitales <br /><span class="text-marca-300">por Estado</span>
 				</h1>
 				<p
-					class="text-xl md:text-2xl text-emerald-50/80 max-w-2xl mx-auto font-medium"
+					class="text-xl md:text-2xl text-marca-50/80 max-w-2xl mx-auto font-medium"
 				>
 					Selecciona tu estado para encontrar los mejores restaurantes con
 					tecnología de menú digital QR y pedidos por WhatsApp.
@@ -78,34 +78,34 @@ const seoData = {
 					states.map((state) => (
 						<a
 							href={`/menus/estados/${state.slug}`}
-							class="group bg-white rounded-[2.5rem] p-10 border border-gray-100 hover:border-emerald-200 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col justify-between overflow-hidden relative"
+							class="group bg-white rounded-[2.5rem] p-10 border border-neutral-100 hover:border-marca-200 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col justify-between overflow-hidden relative"
 						>
-							<div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 group-hover:bg-emerald-100 transition-colors" />
+							<div class="absolute top-0 right-0 w-32 h-32 bg-marca-50 rounded-full -mr-16 -mt-16 group-hover:bg-marca-100 transition-colors" />
 
 							<div class="relative z-10">
-								<div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-									<MapPin className="w-8 h-8 text-emerald-600" />
+								<div class="w-16 h-16 bg-marca-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+									<MapPin className="w-8 h-8 text-marca-600" />
 								</div>
 
-								<h3 class="text-3xl font-black text-gray-900 mb-2 tracking-tighter uppercase group-hover:text-emerald-600 transition-colors">
+								<h3 class="text-3xl font-black text-neutral-900 mb-2 tracking-tighter uppercase group-hover:text-marca-600 transition-colors">
 									{state.name}
 								</h3>
-								<p class="text-gray-400 font-bold text-xs uppercase tracking-[0.2em] mb-8">
+								<p class="text-neutral-400 font-bold text-xs uppercase tracking-[0.2em] mb-8">
 									Estado de México
 								</p>
 							</div>
 
 							<div class="flex items-center justify-between mt-4">
 								<div class="flex flex-col">
-									<span class="text-2xl font-black text-gray-900">
+									<span class="text-2xl font-black text-neutral-900">
 										{state.total_places}
 									</span>
-									<span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">
+									<span class="text-[10px] font-black text-neutral-300 uppercase tracking-widest">
 										Negocios Activos
 									</span>
 								</div>
-								<div class="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 transition-all duration-500">
-									<ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-white" />
+								<div class="w-12 h-12 rounded-full border border-neutral-100 flex items-center justify-center group-hover:bg-marca-600 group-hover:border-marca-600 transition-all duration-500">
+									<ArrowRight className="w-6 h-6 text-neutral-400 group-hover:text-white" />
 								</div>
 							</div>
 						</a>
@@ -115,11 +115,14 @@ const seoData = {
 
 			<!-- Discovery Section -->
 			<div
-				class="mt-24 py-20 bg-slate-900 rounded-[3rem] px-12 text-center relative overflow-hidden"
+				class="mt-24 py-20 bg-neutral-900 rounded-[3rem] px-12 text-center relative overflow-hidden"
 			>
+				<!-- El velo de abajo venía con "from- emerald-500" —con un espacio de
+				     más—, así que el degradado nunca tuvo un tope de color y este div
+				     llevaba tiempo sin pintar nada. Queda neutro y funcionando. -->
 				<div class="absolute inset-0 opacity-10 pointer-events-none">
 					<div
-						class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from- emerald-500 via-transparent to-transparent"
+						class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-500 via-transparent to-transparent"
 					>
 					</div>
 				</div>
@@ -129,14 +132,14 @@ const seoData = {
 				>
 					¿Tu restaurante no aparece?
 				</h2>
-				<p class="text-slate-400 text-lg mb-10 max-w-2xl mx-auto font-medium">
+				<p class="text-neutral-400 text-lg mb-10 max-w-2xl mx-auto font-medium">
 					Digitaliza tu carta hoy mismo, aumenta tus ventas con pedidos por
 					WhatsApp y aparece en nuestro directorio nacional.
 				</p>
 				<div class="flex flex-wrap justify-center gap-4">
 					<a
 						href="/contact"
-						class="px-10 py-4 bg-emerald-600 text-white rounded-full font-black uppercase tracking-widest text-sm hover:bg-emerald-500 transition-all hover:scale-105 shadow-xl shadow-emerald-900/40"
+						class="px-10 py-4 bg-marca-600 text-white rounded-full font-black uppercase tracking-widest text-sm hover:bg-marca-500 transition-all hover:scale-105 shadow-xl shadow-marca-900/40"
 					>
 						Registrar Negocio
 					</a>

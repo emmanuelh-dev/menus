@@ -19,7 +19,7 @@ export default function CategoryNavigation({
   categories, 
   sticky = true, 
   backgroundColor = 'bg-white',
-  textColor = 'text-gray-700'
+  textColor = 'text-neutral-700'
 }: CategoryNavigationProps) {
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState(false);
@@ -28,14 +28,14 @@ export default function CategoryNavigation({
   // Función para generar colores de hover dinámicos
   const getHoverColors = () => {
     // Si es un background oscuro, hover más claro
-    if (backgroundColor.includes('bg-gray-900') || backgroundColor.includes('bg-black') || 
-        backgroundColor.includes('bg-slate-900') || backgroundColor.includes('bg-zinc-900')) {
-      return 'hover:bg-gray-700 hover:bg-opacity-50';
+    if (backgroundColor.includes('bg-neutral-900') || backgroundColor.includes('bg-black') || 
+        backgroundColor.includes('bg-neutral-900') || backgroundColor.includes('bg-neutral-900')) {
+      return 'hover:bg-neutral-700 hover:bg-opacity-50';
     }
     // Si es un background claro, hover más oscuro
-    if (backgroundColor.includes('bg-white') || backgroundColor.includes('bg-gray-50') || 
-        backgroundColor.includes('bg-gray-100')) {
-      return 'hover:bg-gray-100 hover:bg-opacity-80';
+    if (backgroundColor.includes('bg-white') || backgroundColor.includes('bg-neutral-50') || 
+        backgroundColor.includes('bg-neutral-100')) {
+      return 'hover:bg-neutral-100 hover:bg-opacity-80';
     }
     // Para otros colores, usar opacity
     return 'hover:bg-black hover:bg-opacity-10';
@@ -159,17 +159,17 @@ export default function CategoryNavigation({
         </div>
         {isMobileMenuOpen && (
           <div className={`md:hidden border-t ${
-            backgroundColor.includes('bg-white') || backgroundColor.includes('bg-gray-50') 
-              ? 'border-gray-200' 
-              : backgroundColor.includes('bg-gray-900') || backgroundColor.includes('bg-black')
-              ? 'border-gray-700'
-              : 'border-gray-300'
+            backgroundColor.includes('bg-white') || backgroundColor.includes('bg-neutral-50') 
+              ? 'border-neutral-200' 
+              : backgroundColor.includes('bg-neutral-900') || backgroundColor.includes('bg-black')
+              ? 'border-neutral-700'
+              : 'border-neutral-300'
           }`}>            <div className={`px-4 py-2 border-b ${
-              backgroundColor.includes('bg-white') || backgroundColor.includes('bg-gray-50') 
-                ? 'border-gray-200' 
-                : backgroundColor.includes('bg-gray-900') || backgroundColor.includes('bg-black')
-                ? 'border-gray-700'
-                : 'border-gray-300'
+              backgroundColor.includes('bg-white') || backgroundColor.includes('bg-neutral-50') 
+                ? 'border-neutral-200' 
+                : backgroundColor.includes('bg-neutral-900') || backgroundColor.includes('bg-black')
+                ? 'border-neutral-700'
+                : 'border-neutral-300'
             }`}>
               <p className={`text-xs ${textColor} opacity-75`}>
                 Toca una sección para saltar a ella.

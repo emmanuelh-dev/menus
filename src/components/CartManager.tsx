@@ -333,11 +333,11 @@ export default function CartManager({
         if (isFav) {
           svg.setAttribute("fill", "currentColor");
           svg.classList.add("text-red-500");
-          svg.classList.remove("text-stone-400");
+          svg.classList.remove("text-neutral-400");
         } else {
           svg.setAttribute("fill", "none");
           svg.classList.remove("text-red-500");
-          svg.classList.add("text-stone-400");
+          svg.classList.add("text-neutral-400");
         }
       }
     });
@@ -619,7 +619,7 @@ export default function CartManager({
       {/* Floating Toast Notification */}
       {showSuccess && (
         <div className="fixed bottom-20 right-6 z-50 animate-in slide-in-from-right fade-in duration-300">
-          <div className="bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl shadow-emerald-200 flex items-center gap-3 font-bold text-sm">
+          <div className="bg-marca-600 text-white px-5 py-3 rounded-2xl shadow-2xl shadow-marca-200 flex items-center gap-3 font-bold text-sm">
             <Check className="w-5 h-5" />
             <span>¡Agregado al carrito!</span>
           </div>
@@ -656,19 +656,19 @@ export default function CartManager({
           }}
         >
           <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[80dvh] flex flex-col">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-pink-500" fill="currentColor" />
+                <Heart className="w-6 h-6 text-neutral-500" fill="currentColor" />
                 <h2 className="text-xl font-bold">Favoritos</h2>
               </div>
               <button onClick={() => setShowFavorites(false)}>
-                <X className="w-6 h-6 text-gray-400" />
+                <X className="w-6 h-6 text-neutral-400" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
               {favorites.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">
+                <p className="text-center text-neutral-400 py-8">
                   No tienes favoritos
                 </p>
               ) : (
@@ -689,12 +689,12 @@ export default function CartManager({
                     return (
                       <div
                         key={fav.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-3"
+                        className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg gap-3"
                       >
                         <div className="flex-1">
                           <span className="font-medium block">{fav.name}</span>
                           {itemData?.price && (
-                            <span className="text-sm text-gray-600">${itemData.price}</span>
+                            <span className="text-sm text-neutral-600">${itemData.price}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -716,7 +716,7 @@ export default function CartManager({
                           )}
                           <button
                             onClick={() => toggleFavorite(fav)}
-                            className="text-pink-500 hover:text-pink-600"
+                            className="text-neutral-500 hover:text-neutral-600"
                           >
                             <Heart className="w-5 h-5" fill="currentColor" />
                           </button>
@@ -739,37 +739,37 @@ export default function CartManager({
           }}
         >
           <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[90dvh] flex flex-col shadow-2xl">
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10 rounded-t-2xl">
+            <div className="p-4 border-b border-neutral-100 flex items-center justify-between bg-white sticky top-0 z-10 rounded-t-2xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600">
                   <ShoppingCart className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold leading-none">Mi Pedido</h2>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase mt-1 tracking-wider">
                     {totalItems} {totalItems === 1 ? 'producto' : 'productos'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowCart(false)}
-                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
+                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 hover:bg-neutral-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex bg-gray-50 border-b border-gray-100 p-1 m-4 rounded-xl">
+            <div className="flex bg-neutral-50 border-b border-neutral-100 p-1 m-4 rounded-xl">
               <button
                 onClick={() => setActiveTab('cart')}
-                className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === 'cart' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === 'cart' ? 'bg-white text-red-600 shadow-sm' : 'text-neutral-400 hover:text-neutral-600'}`}
               >
                 <ShoppingCart size={14} />
                 Pedido
               </button>
               <button
                 onClick={() => setActiveTab('checkout')}
-                className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === 'checkout' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === 'checkout' ? 'bg-white text-red-600 shadow-sm' : 'text-neutral-400 hover:text-neutral-600'}`}
               >
                 <Truck size={14} />
                 Información de envío
@@ -780,7 +780,7 @@ export default function CartManager({
               {activeTab === 'cart' ? (
                 <div className="py-2">
                   {cart.length === 0 ? (
-                    <p className="text-center text-gray-400 py-8">
+                    <p className="text-center text-neutral-400 py-8">
                       Tu carrito está vacío
                     </p>
                   ) : (
@@ -800,17 +800,17 @@ export default function CartManager({
                               {item.selectedOptions && (
                                 <div className="flex flex-wrap gap-1 mt-0.5">
                                   {Object.entries(item.selectedOptions).map(([key, val]) => (
-                                    <span key={key} className="text-[9px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded uppercase">
+                                    <span key={key} className="text-[9px] font-bold text-neutral-400 bg-neutral-100 px-1.5 py-0.5 rounded uppercase">
                                       {val}
                                     </span>
                                   ))}
                                 </div>
                               )}
-                              <p className="text-xs font-bold text-emerald-600 mt-1">${item.price}</p>
+                              <p className="text-xs font-bold text-marca-600 mt-1">${item.price}</p>
                               <div className="flex items-center gap-3 mt-2">
                                 <button
                                   onClick={() => updateQuantity(item.id, -1)}
-                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors font-bold"
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-neutral-100 hover:bg-neutral-200 transition-colors font-bold"
                                 >
                                   -
                                 </button>
@@ -819,19 +819,19 @@ export default function CartManager({
                                 </span>
                                 <button
                                   onClick={() => updateQuantity(item.id, 1)}
-                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors font-bold"
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-neutral-100 hover:bg-neutral-200 transition-colors font-bold"
                                 >
                                   +
                                 </button>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="font-black text-sm text-gray-800">
+                              <p className="font-black text-sm text-neutral-800">
                                 ${item.price * item.quantity}
                               </p>
                               <button
                                 onClick={() => removeFromCart(item.id)}
-                                className="text-gray-300 hover:text-red-500 mt-2 transition-colors"
+                                className="text-neutral-300 hover:text-red-500 mt-2 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -845,10 +845,10 @@ export default function CartManager({
                               onChange={(e) =>
                                 updateNotes(item.id, e.target.value)
                               }
-                              className="w-full text-xs bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 outline-none focus:border-red-200 focus:bg-white transition-all"
+                              className="w-full text-xs bg-neutral-50 border border-neutral-100 rounded-lg px-3 py-2 outline-none focus:border-red-200 focus:bg-white transition-all"
                             />
                           </div>
-                          <div className="h-px bg-gray-50 w-full" />
+                          <div className="h-px bg-neutral-50 w-full" />
                         </div>
                       ))}
                     </div>
@@ -857,31 +857,31 @@ export default function CartManager({
               ) : (
                 <div className="py-2 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Mis Datos</h3>
+                    <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Mis Datos</h3>
                     <div className="grid grid-cols-1 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Nombre Completo</label>
+                        <label className="text-[10px] font-bold text-neutral-500 uppercase ml-1">Nombre Completo</label>
                         <div className="relative">
-                          <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
                           <input
                             type="text"
                             value={customerName}
                             onChange={(e) => setCustomerName(e.target.value)}
                             placeholder="Ej: Juan Pérez"
-                            className="w-full pl-10 pr-4 py-3 text-sm bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none"
+                            className="w-full pl-10 pr-4 py-3 text-sm bg-neutral-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none"
                           />
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Teléfono (WhatsApp)</label>
+                        <label className="text-[10px] font-bold text-neutral-500 uppercase ml-1">Teléfono (WhatsApp)</label>
                         <div className="relative">
-                          <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
                           <input
                             type="tel"
                             value={customerPhone}
                             onChange={(e) => setCustomerPhone(e.target.value)}
                             placeholder="10 dígitos"
-                            className="w-full pl-10 pr-4 py-3 text-sm bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none"
+                            className="w-full pl-10 pr-4 py-3 text-sm bg-neutral-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none"
                           />
                         </div>
                       </div>
@@ -889,31 +889,31 @@ export default function CartManager({
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Método de Pago</h3>
+                    <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Método de Pago</h3>
                     <div className="grid grid-cols-3 gap-2">
                       <button
                         onClick={() => setPaymentMethod('cash')}
-                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${paymentMethod === 'cash' ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${paymentMethod === 'cash' ? 'border-red-500 bg-red-50 text-red-600' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-200'}`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${paymentMethod === 'cash' ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${paymentMethod === 'cash' ? 'bg-red-500 text-white' : 'bg-white text-neutral-400'}`}>
                           <Coins className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-bold">Efectivo</span>
                       </button>
                       <button
                         onClick={() => setPaymentMethod('card')}
-                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${paymentMethod === 'card' ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${paymentMethod === 'card' ? 'border-red-500 bg-red-50 text-red-600' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-200'}`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${paymentMethod === 'card' ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${paymentMethod === 'card' ? 'bg-red-500 text-white' : 'bg-white text-neutral-400'}`}>
                           <CreditCard className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-bold">Tarjeta</span>
                       </button>
                       <button
                         onClick={() => setPaymentMethod('transfer')}
-                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${paymentMethod === 'transfer' ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${paymentMethod === 'transfer' ? 'border-red-500 bg-red-50 text-red-600' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-200'}`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${paymentMethod === 'transfer' ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${paymentMethod === 'transfer' ? 'bg-red-500 text-white' : 'bg-white text-neutral-400'}`}>
                           <Landmark className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-bold">Transfer</span>
@@ -921,12 +921,12 @@ export default function CartManager({
                     </div>
 
                     {paymentMethod === 'transfer' && clabe && (
-                      <div className="p-4 bg-purple-50 rounded-2xl border border-purple-100 animate-in fade-in zoom-in-95 duration-300">
-                        <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                      <div className="p-4 bg-neutral-50 rounded-2xl border border-neutral-100 animate-in fade-in zoom-in-95 duration-300">
+                        <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                           <Landmark size={12} /> Datos de Transferencia
                         </p>
-                        <div className="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-purple-100">
-                          <code className="text-xs font-bold text-gray-700 tracking-wider">
+                        <div className="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-neutral-100">
+                          <code className="text-xs font-bold text-neutral-700 tracking-wider">
                             {clabe}
                           </code>
                           <button
@@ -935,12 +935,12 @@ export default function CartManager({
                               setCopied(true);
                               setTimeout(() => setCopied(false), 2000);
                             }}
-                            className="p-2 hover:bg-purple-50 rounded-lg transition-colors text-purple-600"
+                            className="p-2 hover:bg-neutral-50 rounded-lg transition-colors text-neutral-600"
                           >
                             {copied ? <Check size={16} /> : <Copy size={16} />}
                           </button>
                         </div>
-                        <p className="text-[9px] text-purple-400 mt-2 font-medium italic">
+                        <p className="text-[9px] text-neutral-400 mt-2 font-medium italic">
                           Al confirmar, se generará tu pedido y podrás enviar el comprobante por WhatsApp.
                         </p>
                       </div>
@@ -948,13 +948,13 @@ export default function CartManager({
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">¿Cómo prefieres tu pedido?</h3>
+                    <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">¿Cómo prefieres tu pedido?</h3>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => setWantsDelivery(true)}
-                        className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all group ${wantsDelivery ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                        className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all group ${wantsDelivery ? 'border-red-500 bg-red-50 text-red-600' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-200'}`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${wantsDelivery ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${wantsDelivery ? 'bg-red-500 text-white' : 'bg-white text-neutral-400'}`}>
                           <Truck className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-bold">A Domicilio</span>
@@ -964,9 +964,9 @@ export default function CartManager({
                           setWantsDelivery(false);
                           setShippingZone(null);
                         }}
-                        className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all group ${!wantsDelivery ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200'}`}
+                        className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 transition-all group ${!wantsDelivery ? 'border-red-500 bg-red-50 text-red-600' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-200'}`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${!wantsDelivery ? 'bg-red-500 text-white' : 'bg-white text-gray-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all ${!wantsDelivery ? 'bg-red-500 text-white' : 'bg-white text-neutral-400'}`}>
                           <ShoppingCart className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-bold tracking-tight">Pasar a Recoger</span>
@@ -978,11 +978,11 @@ export default function CartManager({
                         {availableColonies.length > 0 ? (
                           <>
                             <div className="space-y-1.5">
-                              <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Colonia</label>
+                              <label className="text-[10px] font-bold text-neutral-500 uppercase ml-1">Colonia</label>
                               <select
                                 value={deliveryColony}
                                 onChange={(e) => setDeliveryColony(e.target.value)}
-                                className="w-full px-4 py-3 text-sm bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none appearance-none"
+                                className="w-full px-4 py-3 text-sm bg-neutral-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none appearance-none"
                               >
                                 <option value="">Seleccionar colonia...</option>
                                 {availableColonies.map((item, idx) => (
@@ -994,7 +994,7 @@ export default function CartManager({
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Calle y Número</label>
+                              <label className="text-[10px] font-bold text-neutral-500 uppercase ml-1">Calle y Número</label>
                               <GooglePlacesAutocomplete
                                 value={deliveryStreet}
                                 onChange={(val) => setDeliveryStreet(val)}
@@ -1008,13 +1008,13 @@ export default function CartManager({
                                   }
                                 }}
                                 placeholder="Ej: Av. Principal 123..."
-                                className="w-full px-4 py-3 text-sm bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none"
+                                className="w-full px-4 py-3 text-sm bg-neutral-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none"
                               />
                             </div>
                           </>
                         ) : (
-                          <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl">
-                            <p className="text-[11px] text-amber-700 leading-tight">
+                          <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl">
+                            <p className="text-[11px] text-neutral-700 leading-tight">
                               ⚠️ Esta sucursal aún no tiene zonas de envío configuradas. Por favor, contacta al negocio directamente.
                             </p>
                           </div>
@@ -1026,24 +1026,24 @@ export default function CartManager({
               )}
             </div>
 
-            <div className="p-6 border-t border-gray-100 bg-white sticky bottom-0 z-10 rounded-b-2xl">
+            <div className="p-6 border-t border-neutral-100 bg-white sticky bottom-0 z-10 rounded-b-2xl">
               {activeTab === 'cart' ? (
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl">
-                    <span className="text-sm font-bold text-gray-500 uppercase">Subtotal</span>
-                    <span className="text-xl font-black text-slate-800">${totalPrice}</span>
+                  <div className="flex justify-between items-center bg-neutral-50 p-4 rounded-xl">
+                    <span className="text-sm font-bold text-neutral-500 uppercase">Subtotal</span>
+                    <span className="text-xl font-black text-neutral-800">${totalPrice}</span>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={clearCart}
-                      className="flex-1 py-3.5 border border-gray-100 rounded-xl hover:bg-gray-50 font-bold text-xs text-gray-400 uppercase tracking-widest transition-all"
+                      className="flex-1 py-3.5 border border-neutral-100 rounded-xl hover:bg-neutral-50 font-bold text-xs text-neutral-400 uppercase tracking-widest transition-all"
                     >
                       Limpiar
                     </button>
                     <button
                       onClick={() => setActiveTab('checkout')}
                       disabled={cart.length === 0}
-                      className="flex-[2] py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-200 text-white rounded-xl font-bold transition-all  shadow-red-100 flex items-center justify-center gap-2"
+                      className="flex-[2] py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-neutral-200 text-white rounded-xl font-bold transition-all  shadow-red-100 flex items-center justify-center gap-2"
                     >
                       Siguiente
                       <Send size={16} className="rotate-45" />
@@ -1053,7 +1053,7 @@ export default function CartManager({
               ) : (
                 <div className="space-y-4">
                   <div className="space-y-2 mb-2">
-                    <div className="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <div className="flex justify-between text-xs font-bold text-neutral-400 uppercase tracking-widest">
                       <span>Subtotal</span>
                       <span>${totalPrice}</span>
                     </div>
@@ -1063,25 +1063,25 @@ export default function CartManager({
                         <span>+ ${shippingZone.price}</span>
                       </div>
                     )}
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-50">
-                      <span className="text-sm font-black text-gray-800 uppercase tracking-tighter">Total a Pagar</span>
+                    <div className="flex justify-between items-center pt-2 border-t border-neutral-50">
+                      <span className="text-sm font-black text-neutral-800 uppercase tracking-tighter">Total a Pagar</span>
                       <span className="text-2xl font-black text-red-600">${totalPrice + (wantsDelivery && shippingZone ? shippingZone.price : 0)}</span>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Comentario / Nota al pedido (opcional)</label>
+                    <label className="text-[10px] font-bold text-neutral-500 uppercase ml-1">Comentario / Nota al pedido (opcional)</label>
                     <textarea
                       value={orderNotes}
                       onChange={(e) => setOrderNotes(e.target.value)}
                       placeholder="Ej: Sin cebolla, alergia a mariscos, timbre no funciona..."
-                      className="w-full px-4 py-3 text-sm bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none resize-none h-20"
+                      className="w-full px-4 py-3 text-sm bg-neutral-50 border border-transparent rounded-xl focus:bg-white focus:border-red-500 transition-all outline-none resize-none h-20"
                     />
                   </div>
                   <button
                     onClick={sendToWhatsApp}
                     disabled={creatingOrder || (wantsDelivery && !shippingZone) || !customerName || !customerPhone || cart.length === 0}
-                    className="w-full py-4 bg-green-500 hover:bg-green-600 disabled:bg-gray-200 text-white rounded-2xl font-black text-lg shadow-xl shadow-green-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:scale-100"
+                    className="w-full py-4 bg-marca-500 hover:bg-marca-600 disabled:bg-neutral-200 text-white rounded-2xl font-black text-lg shadow-xl shadow-marca-100 flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:scale-100"
                   >
                     {creatingOrder ? (
                       <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1105,7 +1105,7 @@ export default function CartManager({
               {configuringItem.image ? (
                 <img src={configuringItem.image} className="w-full h-full object-cover" alt="" />
               ) : (
-                <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
+                <div className="w-full h-full bg-neutral-100 flex items-center justify-center text-neutral-300">
                   <ShoppingCart size={40} />
                 </div>
               )}
@@ -1119,9 +1119,9 @@ export default function CartManager({
 
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
               <div className="p-6 sm:p-8 pb-4 shrink-0">
-                <h3 className="text-2xl font-black uppercase text-gray-900 tracking-tight leading-none mb-2">{configuringItem.name}</h3>
-                <p className="text-gray-500 text-sm font-medium leading-relaxed">{configuringItem.description}</p>
-                <p className="text-2xl font-black text-emerald-600 mt-4">${configuringItem.price}</p>
+                <h3 className="text-2xl font-black uppercase text-neutral-900 tracking-tight leading-none mb-2">{configuringItem.name}</h3>
+                <p className="text-neutral-500 text-sm font-medium leading-relaxed">{configuringItem.description}</p>
+                <p className="text-2xl font-black text-marca-600 mt-4">${configuringItem.price}</p>
               </div>
 
               <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-2 space-y-6 custom-scrollbar">
@@ -1132,7 +1132,7 @@ export default function CartManager({
                     {/* PREFIX SELECTORS (Masa, Tamaño, etc.) */}
                     {configuringItem.options.slice(0, -1).map((opt: any) => (
                       <div key={opt.name} className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block px-1">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 block px-1">
                           Selecciona {opt.name}:
                         </label>
                         <div className="grid grid-cols-2 gap-2">
@@ -1140,11 +1140,11 @@ export default function CartManager({
                             <button
                               key={val}
                               onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
-                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-gray-900 bg-gray-900 text-white ' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-100 hover:bg-white'}`}
+                              className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-neutral-900 bg-neutral-900 text-white ' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-100 hover:bg-white'}`}
                             >
                               <span>{val}</span>
                               {opt.prices?.[val] && (
-                                <span className={`text-[8px] mt-1 ${tempOptions[opt.name] === val ? 'text-emerald-300' : 'text-emerald-600'}`}>+$ {opt.prices[val]}</span>
+                                <span className={`text-[8px] mt-1 ${tempOptions[opt.name] === val ? 'text-marca-300' : 'text-marca-600'}`}>+$ {opt.prices[val]}</span>
                               )}
                             </button>
                           ))}
@@ -1157,17 +1157,17 @@ export default function CartManager({
                       <div key={opt.name} className="space-y-4">
                         <div className="flex justify-between items-end px-1 mb-4">
                           <div>
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-1">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 block mb-1">
                               {opt.name}:
                             </label>
-                            <p className="text-[9px] text-gray-400 font-medium italic">Especifica la cantidad de cada uno</p>
+                            <p className="text-[9px] text-neutral-400 font-medium italic">Especifica la cantidad de cada uno</p>
                           </div>
                           {detectLimit(configuringItem) && (
                             <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + (b as number), 0) === detectLimit(configuringItem)
-                              ? 'bg-emerald-500 border-emerald-500 text-white'
+                              ? 'bg-marca-500 border-marca-500 text-white'
                               : Object.values(tempCounts).reduce((a, b) => a + (b as number), 0) > (detectLimit(configuringItem) || 0)
                                 ? 'bg-red-500 border-red-500 text-white animate-shake'
-                                : 'bg-white border-gray-100 text-gray-900'
+                                : 'bg-white border-neutral-100 text-neutral-900'
                               }`}>
                               <span className="text-[10px] font-black">{Object.values(tempCounts).reduce((a, b) => a + (b as number), 0)} / {detectLimit(configuringItem)}</span>
                             </div>
@@ -1178,21 +1178,21 @@ export default function CartManager({
                             const comboKey = getCombinationKey(tempOptions, val);
                             const currentCount = tempCounts[comboKey] || 0;
                             return (
-                              <div key={val} className="flex items-center justify-between bg-gray-50 p-3 rounded-2xl border border-gray-100/50 hover:bg-white hover:shadow-sm transition-all text-gray-700">
+                              <div key={val} className="flex items-center justify-between bg-neutral-50 p-3 rounded-2xl border border-neutral-100/50 hover:bg-white hover:shadow-sm transition-all text-neutral-700">
                                 <div className="flex flex-col">
                                   <span className="font-bold text-sm uppercase">{val}</span>
                                   {opt.prices?.[val] && (
-                                    <span className="text-[10px] font-black text-emerald-600">+$ {opt.prices[val]}</span>
+                                    <span className="text-[10px] font-black text-marca-600">+$ {opt.prices[val]}</span>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <button
                                     onClick={() => setTempCounts(prev => ({ ...prev, [comboKey]: Math.max(0, currentCount - 1) }))}
-                                    className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-red-500 transition-colors border border-gray-100"
+                                    className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-neutral-400 hover:text-red-500 transition-colors border border-neutral-100"
                                   >
                                     -
                                   </button>
-                                  <span className={`font-black text-sm w-4 text-center ${currentCount > 0 ? 'text-gray-900' : 'text-gray-300'}`}>
+                                  <span className={`font-black text-sm w-4 text-center ${currentCount > 0 ? 'text-neutral-900' : 'text-neutral-300'}`}>
                                     {currentCount}
                                   </span>
                                   <button
@@ -1203,7 +1203,7 @@ export default function CartManager({
                                         setTempCounts(prev => ({ ...prev, [comboKey]: currentCount + 1 }));
                                       }
                                     }}
-                                    className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-gray-400 hover:text-emerald-500 transition-colors border border-gray-100"
+                                    className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-neutral-400 hover:text-marca-500 transition-colors border border-neutral-100"
                                   >
                                     +
                                   </button>
@@ -1218,21 +1218,21 @@ export default function CartManager({
                 )}
               </div>
 
-              <div className="p-6 sm:p-8 border-t border-gray-100 space-y-4 shrink-0 bg-white">
+              <div className="p-6 sm:p-8 border-t border-neutral-100 space-y-4 shrink-0 bg-white">
                 {configuringItem.options?.length !== 1 && (
-                  <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl mb-4">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cantidad Total:</span>
+                  <div className="flex items-center justify-between bg-neutral-50 p-4 rounded-2xl mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Cantidad Total:</span>
                     <div className="flex items-center gap-6">
                       <button
                         onClick={() => setTempQuantity(q => Math.max(1, q - 1))}
-                        className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center font-black text-lg"
+                        className="w-10 h-10 rounded-xl bg-white shadow-sm border border-neutral-100 flex items-center justify-center font-black text-lg"
                       >
                         -
                       </button>
                       <span className="font-black text-xl w-6 text-center">{tempQuantity}</span>
                       <button
                         onClick={() => setTempQuantity(q => q + 1)}
-                        className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center font-black text-lg"
+                        className="w-10 h-10 rounded-xl bg-white shadow-sm border border-neutral-100 flex items-center justify-center font-black text-lg"
                       >
                         +
                       </button>
@@ -1304,7 +1304,7 @@ export default function CartManager({
                     if (limit) return total !== limit;
                     return total === 0;
                   })()}
-                  className="w-full py-5 bg-gray-900 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-gray-300 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:shadow-none"
+                  className="w-full py-5 bg-neutral-900 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-neutral-300 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 disabled:bg-neutral-200 disabled:shadow-none"
                 >
                   <ShoppingCart size={18} />
                   {(() => {
@@ -1342,7 +1342,7 @@ export default function CartManager({
                 </button>
 
                 {showSuccess && (
-                  <p className="text-center text-emerald-600 font-bold text-xs animate-bounce">
+                  <p className="text-center text-marca-600 font-bold text-xs animate-bounce">
                     ✓ ¡Agregado correctamente!
                   </p>
                 )}

@@ -159,17 +159,17 @@ export function ManualUploader({
         </div>
       )}
 
-      <div className="rounded-xl border-2 border-dashed border-gray-200 p-4 hover:border-black transition-colors">
+      <div className="rounded-xl border-2 border-dashed border-neutral-200 p-4 hover:border-black transition-colors">
         <input
           type="file"
           accept="image/*"
           multiple={multiple}
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full text-[10px] text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-gray-100 file:text-gray-700 file:px-4 file:py-1.5 file:font-semibold cursor-pointer hover:file:bg-gray-200 transition-all"
+          className="block w-full text-[10px] text-neutral-500 file:mr-3 file:rounded-xl file:border-0 file:bg-neutral-100 file:text-neutral-700 file:px-4 file:py-1.5 file:font-semibold cursor-pointer hover:file:bg-neutral-200 transition-all"
         />
         {uploading && (
-          <p className="mt-2 animate-pulse text-[10px] font-bold text-blue-600 uppercase">Subiendo ráfaga...</p>
+          <p className="mt-2 animate-pulse text-[10px] font-bold text-neutral-600 uppercase">Subiendo ráfaga...</p>
         )}
       </div>
     </div>

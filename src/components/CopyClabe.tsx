@@ -15,22 +15,22 @@ const CopyClabe = ({ clabes }) => {
 
   return (
     <div className="max-w-2xl mx-auto p-4 text-center">
-      <div className="bg-purple-900 rounded-lg p-3 mb-4">
+      <div className="bg-neutral-900 rounded-lg p-3 mb-4">
         <p className="text-white font-bold">TRANSFERENCIA STP:</p>
         <p className="text-white text-sm mb-2">Beneficiario: Yazmin Ayala</p>
         {clabes.map((clabe, index) => (
-          <div key={index} className="flex justify-between items-center bg-gray-800 p-2 rounded-lg mb-2">
-            <p className="text-yellow-400 font-mono text-sm">{clabe}</p>
+          <div key={index} className="flex justify-between items-center bg-neutral-800 p-2 rounded-lg mb-2">
+            <p className="text-neutral-400 font-mono text-sm">{clabe}</p>
             <button
               onClick={() => handleCopy(clabe)}
-              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition text-sm"
+              className="bg-neutral-500 text-white px-3 py-1 rounded-md hover:bg-neutral-600 transition text-sm"
             >
               Copiar
             </button>
           </div>
         ))}
         {copied && (
-          <p className="text-green-500 mt-2">¡Copiado al portapapeles!</p>
+          <p className="text-marca-500 mt-2">¡Copiado al portapapeles!</p>
         )}
       </div>
     </div>

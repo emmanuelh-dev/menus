@@ -14,7 +14,7 @@ export default function MarkdownBlock({ content, className = "" }: MarkdownBlock
         components={{
           p: ({ children }) => <span className="block">{children}</span>,
           a: ({ node, ...props }) => (
-            <a {...props} rel="ugc nofollow noreferrer" target="_blank" className="text-blue-600 hover:underline">
+            <a {...props} rel="ugc nofollow noreferrer" target="_blank" className="text-neutral-600 hover:underline">
               {props.children}
             </a>
           ),

@@ -43,7 +43,7 @@ const faqs = [
 <section class="py-32 bg-white">
 	<div class="max-w-4xl mx-auto px-6">
 		<h2
-			class="text-4xl md:text-6xl font-black text-slate-900 mb-20 tracking-tighter uppercase text-center"
+			class="text-4xl md:text-6xl font-black text-neutral-900 mb-20 tracking-tighter uppercase text-center"
 		>
 			Preguntas Frecuentes {stateName ? `en ${stateName}` : ""}
 		</h2>
@@ -52,19 +52,19 @@ const faqs = [
 			{
 				faqs.map((faq) => (
 					<div
-						class={`group border border-slate-100 rounded-[32px] overflow-hidden transition-all hover:shadow-xl hover:shadow-slate-100 ${faq.highlight ? "bg-emerald-50 border-emerald-100" : "bg-white"}`}
+						class={`group border border-neutral-100 rounded-[32px] overflow-hidden transition-all hover:shadow-xl hover:shadow-neutral-100 ${faq.highlight ? "bg-marca-50 border-marca-100" : "bg-white"}`}
 					>
 						<details class="p-8">
 							<summary class="flex items-center justify-between font-black text-xl uppercase tracking-tight cursor-pointer list-none">
 								<span
-									class={faq.highlight ? "text-emerald-700" : "text-slate-900"}
+									class={faq.highlight ? "text-marca-700" : "text-neutral-900"}
 								>
 									{faq.q}
 								</span>
-								<ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" />
+								<ChevronDown className="w-5 h-5 text-neutral-400 group-open:rotate-180 transition-transform" />
 							</summary>
 							<div
-								class="mt-6 text-slate-500 font-medium leading-relaxed"
+								class="mt-6 text-neutral-500 font-medium leading-relaxed"
 								set:html={faq.a}
 							/>
 						</details>
