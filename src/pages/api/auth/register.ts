@@ -77,29 +77,29 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           subject: `¡Bienvenido a Menús BysMax, ${name || 'amigo(a)'}!`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #f0f0f0; border-radius: 24px; overflow: hidden;">
-              <div style="background: #10b981; padding: 40px; text-align: center;">
+              <div style="background: #1052ba; padding: 40px; text-align: center;">
                 <h1 style="color: white; margin: 0; font-size: 28px;">¡Tu menú digital está listo!</h1>
               </div>
               <div style="padding: 40px; background: white;">
-                <p style="font-size: 18px; color: #1e293b; font-weight: bold;">¡Hola ${name || 'hola'}!</p>
-                <p style="color: #64748b; line-height: 1.6; font-size: 16px;">
+                <p style="font-size: 18px; color: #262626; font-weight: bold;">¡Hola ${name || 'hola'}!</p>
+                <p style="color: #737373; line-height: 1.6; font-size: 16px;">
                   Gracias por unirte a <strong>Menús BysMax</strong>. Hemos registrado correctamente tu negocio 
                   ${business_name ? `<strong>"${business_name}"</strong>` : 'tu negocio'}.
                 </p>
-                <div style="margin: 32px 0; background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                  <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #475569;">¿Qué sigue?</p>
-                  <ul style="margin: 0; padding-left: 20px; color: #64748b; font-size: 14px; line-height: 2;">
+                <div style="margin: 32px 0; background: #fafafa; padding: 24px; border-radius: 16px; border: 1px solid #e5e5e5;">
+                  <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #525252;">¿Qué sigue?</p>
+                  <ul style="margin: 0; padding-left: 20px; color: #737373; font-size: 14px; line-height: 2;">
                     <li>Entra a tu panel de administración</li>
                     <li>Sube las fotos de tus platillos</li>
                     <li>¡Comparte tu link con tus clientes!</li>
                   </ul>
                 </div>
-                <p style="color: #64748b; font-size: 14px;">
+                <p style="color: #737373; font-size: 14px;">
                   Si tienes cualquier duda, simplemente responde a este correo y nuestro equipo de soporte te ayudará de inmediato.
                 </p>
               </div>
-              <div style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
-                <p style="margin: 0; color: #94a3b8; font-size: 12px;">&copy; ${new Date().getFullYear()} BysMax. Todos los derechos reservados.</p>
+              <div style="background: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
+                <p style="margin: 0; color: #a3a3a3; font-size: 12px;">&copy; ${new Date().getFullYear()} BysMax. Todos los derechos reservados.</p>
               </div>
             </div>
           `
@@ -111,7 +111,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           subject: '🔔 Nuevo Registro en la Plataforma',
           html: `
             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
-              <h2 style="color: #10b981;">¡Nuevo usuario registrado!</h2>
+              <h2 style="color: #1052ba;">¡Nuevo usuario registrado!</h2>
               <p>Se ha registrado un nuevo negocio en la plataforma:</p>
               <ul style="list-style: none; padding: 0;">
                 <li><strong>Nombre:</strong> ${name || 'N/A'}</li>

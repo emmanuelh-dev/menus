@@ -64,16 +64,16 @@ export const POST: APIRoute = async ({ request }) => {
           subject: '👤 Nuevo Lead de Cliente',
           html: `
             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
-              <h2 style="color: #10b981; margin-top: 0;">¡Nuevo contacto guardado!</h2>
+              <h2 style="color: #1052ba; margin-top: 0;">¡Nuevo contacto guardado!</h2>
               <p>Un visitante de un menú ha guardado sus datos:</p>
-              <ul style="list-style: none; padding: 0; font-size: 14px; color: #1e293b;">
+              <ul style="list-style: none; padding: 0; font-size: 14px; color: #262626;">
                 <li><strong>Nombre:</strong> ${customer.name || 'N/A'}</li>
                 <li><strong>WhatsApp:</strong> ${customer.phone || 'N/A'}</li>
                 <li><strong>Dirección:</strong> ${customer.default_address || 'No proporcionada'}</li>
                 <li><strong>Colonia:</strong> ${customer.default_colony || 'N/A'}</li>
               </ul>
               <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-              <p style="font-size: 11px; color: #64748b;">Este dato se guardó automáticamente desde el carrito o checkout de un restaurante.</p>
+              <p style="font-size: 11px; color: #737373;">Este dato se guardó automáticamente desde el carrito o checkout de un restaurante.</p>
             </div>
           `
         });

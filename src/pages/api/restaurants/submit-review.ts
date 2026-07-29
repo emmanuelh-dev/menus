@@ -61,22 +61,22 @@ export const POST: APIRoute = async ({ request }) => {
           subject: `⭐ Nueva reseña disponible: ${place.name}`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-              <div style="background: #10b981; padding: 30px; text-align: center;">
+              <div style="background: #1052ba; padding: 30px; text-align: center;">
                 <h2 style="color: white; margin: 0; font-size: 20px;">¡Tienes una nueva reseña!</h2>
               </div>
               <div style="padding: 30px; background: white;">
-                <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
+                <p style="color: #737373; font-size: 14px; margin-bottom: 20px;">
                   Un cliente ha dejado un comentario en <strong>${place.name}</strong>:
                 </p>
                 
-                <div style="background: #f8fafc; p: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #10b981; padding: 15px;">
-                  <p style="margin: 0; font-size: 16px; color: #1e293b; font-style: italic;">"${payload.comment}"</p>
-                  <p style="margin: 10px 0 0 0; font-size: 12px; font-weight: bold; color: #fbbf24;">
+                <div style="background: #fafafa; p: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #1052ba; padding: 15px;">
+                  <p style="margin: 0; font-size: 16px; color: #262626; font-style: italic;">"${payload.comment}"</p>
+                  <p style="margin: 10px 0 0 0; font-size: 12px; font-weight: bold; color: #737373;">
                     ${'★'.repeat(payload.rate)}${'☆'.repeat(5 - payload.rate)}
                   </p>
                 </div>
 
-                <p style="color: #64748b; font-size: 13px; line-height: 1.5;">
+                <p style="color: #737373; font-size: 13px; line-height: 1.5;">
                   <strong>Cliente:</strong> ${payload.content?.author?.name || 'Anónimo'}<br>
                   <strong>WhatsApp:</strong> ${payload.content?.author?.whatsapp || 'No proporcionado'}
                 </p>
@@ -96,15 +96,15 @@ export const POST: APIRoute = async ({ request }) => {
           subject: `💬 Nueva reseña en ${place.name} (${payload.rate}★)`,
           html: `
             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
-              <h2 style="color: #10b981; margin-top: 0;">¡Nueva Actividad!</h2>
+              <h2 style="color: #1052ba; margin-top: 0;">¡Nueva Actividad!</h2>
               <p>Se ha publicado una reseña en <strong>${place.name}</strong>:</p>
               
-              <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
+              <div style="background: #fafafa; padding: 15px; border-radius: 8px; border-left: 4px solid #1052ba; margin: 20px 0;">
                 <p style="margin: 0; font-style: italic;">"${payload.comment}"</p>
-                <p style="margin: 10px 0 0 0; color: #fbbf24;">${'★'.repeat(payload.rate)}${'☆'.repeat(5 - payload.rate)}</p>
+                <p style="margin: 10px 0 0 0; color: #737373;">${'★'.repeat(payload.rate)}${'☆'.repeat(5 - payload.rate)}</p>
               </div>
 
-              <ul style="list-style: none; padding: 0; font-size: 14px; color: #64748b;">
+              <ul style="list-style: none; padding: 0; font-size: 14px; color: #737373;">
                 <li><strong>Cliente:</strong> ${payload.content?.author?.name || 'Anónimo'}</li>
                 <li><strong>WhatsApp:</strong> ${payload.content?.author?.whatsapp || 'No proporcionado'}</li>
                 <li><strong>Dueño avisado:</strong> ${owner.email}</li>
