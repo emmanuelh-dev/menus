@@ -474,16 +474,28 @@ export default function MotelPageRenderer({
               Sitio verificado • {place.name} • {new Date().getFullYear()}
             </p>
 
-            <div className="inline-block bg-white/[0.02] border border-white/5 rounded-2xl p-8 max-w-sm">
-              <p className="text-xs font-bold text-white mb-2 uppercase tracking-tight">¿Administras un motel o restaurante?</p>
-              <p className="text-[10px] text-neutral-500 mb-6 leading-relaxed">Moderniza tu establecimiento con un menú digital interactivo. Sube tus habitaciones, precios y servicios gratis.</p>
+            {/* Mismo criterio que en las fichas de menú: el dueño de ESTE motel
+                y el dueño de otro son dos personas distintas y necesitan dos
+                caminos. El `?ref=` permite saber si el registro salió de aquí. */}
+            <div className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-white/[0.03] p-7 text-left">
+              <p className="text-sm font-black uppercase tracking-tight text-white">¿Es tuyo {place.name}?</p>
+              <p className="mt-2 text-xs leading-relaxed text-neutral-400">
+                Esta página es la que aparece cuando alguien busca tus precios en Google. Reclámala y decides tú qué habitaciones, tarifas y fotos se muestran.
+              </p>
               <a
-                href="/menu-digital-gratis"
-                className={`inline-flex items-center gap-2 px-6 py-3 ${config.accentBg} text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl`}
+                href="https://admin-menus.bysmax.com?ref=ficha-motel-reclamar"
+                className={`mt-4 inline-flex items-center gap-2 px-5 py-2.5 ${config.accentBg} text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-opacity hover:opacity-90`}
               >
-                Crear Catálogo Gratis
+                Reclamar esta página
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
               </a>
+
+              <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-relaxed text-neutral-400">
+                ¿Administras otro motel o restaurante? <span className="font-bold text-white">Así se vería el tuyo</span>, con tus habitaciones, tarifas y servicios.{" "}
+                <a href="https://admin-menus.bysmax.com?ref=ficha-motel-crear" className="font-black text-white underline underline-offset-4">
+                  Empieza ahora
+                </a>
+              </p>
             </div>
           </footer>
         )}

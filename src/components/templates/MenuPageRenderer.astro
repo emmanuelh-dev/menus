@@ -756,21 +756,38 @@ const toCategorySlug = (value: string) =>
 				>
 					Potenciado por BYSMAX • {place.name}
 				</p>
+				{/* Estas fichas son el 99% del tráfico del sitio, y quien llega no es
+				    una sola persona: está el comensal que buscó el menú, el dueño de
+				    ESTE negocio —que googlea lo suyo y encuentra esta página antes que
+				    la propia— y el dueño de otra taquería o cafetería, para quien esta
+				    página ya es la demo del producto.
+
+				    Antes había un solo bloque preguntando "¿Eres dueño de este u otro
+				    negocio?", que junta a los dos últimos en una pregunta que no obliga
+				    a nada, y mandaba a una landing intermedia. Ahora cada uno tiene su
+				    camino y su destino.
+
+				    El `?ref=` no es adorno: sin él no hay forma de saber si el registro
+				    vino de aquí o de un anuncio, y esta es justo la hipótesis que hay
+				    que comprobar antes de gastar en ads.
+
+				    Sólo se muestra cuando la ficha no tiene dueño todavía. */}
 				{
 					!place.content?.semantic_data?.has_admin && (
-						<div class="inline-block bg-neutral-50 border border-neutral-100 rounded-2xl p-6 max-w-sm">
-							<p class="text-xs font-bold text-neutral-900 mb-2 uppercase tracking-tight">
-								¿Eres dueño de este u otro negocio?
+						<div class="mx-auto max-w-xl rounded-2xl border border-neutral-200 bg-neutral-50 p-7 text-left">
+							<p class="text-sm font-black uppercase tracking-tight text-neutral-900">
+								¿Es tuyo {place.name}?
 							</p>
-							<p class="text-[10px] text-neutral-500 mb-4 leading-relaxed">
-								Crea tu propio menú digital interactivo como este, sin comisión por pedido, y
-								mejora la experiencia de tus clientes.
+							<p class="mt-2 text-xs leading-relaxed text-neutral-600">
+								Esta página es la que aparece cuando alguien busca tu menú en
+								Google. Reclámala y decides tú qué precios, fotos y platillos
+								se muestran.
 							</p>
 							<a
-								href="/menu-digital-gratis"
-								class="inline-flex items-center gap-2 px-4 py-2 bg-marca-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-marca-600 transition-all shadow-marca-500/10"
+								href="https://admin-menus.bysmax.com?ref=ficha-reclamar"
+								class="mt-4 inline-flex items-center gap-2 rounded-xl bg-marca-600 px-4 py-2.5 text-[11px] font-black uppercase tracking-widest text-white transition-colors hover:bg-marca-700"
 							>
-								Crear mi menú
+								Reclamar esta página
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									width="12"
@@ -785,6 +802,21 @@ const toCategorySlug = (value: string) =>
 									<path d="M5 12h14m-7-7 7 7-7 7" />
 								</svg>
 							</a>
+
+							<p class="mt-6 border-t border-neutral-200 pt-5 text-xs leading-relaxed text-neutral-600">
+								¿Tienes otro restaurante o cafetería?{" "}
+								<span class="font-bold text-neutral-900">
+									Así se vería el tuyo
+								</span>
+								, con pedidos directos a tu WhatsApp y sin comisión por
+								pedido.{" "}
+								<a
+									href="https://admin-menus.bysmax.com?ref=ficha-crear"
+									class="font-black text-marca-700 underline underline-offset-4"
+								>
+									Empieza ahora
+								</a>
+							</p>
 						</div>
 					)
 				}
