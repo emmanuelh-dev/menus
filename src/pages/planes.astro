@@ -2,12 +2,12 @@
 import { X } from 'lucide-react';
 import DefaultLayout from '../layouts/DefaultLayout.astro';
 import BysmaxSectionNav from '../components/BysmaxSectionNav.astro';
-import { comparativeFeatures, publicPlans } from '../data/pricing';
+import { comparativeFeatures, publicPlans, DIAS_DE_PRUEBA } from '../data/pricing';
 
 const seo = {
   title: 'Planes para abrir tu tienda online | BySMax',
-  description: 'Publica tus productos y potencia tus ventas recibiendo pedidos por WhatsApp. Conoce los planes y elige el que mejor se adapta a tu negocio.',
-  keywords: 'planes tienda online, pedidos por whatsapp, plan gratis ecommerce, software tienda online',
+  description: 'Recibe pedidos por WhatsApp sin pagar comision por venta. Conoce los planes y elige el que mejor se adapta a tu negocio.',
+  keywords: 'planes menu digital, pedidos por whatsapp sin comision, software para restaurantes, precios menu qr',
 };
 
 const quickBenefits = [
@@ -60,11 +60,11 @@ const features = [
     <section class="max-w-7xl mx-auto px-6 pt-14 pb-10">
       <div class="max-w-3xl">
         <p class="text-[11px] font-black uppercase tracking-[0.2em] text-marca-700">Planes</p>
-        <h1 class="text-4xl md:text-6xl font-black text-neutral-900 tracking-tight mt-3 leading-[0.95]">Abre hoy tu tienda online</h1>
-        <p class="text-lg text-neutral-600 mt-6 font-medium">Publica tus productos y potencia tus ventas recibiendo pedidos ilimitados por WhatsApp.</p>
+        <h1 class="text-4xl md:text-6xl font-black text-neutral-900 tracking-tight mt-3 leading-[0.95]">Paga la herramienta, no un porcentaje</h1>
+        <p class="text-lg text-neutral-600 mt-6 font-medium">Las apps de reparto cobran hasta 30% de cada pedido. Aquí el precio es fijo y los pedidos ilimitados llegan directo a tu WhatsApp.</p>
         <div class="mt-8">
-          <a href="/admin/register" class="inline-flex items-center px-6 py-3 rounded-xl bg-marca-600 text-white text-xs font-black uppercase tracking-widest hover:bg-marca-700 transition-colors">
-            Crea tu cuenta
+          <a href="https://admin-menus.bysmax.com" class="inline-flex items-center px-6 py-3 rounded-xl bg-marca-600 text-white text-xs font-black uppercase tracking-widest hover:bg-marca-700 transition-colors">
+            Empieza ahora
           </a>
         </div>
       </div>
@@ -117,7 +117,7 @@ const features = [
           <thead>
             <tr class="bg-neutral-50">
               <th class="p-4 text-left text-xs uppercase tracking-widest text-neutral-500">Característica</th>
-              <th class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500">Gratis</th>
+              <th class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500">Prueba {DIAS_DE_PRUEBA} días</th>
               <th class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500">Pro</th>
               <th class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500">Empresarial</th>
             </tr>

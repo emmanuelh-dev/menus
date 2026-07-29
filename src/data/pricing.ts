@@ -1,5 +1,7 @@
 export interface ComparativeFeature {
   name: string;
+  /** La columna de la prueba. Se sigue llamando `free` por el codigo que ya la
+   *  lee; lo que muestra es lo que incluye el periodo de prueba. */
   free: string;
   pro: string;
   enterprise: string;
@@ -55,26 +57,35 @@ export const comparativeFeatures: ComparativeFeature[] = [
   { name: 'Solicitud de funciones', free: 'No', pro: 'No', enterprise: 'Sí' },
 ];
 
+// El plan de $0 permanente se convirtio en prueba con fecha. Un plan gratis
+// para siempre le enseña al cliente que el producto no cuesta, y despues hay
+// que desdecirse para cobrarle. La prueba dice lo contrario: esto vale, pruebalo
+// antes de pagar.
+//
+// Los 14 dias son el estandar de la categoria y estan en un solo lugar a
+// proposito: si se cambia el numero, se cambia aqui.
+export const DIAS_DE_PRUEBA = 14;
+
 export const publicPlans: PublicPlan[] = [
   {
     id: 'free',
-    name: 'Plan Gratis',
-    fromLabel: 'DESDE',
-    headline: '$0',
-    description: 'Abre tu tienda online en minutos y recibe pedidos ilimitados por WhatsApp.',
-    note: 'Ideal para empezar sin costo ni tarjetas de crédito.',
-    ctaLabel: 'Crear cuenta gratis',
-    ctaHref: '/admin/register',
+    name: 'Prueba',
+    fromLabel: 'PRIMEROS',
+    headline: `${DIAS_DE_PRUEBA} días`,
+    description: 'Monta tu menú, publica tu QR y recibe pedidos por WhatsApp para ver cómo se comporta con tus clientes reales.',
+    note: 'Sin tarjeta para empezar. Al terminar eliges plan.',
+    ctaLabel: 'Empezar la prueba',
+    ctaHref: 'https://admin-menus.bysmax.com',
   },
   {
     id: 'pro',
     name: 'Plan Pro',
     fromLabel: 'DESDE',
     headline: 'Cotización',
-    description: 'Ahorra tiempo administrando productos, precios y flujo de pedidos en un solo panel.',
-    note: 'Incluye soporte prioritario y herramientas avanzadas.',
+    description: 'Tu menú, tus pedidos y tus precios en un solo panel, con dominio propio y soporte prioritario.',
+    note: 'Sin comisión por pedido: pagas la herramienta, no un porcentaje de lo que vendes.',
     ctaLabel: 'Solicitar plan Pro',
-    ctaHref: '/admin/register',
+    ctaHref: 'https://admin-menus.bysmax.com',
   },
   {
     id: 'enterprise',
@@ -84,6 +95,6 @@ export const publicPlans: PublicPlan[] = [
     description: 'Escala con personalización, integraciones y soporte dedicado para operaciones grandes.',
     note: 'Recomendado para cadenas, franquicias y equipos de alto volumen.',
     ctaLabel: 'Hablar con ventas',
-    ctaHref: '/admin/register',
+    ctaHref: 'https://admin-menus.bysmax.com',
   },
 ];

@@ -3,6 +3,7 @@ title: 'Los Mejores Moteles de Guerrero 2026 - Acapulco y Más'
 description: 'Guía de los mejores moteles en Guerrero, con fuerte presencia en Acapulco de Juárez. Precios reales, servicios y ubicación de cada establecimiento. Actualizado 2026.'
 pubDate: 'Jul 15 2026'
 heroImage: '/motel.png'
+audiencia: 'directorio'
 ---
 
 Acapulco de Juárez concentra la mayor parte de la oferta de moteles en Guerrero, con establecimientos repartidos por toda la zona urbana y alrededores como La Garita y Paso Limonero. Aquí una selección real con precios y servicios verificados.

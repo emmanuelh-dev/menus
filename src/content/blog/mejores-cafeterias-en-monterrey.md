@@ -3,6 +3,7 @@ title: 'Las Mejores Cafeterías en Monterrey: Guía Definitiva 2026'
 description: '¿Buscas el mejor café de Monterrey? Descubre nuestro top de cafeterías para trabajar, tener una cita o disfrutar de café de especialidad. Kali, Blason, Aromali y más.'
 pubDate: 'Feb 03 2026'
 heroImage: '/cafeterias-monterrey.webp'
+audiencia: 'directorio'
 ---
 
 Monterrey se ha convertido en una verdadera capital del café en el norte de México. Ya no se trata solo de ir por un "americano", sino de vivir una experiencia completa de sabor, ambiente y comunidad. 
@@ -78,4 +79,4 @@ Ya sea que busques un lugar para terminar ese reporte urgente, una esquina tranq
 
 ---
 
-*¿Buscas digitalizar tu menú o crear una página para tu cafetería? Crea tu menú digital gratis con [Menús BysMax](https://menus.bysmax.com).*
+*¿Buscas digitalizar tu menú o crear una página para tu cafetería? Crea el menú digital de tu negocio con [Menús BysMax](https://menus.bysmax.com).*

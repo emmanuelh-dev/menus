@@ -3,6 +3,7 @@ title: 'Top 8 de Mejores Restaurantes de Espadas en Monterrey'
 description: 'Conoce los mejores restaurantes de Espadas en monterrey, un destino gastronómico por excelencia con una variedad culinaria y ofrecer experiencias ónicas a los amantes de la buena comida.'
 pubDate: 'Jan 16 2025'
 heroImage: '/espadas.webp'
+audiencia: 'directorio'
 ---
 
 Monterrey es un destino gastronómico por excelencia, conocido por su variedad culinaria y por ofrecer experiencias únicas a los amantes de la buena comida. Pero, uno de los conceptos que ha ganado gran popularidad son los restaurantes de espadas en Monterrey, los cuales **se destacan por su estilo brasileño de servir carnes asadas en grandes brochetas** directamente en la mesa.

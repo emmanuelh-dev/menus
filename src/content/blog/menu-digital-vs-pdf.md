@@ -3,14 +3,15 @@ title: 'Menú digital vs carta en PDF: qué opción vende más en 2026'
 description: '¿Estás perdiendo clientes por culpa de una carta obsoleta? Descubre por qué el menú digital supera al PDF en 2026 y cómo puede aumentar tus ventas.'
 pubDate: 'Jan 30 2026'
 heroImage: '/blog/menu-vs-pdf.png'
+audiencia: 'negocio'
 ---
 
 <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
   <a 
-    href="/admin/register" 
-    style="background-color: #10b981; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: bold; text-decoration: none; display: inline-block; font-size: 1.25rem; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);"
+    href="https://admin-menus.bysmax.com" 
+    style="background-color: #1052ba; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: bold; text-decoration: none; display: inline-block; font-size: 1.25rem; box-shadow: 0 10px 15px -3px rgba(16, 82, 186, 0.2);"
   >
-    🚀 ¡Crea tu Menú Digital GRATIS ahora!
+    🚀 Empieza tu prueba de 14 días
   </a>
 </div>
 
@@ -87,9 +88,9 @@ Un menú digital es tu pasaporte hacia una experiencia de cliente superior y un 
 
 <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
   <a 
-    href="/admin/register" 
-    style="background-color: #10b981; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: bold; text-decoration: none; display: inline-block; font-size: 1.25rem; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);"
+    href="https://admin-menus.bysmax.com" 
+    style="background-color: #1052ba; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: bold; text-decoration: none; display: inline-block; font-size: 1.25rem; box-shadow: 0 10px 15px -3px rgba(16, 82, 186, 0.2);"
   >
-    🚀 ¡Crea tu Menú Digital GRATIS ahora!
+    🚀 Empieza tu prueba de 14 días
   </a>
 </div>

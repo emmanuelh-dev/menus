@@ -3,6 +3,7 @@ title: 'Los Mejores Moteles de Guanajuato 2026 - León, Celaya, Irapuato y Más'
 description: 'Directorio de los mejores moteles de Guanajuato: León, Celaya e Irapuato. Precios reales, amenidades y ubicación de cada establecimiento. Guía actualizada 2026.'
 pubDate: 'Jul 12 2026'
 heroImage: '/motel.png'
+audiencia: 'directorio'
 ---
 
 Guanajuato tiene una oferta de moteles repartida entre sus principales ciudades: León, Celaya, Irapuato y Dolores Hidalgo. Aquí una selección real con precios y servicios verificados para que compares antes de decidir.

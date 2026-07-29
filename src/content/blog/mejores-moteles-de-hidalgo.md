@@ -3,6 +3,7 @@ title: 'Los Mejores Moteles de Hidalgo 2026 - Pachuca, Tulancingo y Más'
 description: 'Guía de los mejores moteles en Hidalgo: Pachuca de Soto, Tulancingo de Bravo y municipios cercanos. Precios reales, servicios y ubicación de cada motel. Actualizado 2026.'
 pubDate: 'Jul 11 2026'
 heroImage: '/motel.png'
+audiencia: 'directorio'
 ---
 
 Hidalgo tiene una de las ofertas de moteles más grandes del centro del país, concentrada principalmente en Pachuca de Soto y Tulancingo de Bravo. Aquí te compartimos una selección real de establecimientos, con precios y servicios verificados, para que encuentres opciones sin dar vueltas.

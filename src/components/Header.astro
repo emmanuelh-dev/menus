@@ -30,14 +30,23 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 			</a>
 
 			<div class="hidden lg:flex items-center space-x-7">
-				{/* El resto de los links (soluciones, herramientas, directorio, planes,
-				    nosotros, soporte) vive en el footer — este nav se queda solo con
-				    lo que la gente busca primero: ver ejemplos y el blog. */}
+				{/* El resto de los links (soluciones, herramientas, directorio,
+				    nosotros, soporte) vive en el footer. Aquí sólo lo que alguien
+				    necesita para decidir: ver que el producto existe, cuánto cuesta
+				    y quién lo hace. Precios entró porque faltaba: si el sitio va a
+				    recibir tráfico pagado, esconder el precio quema el clic. */}
 				<a
 					href="/menus"
 					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-neutral-200 hover:text-white" : "text-neutral-600 hover:text-marca-600"} transition-colors`}
 				>
 					Ver ejemplos
+				</a>
+
+				<a
+					href="/precios"
+					class={`py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-neutral-200 hover:text-white" : "text-neutral-600 hover:text-marca-600"} transition-colors`}
+				>
+					Precios
 				</a>
 
 				<a
@@ -48,13 +57,21 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 				</a>
 			</div>
 
-			<div class="flex items-center space-x-2 sm:space-x-4 shrink-0">
+			<div class="flex items-center gap-2 sm:gap-4 shrink-0">
+				{/* Faltaba por dónde entrar. Un cliente que ya paga llegaba al sitio
+				    y el único botón que veía le ofrecía crear otra cuenta. */}
+				<a
+					href="https://admin-menus.bysmax.com/login"
+					class={`hidden sm:inline-flex py-2 font-bold text-[13px] uppercase tracking-wider ${textWhite ? "text-neutral-200 hover:text-white" : "text-neutral-600 hover:text-marca-600"} transition-colors`}
+				>
+					Entrar
+				</a>
+
 				<a
 					href="https://admin-menus.bysmax.com"
-					class="inline-flex items-center px-4 py-2 sm:px-6 sm:py-2.5 bg-marca-600 text-white font-black rounded-xl hover:bg-marca-700 active:scale-95 transition-all shadow-marca-500/20 text-[11px] uppercase tracking-widest border border-marca-500/50"
+					class="inline-flex items-center px-4 py-2 sm:px-6 sm:py-2.5 bg-marca-600 text-white font-black rounded-xl hover:bg-marca-700 active:scale-95 transition-all text-[11px] uppercase tracking-widest"
 				>
-					<span class="sm:hidden">Crear Menú Gratis</span>
-					<span class="hidden sm:inline">Crear Menú Gratis</span>
+					Empieza ahora
 				</a>
 
 				<button
@@ -79,9 +96,9 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 				<div>
 					<a
 						href="https://admin-menus.bysmax.com"
-						class="mb-4 flex items-center justify-center gap-3 w-full py-5 bg-marca-600 text-white text-center rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-marca-500/40 active:scale-[0.98] transition-all"
+						class="mb-4 flex items-center justify-center gap-3 w-full py-5 bg-marca-600 text-white text-center rounded-3xl font-black text-sm uppercase tracking-widest active:scale-[0.98] transition-all"
 					>
-						Crea tu menú gratis <Zap className="w-4 h-4" />
+						Empieza ahora <Zap className="w-4 h-4" />
 					</a>
 					{/* El resto de los links vive en el footer — ver nota arriba. */}
 					<div class="space-y-3">
@@ -96,12 +113,32 @@ const { textWhite, backgroundColor = "bg-white/90" } = Astro.props;
 							<ArrowRight className="w-4 h-4 text-neutral-300" />
 						</a>
 						<a
+							href="/precios"
+							class="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl group active:bg-marca-50 transition-colors"
+						>
+							<span
+								class="text-sm font-black text-neutral-900 uppercase tracking-widest"
+								>Precios</span
+							>
+							<ArrowRight className="w-4 h-4 text-neutral-300" />
+						</a>
+						<a
 							href="/blog"
 							class="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl group active:bg-marca-50 transition-colors"
 						>
 							<span
 								class="text-sm font-black text-neutral-900 uppercase tracking-widest"
 								>Blog</span
+							>
+							<ArrowRight className="w-4 h-4 text-neutral-300" />
+						</a>
+						<a
+							href="https://admin-menus.bysmax.com/login"
+							class="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl group active:bg-marca-50 transition-colors"
+						>
+							<span
+								class="text-sm font-black text-neutral-900 uppercase tracking-widest"
+								>Entrar</span
 							>
 							<ArrowRight className="w-4 h-4 text-neutral-300" />
 						</a>

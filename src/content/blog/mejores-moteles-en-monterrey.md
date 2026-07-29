@@ -4,6 +4,7 @@ description: 'Descubre los mejores moteles en Monterrey con fotos reales, precio
 pubDate: 'Jul 17 2026'
 updatedDate: 'Jul 17 2026'
 heroImage: 'https://res.cloudinary.com/dvdq078aa/image/upload/f_auto,q_auto,w_800/v1767327143/motel_cuerpo_f1f67b3a3e_crxiq0.jpg'
+audiencia: 'directorio'
 ---
 
 Si estás buscando los **mejores moteles en Monterrey**, esta guía te presenta opciones reales de nuestro propio directorio, con fotos, precios y ubicaciones verificadas — nada de recomendaciones genéricas, todos los establecimientos aquí tienen su propia ficha con más detalles.

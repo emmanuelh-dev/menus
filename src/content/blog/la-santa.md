@@ -3,6 +3,7 @@ title: 'La santa La Santa Kitchen bar - 📍San Pedro - Plaza Sienna📍Mty - Pa
 description: 'American - Hamburguesas - Alitas - Boneless'
 pubDate: 'Mar 10 2025'
 heroImage: '/la-santa/la-santa.jpeg'
+audiencia: 'directorio'
 ---
 
 ¡Bienvenidos a esta nueva entrada\! Soy Emmanuel y hoy les hablaré sobre "La Santa Kitchen Bar", un restaurante de cocina americana que ha generado opiniones diversas. A continuación, les compartiré mi experiencia personal.

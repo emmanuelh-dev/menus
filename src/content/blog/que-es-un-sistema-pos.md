@@ -5,6 +5,7 @@ pubDate: 2026-02-04
 author: "BySMax Team"
 image: "https://images.unsplash.com/photo-1556742049-0adff456a477?q=80&w=2070&auto=format&fit=crop"
 tags: ["POS", "tecnología", "ventas", "restaurantes"]
+audiencia: 'negocio'
 ---
 
 Si estás en el mundo de los restaurantes, probablemente hayas escuchado el término **POS** o **Punto de Venta**. Pero, ¿qué significa realmente y por qué es tan importante para el éxito de tu negocio?

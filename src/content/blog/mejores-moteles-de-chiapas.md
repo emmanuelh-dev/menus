@@ -3,6 +3,7 @@ title: 'Los Mejores Moteles de Chiapas 2026 - Tuxtla Gutiérrez y Más'
 description: 'Guía de los mejores moteles en Chiapas: Tuxtla Gutiérrez y municipios cercanos. Precios reales, servicios y ubicación de cada establecimiento. Actualizado 2026.'
 pubDate: 'Jul 13 2026'
 heroImage: '/motel.png'
+audiencia: 'directorio'
 ---
 
 Tuxtla Gutiérrez concentra la gran mayoría de la oferta de moteles en Chiapas, con opciones que van desde establecimientos económicos hasta suites con jacuzzi. Esta es una selección real, con precios y servicios verificados, de los mejores moteles del estado.

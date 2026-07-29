@@ -12,7 +12,11 @@ const {
 	title,
 	subtitle,
 	stateName,
-	badgeText = "Inicia hoy GRATIS con tu link de negocio",
+	// El badge decia "Inicia hoy GRATIS con tu link de negocio". Vender el
+	// precio antes que el producto atrae a quien nunca va a pagar, y con
+	// trafico de anuncios eso se cobra por clic. Ahora abre con el problema
+	// que el producto resuelve, que es el que hace ver barato el precio.
+	badgeText = "Las apps de reparto se llevan hasta 30% de cada pedido",
 } = Astro.props;
 ---
 
@@ -44,11 +48,8 @@ const {
 					<Fragment set:html={title} />
 				) : (
 					<>
-						Crea tu{" "}
-						<span class="text-marca-600">
-							Menú Digital QR
-						</span>{" "}
-						y recibe pedidos por WhatsApp
+						Tus pedidos,{" "}
+						<span class="text-marca-600">sin comisiones</span>
 					</>
 				)
 			}
@@ -62,43 +63,47 @@ const {
 					<Fragment set:html={subtitle} />
 				) : (
 					<>
-						Recibe pedidos y atiende a tus clientes por WhatsApp más
-						rápido y{" "}
+						Menú digital con QR y pedidos directos por WhatsApp.{" "}
 						<span class="text-neutral-900 border-b-2 border-marca-400">
-							sin pagar comisiones
+							Lo que vendes es tuyo
 						</span>
-						.
+						: sin intermediarios y sin porcentaje por pedido.
 					</>
 				)
 			}
 		</p>
 
+		{/* Antes habia tres botones del mismo peso —"Inicia gratis", "Directorio
+		    de servicios" y "Revisa un menú demo"— compitiendo entre ellos. Tres
+		    caminos igual de fuertes es lo mismo que ninguno. Quedan dos, y el
+		    directorio baja a enlace de texto para no quedarse huerfano: el pie
+		    de pagina no lo enlaza. */}
 		<div
-			class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-24"
+			class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6"
 		>
 			<a
-				href="/admin/register"
-				class="group inline-flex items-center px-10 py-5 bg-neutral-900 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-neutral-200 uppercase tracking-widest text-xs active:scale-95"
+				href="https://admin-menus.bysmax.com"
+				class="group inline-flex items-center px-10 py-5 bg-neutral-900 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 uppercase tracking-widest text-xs active:scale-95"
 			>
-				Inicia gratis
-				<ArrowRight
-					className="ml-3 h-4 w-4 group-hover:translate-x-1 transition-transform"
-				/>
-			</a>
-			<a
-				href="/servicios"
-				class="group inline-flex items-center px-10 py-5 bg-marca-500 text-white font-black rounded-[24px] hover:bg-black transition-all duration-300 shadow-2xl shadow-neutral-200 uppercase tracking-widest text-xs active:scale-95"
-			>
-				Directorio de servicios
+				Empieza ahora
 				<ArrowRight
 					className="ml-3 h-4 w-4 group-hover:translate-x-1 transition-transform"
 				/>
 			</a>
 			<a
 				href={stateName ? "#ejemplos" : "/menus"}
-				class="inline-flex items-center px-10 py-5 border border-neutral-100 text-neutral-900 font-black rounded-[24px] hover:bg-neutral-50 transition-all text-xs uppercase tracking-widest active:scale-95"
+				class="inline-flex items-center px-10 py-5 border border-neutral-200 text-neutral-900 font-black rounded-[24px] hover:bg-neutral-50 transition-all text-xs uppercase tracking-widest active:scale-95"
 			>
-				{stateName ? "Ver ejemplos locales" : "Revisa un menú demo"}
+				{stateName ? "Ver ejemplos locales" : "Ver un menú real"}
+			</a>
+		</div>
+
+		<div class="mb-24">
+			<a
+				href="/servicios"
+				class="text-xs font-bold uppercase tracking-widest text-neutral-500 hover:text-marca-600 transition-colors"
+			>
+				Directorio de servicios
 			</a>
 		</div>
 

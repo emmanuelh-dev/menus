@@ -1,25 +1,26 @@
 ---
-title: 'Cómo hacer un menú digital gratis en 2026: Guía completa con imágenes'
-description: 'Guía paso a paso para crear el menú digital de tu restaurante 100% gratis. Aprende a usar Canva, BySMax y otras herramientas para digitalizar tu negocio hoy.'
+title: 'Cómo hacer un menú digital en 2026: guía completa y qué cuesta de verdad'
+description: 'Guía paso a paso para crear la carta QR de tu restaurante, con las opciones gratuitas, sus límites reales y cuándo conviene pagar por una herramienta.'
 pubDate: 'Feb 09 2026'
 heroImage: '/images/landing/hero-free.png'
+audiencia: 'negocio'
 ---
 
 <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
   <a 
-    href="/admin/register" 
-    style="background-color: #10b981; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: bold; text-decoration: none; display: inline-block; font-size: 1.25rem; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);"
+    href="https://admin-menus.bysmax.com" 
+    style="background-color: #1052ba; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: bold; text-decoration: none; display: inline-block; font-size: 1.25rem; box-shadow: 0 10px 15px -3px rgba(16, 82, 186, 0.2);"
   >
-    🚀 ¡Crea tu Menú Digital GRATIS ahora!
+    🚀 Empieza tu prueba de 14 días
   </a>
 </div>
 
-¿Buscas digitalizar tu restaurante sin gastar un solo peso? En 2026, tener una carta QR no es un lujo, es una necesidad. En esta guía te enseñamos **cómo hacer un menú digital gratis** profesional que atraiga clientes y funcione en segundos.
+En 2026 una carta QR no es un lujo, es lo mínimo. Se puede armar sin gastar, y en esta guía te enseñamos cómo — pero también dónde se topa cada opción gratuita, porque casi siempre el costo no está en el precio sino en el tiempo que te consume después.
 
 ---
 
-### Resumen Rápido para Crear un Menú Digital Gratis
-Para crear un menú digital gratis en 2026, sigue estos 4 pasos clave:
+### Resumen rápido
+Para crear un menú digital en 2026, sigue estos 4 pasos clave:
 1. **Diseña tu carta** en herramientas como Canva o Adobe Express.
 2. **Sube tus productos** a una plataforma de gestión como **BySMax** o **Yumm Menu**.
 3. **Genera tu código QR** de acceso.
@@ -71,17 +72,21 @@ Lo mejor de un menú digital dinámico es que **no necesitas volver a imprimir**
 
 | Característica | BySMax | Yumm Menu | Menú PDF (Drive) |
 | :--- | :--- | :--- | :--- |
-| **Costo** | Gratis | Gratis (Básico) | Gratis |
+| **Costo** | Prueba 14 días, después plan fijo | Plan básico gratuito | Gratis |
 | **Actualización en tiempo real** | ✅ Sí | ✅ Sí | ❌ No (hay que resubir) |
-| **Pedidos por WhatsApp** | ✅ Sí | ❌ No (Plan Pro) | ❌ No |
+| **Pedidos por WhatsApp** | ✅ Sí, sin comisión por pedido | ❌ No (Plan Pro) | ❌ No |
 | **Fotos por plato** | ✅ Sí | ✅ Sí | ❌ No |
 
 ---
 
 ## Preguntas Frecuentes (FAQ)
 
-### ¿Es realmente gratis?
-Sí, herramientas como BySMax ofrecen versiones gratuitas que son suficientes para la mayoría de los restaurantes pequeños y medianos.
+### ¿Se puede hacer sin pagar nada?
+Sí, y esta guía te dice cómo. La pregunta útil es otra: qué te cuesta después.
+
+Un PDF en Drive no cuesta un peso, pero cada cambio de precio implica rehacerlo, resubirlo y esperar que el enlace no se rompa. Y ninguna opción gratuita recibe pedidos, así que el pedido acaba llegando por las apps de reparto, que se llevan hasta 30% de cada venta. Con $50,000 de venta al mes, eso son $15,000 — bastante más que cualquier herramienta.
+
+En BySMax tienes 14 días de prueba sin tarjeta para comprobarlo con tus propios clientes. Después eliges plan, y ninguno cobra porcentaje sobre lo que vendes.
 
 ### ¿Mis clientes necesitan bajar una app?
 No. Solo escanean con la cámara de su celular y el menú se abre en el navegador.
@@ -89,4 +94,4 @@ No. Solo escanean con la cámara de su celular y el menú se abre en el navegado
 ### SEO y Visibilidad
 Los menús están optimizados para SEO de forma nativa. Si alguien busca tu restaurante, es muy seguro que Google responda con la información que subas, tal como ya sucede con otros negocios en nuestra plataforma.
 
-¿Listo para empezar? **[Crea tu cuenta gratis aquí](/admin/register)** y digitaliza tu negocio hoy mismo.
+¿Listo para empezar? **[Empieza tu prueba aquí](https://admin-menus.bysmax.com)** y digitaliza tu negocio hoy mismo.

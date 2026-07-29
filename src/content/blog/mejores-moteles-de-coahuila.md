@@ -3,6 +3,7 @@ title: 'Los Mejores Moteles de Coahuila 2026 - Torreón, Saltillo y Más'
 description: 'Directorio de los mejores moteles de Coahuila, con fuerte presencia en Torreón. Precios reales, servicios y ubicación de cada establecimiento. Guía actualizada 2026.'
 pubDate: 'Jul 14 2026'
 heroImage: '/motel.png'
+audiencia: 'directorio'
 ---
 
 Torreón concentra la mayor parte de la oferta de moteles en Coahuila, con una densidad de establecimientos que la convierte en una de las mejores zonas del norte del país para encontrar opciones variadas. Aquí una selección real con precios verificados.

@@ -1,14 +1,29 @@
 ---
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X, Check } from "lucide-react";
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
-import { comparativeFeatures } from "../../data/pricing";
+import {
+	comparativeFeatures,
+	publicPlans,
+	DIAS_DE_PRUEBA,
+} from "../../data/pricing";
+
 const seoData = {
-	title: "Precios y Planes para Menú Digital y Carta QR | BySMax",
+	title: "Precios | Menú digital sin comisión por pedido | BySMax",
 	description:
-		"Consulta nuestros planes para digitalizar tu restaurante. Desde un plan gratuito para siempre hasta opciones Pro con pedidos por WhatsApp. Sin comisiones.",
+		"Precio fijo por la herramienta, sin porcentaje sobre lo que vendes. Prueba " +
+		DIAS_DE_PRUEBA +
+		" días y elige plan después.",
 	keywords:
 		"menu digital precio, planes carta qr, costo menu digital restaurantes, sistema qr restaurante precio",
 };
+
+// El numero con el que se compara. Es el rango publico que cobran las apps de
+// reparto en Mexico por pedido de comercio; se habla de "hasta" a proposito,
+// porque varia por acuerdo y no queremos afirmar una cifra exacta ajena.
+const comisionApps = 30;
+const ventaEjemplo = 50000;
+const costoComision = (ventaEjemplo * comisionApps) / 100;
+const pesos = (n: number) => "$" + n.toLocaleString("es-MX");
 ---
 
 <RestaurantLayout
@@ -17,78 +32,127 @@ const seoData = {
 	keywords={seoData.keywords}
 	textWhite={false}
 >
-	<div class="mt-24 max-w-[85%] mx-auto">
-		<h2 class="text-2xl font-bold text-neutral-900 mb-8 text-center">
-			Comparativa de planes
-		</h2>
-		<div class="overflow-x-auto">
-			<table class="w-full">
-				<thead>
-					<tr>
-						<th class="w-[200px] p-4 text-left">Característica</th>
-						<th class="p-4 text-center">Gratis</th>
-						<th class="p-4 text-center">Pro</th>
-						<th class="p-4 text-center">Empresarial</th>
-					</tr>
-				</thead>
-				<tbody>
-					{
-						comparativeFeatures.map((feature) => (
-							<tr class="border-b border-neutral-200 hover:bg-neutral-100 last:border-b-0">
-								<td class="font-medium p-4">{feature.name}</td>
-								<td class="p-4 text-center">
-									{feature.free === "No" ? (
-										<X className="text-red-500 mx-auto" />
-									) : (
-										feature.free
-									)}
-								</td>
-								<td class="p-4 text-center">
-									{feature.pro === "No" ? (
-										<X className="text-red-500 mx-auto" />
-									) : (
-										feature.pro
-									)}
-								</td>
-								<td class="p-4 text-center">
-									{feature.enterprise === "No" ? (
-										<X className="text-red-500 mx-auto" />
-									) : (
-										feature.enterprise
-									)}
-								</td>
-							</tr>
-						))
-					}
-					<tr>
-						<td></td>
-						<td class="p-4 text-center justify-center">
-							<a href="/admin/dashboard">
-								<span class="flex items-center justify-center">
-									Comenzar Ahora
-									<ArrowRight className="ml-2" />
-								</span>
+	<main>
+		<section class="max-w-7xl mx-auto px-6 pt-16 pb-10">
+			<div class="max-w-3xl">
+				<p
+					class="text-[11px] font-black uppercase tracking-[0.2em] text-marca-700"
+				>
+					Precios
+				</p>
+				<h1
+					class="text-4xl md:text-6xl font-black text-neutral-900 tracking-tight mt-3 leading-[0.95]"
+				>
+					Paga la herramienta, no un porcentaje
+				</h1>
+				<p class="text-lg text-neutral-600 mt-6 font-medium">
+					Las apps de reparto se llevan hasta {comisionApps}% de cada
+					pedido. Con {pesos(ventaEjemplo)} de venta al mes, eso son
+					<strong class="text-neutral-900">{pesos(costoComision)}</strong> que
+					no llegan a tu caja. Aquí el precio es fijo y los pedidos son
+					ilimitados.
+				</p>
+			</div>
+		</section>
+
+		<section class="max-w-7xl mx-auto px-6 pb-8">
+			<div class="grid gap-6 md:grid-cols-3">
+				{
+					publicPlans.map((plan) => (
+						<article class="flex flex-col rounded-2xl border border-neutral-200 bg-white p-7">
+							<p class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">
+								{plan.fromLabel}
+							</p>
+							<p class="mt-1 text-4xl font-black tracking-tight text-neutral-900">
+								{plan.headline}
+							</p>
+							<h2 class="mt-4 text-sm font-black uppercase tracking-widest text-marca-700">
+								{plan.name}
+							</h2>
+							<p class="mt-3 text-sm font-medium leading-relaxed text-neutral-600">
+								{plan.description}
+							</p>
+							<p class="mt-4 text-xs font-bold leading-relaxed text-neutral-500">
+								{plan.note}
+							</p>
+							<a
+								href={plan.ctaHref}
+								class="group mt-6 inline-flex items-center justify-center rounded-xl bg-neutral-900 px-4 py-3 text-[11px] font-black uppercase tracking-widest text-white transition-colors hover:bg-black"
+							>
+								{plan.ctaLabel}
+								<ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
 							</a>
-						</td>
-						<td class="p-4 text-center">
-							<a href="/admin/dashboard">
-								<span class="flex items-center justify-center">
-									Comenzar Ahora
-									<ArrowRight className="ml-2" />
-								</span>
-							</a>
-						</td>
-						<td class="p-4 text-center">
-							<a href="/admin/dashboard">
-								<span class="flex items-center justify-center">
-									Comenzar Ahora
-									<ArrowRight className="ml-2" />
-								</span>
-							</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+						</article>
+					))
+				}
+			</div>
+			<p class="mt-6 text-xs font-bold text-neutral-500">
+				Ningún plan cobra comisión por pedido. Lo que vendes es tuyo.
+			</p>
+		</section>
+
+		<section class="max-w-7xl mx-auto px-6 pb-24">
+			<h2
+				class="mb-6 text-2xl font-black tracking-tight text-neutral-900"
+			>
+				Qué incluye cada plan
+			</h2>
+			<div
+				class="overflow-x-auto rounded-2xl border border-neutral-200 bg-white"
+			>
+				<table class="w-full min-w-[720px]">
+					<thead>
+						<tr class="bg-neutral-50">
+							<th
+								class="w-[220px] p-4 text-left text-xs uppercase tracking-widest text-neutral-500"
+								>Característica</th
+							>
+							<th
+								class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500"
+								>Prueba {DIAS_DE_PRUEBA} días</th
+							>
+							<th
+								class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500"
+								>Pro</th
+							>
+							<th
+								class="p-4 text-center text-xs uppercase tracking-widest text-neutral-500"
+								>Empresarial</th
+							>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							comparativeFeatures.map((feature) => (
+								<tr class="border-t border-neutral-100">
+									<td class="p-4 text-sm font-bold text-neutral-800">
+										{feature.name}
+									</td>
+									{[feature.free, feature.pro, feature.enterprise].map(
+										(valor) => (
+											<td class="p-4 text-center text-sm text-neutral-600">
+												{valor === "No" ? (
+													<X
+														className="mx-auto h-4 w-4 text-neutral-300"
+														aria-label="No incluido"
+													/>
+												) : valor === "Sí" ? (
+													<Check
+														className="mx-auto h-4 w-4 text-neutral-900"
+														aria-label="Incluido"
+													/>
+												) : (
+													valor
+												)}
+											</td>
+										),
+									)}
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+		</section>
+	</main>
 </RestaurantLayout>
