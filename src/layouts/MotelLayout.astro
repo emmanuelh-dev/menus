@@ -50,6 +50,35 @@ function getMinPrice(place: any): number | null {
 	return prices.length > 0 ? Math.min(...prices) : null;
 }
 
+// 353 de los 527 lugares ya llevan "motel" en el nombre, así que anteponer
+// "Motel" a secas producía "Motel Motel Faschas" en el <title> y en la
+// descripción — lo primero que ve alguien en Google, y lo que le dice que la
+// página está generada sin que nadie la lea.
+//
+// La condición es "contiene la palabra", no "empieza con": 33 de esos 353 lo
+// traen a media frase ("Kyoto Suites Motel", "Hotel y Motel Santa Rosa"), y
+// con la regla de prefijo quedaban igual de mal. El \b evita que "Motelito"
+// cuente como que ya lo dice.
+function conPrefijoMotel(nombre: string): string {
+	return /\bmotel\b/i.test(nombre) ? nombre : `Motel ${nombre}`;
+}
+
+// ¿Hay al menos una foto de verdad? Se mira lo mismo que pinta la galería:
+// la imagen del lugar y las de los items de cada sección. Sin esto el título
+// prometía "Fotos" en las 527 fichas cuando sólo 18 tienen una — y el que
+// entra buscando fotos y encuentra un placeholder se va, que es justo la
+// señal que hunde la página.
+function tieneFotos(place: any): boolean {
+	if (place.image) return true;
+	for (const block of place.content?.blocks ?? []) {
+		if (block.type === "gallery" && block.data?.images?.length) return true;
+		if (block.type === "section" && block.data?.items) {
+			if (block.data.items.some((i: any) => i.image)) return true;
+		}
+	}
+	return false;
+}
+
 function generateSEOTitle(
 	place: Place,
 	year: number = new Date().getFullYear(),
@@ -57,17 +86,21 @@ function generateSEOTitle(
 	const city = place.states?.name || "Monterrey";
 	const minPrice = getMinPrice(place);
 	const hasJacuzzi = hasAmenity("jacuzzi", place.amenities);
+	const nombre = conPrefijoMotel(place.name);
+	// Sin fotos se ofrece lo que sí hay: la ubicación. Prometer menos y
+	// cumplirlo vale más que prometer fotos que no existen.
+	const gancho = tieneFotos(place) ? "Fotos" : "Ubicación";
 
 	if (minPrice && hasJacuzzi) {
-		return `Motel ${place.name} en ${city} | Precios desde $${minPrice}, Fotos y Jacuzzi (${year})`;
+		return `${nombre} en ${city} | Precios desde $${minPrice}, ${gancho} y Jacuzzi (${year})`;
 	}
 	if (minPrice) {
-		return `Motel ${place.name} en ${city} | Precios desde $${minPrice}, Fotos y Tarifas (${year})`;
+		return `${nombre} en ${city} | Precios desde $${minPrice}, ${gancho} y Tarifas (${year})`;
 	}
 	if (hasJacuzzi) {
-		return `Motel ${place.name} en ${city} | Precios, Fotos y Jacuzzi (${year})`;
+		return `${nombre} en ${city} | Precios, ${gancho} y Jacuzzi (${year})`;
 	}
-	return `Motel ${place.name} en ${city} ➔ Precios, Fotos y Habitaciones (${year})`;
+	return `${nombre} en ${city} ➔ Precios, ${gancho} y Habitaciones (${year})`;
 }
 
 function generateSEODescription(place: Place, description?: string): string {
@@ -83,8 +116,9 @@ function generateSEODescription(place: Place, description?: string): string {
 		? `habitaciones desde $${minPrice}`
 		: "precios actualizados";
 	const jacuzziText = hasJacuzzi ? ", suites con jacuzzi" : "";
+	const fotosText = tieneFotos(place) ? "fotos de las habitaciones y " : "";
 
-	return `¿Buscas tarifas de Motel ${place.name} en ${city}? ➔ Entra y consulta tarifas de 12 horas, ${priceText}${jacuzziText}, fotos de las habitaciones y ubicación en mapa.${reviews}`;
+	return `¿Buscas tarifas de ${conPrefijoMotel(place.name)} en ${city}? ➔ Entra y consulta tarifas de 12 horas, ${priceText}${jacuzziText}, ${fotosText}ubicación en mapa.${reviews}`;
 }
 
 interface Address {

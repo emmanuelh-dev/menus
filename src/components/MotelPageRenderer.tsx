@@ -209,11 +209,19 @@ export default function MotelPageRenderer({
               {place.name}
             </h1>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-              <div className="flex items-center gap-1.5 font-bold text-white">
-                <span className="text-neutral-400"><Icons.Star filled /></span>
-                {place.rating || "5.0"}
-                <span className="text-neutral-400 font-normal">({place.count || 0} opiniones)</span>
-              </div>
+              {/* La calificación se pinta sólo si hay opiniones que la
+                  respalden. Antes salía `4.5 (0 opiniones)` en 512 de 527
+                  fichas: una estrella sin una sola reseña no informa nada y
+                  además contradice lo que Google ya sabe del lugar —Faschas
+                  tiene 4.2 con 143 opiniones—, que es la peor combinación
+                  posible. Mejor no decir nada que decir un número inventado. */}
+              {place.rating && (place.count ?? 0) > 0 && (
+                <div className="flex items-center gap-1.5 font-bold text-white">
+                  <span className="text-neutral-400"><Icons.Star filled /></span>
+                  {place.rating}
+                  <span className="text-neutral-400 font-normal">({place.count} opiniones)</span>
+                </div>
+              )}
 
               {address && (
                 <a
