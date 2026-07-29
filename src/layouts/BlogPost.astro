@@ -9,7 +9,15 @@ import FormattedDate from "../components/FormattedDate.astro";
 import "../styles/blog.css";
 import DefaultLayout from "./DefaultLayout.astro";
 
-type Props = CollectionEntry<"blog">["data"];
+// Este layout sólo pinta estos cinco campos. Tiparlo como el esquema completo
+// de la colección obligaba a cualquier página que lo reutilice —about.astro no
+// es un artículo— a inventar campos que este archivo ni lee. Al agregar
+// `audiencia` al esquema, about dejó de compilar por eso. Pedir lo que se usa
+// evita que el próximo campo del esquema vuelva a romperla.
+type Props = Pick<
+	CollectionEntry<"blog">["data"],
+	"title" | "description" | "pubDate" | "updatedDate" | "heroImage"
+>;
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
