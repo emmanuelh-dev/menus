@@ -20,15 +20,15 @@
 //   node scripts/scrape-delitech.js https://ordena.pollopepe.com pollo-pepe --escribir
 //
 // Sin --escribir sólo imprime lo que encontró y deja el JSON en /tmp, que es
-// como conviene correrlo la primera vez. Con --escribir hace PATCH a
-// places.content y purga el borde.
+// como conviene correrlo la primera vez. Con --escribir manda el content a Go.
 //
-// Requiere PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.
+// Requiere BM_SESSION (ver scripts/lib/places-go.js).
 
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { leerPlace, escribirContent } from "./lib/places-go.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.join(HERE, "..");
@@ -48,17 +48,6 @@ function idEstable(clave) {
     h.slice(0, 8) + "-" + h.slice(8, 12) + "-5" + h.slice(13, 16) + "-a" +
     h.slice(17, 20) + "-" + h.slice(20, 32)
   );
-}
-
-function cargarEnv() {
-  const env = {};
-  const ruta = path.join(RAIZ, ".env");
-  if (!fs.existsSync(ruta)) return env;
-  for (const linea of fs.readFileSync(ruta, "utf8").split("\n")) {
-    const m = linea.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-    if (m) env[m[1]] = m[2].replace(/^["']|["']$/g, "").trim();
-  }
-  return env;
 }
 
 const limpiar = (t) => (t || "").replace(/\s+/g, " ").trim();
@@ -150,22 +139,12 @@ async function main() {
   console.log(`${bloques.length} secciones, ${total} platillos`);
   for (const b of bloques) console.log(`  ${String(b.data.items.length).padStart(3)}  ${b.data.title}`);
 
-  const env = { ...cargarEnv(), ...process.env };
-  const base = env.PUBLIC_SUPABASE_URL;
-  const llave = env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!base || !llave) throw new Error("faltan PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY");
-
-  const cab = { apikey: llave, authorization: `Bearer ${llave}` };
-  const fila = await (await fetch(
-    `${base}/rest/v1/places?select=id,content&short_name=eq.${encodeURIComponent(slug)}`,
-    { headers: cab },
-  )).json();
-  if (!fila.length) throw new Error(`no existe el place ${slug}`);
-  const { id, content: anterior } = fila[0];
+  const place = await leerPlace(slug);
+  const anterior = place.content || {};
 
   // Se conservan view_settings y semantic_data: son ajustes de la ficha, no del
   // menú, y este script no sabe nada de ellos.
-  const nuevo = { ...(anterior || {}), blocks: bloques };
+  const nuevo = { ...anterior, blocks: bloques };
 
   const salida = `/tmp/delitech-${slug}-${Date.now()}`;
   fs.writeFileSync(`${salida}-nuevo.json`, JSON.stringify(nuevo, null, 1));
@@ -178,14 +157,8 @@ async function main() {
     return;
   }
 
-  const put = await fetch(`${base}/rest/v1/places?id=eq.${id}`, {
-    method: "PATCH",
-    headers: { ...cab, "content-type": "application/json", prefer: "return=minimal" },
-    body: JSON.stringify({ content: nuevo }),
-  });
-  if (!put.ok) throw new Error(`PATCH ${put.status}: ${await put.text()}`);
-  console.log(`escrito en place ${id}`);
-  console.log(`ahora: node scripts/purge-cache.js ${slug}`);
+  await escribirContent(place.id, nuevo);
+  console.log(`escrito en place ${place.id} (por Go: repuebla catalog_* y purga el borde)`);
 }
 
 main().catch((e) => {
