@@ -77,7 +77,7 @@ const finalSchema = customSchema || defaultSchema;
 		<link rel="canonical" href={canonical || Astro.url} />
 
 		<!-- Open Graph / Facebook -->
-		<meta property="og:type" content="website" />
+		<meta property="og:type" content={type.toLowerCase()} />
 		<meta property="og:url" content={ogUrl || Astro.url} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />

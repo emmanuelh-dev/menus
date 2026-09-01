@@ -200,12 +200,43 @@ function generateSEODescription(): string {
 	}
 
 	const highlights = getMenuHighlights(place);
-	let highlightsText = "";
-	if (highlights.length > 0) {
-		highlightsText = ` Consulta nuestra sección de ${highlights.join(", ")}.`;
-	}
+	const descubre = highlights.length
+		? ` Descubre ${highlights.join(", ")} con precios actualizados.`
+		: " Descubre paquetes, platos populares, bebidas y postres con precios actualizados.";
 
-	return `¿Quieres comer en ${title}${location}? ➔ Consulta el MENÚ COMPLETO y PRECIOS del ${currentYear}. Descubre paquetes, platos populares, bebidas${highlightsText} y opiniones.${reviews}`;
+	return `¿Quieres comer en ${title}${location}? ➔ Consulta el MENÚ COMPLETO y PRECIOS del ${currentYear}.${descubre}${reviews}`;
+}
+
+/** Schema de menú autogenerado desde el content: Menu → MenuSection →
+ *  MenuItem, cada item con su oferta en MXN. Es lo que habilita los rich
+ *  results de "menu con precios" en Google. */
+function buildMenuSchema(place?: any) {
+	if (!place?.content?.blocks) return undefined;
+	const sections = (place.content.blocks as any[])
+		.filter((b: any) => b.type === "section" && b.data?.items?.length)
+		.map((b: any) => {
+			const items = (b.data.items as any[])
+				.filter((i: any) => i?.name && Number(i.price) > 0)
+				.map((i: any) => ({
+					"@type": "MenuItem",
+					name: i.name,
+					...(i.image && typeof i.image === "string" ? { image: i.image } : {}),
+					offers: {
+						"@type": "Offer",
+						price: String(i.price),
+						priceCurrency: "MXN",
+						availability: "https://schema.org/InStock",
+					},
+				}));
+			return {
+				"@type": "MenuSection",
+				name: b.data.title,
+				...(items.length ? { hasMenuItem: items } : {}),
+			};
+		})
+		.filter((s: any) => s.hasMenuItem?.length);
+	if (!sections.length) return undefined;
+	return { "@type": "Menu", hasMenuSection: sections };
 }
 
 let reviewStats = {
@@ -367,6 +398,14 @@ if (reviewStats.reviewCount > 0) {
 
 if (type === "Menu" && schemaEnrichment.menu) {
 	schema.hasMenuSection = schemaEnrichment.menu;
+}
+
+// Menú autogenerado para el tipo Restaurant: convierte los bloques del content
+// en MenuItem con oferta (precio MXN). Es lo que le da rich results de "menú
+// con precios" a todas las fichas, no solo a las que pasan schemaEnrichment.
+if (type !== "Menu") {
+	const menuSchema = buildMenuSchema(place);
+	if (menuSchema) schema.hasMenu = menuSchema;
 }
 
 if (schemaEnrichment.awards) {

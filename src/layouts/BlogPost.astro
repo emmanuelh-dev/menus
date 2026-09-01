@@ -9,23 +9,64 @@ import FormattedDate from "../components/FormattedDate.astro";
 import "../styles/blog.css";
 import DefaultLayout from "./DefaultLayout.astro";
 
-// Este layout sólo pinta estos cinco campos. Tiparlo como el esquema completo
+// Este layout sólo pinta los campos que usa. Tiparlo como el esquema completo
 // de la colección obligaba a cualquier página que lo reutilice —about.astro no
 // es un artículo— a inventar campos que este archivo ni lee. Al agregar
 // `audiencia` al esquema, about dejó de compilar por eso. Pedir lo que se usa
 // evita que el próximo campo del esquema vuelva a romperla.
 type Props = Pick<
 	CollectionEntry<"blog">["data"],
-	"title" | "description" | "pubDate" | "updatedDate" | "heroImage"
+	"title" | "description" | "pubDate" | "updatedDate" | "heroImage" | "faq"
 >;
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, faq } =
+	Astro.props;
+
+const faqItems = faq ?? [];
+
+// Schema específico de artículo (en vez del WebSite genérico de DefaultLayout):
+// BlogPosting con fechas y autor, más FAQPage cuando el post trae FAQ. Esto
+// habilita los rich results de artículo y de preguntas frecuentes en Google.
+const schema = [
+	{
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		headline: title,
+		description,
+		...(heroImage
+			? { image: new URL(heroImage, Astro.url).toString() }
+			: {}),
+		datePublished: pubDate.toISOString(),
+		...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
+		author: { "@type": "Organization", name: "BySMax" },
+		publisher: { "@type": "Organization", name: "BySMax" },
+		mainEntityOfPage: Astro.url.toString(),
+	},
+	...(faqItems.length
+		? [
+				{
+					"@context": "https://schema.org",
+					"@type": "FAQPage",
+					mainEntity: faqItems.map((item) => ({
+						"@type": "Question",
+						name: item.question,
+						acceptedAnswer: {
+							"@type": "Answer",
+							text: item.answer,
+						},
+					})),
+				},
+			]
+		: []),
+];
 ---
 
 <DefaultLayout
 	title={title}
 	description={description}
 	image={heroImage}
+	type="Article"
+	schema={schema}
 >
 	<main class="blog-animation">
 		<!-- Hero Image Section -->
@@ -67,7 +108,27 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<!-- Article Content -->
 		<article class="prose lg:prose-xl mx-auto px-4 py-12 max-w-4xl">
 			<slot />
-			
+
+			{
+				faqItems.length > 0 && (
+					<section class="not-prose mt-12">
+						<h2 class="text-2xl md:text-3xl font-bold mb-6">
+							Preguntas Frecuentes
+						</h2>
+						<div class="space-y-4">
+							{faqItems.map((item) => (
+								<div class="rounded-xl border border-neutral-200 p-5">
+									<h3 class="font-semibold mb-2">{item.question}</h3>
+									<p class="text-neutral-600 leading-relaxed">
+										{item.answer}
+									</p>
+								</div>
+							))}
+						</div>
+					</section>
+				)
+			}
+
 			<!-- Author and Share Section -->
 			<div class="mt-12 pt-8 border-t border-neutral-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
 				<div>

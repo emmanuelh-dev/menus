@@ -9,10 +9,16 @@ import { getRestaurants, getStates } from "../../lib/api";
 import { Star, DollarSign } from "lucide-react";
 
 
-const [motelesList, states] = await Promise.all([
-  getRestaurants({ type: 'motel' }),
-  getStates()
-]);
+const states = await getStates();
+const monterreyState = states.find((s) => s.slug === 'nuevo-leon');
+
+// `/moteles/` es la landing de Monterrey (responde a "Mejores Moteles en
+// Monterrey"): sólo muestra los moteles de Nuevo León (hoy todos en el AMBA
+// de Monterrey). El resto del país vive en `/moteles/estados`.
+const motelesList = await getRestaurants({
+  type: 'motel',
+  state_id: monterreyState?.id,
+});
 
 const url = new URL(Astro.request.url);
 const zona = url.searchParams.get('zona') || undefined;

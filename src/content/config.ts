@@ -15,6 +15,17 @@ const blog = defineCollection({
 		// quien busca dónde comer o dormir, que traen tráfico pero no compran.
 		// Sin esto la portada no puede hablarle a uno sin confundir al otro.
 		audiencia: z.enum(['negocio', 'directorio']).default('negocio'),
+		// FAQ estructurada opcional. Si el post la trae, BlogPost la pinta y
+		// emite el schema FAQPage (rich results). El resto de posts siguen con
+		// su FAQ en markdown sin schema.
+		faq: z
+			.array(
+				z.object({
+					question: z.string(),
+					answer: z.string(),
+				}),
+			)
+			.optional(),
 	}),
 });
 
