@@ -583,6 +583,31 @@ const tiendaItemUrl =
 								${item.price}
 							</span>
 						)}
+						{showCartButton && (
+							// El "+" vive en la esquina opuesta al precio, sobre la
+							// foto: en el mosaico la tarjeta queda limpia de botones
+							// sueltos y el agregar queda donde cae el pulgar.
+							<button
+								class="cart-add-btn absolute bottom-2 right-2 w-9 h-9 md:w-10 md:h-10 bg-[var(--m-accent)] text-[var(--m-on-accent)] shadow-lg transition-all hover:scale-110 active:scale-90 flex items-center justify-center rounded-full"
+								aria-label={`Agregar ${item.name} al pedido`}
+								data-item={JSON.stringify(item)}
+								title="Agregar al pedido"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M12 5v14M5 12h14" />
+								</svg>
+							</button>
+						)}
 					</div>
 				)}
 
@@ -648,7 +673,7 @@ const tiendaItemUrl =
 					)}
 				</div>
 
-				{showCartButton && (
+				{showCartButton && !isTile && (
 					<div class="order-3 self-center justify-self-end">
 						<button
 							class="cart-add-btn w-9 h-9 md:w-10 md:h-10 bg-[#3A342E] text-[#f6f3f3] border border-[#2F2A25] transition-all hover:bg-[#2F2A25] active:scale-95 flex items-center justify-center rounded-full"
