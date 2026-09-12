@@ -668,7 +668,7 @@ const toCategorySlug = (value: string) =>
 
 										<div class="px-2">
 											{block.data.image && !hideCategoryImages && (
-												<div>
+												<div class:list={[corners === "cuadrado" ? "rounded-none" : "rounded-xl", "overflow-hidden"]}>
 													<Image
 														src={block.data.image}
 														alt={`${place.name} - ${block.data.title || "Menú"}`}

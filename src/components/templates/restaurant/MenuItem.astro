@@ -67,14 +67,12 @@ const EFFECTS: Record<string, string> = {
 // de romper: un nombre mal escrito en el editor no debe vaciar la vitrina.
 const effectKey = item?.effect || effect;
 
-// Misma cascada que el efecto: el producto puede pisar al lugar. Sirve para el
-// caso real de un menú con fotografía a sangre que trae dos o tres productos
-// recortados sobre blanco, o al revés.
-const fitKey: "contain" | "cover" =
-	item?.image_fit === "cover" || item?.image_fit === "contain"
-		? item.image_fit
-		: imageFit;
-const fitClass = fitKey === "cover" ? "object-cover" : "object-contain";
+// El fit lo decide el lugar (view_settings.image_fit), no el item. Antes el
+// producto podía pisarlo con su propio image_fit, y los scrappers dejaron
+// 'contain' grabado en cada item: cambiar el "Foto" del lugar (Rellenar/
+// Completa) no tenía ningún efecto porque el item pisaba siempre con el valor
+// viejo. El editor ya no escribe image_fit por item; aquí solo se lee el global.
+const fitClass = imageFit === "cover" ? "object-cover" : "object-contain";
 const effectClass = EFFECTS[effectKey] ?? "";
 const toItemSlug = (value: string) =>
 	(value || "")
@@ -620,12 +618,11 @@ const tiendaItemUrl =
 							))}
 						</div>
 					) : (
-						!isTile &&
 						item.description && (
-							// El mosaico va sin descripción a propósito. Fuera de él se
-							// recorta a dos líneas: las descripciones scrapeadas llegan a
-							// tener tres renglones y empujan el precio fuera de vista. El
-							// texto completo sigue en el DOM para SEO.
+							// Se recorta a dos líneas tanto en el mosaico como en la
+							// fila: las descripciones scrapeadas llegan a tener tres
+							// renglones y empujan el precio fuera de vista. El texto
+							// completo sigue en el DOM para SEO.
 							<div class="mb-2 overflow-hidden max-h-[2.85rem]">
 								<MarkdownBlock
 									client:load
