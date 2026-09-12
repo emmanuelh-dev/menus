@@ -140,25 +140,27 @@ export default function CategoryCards({ blocks, onCategoryClick, variant = 'grid
                 <button
                   key={section.id}
                   onClick={() => handleCategoryAction(section.id, section.data.title || '')}
-                  className={`group relative overflow-hidden flex-none w-[calc(45%-0.375rem)] h-auto snap-start border border-white/10 ${isFeatured ? 'ring-2 ring-neutral-400/80' : ''}`}
+                  className={`group relative overflow-hidden flex-none w-[calc(45%-0.375rem)] h-56 sm:h-72 snap-start rounded-xl border border-white/10 ${isFeatured ? 'ring-2 ring-neutral-400/80' : ''}`}
                 >
                   {section.data.image ? (
-                    <img
-                      src={section.data.image}
-                      alt={section.data.title}
-                      className='w-full'
-                    />
+                    <div className="absolute inset-0 p-2">
+                      <img
+                        src={section.data.image}
+                        alt={section.data.title}
+                        className="w-full h-full object-cover rounded-lg transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900" />
                   )}
 
-                  <div className="">
+                  <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/50 px-2 py-1.5 backdrop-blur-sm">
                     <div className="w-full text-left">
                       <p className="text-white font-black text-xs uppercase tracking-widest line-clamp-1">
                         {section.data.title}
                       </p>
                       {section.data.items?.length > 0 && (
-                        <p className="text-white/70 text-[10px] font-bold uppercase tracking-wider mt-1">
+                        <p className="text-white/70 text-[10px] font-bold uppercase tracking-wider mt-0.5">
                           {section.data.items.length} productos
                         </p>
                       )}
