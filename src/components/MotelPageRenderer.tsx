@@ -6,6 +6,7 @@ import {
 import { ReactGallery } from './ReactGallery';
 import ReviewForm from './ReviewForm';
 import QuickFeed from './QuickFeed';
+import { formatMoney } from '../lib/money';
 
 interface MotelPageRendererProps {
   place: any;
@@ -119,6 +120,7 @@ export default function MotelPageRenderer({
 
   const { blocks = [], view_settings = {} } = place.content || {};
   const semantic_data = place.content?.semantic_data || {};
+  const currency = semantic_data.currency || "";
   const template = view_settings.template || "default";
 
   const templateConfigs: Record<string, any> = {
@@ -391,7 +393,7 @@ export default function MotelPageRenderer({
                                 </h3>
                                 {showPrices && !!item.price && (
                                   <span className={`text-lg font-bold ${config.accent} whitespace-nowrap`}>
-                                    ${item.price}
+                                    {formatMoney(item.price, currency)}
                                   </span>
                                 )}
                               </div>

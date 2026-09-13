@@ -102,6 +102,7 @@ const whatsappNumber = semanticData.whatsapp || semanticData.whatsappNumber || '
             showPrices={place?.content?.view_settings?.show_prices ?? true}
             enableCart={enableCart || enableDelivery}
             whatsappNumber={whatsappNumber}
+            currency={semanticData?.currency}
           />
         ))}
       </section>
@@ -117,6 +118,7 @@ const whatsappNumber = semanticData.whatsapp || semanticData.whatsappNumber || '
         deliveryEnabled={enableDelivery}
         blocks={blocks}
         clabe={semanticData?.clabe}
+        currency={semanticData?.currency}
       />
     )}
   </div>

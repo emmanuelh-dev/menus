@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import ReviewForm from "../components/ReviewForm";
 import ScrollTopAndComment from "../components/ScrollTopAndComment";
 import { supabase } from "../lib/supabase";
+import { formatMoney, currencyCode } from "../lib/money";
 
 const path = Astro.url.pathname;
 
@@ -84,14 +85,18 @@ const {
 } = Astro.props;
 
 const currentYear = new Date().getFullYear();
+const semanticData = place?.content?.semantic_data || {};
 const streetAddress =
-	schemaEnrichment.address?.streetAddress ||
-	place?.content?.semantic_data?.address ||
-	"";
+	schemaEnrichment.address?.streetAddress || semanticData.address || "";
+// El municipio que configura el dueño en el panel manda para SEO local
+// ("Menú de X en Monterrey"); si no lo puso, se cae al estado de siempre.
 const city =
 	schemaEnrichment.address?.addressLocality ||
+	semanticData.municipality ||
 	place?.states?.name ||
 	"Monterrey";
+const countryCode = (semanticData.country_code || "MX").toUpperCase();
+const currency = semanticData.currency || "";
 
 function hasAmenity(amenity: string, amenities?: string[]): boolean {
 	if (!amenities) return false;
@@ -170,10 +175,10 @@ function generateSEOTitle(): string {
 		const hasJacuzzi = hasAmenity("jacuzzi", place?.amenities);
 
 		if (minPrice && hasJacuzzi) {
-			return `Motel ${title}${location} | Precios desde $${minPrice}, Fotos y Jacuzzi (${currentYear})`;
+			return `Motel ${title}${location} | Precios desde ${formatMoney(minPrice, currency)}, Fotos y Jacuzzi (${currentYear})`;
 		}
 		if (minPrice) {
-			return `Motel ${title}${location} | Precios desde $${minPrice}, Fotos y Habitaciones (${currentYear})`;
+			return `Motel ${title}${location} | Precios desde ${formatMoney(minPrice, currency)}, Fotos y Habitaciones (${currentYear})`;
 		}
 		if (hasJacuzzi) {
 			return `Motel ${title}${location} | Precios, Fotos y Jacuzzi (${currentYear})`;
@@ -193,7 +198,7 @@ function generateSEODescription(): string {
 	if (isMotel) {
 		const minPrice = getMinPrice(place);
 		const hasJacuzzi = hasAmenity("jacuzzi", place?.amenities);
-		const priceText = minPrice ? `habitaciones desde $${minPrice}` : "precios actualizados";
+		const priceText = minPrice ? `habitaciones desde ${formatMoney(minPrice, currency)}` : "precios actualizados";
 		const jacuzziText = hasJacuzzi ? ", suites con jacuzzi" : "";
 
 		return `¿Buscas tarifas de Motel ${title}${location}? ➔ Entra y consulta tarifas de 12 horas, ${priceText}${jacuzziText}, fotos reales y ubicación en mapa.${reviews}`;
@@ -224,7 +229,7 @@ function buildMenuSchema(place?: any) {
 					offers: {
 						"@type": "Offer",
 						price: String(i.price),
-						priceCurrency: "MXN",
+						priceCurrency: currencyCode(currency),
 						availability: "https://schema.org/InStock",
 					},
 				}));
@@ -335,13 +340,15 @@ if (schemaEnrichment.address) {
 		"@type": "PostalAddress",
 		...schemaEnrichment.address,
 	};
-} else if (place?.content?.semantic_data?.address) {
+} else if (streetAddress || semanticData.municipality || semanticData.country_code) {
 	schema.address = {
 		"@type": "PostalAddress",
-		streetAddress: place.content.semantic_data.address,
+		...(streetAddress ? { streetAddress } : {}),
 		addressLocality: city,
-		addressRegion: place.states?.name || "Nuevo León",
-		addressCountry: "MX",
+		...(place?.states?.name && countryCode === "MX"
+			? { addressRegion: place.states.name }
+			: {}),
+		addressCountry: countryCode,
 	};
 }
 
@@ -363,6 +370,7 @@ if (schemaEnrichment.paymentAccepted)
 	schema.paymentAccepted = schemaEnrichment.paymentAccepted;
 if (schemaEnrichment.currenciesAccepted)
 	schema.currenciesAccepted = schemaEnrichment.currenciesAccepted;
+else if (currency) schema.currenciesAccepted = currencyCode(currency);
 
 if (reviewStats.reviewCount > 0) {
 	schema.aggregateRating = {

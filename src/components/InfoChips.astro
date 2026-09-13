@@ -11,7 +11,14 @@ const { semantic_data = {} } = place?.content || {};
 const alignmentClass = className.includes("justify-") ? "" : "justify-center";
 
 const address = semantic_data.address || place.address || "";
-const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
+// Localidad configurada en el panel (municipio/país). Sirve de respaldo cuando
+// no hay dirección: el chip de ubicación y el mapa siguen funcionando.
+const locality = [semantic_data.municipality, semantic_data.country]
+	.filter(Boolean)
+	.join(", ");
+const mapsSearchQuery = encodeURIComponent(
+	`${place.name} ${address || locality || ""}`,
+);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
 
@@ -62,7 +69,7 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 	}
 
 	{
-		address && (
+		(address || locality) && (
 			<a
 				href={googleMapsUrl}
 				target="_blank"

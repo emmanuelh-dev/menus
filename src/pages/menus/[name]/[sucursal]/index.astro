@@ -17,6 +17,7 @@ const placeTag = `place-${name}`;
 Astro.response.headers.set('Vercel-Cache-Tag', placeTag);
 
 import RestaurantLayout from "../../../../layouts/RestaurantLayout.astro";
+import { formatMoney } from "../../../../lib/money";
 import Gallery from "../../../../components/Gallery.astro";
 import WhatsappButton from "../../../../components/WhatsappButton";
 import { getRestaurantByName } from "../../../../lib/api";
@@ -41,6 +42,7 @@ blocks = blocks.map((block: any) => {
 });
 
 const address = place.content?.semantic_data?.address || place.address || "";
+const currency = place.content?.semantic_data?.currency || "";
 const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 ---
@@ -225,9 +227,9 @@ const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSea
 																	{item.name}
 																</h3>
 																<span class="text-sm font-light text-neutral-400 ml-4">
-																	{view_settings.show_prices &&
-																		item.price > 0 &&
-																		`$${item.price}`}
+									{view_settings.show_prices &&
+										item.price > 0 &&
+										formatMoney(item.price, currency)}
 																</span>
 															</div>
 															{item.description && (

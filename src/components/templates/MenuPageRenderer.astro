@@ -57,6 +57,8 @@ const sd = place.content?.semantic_data || {};
 const enableCart = sd.enable_cart || sd.enableCart || false;
 const enableDelivery = sd.enable_delivery || sd.enableDelivery || false;
 const whatsappNumber = sd.whatsapp || sd.whatsappNumber || "";
+// Moneda configurada por el dueño en el panel; el symbol/format vive en lib/money.
+const currency = sd.currency || "";
 
 // Limpieza de bloques
 const galleryBlocks = blocks.filter((block: any) => block.type === "gallery");
@@ -73,7 +75,12 @@ blocks = blocks.map((block: any) => {
 });
 
 const address = place.content?.semantic_data?.address || place.address || "";
-const mapsSearchQuery = encodeURIComponent(`${place.name} ${address || ""}`);
+// Si no hay dirección, el municipio/país configurado evita que el mapa busque
+// sólo el nombre del lugar.
+const locality = [sd.municipality, sd.country].filter(Boolean).join(", ");
+const mapsSearchQuery = encodeURIComponent(
+	`${place.name} ${address || locality || ""}`,
+);
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsSearchQuery}`;
 
 const isCloudinaryUrl = (url: string) =>
@@ -612,7 +619,7 @@ const toCategorySlug = (value: string) =>
 			{/* Info compacta en una sola línea de chips */}
 
 			{/* Favorites Manager - Always visible */}
-			<FavoritesManager client:load placeSlug={name} blocks={blocks} />
+			<FavoritesManager client:load placeSlug={name} blocks={blocks} currency={currency} />
 
 			{/* Cart Manager - Only when enabled */}
 			{
@@ -626,6 +633,7 @@ const toCategorySlug = (value: string) =>
 						deliveryEnabled={enableDelivery}
 						blocks={blocks}
 						clabe={place.content?.semantic_data?.clabe}
+						currency={currency}
 					/>
 				)
 			}
@@ -703,6 +711,7 @@ const toCategorySlug = (value: string) =>
 														enableCart={enableCart || enableDelivery}
 														whatsappNumber={whatsappNumber}
 														placeName={place.name}
+														currency={currency}
 														layout={sectionHasImages ? "tile" : "row"}
 														corners={corners}
 														effect={effect}

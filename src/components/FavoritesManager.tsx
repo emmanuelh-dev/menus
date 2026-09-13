@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Heart, X, ShoppingCart } from 'lucide-react';
+import { formatMoney } from '../lib/money';
 
 interface Favorite {
   id: string;
@@ -10,6 +11,7 @@ interface Favorite {
 interface FavoritesManagerProps {
   placeSlug: string;
   blocks?: any[];
+  currency?: string;
 }
 
 const getFavoritesKey = (slug: string) => `favorites_${slug}`;
@@ -35,7 +37,7 @@ function saveCart(slug: string, cart: any[]) {
   localStorage.setItem(getCartKey(slug), JSON.stringify(cart));
 }
 
-export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesManagerProps) {
+export default function FavoritesManager({ placeSlug, blocks = [], currency = "" }: FavoritesManagerProps) {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [showFavorites, setShowFavorites] = useState(false);
 
@@ -183,7 +185,7 @@ export default function FavoritesManager({ placeSlug, blocks = [] }: FavoritesMa
                         <div className="flex-1">
                           <span className="font-medium block">{fav.name}</span>
                           {itemData?.price && (
-                            <span className="text-sm text-neutral-600">${itemData.price}</span>
+                            <span className="text-sm text-neutral-600">{formatMoney(itemData.price, currency)}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">

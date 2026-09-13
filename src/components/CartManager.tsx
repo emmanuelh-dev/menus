@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, X, Trash2, Send, MapPin, User, Phone, Search, Truck, CreditCard, Coins, Landmark, Copy, Check } from 'lucide-react';
 import GooglePlacesAutocomplete from './admin/GooglePlacesAutocomplete';
+import { formatMoney } from '../lib/money';
 
 declare global {
   interface Window {
@@ -49,6 +50,8 @@ interface CartManagerProps {
   placeId: number;
   deliveryEnabled?: boolean;
   clabe?: string;
+  /** Moneda del lugar (semantic_data.currency) para formatear precios/totales. */
+  currency?: string;
 }
 
 const getCartKey = (slug: string) => `cart_${slug}`;
@@ -94,7 +97,10 @@ export default function CartManager({
   placeId,
   deliveryEnabled = false,
   clabe,
+  currency = "",
 }: CartManagerProps) {
+  // Atajo para no repetir formatMoney(..., currency) en cada precio del carrito.
+  const money = (value: number | string) => formatMoney(value, currency);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -570,15 +576,15 @@ export default function CartManager({
           .join(', ');
         itemName += ` (${optValues})`;
       }
-      message += `• ${item.quantity}x ${itemName} - $${item.price * item.quantity}\n`;
+      message += `• ${item.quantity}x ${itemName} - ${money(item.price * item.quantity)}\n`;
       if (item.notes) message += `  _Nota: ${item.notes}_\n`;
     });
 
     message += `\n--------------------------\n`;
     message += `${icons.money} *RESUMEN DE PAGO*\n`;
-    message += `• *Subtotal:* $${subtotal}\n`;
-    if (wantsDelivery) message += `• *Envío:* $${deliveryPrice}\n`;
-    message += `*TOTAL A PAGAR: $${total}*\n`;
+    message += `• *Subtotal:* ${money(subtotal)}\n`;
+    if (wantsDelivery) message += `• *Envío:* ${money(deliveryPrice)}\n`;
+    message += `*TOTAL A PAGAR: ${money(total)}*\n`;
     const paymentLabel = paymentMethod === 'cash' ? 'Efectivo ' + icons.money :
       paymentMethod === 'card' ? 'Tarjeta ' + icons.card :
         'Transferencia ' + icons.bank;
@@ -694,7 +700,7 @@ export default function CartManager({
                         <div className="flex-1">
                           <span className="font-medium block">{fav.name}</span>
                           {itemData?.price && (
-                            <span className="text-sm text-neutral-600">${itemData.price}</span>
+                            <span className="text-sm text-neutral-600">{money(itemData.price)}</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -806,7 +812,7 @@ export default function CartManager({
                                   ))}
                                 </div>
                               )}
-                              <p className="text-xs font-bold text-marca-600 mt-1">${item.price}</p>
+                              <p className="text-xs font-bold text-marca-600 mt-1">{money(item.price)}</p>
                               <div className="flex items-center gap-3 mt-2">
                                 <button
                                   onClick={() => updateQuantity(item.id, -1)}
@@ -827,7 +833,7 @@ export default function CartManager({
                             </div>
                             <div className="text-right">
                               <p className="font-black text-sm text-neutral-800">
-                                ${item.price * item.quantity}
+                                {money(item.price * item.quantity)}
                               </p>
                               <button
                                 onClick={() => removeFromCart(item.id)}
@@ -987,7 +993,7 @@ export default function CartManager({
                                 <option value="">Seleccionar colonia...</option>
                                 {availableColonies.map((item, idx) => (
                                   <option key={idx} value={item.colony}>
-                                    {item.colony} - ${item.price}
+                                    {item.colony} - {money(item.price)}
                                   </option>
                                 ))}
                               </select>
@@ -1031,7 +1037,7 @@ export default function CartManager({
                 <div className="space-y-4">
                   <div className="flex justify-between items-center bg-neutral-50 p-4 rounded-xl">
                     <span className="text-sm font-bold text-neutral-500 uppercase">Subtotal</span>
-                    <span className="text-xl font-black text-neutral-800">${totalPrice}</span>
+                    <span className="text-xl font-black text-neutral-800">{money(totalPrice)}</span>
                   </div>
                   <div className="flex gap-3">
                     <button
@@ -1055,17 +1061,17 @@ export default function CartManager({
                   <div className="space-y-2 mb-2">
                     <div className="flex justify-between text-xs font-bold text-neutral-400 uppercase tracking-widest">
                       <span>Subtotal</span>
-                      <span>${totalPrice}</span>
+                      <span>{money(totalPrice)}</span>
                     </div>
                     {wantsDelivery && shippingZone && (
                       <div className="flex justify-between text-xs font-bold text-red-500 uppercase tracking-widest">
                         <span>Envío ({deliveryColony})</span>
-                        <span>+ ${shippingZone.price}</span>
+                        <span>+ {money(shippingZone.price)}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center pt-2 border-t border-neutral-50">
                       <span className="text-sm font-black text-neutral-800 uppercase tracking-tighter">Total a Pagar</span>
-                      <span className="text-2xl font-black text-red-600">${totalPrice + (wantsDelivery && shippingZone ? shippingZone.price : 0)}</span>
+                      <span className="text-2xl font-black text-red-600">{money(totalPrice + (wantsDelivery && shippingZone ? shippingZone.price : 0))}</span>
                     </div>
                   </div>
 
@@ -1121,7 +1127,7 @@ export default function CartManager({
               <div className="p-6 sm:p-8 pb-4 shrink-0">
                 <h3 className="text-2xl font-black uppercase text-neutral-900 tracking-tight leading-none mb-2">{configuringItem.name}</h3>
                 <p className="text-neutral-500 text-sm font-medium leading-relaxed">{configuringItem.description}</p>
-                <p className="text-2xl font-black text-marca-600 mt-4">${configuringItem.price}</p>
+                <p className="text-2xl font-black text-marca-600 mt-4">{money(configuringItem.price)}</p>
               </div>
 
               <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-2 space-y-6 custom-scrollbar">
@@ -1319,7 +1325,7 @@ export default function CartManager({
                         const selectedVal = tempOptions[opt.name];
                         if (selectedVal && opt.prices?.[selectedVal]) packagePrice += opt.prices[selectedVal];
                       });
-                      return `Confirmar Paquete • $${packagePrice.toFixed(2)}`;
+                      return `Confirmar Paquete • ${money(packagePrice)}`;
                     }
 
                     let totalPrice = 0;
@@ -1337,7 +1343,7 @@ export default function CartManager({
                       }
                     });
 
-                    return total > 0 ? `Agregar al Carrito • $${totalPrice.toFixed(2)}` : 'Selecciona opciones';
+                    return total > 0 ? `Agregar al Carrito • ${money(totalPrice)}` : 'Selecciona opciones';
                   })()}
                 </button>
 

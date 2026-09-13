@@ -117,6 +117,13 @@ export interface SemanticData {
   description?: string;
   areas?: string[];
   address?: string;
+  /** Localidad para SEO/schema.org: nombre visible del país ("México") y su
+   *  código ISO-3166 alpha-2 ("MX"). `municipality` es ciudad/municipio. */
+  country?: string;
+  country_code?: string;
+  municipality?: string;
+  /** Código ISO-4217 de la moneda del lugar (MXN, USD, ARS...). */
+  currency?: string;
   price_range?: string;
   ambiance?: string;
   hours?: string;
