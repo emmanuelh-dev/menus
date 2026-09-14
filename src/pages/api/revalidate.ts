@@ -1,11 +1,26 @@
 import type { APIRoute } from 'astro';
 export const prerender = false;
 
-// En Vercel se purgaba por tag con invalidateByTag(). Cloudflare no ofrece
-// purga por tag salvo en planes Enterprise, así que por ahora solo se registra.
-const purgeTags = async (tags: string[]) => {
-  tags.forEach((tag) => console.log('[revalidate] purge tag', tag));
-};
+// Purga real en el edge. En Cloudflare no hay purga por tag salvo Enterprise,
+// así que mapeamos los tags del webhook a URLs concretas y usamos la API de
+// purge_cache por archivo. Requiere CF_ZONE_ID y CF_API_TOKEN en el runtime.
+const SITE = 'https://menus.bysmax.com';
+
+const HUB_URLS = [
+  `${SITE}/`,
+  `${SITE}/menus`,
+  `${SITE}/menus/estados`,
+  `${SITE}/moteles`,
+  `${SITE}/moteles/estados`,
+  `${SITE}/cafeterias`,
+  `${SITE}/servicios`,
+  `${SITE}/tienda`,
+  `${SITE}/tienda/estados`,
+  `${SITE}/plantillas`,
+  `${SITE}/sitemap-index.xml`,
+  `${SITE}/sitemap-menus.xml`,
+  `${SITE}/sitemap-tienda.xml`,
+];
 
 const toSlug = (value: string) =>
   (value || '')
@@ -19,11 +34,53 @@ const toSlug = (value: string) =>
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 
-export const POST: APIRoute = async ({ request }) => {
-  try {
-    const secret = request.headers.get('x-webhook-secret') || request.headers.get('authorization')?.replace('Bearer ', '');
+function urlsForTags(tags: string[]): string[] {
+  const urls = new Set<string>(HUB_URLS);
+  for (const tag of tags) {
+    const match = tag.match(/^place-(.+)$/);
+    if (!match) continue;
+    const slug = match[1];
+    urls.add(`${SITE}/menus/${slug}`);
+    urls.add(`${SITE}/moteles/${slug}`);
+    urls.add(`${SITE}/qr/${slug}`);
+  }
+  return [...urls];
+}
 
-    if (!secret || secret !== import.meta.env.WEBHOOK_SECRET) {
+async function purgeUrls(urls: string[], env: Record<string, unknown>) {
+  const zone = env.CF_ZONE_ID as string | undefined;
+  const token = env.CF_API_TOKEN as string | undefined;
+  if (!zone || !token) {
+    console.warn('[revalidate] CF_ZONE_ID/CF_API_TOKEN ausentes; no se purga nada');
+    return;
+  }
+
+  // Cloudflare acepta hasta 30 URLs por request en planes Free.
+  for (let i = 0; i < urls.length; i += 30) {
+    const files = urls.slice(i, i + 30);
+    const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zone}/purge_cache`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ files }),
+    });
+    if (!res.ok) {
+      console.error(`[revalidate] purge failed (${res.status}):`, await res.text());
+    }
+  }
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  try {
+    const env = ((locals as any)?.runtime?.env ?? {}) as Record<string, unknown>;
+    const secret =
+      request.headers.get('x-webhook-secret') ||
+      request.headers.get('authorization')?.replace('Bearer ', '');
+    const expected = (env.WEBHOOK_SECRET as string) || import.meta.env.WEBHOOK_SECRET;
+
+    if (!secret || secret !== expected) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -36,17 +93,16 @@ export const POST: APIRoute = async ({ request }) => {
     // ({ tags: ["place-foo", "places-all"] }). Es el camino correcto para las
     // escrituras del dashboard, y a propósito NO pasa por toSlug(): esa
     // función corrompe los short_name con puntos — "quesabirrias.laregia.mty"
-    // se vuelve "quesabirriaslaregiamty" — y purgaría un tag que ninguna
-    // página emite, dejando la ficha stale con un TTL de un año.
+    // se vuelve "quesabirriaslaregiamty" — y purgaría una URL que ninguna
+    // página emite.
     if (Array.isArray(body?.tags)) {
       const rawTags = body.tags as unknown[];
       const tags: string[] = [...new Set(
         rawTags.filter((t): t is string => typeof t === 'string' && t.length > 0)
       )];
-      if (tags.length > 0) {
-        await purgeTags(tags);
-      }
-      return new Response(JSON.stringify({ revalidated: true, tags }), {
+      const urls = urlsForTags(tags);
+      await purgeUrls(urls, env);
+      return new Response(JSON.stringify({ revalidated: true, tags, purged: urls }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -94,9 +150,10 @@ export const POST: APIRoute = async ({ request }) => {
       tags.add(`place-${previousSlug}`);
     }
 
-    await purgeTags([...tags]);
+    const urls = urlsForTags([...tags]);
+    await purgeUrls(urls, env);
 
-    return new Response(JSON.stringify({ revalidated: true, tags: [...tags] }), {
+    return new Response(JSON.stringify({ revalidated: true, tags: [...tags], purged: urls }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

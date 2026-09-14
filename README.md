@@ -1,9 +1,9 @@
 # menus.bysmax.com
 
 Sitio público: directorio de menús de restaurantes, moteles y servicios en
-México. Astro 5 + Tailwind 3, desplegado en Vercel.
+México. Astro 5 + Tailwind 3, desplegado en **Cloudflare Workers**.
 
-Última actualización de este documento: **2026-07-29**.
+Última actualización de este documento: **2026-09-13**.
 
 ---
 
@@ -75,23 +75,45 @@ sin depender del navegador de nadie.
 
 ---
 
-## Cache: TTL de un año + purge por tag
+## Cache en Cloudflare: edge cache (ISR) + purge por URL
 
-Las páginas públicas se sirven con `s-maxage=31536000`. La frescura depende por
-completo del purge por tag. Normalmente lo dispara Go al escribir — **pero si
-al servicio le faltan `REVALIDATE_URL` / `REVALIDATE_SECRET`, su cliente de
-purge es `nil` y no hace nada NI avisa.**
+Las páginas del catálogo son `prerender = false` (SSR) porque los filtros usan
+query params y las fichas se crean/editan desde el panel. En Cloudflare el
+`s-maxage=31536000` que ponen las páginas **no basta**: Cloudflare no cachea
+respuestas generadas por un Worker por defecto. Por eso:
 
-Hoy le faltan. Mientras tanto, a mano:
+- `src/middleware.ts` cachea en el edge con la Cache API (`caches.default`) toda
+  respuesta GET 200 con `Cache-Control` público (`s-maxage`/`max-age`). Sin esto,
+  cada visita re-renderizaba y `/_image` refetchaba el origen.
+- `public/_headers` marca `/_astro/*` y `/fonts/*` como `immutable` (antes se
+  revalidaban siempre).
+
+Esto deja el sitio en modo **ISR**: una URL nueva se renderiza en la primera
+visita y queda cacheada; una edición purga las URLs afectadas. No hay rebuilds.
+
+La purga la dispara Go al escribir, vía `src/pages/api/revalidate.ts`, que mapea
+los tags (`place-<slug>`, `places-all`) a URLs concretas y llama a la API de
+Cloudflare (`purge_cache` por archivo, lotes de 30).
+
+**Pendiente para que la purga funcione** (si faltan, sólo se loguea un warning):
+
+```sh
+# Token con permiso Zone > Cache Purge > Purge, scoped a bysmax.com
+npx wrangler secret put CF_ZONE_ID
+npx wrangler secret put CF_API_TOKEN
+npx wrangler deploy
+```
+
+Verificar tras desplegar: dos `curl` seguidos a `/menus` y a un `/_image?...`
+deben devolver `cf-cache-status: HIT` (y `age`). Si sale contenido viejo con
+`HIT`, la purga no entró (revisa los secretos).
+
+Mientras tanto, a mano:
 
 ```sh
 node scripts/purge-cache.js pollo-pepe        # una ficha + listados
 node scripts/purge-cache.js --all             # todos los places
 ```
-
-Si una página no cambia después de purgar, mira `x-vercel-cache`: `STALE`
-significa que el purge entró y Vercel está regenerando — espera y vuelve a
-pedir. `HIT` con contenido viejo sí es problema.
 
 ---
 
