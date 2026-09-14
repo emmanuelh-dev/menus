@@ -64,8 +64,9 @@ Pendiente de despliegue, en este orden:
 3. Probar en producción un pedido de recogida y uno de entrega: zona, precio
    del envío, cliente, WhatsApp y la página `/pedidos/<tracking_id>`.
 
-Nada de este registro implica un despliegue: el código debe pasar build,
-confirmarse y publicarse de forma explícita.
+Los commits de esta recuperación ya están publicados en GitHub (`menus`
+`0f23836`; `menus-backend` `a0c5768`), pero ningún servicio ha sido
+desplegado todavía. El VPS debe actualizar Go antes de desplegar el Worker.
 
 ## Contexto
 
