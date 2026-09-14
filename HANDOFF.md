@@ -17,6 +17,26 @@ motivo, la validación realizada y los pasos aún pendientes. No copies este
 estado en los otros repositorios: sus `AGENTS.md` sólo enlazan a este documento
 para evitar que las bitácoras se desincronicen.
 
+## Registro 2026-09-14 — Analíticas de un lugar migradas a Go
+
+El error "No se pudieron cargar las analíticas" en `admin-menus` venía de leer
+visitas y reseñas de la copia vieja de Supabase, cuyo proyecto ya no resuelve.
+Se migró esa lectura a Go:
+
+- `menus-backend`: nuevo `GET /api/admin/place/{id}/insights` (dueño o admin),
+  con paridad de rangos y cortes UTC respecto al handler anterior de Next.
+  Corrige además el 500 de `GET /api/public/reviews`, que seleccionaba una
+  columna `restaurant` inexistente en el esquema de Go (ahora emite `NULL`).
+- `admin-menus`: `app/api/admin/place/[id]/insights/route.ts` pasó a ser proxy
+  de `goFetch`; ya no consulta Supabase.
+
+Validación local: `go build ./...` y `go vet` pasan; `npm run build` pasa.
+`npm run lint` conserva errores heredados, sin nuevos.
+
+Pendiente: ingesta de visitas y reseñas en la BD de Go. Hasta entonces el
+endpoint responde `200` con ceros. Orden de despliegue: Go primero, luego
+`admin-menus`.
+
 ## Registro 2026-09-14 — Slugs inválidos
 
 `/menus/null` y slugs sin ficha ya no lanzan un error de render en el Worker:
