@@ -618,7 +618,7 @@ const toCategorySlug = (value: string) =>
 			{/* Info compacta en una sola línea de chips */}
 
 			{/* Favorites Manager - Always visible */}
-			<FavoritesManager client:load placeSlug={name} blocks={blocks} currency={currency} />
+			<FavoritesManager client:load placeSlug={name} blocks={blocks} currency={currency} enableCart={enableCart || enableDelivery} />
 
 			{/* Menú Dinámico basado en Bloques */}
 			<div class="space-y-4">
