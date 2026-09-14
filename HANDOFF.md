@@ -65,8 +65,11 @@ Pendiente de despliegue, en este orden:
    del envío, cliente, WhatsApp y la página `/pedidos/<tracking_id>`.
 
 Los commits de esta recuperación ya están publicados en GitHub (`menus`
-`0f23836`; `menus-backend` `a0c5768`), pero ningún servicio ha sido
-desplegado todavía. El VPS debe actualizar Go antes de desplegar el Worker.
+`0f23836`; `menus-backend` `a0c5768`). Go fue desplegado en
+`adminm.bysmax.com`: `/healthz` responde `{"ok":true}` y el endpoint de zonas
+responde `200`. Falta publicar el Worker de Cloudflare de `menus`; este entorno
+requiere autenticación de Wrangler o un `CLOUDFLARE_API_TOKEN` con permisos de
+Worker para ejecutar ese paso.
 
 ## Contexto
 
