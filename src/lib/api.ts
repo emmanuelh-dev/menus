@@ -1,6 +1,5 @@
-// Cliente contra el API público de Go (doc 11). Reemplaza src/lib/supabase.ts
-// SOLO para las páginas de moteles (migración por secciones, doc 11: moteles
-// → restaurantes → servicios → tienda). El resto del sitio sigue en Supabase.
+// Cliente contra el API público de Go (doc 11).
+// El sitio entero lee datos desde aquí; ya no se usa Supabase.
 const API_URL = import.meta.env.PUBLIC_GO_API_URL;
 
 async function fetchJSON<T>(path: string): Promise<T | null> {
@@ -14,14 +13,13 @@ async function fetchJSON<T>(path: string): Promise<T | null> {
   }
 }
 
-// Mismo enriquecimiento que hoy hace src/lib/supabase.ts client-side — el
-// backend ya trae rating/reviewCount calculados, así que no hace falta una
-// segunda consulta a reviews para el promedio (getAllPlaceRatings queda sin uso).
+// Mismo enriquecimiento que antes se hacía client-side — el backend ya trae
+// rating/reviewCount calculados, así que no hace falta una segunda consulta.
 function enrichPlace(place: any): any {
   return {
     ...place,
     state_slug: place.states?.slug || 'nuevo-leon',
-    rating: place.rating || 4.0, // mismo default que hoy usa supabase.ts para places sin reviews
+    rating: place.rating || 4.0, // default para places sin reviews
     count: place.reviewCount ?? 0, // alias que espera MotelPageRenderer (place.count)
     priceRange: place.priceRange || '$$',
     address: place.address || '',

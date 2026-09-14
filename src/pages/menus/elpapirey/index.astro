@@ -5,10 +5,8 @@ import RestaurantLayout from "../../../layouts/RestaurantLayout.astro";
 import { Facebook, Instagram } from "lucide-react";
 import CopyClabe from "../../../components/CopyClabe";
 import WhatsappButton from "../../../components/WhatsappButton";
-import RecommendationButton from "../../../components/RecommendationButton";
 import { getRestaurantByName } from "../../../lib/api";
 import Gallery from "../../../components/Gallery.astro";
-import CartManager from "../../../components/CartManager.tsx";
 import CategoryNav from "../../../components/CategoryNav.tsx";
 
 const [place] = await getRestaurantByName({ name: "elpapirey" });
@@ -94,24 +92,6 @@ const enableCart = true;
 			</div>
 
 			<CopyClabe client:load clabes={contactInfo.clabes} />
-
-			{
-				enableCart && place && (
-					<CartManager
-						client:load
-						placeId={place.id as number}
-						placeName={place.name as string}
-						placeSlug="elpapirey"
-						whatsappNumber={contactInfo.whatsapp as string}
-						deliveryEnabled={
-							(place.content?.semantic_data?.enable_delivery as boolean) ||
-							false
-						}
-						blocks={blocks as any[]}
-						currency={place.content?.semantic_data?.currency as string}
-					/>
-				)
-			}
 
 			<CategoryNav client:load blocks={blocks} variant="pills" />
 

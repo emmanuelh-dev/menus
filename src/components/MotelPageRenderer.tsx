@@ -4,15 +4,11 @@ import {
   MapPin, Wifi, Car, Snowflake, Waves, Utensils, Martini, Tv, CircleCheck
 } from 'lucide-react';
 import { ReactGallery } from './ReactGallery';
-import ReviewForm from './ReviewForm';
-import QuickFeed from './QuickFeed';
 import { formatMoney } from '../lib/money';
 
 interface MotelPageRendererProps {
   place: any;
   isPreview?: boolean;
-  isAdmin?: boolean;
-  initialReviews?: any[];
 }
 
 const Icons = {
@@ -100,9 +96,7 @@ function collectMinPrice(blocks: any[]): number | null {
 
 export default function MotelPageRenderer({
   place,
-  isPreview = false,
-  isAdmin = false,
-  initialReviews = [] as any[]
+  isPreview = false
 }: MotelPageRendererProps) {
   const adPushed = useRef(false);
 
@@ -460,24 +454,6 @@ export default function MotelPageRenderer({
               data-ad-slot="7914990909"></ins>
           </div>
         )}
-        {!isPreview && (
-          <div className="mt-12">
-            <QuickFeed placeId={place.id} isInline />
-          </div>
-        )}
-
-        {!isPreview && (
-          <section id="reviews" data-review-section className="mt-10 border-t border-white/5 pt-6">
-            <h2 className="text-xl font-bold text-white tracking-tight mb-4">Opiniones de huéspedes</h2>
-            {React.createElement(ReviewForm as any, {
-              id: place.id,
-              restaurantName: place.name,
-              isAdmin: isAdmin,
-              initialReviews: initialReviews as any[]
-            })}
-          </section>
-        )}
-
         {!isPreview && (
           <footer className="mt-16 pb-10 text-center px-6">
             <p className="text-[10px] text-neutral-600 uppercase tracking-[0.5em] mb-8">

@@ -16,12 +16,9 @@ const placeTag = `place-${name}`;
 Astro.response.headers.set("Vercel-Cache-Tag", placeTag);
 
 import Breadcrumbs from "../../../../../components/Breadcrumbs.astro";
-import { getStates, getRestaurantByName, getReviews } from "../../../../../lib/api";
+import { getStates, getRestaurantByName } from "../../../../../lib/api";
 import MotelLayout from "../../../../../layouts/MotelLayout.astro";
 import MotelPageRenderer from "../../../../../components/MotelPageRenderer";
-import { isAuthenticated } from "../../../../../middleware/auth";
-
-const isAdmin = await isAuthenticated(Astro.request, Astro.cookies);
 
 const places = await getRestaurantByName({ name });
 const place = places[0];
@@ -38,8 +35,6 @@ if (place.states?.slug && place.states.slug !== state) {
 
 // getRestaurantByName ya trae rating/reviewCount (+ alias .count) calculados
 // server-side — no hace falta una consulta de stats aparte.
-const initialReviews = await getReviews(place.id, 10);
-
 const placeWithStats = place;
 
 const states = await getStates();
@@ -76,11 +71,7 @@ const currentState = states.find((s) => s.slug === state);
 
 		<MotelPageRenderer
 			place={placeWithStats}
-			isAdmin={isAdmin}
-			initialReviews={initialReviews || []}
 			client:load
 		/>
 	</div>
-
-	<!-- <QuickFeed placeId={place.id} client:load /> -->
 </MotelLayout>

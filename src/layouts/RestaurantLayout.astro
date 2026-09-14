@@ -1,9 +1,7 @@
 ---
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
-import ReviewForm from "../components/ReviewForm";
 import ScrollTopAndComment from "../components/ScrollTopAndComment";
-import { supabase } from "../lib/supabase";
 import { formatMoney, currencyCode } from "../lib/money";
 
 const path = Astro.url.pathname;
@@ -245,58 +243,14 @@ function buildMenuSchema(place?: any) {
 }
 
 let reviewStats = {
-	ratingValue: 0,
-	reviewCount: 0,
+	ratingValue: Number(place?.rating) || 0,
+	reviewCount: Number(place?.reviewCount ?? place?.count) || 0,
 };
 
-let initialReviews = [];
-let restaurantData: any = null;
-
-try {
-	const { data } = await supabase
-		.from("places")
-		.select("id")
-		.eq("menu", path)
-		.single();
-
-	restaurantData = data;
-
-	if (restaurantData) {
-		const [reviewsResponse, statsResponse] = await Promise.all([
-			supabase
-				.from("reviews")
-				.select("*")
-				.eq("place_id", restaurantData.id)
-				.order("created_at", { ascending: false })
-				.limit(10),
-
-			supabase.from("reviews").select("rate").eq("place_id", restaurantData.id),
-		]);
-
-		if (reviewsResponse.data) {
-			initialReviews = reviewsResponse.data as any;
-		}
-
-		if (statsResponse.data && statsResponse.data.length > 0) {
-			const totalRating = statsResponse.data.reduce(
-				(sum, review) => sum + review.rate,
-				0,
-			);
-			const averageRating = totalRating / statsResponse.data.length;
-
-			reviewStats = {
-				ratingValue: parseFloat(averageRating.toFixed(1)),
-				reviewCount: statsResponse.data.length,
-			};
-		}
-	}
-} catch (error) {
-	console.error("Error al obtener estadísticas de reseñas:", error);
-}
+let initialReviews: any[] = [];
 
 const seoTitle = generateSEOTitle();
 const seoDescription = generateSEODescription();
-const trackingPlaceId = place?.id || restaurantData?.id || null;
 
 // Fallback image logic
 let ogImage = image || place.image;
@@ -535,65 +489,6 @@ if (schemaEnrichment.suitableForDiet) {
         </style> -->
 
         <script defer src="https://umami.bysmax.com/script.js" data-website-id="313460e1-c7b8-4330-b06b-f7e46e608c47"></script>
-		{trackingPlaceId && (
-			<script is:inline define:vars={{ trackingPlaceId }}>
-				(() => {
-					try {
-						const isLocalhost =
-							window.location.hostname === "localhost" ||
-							window.location.hostname === "127.0.0.1";
-						const storageKey = "menu_visitor_id";
-						let visitorId = localStorage.getItem(storageKey);
-						if (!visitorId) {
-							visitorId =
-								typeof crypto !== "undefined" && "randomUUID" in crypto
-									? crypto.randomUUID()
-									: `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-							localStorage.setItem(storageKey, visitorId);
-						}
-
-						const payload = JSON.stringify({
-							placeId: trackingPlaceId,
-							visitorId,
-							path: window.location.pathname,
-						});
-
-						if (isLocalhost) {
-							console.log("[analytics] track payload", {
-								placeId: trackingPlaceId,
-								visitorId,
-								path: window.location.pathname,
-							});
-						}
-
-						if (!isLocalhost && navigator.sendBeacon) {
-							const blob = new Blob([payload], { type: "application/json" });
-							navigator.sendBeacon("/api/analytics/visit", blob);
-						} else {
-							fetch("/api/analytics/visit", {
-								method: "POST",
-								headers: { "Content-Type": "application/json" },
-								body: payload,
-								keepalive: true,
-							})
-								.then(async (response) => {
-									if (isLocalhost) {
-										const text = await response.text();
-										console.log("[analytics] track response", response.status, text || "<empty>");
-									}
-								})
-								.catch((error) => {
-									if (isLocalhost) {
-										console.error("[analytics] track error", error);
-									}
-								});
-						}
-					} catch (_error) {
-						return;
-					}
-				})();
-			</script>
-		)}
 		<script is:inline>
 			(function (c, l, a, r, i, t, y) {
 				c[a] =
@@ -612,27 +507,6 @@ if (schemaEnrichment.suitableForDiet) {
 	<body class="restaurant-typography">
 		<Header textWhite={textWhite} backgroundColor={backgroundColor} />
 		<slot />
-		{
-			(path.includes("/menus/") ||
-				path.includes("/cafeterias") ||
-				path.includes("/espadas") ||
-				path.includes("/moteles")) && (
-				<div
-					class={`${textWhite ? "text-white" : "text-black"} ${backgroundColor} review-form-section`}
-				>
-					<div>
-						{(place?.id || restaurantData?.id) && (
-							<ReviewForm
-								client:load
-								id={place?.id || restaurantData?.id}
-								restaurantName={title}
-								initialReviews={initialReviews}
-							/>
-						)}
-					</div>
-				</div>
-			)
-		}
 		<ScrollTopAndComment client:load />
 		<Footer textWhite={textWhite} backgroundColor={backgroundColor} />
 

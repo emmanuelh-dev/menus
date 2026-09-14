@@ -37,7 +37,6 @@
     "typescript": "^5.5.4"
   },
   "devDependencies": {
-    "@supabase/supabase-js": "^2.95.3",
     "@tailwindcss/typography": "^0.5.16",
     "@types/google.maps": "^3.58.1",
     "@types/uuid": "^10.0.0",

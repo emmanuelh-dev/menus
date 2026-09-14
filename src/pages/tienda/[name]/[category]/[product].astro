@@ -8,7 +8,6 @@ Astro.response.headers.set(
 
 import { Image } from 'astro:assets';
 import RestaurantLayout from '../../../../layouts/RestaurantLayout.astro';
-import CartManager from '../../../../components/CartManager';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import { getRestaurantByName } from '../../../../lib/api';
 import { formatMoney } from '../../../../lib/money';
@@ -156,19 +155,5 @@ const whatsappNumber = semanticData.whatsapp || semanticData.whatsappNumber || '
         )}
       </section>
     </main>
-
-    {(enableCart || enableDelivery) && (
-      <CartManager
-        client:load
-        placeName={place.name}
-        placeSlug={name}
-        placeId={place.id}
-        whatsappNumber={whatsappNumber || ''}
-        deliveryEnabled={enableDelivery}
-        blocks={blocks}
-        clabe={semanticData?.clabe}
-        currency={semanticData?.currency}
-      />
-    )}
   </div>
 </RestaurantLayout>

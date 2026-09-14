@@ -2,7 +2,6 @@
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
 import Gallery from "../Gallery.astro";
 import { Image } from "astro:assets";
-import CartManager from "../CartManager.tsx";
 import FavoritesManager from "../FavoritesManager.tsx";
 import Carousel from "../Carousel.tsx";
 import CategoryNav from "../CategoryNav.tsx";
@@ -620,23 +619,6 @@ const toCategorySlug = (value: string) =>
 
 			{/* Favorites Manager - Always visible */}
 			<FavoritesManager client:load placeSlug={name} blocks={blocks} currency={currency} />
-
-			{/* Cart Manager - Only when enabled */}
-			{
-				(enableCart || enableDelivery) && (
-					<CartManager
-						client:load
-						placeName={place.name}
-						placeSlug={name}
-						placeId={place.id}
-						whatsappNumber={whatsappNumber || ""}
-						deliveryEnabled={enableDelivery}
-						blocks={blocks}
-						clabe={place.content?.semantic_data?.clabe}
-						currency={currency}
-					/>
-				)
-			}
 
 			{/* Menú Dinámico basado en Bloques */}
 			<div class="space-y-4">
