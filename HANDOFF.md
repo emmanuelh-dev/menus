@@ -16,6 +16,12 @@ motivo, la validación realizada y los pasos aún pendientes. No copies este
 estado en los otros repositorios: sus `AGENTS.md` sólo enlazan a este documento
 para evitar que las bitácoras se desincronicen.
 
+## Registro 2026-09-14 — Slugs inválidos
+
+`/menus/null` y slugs sin ficha ya no lanzan un error de render en el Worker:
+redirigen a `/menus` antes de cargar la ficha. Se validó con `astro check` y
+build local. Falta desplegar para que deje de aparecer el 500 en producción.
+
 ## Contexto
 
 El sitio corre en Cloudflare Workers. Las páginas del catálogo son

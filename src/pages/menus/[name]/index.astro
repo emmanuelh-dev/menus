@@ -8,8 +8,8 @@ Astro.response.headers.set(
 
 const { name } = Astro.params;
 
-if (!name) {
-	throw new Error("No se ha especificado el nombre del restaurante");
+if (!name || name === "null") {
+	return Astro.redirect("/menus");
 }
 
 const placeTag = `place-${name}`;
@@ -20,7 +20,7 @@ import { getRestaurantByName } from "../../../lib/api";
 const [place] = await getRestaurantByName({ name });
 
 if (!place) {
-	throw new Error(`No se encontró el restaurante: ${name}`);
+	return Astro.redirect("/menus");
 }
 ---
 
