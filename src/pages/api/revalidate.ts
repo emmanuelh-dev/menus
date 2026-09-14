@@ -1,6 +1,12 @@
 import type { APIRoute } from 'astro';
-import { invalidateByTag } from '@vercel/functions';
 export const prerender = false;
+
+// En Vercel se purgaba por tag con invalidateByTag(). Cloudflare no ofrece
+// purga por tag salvo en planes Enterprise, así que por ahora solo se registra.
+const purgeTags = async (tags: string[]) => {
+  tags.forEach((tag) => console.log('[revalidate] purge tag', tag));
+};
+
 const toSlug = (value: string) =>
   (value || '')
     .toString()
@@ -38,7 +44,7 @@ export const POST: APIRoute = async ({ request }) => {
         rawTags.filter((t): t is string => typeof t === 'string' && t.length > 0)
       )];
       if (tags.length > 0) {
-        await Promise.all(tags.map((tag) => invalidateByTag(tag)));
+        await purgeTags(tags);
       }
       return new Response(JSON.stringify({ revalidated: true, tags }), {
         status: 200,
@@ -88,7 +94,7 @@ export const POST: APIRoute = async ({ request }) => {
       tags.add(`place-${previousSlug}`);
     }
 
-    await Promise.all([...tags].map((tag) => invalidateByTag(tag)));
+    await purgeTags([...tags]);
 
     return new Response(JSON.stringify({ revalidated: true, tags: [...tags] }), {
       status: 200,

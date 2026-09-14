@@ -6,7 +6,7 @@ import tailwind from "@astrojs/tailwind";
 
 import react from '@astrojs/react';
 
-import vercel from '@astrojs/vercel';
+import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,10 +20,8 @@ export default defineConfig({
     react(),
   ],
   output: 'static',
-  adapter: vercel({
-    webAnalytics: {
-      enabled: true,
-    }
+  adapter: cloudflare({
+    imageService: 'passthrough',
   }),
   prefetch: {
     prefetchAll: true, // Esto hace que TODOS los <a href> tengan prefetch por defecto

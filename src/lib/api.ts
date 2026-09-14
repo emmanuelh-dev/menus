@@ -1,6 +1,8 @@
 // Cliente contra el API público de Go (doc 11).
 // El sitio entero lee datos desde aquí; ya no se usa Supabase.
-const API_URL = import.meta.env.PUBLIC_GO_API_URL;
+// Fallback para no romper el build/deploy si olvidan definir la variable.
+const API_URL =
+  import.meta.env.PUBLIC_GO_API_URL || 'https://adminm.bysmax.com';
 
 async function fetchJSON<T>(path: string): Promise<T | null> {
   try {
