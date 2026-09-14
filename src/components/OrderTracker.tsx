@@ -1,0 +1,330 @@
+import { useState, useEffect } from 'react';
+import {
+  Package, Clock, CheckCircle, Truck, XCircle,
+  MapPin, Phone, MessageCircle, ArrowLeft,
+  ChevronRight, Receipt, User, ExternalLink,
+  Coins, CreditCard, Landmark, ShoppingCart
+} from 'lucide-react';
+
+interface Order {
+  id: number;
+  tracking_id?: number;
+  customer_name: string;
+  customer_phone: string;
+  delivery_address: string;
+  delivery_colony?: string;
+  delivery_price: number;
+  items: any[];
+  subtotal: number;
+  total: number;
+  status: 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+  notes?: string;
+  payment_method?: 'cash' | 'card' | 'transfer';
+  created_at: string;
+  place_id: number;
+  uuid?: string;
+  delivery_type?: 'delivery' | 'pickup';
+  places?: {
+    name: string;
+    short_name: string;
+    user_id?: string;
+  };
+}
+
+// Los estados intermedios van en gris a propósito: antes cada uno traía su
+// color y el cliente no sabía cuál era "bueno". El único que se pinta es el
+// final —verde si llegó, rojo si se canceló—, que es la única distinción que
+// de verdad le importa a quien está esperando su comida.
+const statusConfig = {
+  pending: { label: 'Pendiente', color: 'bg-neutral-100 text-neutral-700', icon: Clock, desc: 'Estamos esperando que la cocina confirme tu pedido.' },
+  confirmed: { label: 'Confirmado', color: 'bg-neutral-100 text-neutral-700', icon: CheckCircle, desc: '¡Tu pedido ha sido recibido y está en fila!' },
+  preparing: { label: 'Preparando', color: 'bg-neutral-100 text-neutral-700', icon: Package, desc: 'El chef está poniendo manos a la obra con tu comida.' },
+  delivering: { label: 'En camino', color: 'bg-neutral-100 text-neutral-700', icon: Truck, desc: '¡Tu comida va volando hacia tu ubicación!' },
+  completed: { label: 'Entregado', color: 'bg-exito-suave text-exito', icon: CheckCircle, desc: '¡Buen provecho! Esperamos que disfrutes tu comida.' },
+  cancelled: { label: 'Cancelado', color: 'bg-red-100 text-red-700', icon: XCircle, desc: 'Lo sentimos, el pedido no pudo ser procesado.' },
+};
+
+const statusOrder = ['pending', 'confirmed', 'preparing', 'delivering', 'completed'];
+
+export default function OrderTracker({ orderId, initialOrder }: { orderId: string | number, initialOrder: Order }) {
+  const [order, setOrder] = useState<Order>(initialOrder);
+  const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    checkAuth();
+    const interval = setInterval(refreshOrder, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          // Permitir si es admin real o si es el dueño del lugar (incluyendo si está impersonando)
+          const userId = data.impersonating?.id || data.user.id;
+          const isOwner = userId === order.places?.user_id;
+          const finalIsAdmin = data.isAdmin || isOwner;
+          console.log("Auth Check:", { userId, placeOwner: order.places?.user_id, isOwner, isAdmin: finalIsAdmin });
+          setIsAdmin(finalIsAdmin);
+        }
+      }
+    } catch (err) {
+      console.error("Auth check failed:", err);
+    }
+  };
+
+  const refreshOrder = async () => {
+    try {
+      const res = await fetch(`/api/orders/${orderId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setOrder(data.order);
+      }
+    } catch (err) {
+      console.error("Refresh failed:", err);
+    }
+  };
+
+  const updateStatus = async (newStatus: string) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      console.log("Updating status to:", newStatus, "for order:", orderId);
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setOrder(data.order);
+      } else {
+        alert("Error al actualizar: " + (data.error || "Error desconocido"));
+      }
+    } catch (err) {
+      console.error("Update failed:", err);
+      alert("Error de conexión al actualizar el pedido.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const config = statusConfig[order.status] || statusConfig.pending;
+  const StatusIcon = config.icon;
+
+  const currentStatusIndex = statusOrder.indexOf(order.status);
+
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Header Card */}
+      <div className="bg-white rounded-[32px] p-8 shadow-2xl shadow-neutral-200/50 border border-neutral-100">
+        <div className="flex flex-col items-center text-center mb-10">
+          <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-xl ${config.color.replace('text-', 'shadow-').replace('100', '200')} ${config.color}`}>
+            <StatusIcon size={40} />
+          </div>
+          <h1 className="text-3xl font-black text-neutral-900 tracking-tight mb-2">
+            Orden #{order.tracking_id || order.id}
+          </h1>
+          <p className="text-neutral-500 font-medium max-w-xs leading-relaxed">
+            {config.desc}
+          </p>
+        </div>
+
+        {/* Progress Stepper */}
+        <div className="relative flex justify-between mb-12 px-2">
+          <div className="absolute top-5 left-10 right-10 h-0.5 bg-neutral-100 -z-10"></div>
+          <div
+            className="absolute top-5 left-10 h-0.5 bg-marca-500 transition-all duration-1000 -z-10"
+            style={{ width: `${(Math.max(0, currentStatusIndex) / (statusOrder.length - 1)) * 90}%` }}
+          ></div>
+
+          {statusOrder.map((s, idx) => {
+            const isActive = idx <= currentStatusIndex;
+            const isCurrent = idx === currentStatusIndex;
+            const SIcon = statusConfig[s as keyof typeof statusConfig]?.icon || Clock;
+
+            return (
+              <div key={s} className="flex flex-col items-center gap-2">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${isCurrent ? 'bg-marca-500 text-white shadow-lg shadow-marca-200' :
+                  isActive ? 'bg-marca-100 text-marca-600' : 'bg-white border-2 border-neutral-100 text-neutral-200'
+                  }`}>
+                  <SIcon size={18} />
+                </div>
+                <span className={`text-[10px] font-bold uppercase tracking-tighter ${isActive ? 'text-neutral-900' : 'text-neutral-300'
+                  }`}>
+                  {statusConfig[s as keyof typeof statusConfig]?.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Admin Controls */}
+        {isAdmin && (
+          <div className=" rounded-2xl mb-8 ">
+            <p className="text-[10px] font-black uppercase text-neutral-400 mb-4 tracking-widest flex items-center justify-between">
+              <span className="flex items-center gap-2"><User size={12} /> Panel de Control (Dueño)</span>
+              {user && <span className="lowercase opacity-50">{user.email}</span>}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {Object.entries(statusConfig).map(([val, cfg]) => {
+                const isCurrent = order.status === val;
+
+                return (
+                  <button
+                    key={val}
+                    onClick={() => updateStatus(val)}
+                    disabled={loading || isCurrent}
+                    className={`relative py-3.5 px-2 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border-2 flex items-center justify-center cursor-pointer ${isCurrent
+                      ? `${cfg.color} border-current shadow-md shadow-neutral-100`
+                      : 'bg-white text-neutral-400 border-neutral-100 hover:border-neutral-300 hover:text-neutral-600 active:scale-95'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isCurrent && <div className="absolute top-1 right-1 w-2 h-2 bg-current rounded-full animate-pulse" />}
+                    {loading && !isCurrent ? (
+                      <div className="w-4 h-4 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin" />
+                    ) : (
+                      cfg.label
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Details Card */}
+      <div className="bg-white rounded-[32px] p-8 shadow-xl shadow-neutral-200/40 border border-neutral-100">
+        <h2 className="text-xl font-black text-neutral-900 mb-6 flex items-center gap-3">
+          <span className="w-8 h-8 bg-neutral-900 text-white rounded-xl flex items-center justify-center text-xs">
+            {order.items.reduce((acc, curr) => acc + curr.quantity, 0)}
+          </span>
+          Resumen del Pedido
+        </h2>
+
+        <div className="space-y-4 mb-8">
+          {order.items.map((item, idx) => (
+            <div key={idx} className="flex items-start gap-4 p-3 hover:bg-neutral-50 rounded-2xl transition-colors">
+              {item.image && (
+                <img src={item.image} className="w-14 h-14 object-cover rounded-xl shrink-0" alt="" />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start">
+                  <p className="font-bold text-neutral-900 leading-tight">
+                    <span className="text-marca-600 mr-1.5">{item.quantity}x</span>
+                    {item.name}
+                  </p>
+                  <span className="font-black text-neutral-900 ml-4">${item.price * item.quantity}</span>
+                </div>
+                {item.selectedOptions && (
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase mt-1">
+                    {Object.values(item.selectedOptions).join(' · ')}
+                  </p>
+                )}
+                {item.notes && (
+                  <p className="text-xs text-neutral-500 italic mt-1 leading-snug">"{item.notes}"</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-neutral-50 rounded-3xl p-6 space-y-3">
+          <div className="flex justify-between text-sm text-neutral-500 font-medium">
+            <span>Subtotal</span>
+            <span>${order.subtotal}</span>
+          </div>
+          <div className="flex justify-between text-sm text-neutral-500 font-medium">
+            <span>Envío</span>
+            <span>${order.delivery_price}</span>
+          </div>
+          <div className="pt-3 border-t border-neutral-200 flex justify-between items-center text-xl font-black text-neutral-900">
+            <span>Total</span>
+            <span>${order.total}</span>
+          </div>
+        </div>
+
+        <div className={`mt-6 p-4 rounded-2xl flex items-center gap-3 ${order.payment_method === 'cash' ? 'bg-marca-50 text-marca-700' :
+          order.payment_method === 'card' ? 'bg-neutral-50 text-neutral-700' : 'bg-neutral-50 text-neutral-700'
+          }`}>
+          {order.payment_method === 'cash' && <Coins size={20} />}
+          {order.payment_method === 'card' && <CreditCard size={20} />}
+          {order.payment_method === 'transfer' && <Landmark size={20} />}
+          <span className="text-sm font-bold uppercase tracking-wide">
+            Pago en {
+              order.payment_method === 'cash' ? 'Efectivo' :
+                order.payment_method === 'card' ? 'Tarjeta' : 'Transferencia'
+            }
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="flex items-center justify-between py-4 border-b border-neutral-50">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-400">
+              <Receipt size={20} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Restaurante</p>
+              <p className="font-bold text-neutral-900">{order.places?.name}</p>
+            </div>
+          </div>
+          <a
+            href={`/menus/${order.places?.short_name}`}
+            className="p-2 bg-neutral-50 text-neutral-400 rounded-xl hover:bg-neutral-100 transition-colors"
+          >
+            <ExternalLink size={18} />
+          </a>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-400">
+            {order.delivery_type === 'pickup' ? <ShoppingCart size={20} /> : <MapPin size={20} />}
+          </div>
+          <div>
+            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+              {order.delivery_type === 'pickup' ? 'Tipo de Pedido' : 'Entrega en'}
+            </p>
+            <p className="font-bold text-neutral-900">
+              {order.delivery_type === 'pickup' ? 'Pasar a Recoger (Para Llevar)' : (order.delivery_address || 'Entrega a domicilio')}
+            </p>
+            {order.delivery_type === 'delivery' && order.delivery_colony && <p className="text-xs text-neutral-500">{order.delivery_colony}</p>}
+          </div>
+        </div>
+      </div>
+      {/* Footer info/help (Admin only to contact customer) */}
+      {isAdmin && (
+        <div className="flex flex-col sm:flex-row gap-2">
+          <a
+            href={`tel:${order.customer_phone}`}
+            className="flex-1 bg-white border border-neutral-200 p-4 rounded-2xl flex items-center justify-center gap-3 text-neutral-600 hover:bg-neutral-50 transition-all shadow-sm"
+          >
+            <Phone size={18} />
+            <span className="text-xs font-bold uppercase tracking-widest">Llamar Cliente</span>
+          </a>
+          <a
+            href={`https://wa.me/52${order.customer_phone.replace(/\D/g, '')}`}
+            className="flex-1 bg-marca-500 text-white p-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-marca-600 transition-all shadow-lg shadow-marca-100"
+          >
+            <MessageCircle size={18} />
+            <span className="text-xs font-bold uppercase tracking-widest">WhatsApp Cliente</span>
+          </a>
+        </div>
+      )}
+
+      <p className="text-center text-[10px] text-neutral-300 font-bold uppercase tracking-[0.2em] pt-8">
+        BY BYSMAX · {new Date(order.created_at).toLocaleDateString()}
+      </p>
+    </div>
+  );
+}

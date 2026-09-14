@@ -31,6 +31,42 @@ rutas públicas. La corrección conserva los `Cache-Control` ya declarados y
 evita que el Worker falle; no habilita caché SSR en el edge. Se validará con
 `astro check`, build y solicitudes HTTP tras el despliegue.
 
+## Registro 2026-09-14 — Recuperación del checkout público
+
+La eliminación del checkout completo en el remoto fue una solución puntual al
+error del Worker, no una decisión de producto. Se recuperó el flujo público
+sobre la versión remota actual, conservando los colores configurados por tema:
+
+- `menus` vuelve a montar el carrito para negocios que permiten carrito o
+  entrega. Incluye datos de cliente, recogida o envío, selección de zona y
+  dirección, efectivo/tarjeta/transferencia, CLABE, notas, creación de pedido,
+  enlace de seguimiento y mensaje de WhatsApp.
+- Las rutas públicas de `menus` son proxies de sesión hacia Go para pedidos,
+  estado de pedido, sesión y zonas de envío; no reintroducen Supabase.
+- `menus-backend` expone `GET /api/public/shipping-zones?place_id=...` y al
+  crear un pedido valida la zona activa y calcula el envío con el precio
+  configurado en PostgreSQL. También crea o actualiza el cliente por teléfono
+  dentro de la misma transacción del pedido.
+
+Validación local: `go test ./...` pasó. Las pruebas de integración de pedidos
+requieren `TEST_DATABASE_URL`, por lo que se omiten cuando esa base no está
+configurada. `npx astro check` pasó con 0 errores y 0 advertencias (quedan los
+hints informativos ya existentes). Falta registrar el resultado de
+`npm run build` pasó. El build conserva avisos heredados de fuentes que se
+resuelven en tiempo de ejecución y de anotaciones de dependencias; no son
+errores del checkout.
+
+Pendiente de despliegue, en este orden:
+
+1. Desplegar primero `menus-backend` con la migración operacional ya aplicada.
+2. Desplegar `menus` y confirmar `PUBLIC_GO_API_URL` y
+   `PUBLIC_GOOGLE_MAPS_API_KEY` en el Worker.
+3. Probar en producción un pedido de recogida y uno de entrega: zona, precio
+   del envío, cliente, WhatsApp y la página `/pedidos/<tracking_id>`.
+
+Nada de este registro implica un despliegue: el código debe pasar build,
+confirmarse y publicarse de forma explícita.
+
 ## Contexto
 
 El sitio corre en Cloudflare Workers. Las páginas del catálogo son
