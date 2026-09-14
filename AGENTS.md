@@ -20,6 +20,13 @@ reglas del runtime antes de tocar código.
   npx wrangler deploy
   ```
 
+### Publicación automática
+
+Cuando el usuario diga **"súbelo"**, prepara y valida el cambio, luego usa
+`git add`, `git commit` y `git push`. El despliegue de Cloudflare se activa
+automáticamente con el push; no ejecutar `wrangler deploy` ni buscar tokens
+salvo petición explícita de un despliegue manual o diagnóstico de fallo.
+
 ## Cosas del runtime Cloudflare que ya nos mordieron
 
 1. **No cachea respuestas de Worker por defecto.** Un `Cache-Control:
@@ -45,9 +52,9 @@ reglas del runtime antes de tocar código.
 
 - **La fuente de verdad es `admin-menus-go`** (`https://adminm.bysmax.com`).
   Todas las lecturas pasan por `src/lib/api.ts`. No hay Supabase en este repo.
-- **No reintroducir admin ni features de Supabase** (carrito, pedidos, reseñas,
-  analítica, IA). Se eliminaron a propósito; los respaldos viven en los branches
-  `legacy-admin` y `legacy-full-backup`.
+- No reintroducir admin ni features de Supabase. El checkout público recuperado
+  (carrito, pedidos, zonas, cliente y WhatsApp) usa exclusivamente Go y debe
+  conservarse; los respaldos viven en `legacy-admin` y `legacy-full-backup`.
 - Escribir fichas siempre por Go; ver README y `scripts/lib/places-go.js`.
 
 ## Ecosistema y bitácora canónica
