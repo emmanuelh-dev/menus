@@ -17,25 +17,14 @@ import { getStates, getPlacesPage } from "../../lib/api";
 import { formater } from "../../types/app";
 import { Image } from "astro:assets";
 
-type Industry = "Todos" | "Restaurante" | "Café" | "Bar" | "Hotel";
-type BusinessType = "Todos" | "Casual" | "Formal" | "Fast Food" | "Buffet";
-type Capacity = "Todos" | "0-50" | "51-100" | "101-200" | "200+";
+type Tipo = "Todos" | "Restaurantes" | "Cafeterías";
 
-const industries: Industry[] = ["Todos", "Restaurante", "Café", "Bar", "Hotel"];
-const types: BusinessType[] = [
-	"Todos",
-	"Casual",
-	"Formal",
-	"Fast Food",
-	"Buffet",
-];
-const capacities: Capacity[] = ["Todos", "0-50", "51-100", "101-200", "200+"];
+const tipos: Tipo[] = ["Todos", "Restaurantes", "Cafeterías"];
 
 const pageSize = 9;
 const searchParams = Astro.url.searchParams;
 const currentPage = Math.max(1, Number(searchParams.get("page") || "1"));
-const selectedIndustry = (searchParams.get("industry") || "Todos") as Industry;
-const selectedType = (searchParams.get("type") || "Todos") as BusinessType;
+const selectedTipo = (searchParams.get("tipo") || "Todos") as Tipo;
 const selectedSort = searchParams.get("sort") || "popular";
 
 // El selector ofrece 3 opciones pero antes solo había 2 modos reales:
@@ -53,19 +42,21 @@ const sort =
 // prueba; ahora la lista de tipos es explícita.
 const MENU_TYPES = "restaurant,cafe,cafeteria";
 
+// "Restaurantes" y "Cafeterías" mapean a type=, que sí existe en la base.
+// Antes el filtro se mandaba como category (NULL en casi todos los places) y
+// siempre devolvía 0 resultados.
 const dbType =
-	selectedType === "Todos"
-		? MENU_TYPES
-		: selectedType === "Casual"
-			? "restaurant"
-			: selectedType;
+	selectedTipo === "Restaurantes"
+		? "restaurant"
+		: selectedTipo === "Cafeterías"
+			? "cafe,cafeteria"
+			: MENU_TYPES;
 
 const from = (currentPage - 1) * pageSize;
 
 const [{ data: restaurants, total: totalRestaurants }, states] = await Promise.all([
 	getPlacesPage({
 		type: dbType,
-		category: selectedIndustry === "Todos" ? undefined : selectedIndustry,
 		sort,
 		limit: pageSize,
 		offset: from,
@@ -88,8 +79,7 @@ const summaryTo = totalRestaurants
 const buildQueryString = (page: number) => {
 	const params = new URLSearchParams();
 	params.set("page", String(page));
-	params.set("industry", selectedIndustry);
-	params.set("type", selectedType);
+	params.set("tipo", selectedTipo);
 	params.set("sort", selectedSort);
 	return `/menus?${params.toString()}`;
 };
@@ -155,29 +145,13 @@ const seoData = {
 					class="mb-8 flex flex-wrap gap-4 justify-center"
 				>
 					<select
-						name="industry"
+						name="tipo"
 						class="px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-200"
 					>
 						{
-							industries.map((industry) => (
-								<option
-									value={industry}
-									selected={selectedIndustry === industry}
-								>
-									{industry}
-								</option>
-							))
-						}
-					</select>
-
-					<select
-						name="type"
-						class="px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-200"
-					>
-						{
-							types.map((type) => (
-								<option value={type} selected={selectedType === type}>
-									{type}
+							tipos.map((tipo) => (
+								<option value={tipo} selected={selectedTipo === tipo}>
+									{tipo}
 								</option>
 							))
 						}
