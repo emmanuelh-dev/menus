@@ -49,6 +49,14 @@ reglas del runtime antes de tocar código.
   `legacy-admin` y `legacy-full-backup`.
 - Escribir fichas siempre por Go; ver README y `scripts/lib/places-go.js`.
 
+## Ecosistema y bitácora canónica
+
+Este proyecto trabaja con [`admin-menus`](https://github.com/emmanuelh-dev/admin-menus)
+(panel) y [`menus-backend`](https://github.com/emmanuelh-dev/menus-backend)
+(API Go y fuente de verdad). El control compartido vive sólo en
+[`HANDOFF.md`](./HANDOFF.md). Actualízalo cuando el cambio cruce repositorios o
+afecte runtime, despliegue, caché o contratos con Go.
+
 ## Referencias
 
 - `README.md` — contexto completo, sección de caché y pendientes.

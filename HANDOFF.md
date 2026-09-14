@@ -3,6 +3,19 @@
 **Fecha:** 2026-09-13
 **Estado:** código listo, falta configurar secretos y desplegar.
 
+## Control del ecosistema
+
+Este es el registro canónico del trabajo que cruza los tres repositorios:
+
+- [`menus`](https://github.com/emmanuelh-dev/menus): sitio público y Worker de Cloudflare.
+- [`admin-menus`](https://github.com/emmanuelh-dev/admin-menus): panel de administración.
+- [`menus-backend`](https://github.com/emmanuelh-dev/menus-backend): API Go y fuente de verdad de los datos.
+
+Al cambiar un flujo compartido, registra aquí el alcance por repositorio, el
+motivo, la validación realizada y los pasos aún pendientes. No copies este
+estado en los otros repositorios: sus `AGENTS.md` sólo enlazan a este documento
+para evitar que las bitácoras se desincronicen.
+
 ## Contexto
 
 El sitio corre en Cloudflare Workers. Las páginas del catálogo son
