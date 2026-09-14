@@ -1,7 +1,8 @@
 # HANDOFF — Cache en el edge (ISR) de menus.bysmax.com
 
 **Fecha:** 2026-09-13
-**Estado:** código listo, falta configurar secretos y desplegar.
+**Estado:** purga por URL lista; el intento de caché ISR en el Worker fue
+retirado por incompatibilidad con Astro.
 
 ## Control del ecosistema
 
@@ -19,8 +20,16 @@ para evitar que las bitácoras se desincronicen.
 ## Registro 2026-09-14 — Slugs inválidos
 
 `/menus/null` y slugs sin ficha ya no lanzan un error de render en el Worker:
-redirigen a `/menus` antes de cargar la ficha. Se validó con `astro check` y
-build local. Falta desplegar para que deje de aparecer el 500 en producción.
+redirigen a `/menus` antes de cargar la ficha. Está desplegado y producción
+responde `302` hacia `/menus`.
+
+## Registro 2026-09-14 — Headers inmutables del Worker
+
+Se retiró `src/middleware.ts`. El middleware de Cache API agregado para ISR
+causaba `TypeError: Can't modify immutable headers` durante el render SSR de
+rutas públicas. La corrección conserva los `Cache-Control` ya declarados y
+evita que el Worker falle; no habilita caché SSR en el edge. Se validará con
+`astro check`, build y solicitudes HTTP tras el despliegue.
 
 ## Contexto
 
@@ -30,11 +39,10 @@ pero **Cloudflare no cachea respuestas de Worker por defecto**, así que cada
 visita re-renderizaba y `/_image` refetchaba el origen. El `Vercel-Cache-Tag` y
 la purga por tag (`purgeTags`) eran no-ops heredados de Vercel.
 
-## Cambios (sin commitear)
+## Cambios de caché y purga
 
 | Archivo | Qué hace |
 |---|---|
-| `src/middleware.ts` (nuevo) | Cachea en el edge con `caches.default` toda respuesta GET 200 con `Cache-Control` público (`s-maxage`/`max-age`), excepto `/api/`, `no-store/private` y `Set-Cookie`. |
 | `public/_headers` (nuevo) | `/_astro/*` y `/fonts/*` → `public, max-age=31536000, immutable`. |
 | `src/pages/api/revalidate.ts` | Purga real: mapea tags (`place-<slug>`, `places-all`) a URLs (`/menus/<slug>`, `/moteles/<slug>`, `/qr/<slug>` + hubs + sitemaps) y llama `purge_cache` de Cloudflare en lotes de 30. Lee `CF_ZONE_ID`/`CF_API_TOKEN` de `locals.runtime.env`. |
 | `README.md` | Sección "Cache en Cloudflare: edge cache (ISR) + purge por URL". |
@@ -50,18 +58,17 @@ la purga por tag (`purgeTags`) eran no-ops heredados de Vercel.
    npx wrangler secret put CF_ZONE_ID
    npx wrangler secret put CF_API_TOKEN
    ```
-3. `wrangler deploy`.
-4. Verificar: dos `curl` seguidos a `/menus` y a un `/_image?...` deben devolver
-   `cf-cache-status: HIT` (y `age`). Si sale contenido viejo con `HIT`, la purga
-   no entró (revisar secretos).
+3. Desplegar los cambios de caché/purga.
+4. Verificar que las rutas SSR respondan `200`; el Worker no ofrece caché ISR
+   actualmente. Si se vuelve a evaluar, primero hay que probar la compatibilidad
+   del adapter con la Cache API y los headers de Astro.
 
 ## Modelo elegido
 
-ISR: la URL se genera en la primera visita y queda cacheada; la edición purga las
-URLs afectadas. Sin rebuilds. Se descartó SSG+rebuild por webhook (más lento y no
-soporta filtros por query params de `/menus`).
+La purga por URL queda disponible para una futura estrategia de caché. No hay
+ISR activo ahora. Se descartó SSG+rebuild por webhook porque no soporta filtros
+por query params de `/menus`.
 
 ## Nota
 
-`/menus` no puede ser estática (usa `page`/`tipo`/`sort` por query string). Con
-caché en edge cada combinación se cachea por separado.
+`/menus` no puede ser estática (usa `page`/`tipo`/`sort` por query string).

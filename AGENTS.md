@@ -23,8 +23,9 @@ reglas del runtime antes de tocar código.
 ## Cosas del runtime Cloudflare que ya nos mordieron
 
 1. **No cachea respuestas de Worker por defecto.** Un `Cache-Control:
-   s-maxage=...` en una página SSR es decorativo: cada request re-renderiza. La
-   caché real vive en `src/middleware.ts` (Cache API, `locals.runtime.caches.default`).
+   s-maxage=...` en una página SSR no implementa por sí solo caché en el edge.
+   No añadas un middleware de Cache API sin comprobar que el adapter permite
+   conservar mutables los headers de `Astro.response`.
 2. **`eval` / `new Function` están prohibidos** ("Code generation from strings
    disallowed for this context"). No introduzcas librerías que compilen strings
    en runtime.
