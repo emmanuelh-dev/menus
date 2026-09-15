@@ -37,6 +37,40 @@ Pendiente: ingesta de visitas y reseñas en la BD de Go. Hasta entonces el
 endpoint responde `200` con ceros. Orden de despliegue: Go primero, luego
 `admin-menus`.
 
+## Registro 2026-09-14 — Ingesta de visitas del menú público
+
+El panel mostraba visitas en cero pese a que `/menus/<slug>` renderiza bien. La
+causa no era el visor de analíticas (ya leía de Go), sino que **nada escribía
+`place_menu_visits`**: el commit `fca1de6` ("eliminar admin y features basadas
+en Supabase") borró `src/pages/api/analytics/visit.ts` y el `<script>` de
+`RestaurantLayout.astro`, y el reemplazo previsto en
+`migration/11-api-publica-astro.md` (`POST /api/public/visits`) nunca se
+implementó. El propio `insights.go` lo anunciaba: respondía `200` con ceros.
+
+- `menus-backend`: nuevo `POST /api/public/visits` en `internal/api/visits.go`.
+  Sin auth, inserta `place_id`, `visitor_id`, `path`, `user_agent` y `referer`
+  (con fallback a los headers) y responde `204`. Un `place_id` inexistente
+  (FK `23503`) devuelve `404`, no `500`.
+- `menus`: el beacon de `RestaurantLayout.astro` (con el `menu_visitor_id` de
+  `localStorage`) llama **directo** a
+  `https://adminm.bysmax.com/api/public/visits` desde el navegador: cero hop por
+  el Worker, sin ruta `/api/analytics/visit`. `referer`/`userAgent` van en el
+  cuerpo porque el navegador no deja fijarlos como headers.
+- `menus-backend`: `withPublicCORS` ahora contesta el preflight `OPTIONS` de
+  `/api/public/*` y restringe las escrituras a `ALLOWED_ORIGINS` (refleja el
+  origen permitido + `Vary: Origin`); las lecturas siguen abiertas con `*`.
+
+Validación local: `go build ./...` y `go vet ./...` pasan; en `menus`,
+`astro check` con 0 errores / 0 warnings y `npm run build` completo. El chunk
+del layout y el manifest del Worker incluyen el script y la ruta.
+
+Orden de despliegue: Go primero (`adminm.bysmax.com`), luego `menus`
+(Cloudflare). `admin-menus` no cambia: su proxy a Go ya estaba.
+
+Pendiente: rate limit / retención de `place_menu_visits`, y la ingesta de
+reseñas (sigue sin ruta pública en Go; hoy `reviews` también se lee pero no se
+escribe).
+
 ## Registro 2026-09-14 — Slugs inválidos
 
 `/menus/null` y slugs sin ficha ya no lanzan un error de render en el Worker:

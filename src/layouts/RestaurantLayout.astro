@@ -83,6 +83,14 @@ const {
 } = Astro.props;
 
 const currentYear = new Date().getFullYear();
+// Id numérico del place para la ingesta de visitas. null cuando la página no
+// es una ficha (p. ej. el layout se reutiliza en landings sin place).
+const trackingPlaceId = place?.id || null;
+// Base de Go para llamar la ingesta de visitas directo desde el navegador
+// (cero hop): el CORS/OPTIONS de /api/public/* lo resuelve el backend.
+const goApiUrl = (
+	import.meta.env.PUBLIC_GO_API_URL || "https://adminm.bysmax.com"
+).replace(/\/$/, "");
 const semanticData = place?.content?.semantic_data || {};
 const streetAddress =
 	schemaEnrichment.address?.streetAddress || semanticData.address || "";
@@ -489,6 +497,60 @@ if (schemaEnrichment.suitableForDiet) {
         </style> -->
 
         <script defer src="https://umami.bysmax.com/script.js" data-website-id="313460e1-c7b8-4330-b06b-f7e46e608c47"></script>
+		{trackingPlaceId && (
+			<script is:inline define:vars={{ trackingPlaceId, goApiUrl }}>
+				(() => {
+					try {
+						const isLocalhost =
+							window.location.hostname === "localhost" ||
+							window.location.hostname === "127.0.0.1";
+						const storageKey = "menu_visitor_id";
+						let visitorId = localStorage.getItem(storageKey);
+						if (!visitorId) {
+							visitorId =
+								typeof crypto !== "undefined" && "randomUUID" in crypto
+									? crypto.randomUUID()
+									: `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+							localStorage.setItem(storageKey, visitorId);
+						}
+
+						// Llamada directa a Go (POST /api/public/visits), sin
+						// hop por el Worker. Referer y user-agent van en el
+						// cuerpo porque el navegador no deja fijarlos como
+						// headers.
+						const payload = JSON.stringify({
+							placeId: trackingPlaceId,
+							visitorId,
+							path: window.location.pathname,
+							referer: document.referrer || "",
+							userAgent: navigator.userAgent || "",
+						});
+
+						if (isLocalhost) {
+							console.log("[analytics] track payload", {
+								placeId: trackingPlaceId,
+								visitorId,
+								path: window.location.pathname,
+							});
+							return;
+						}
+
+						// fetch keepalive en vez de sendBeacon: cross-origin con
+						// Content-Type JSON dispara preflight y el fetch lo
+						// maneja de forma predecible (el error se ignora: es un
+						// beacon de mejor esfuerzo).
+						fetch(`${goApiUrl}/api/public/visits`, {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: payload,
+							keepalive: true,
+						}).catch(() => {});
+					} catch (_error) {
+						return;
+					}
+				})();
+			</script>
+		)}
 		<script is:inline>
 			(function (c, l, a, r, i, t, y) {
 				c[a] =
