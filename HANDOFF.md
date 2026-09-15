@@ -71,6 +71,27 @@ Pendiente: rate limit / retención de `place_menu_visits`, y la ingesta de
 reseñas (sigue sin ruta pública en Go; hoy `reviews` también se lee pero no se
 escribe).
 
+## Registro 2026-09-14 — Visitas en el hub `/menus`
+
+Con la ingesta viva, el hub muestra las visitas además de usarlas para ordenar:
+
+- `menus-backend`: `GET /api/public/places` emite `visitCount` (visitantes
+  únicos de los últimos 30 días). El `LEFT JOIN` de `place_menu_visits` pasó de
+  agregarse solo con `sort=visits` a ir siempre, porque el badge lo necesita en
+  cualquier orden; sigue siendo una sola agregación por request sobre el índice
+  `(place_id, visited_at DESC)`.
+- `menus`: la tarjeta de `/menus` pinta un badge "N visitas" cuando
+  `visitCount > 0` (singular/plural), junto a rating y reseñas. Además los
+  selectores de tipo y orden ahora hacen `onchange="this.form.submit()"`: el
+  filtro se aplica al elegir, sin depender del botón "Aplicar" (que se creía
+  roto porque no parecía hacer nada al cambiar de opción).
+
+Validación local: `go build`/`go vet`/`go test` pasan; `astro check` 0 errores
+y `npm run build` completo. La query del listado se probó contra la base de
+producción.
+
+Orden de despliegue: Go primero, luego `menus`. Pendiente de push y deploy.
+
 ## Registro 2026-09-14 — Slugs inválidos
 
 `/menus/null` y slugs sin ficha ya no lanzan un error de render en el Worker:
