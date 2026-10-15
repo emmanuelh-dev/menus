@@ -187,3 +187,11 @@ por query params de `/menus`.
 ## Nota
 
 `/menus` no puede ser estática (usa `page`/`tipo`/`sort` por query string).
+
+
+## Registro 2026-10-15 — Variantes de precio y distribución del editor
+
+- Admin: ajustes de sección colapsados, cabecera móvil con espacio para el nombre y panel de variantes con presentación opcional y precio final. Convierte precios finales en base + recargos compatibles con Go; sin endpoints nuevos ni cambios en Go.
+- Público: el carrito respeta el precio de cada combinación y evita interpretar variantes de precio como paquetes de piezas. Cambiar presentación de un paquete reinicia sus sabores para evitar mezclas.
+- Validación: builds de Next/Astro, astro check sin errores, autocheck de precios y prueba Playwright del carrito ($22 y combinaciones $13/$24). Capturas reales del editor en claro, oscuro y móvil; guardado interceptado, sin modificar el menú real. Lint general del admin conserva deuda previa (161 errores); archivos tocados sin errores.
+- Publicación: commits/push de menus primero y admin-menus después; Cloudflare despliega ambos automáticamente. Go no requiere deploy. Verificación visual en producción posterior al push.

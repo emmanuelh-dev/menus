@@ -123,6 +123,7 @@ export default function CartManager({
 
   // Helper to detect package size from name or description
   const detectLimit = (item: any) => {
+    if (item.options?.at(-1)?.name === 'Cantidad / presentación') return null;
     const text = `${item.name} ${item.description}`.toLowerCase();
     const match = text.match(/(?:paquete|combo|pqt|ord[en]+|pzs|piezas|ítems)\s*(?:de|:)?\s*(\d+)/i) ||
       text.match(/(\d+)\s*(?:piezas|pzs|pazas|ítems|items|pzas)/i);
@@ -1093,7 +1094,10 @@ export default function CartManager({
                           {opt.values.map((val: string) => (
                             <button
                               key={val}
-                              onClick={() => setTempOptions(prev => ({ ...prev, [opt.name]: val }))}
+                              onClick={() => {
+                                setTempOptions(prev => ({ ...prev, [opt.name]: val }));
+                                if (detectLimit(configuringItem)) setTempCounts({});
+                              }}
                               className={`p-3 rounded-xl border-2 font-bold text-[10px] uppercase tracking-wider transition-all flex flex-col items-center justify-center ${tempOptions[opt.name] === val ? 'border-neutral-900 bg-neutral-900 text-white ' : 'border-neutral-50 bg-neutral-50 text-neutral-400 hover:border-neutral-100 hover:bg-white'}`}
                             >
                               <span>{val}</span>
@@ -1230,7 +1234,7 @@ export default function CartManager({
                         let itemPrice = configuringItem.price;
 
                         // Add prefix option prices (size, etc.)
-                        Object.entries(prefixOptions).forEach(([optName, val]) => {
+                        Object.entries(options).forEach(([optName, val]) => {
                           const opt = configuringItem.options.find((o: any) => o.name === optName);
                           if (opt && opt.prices?.[val as string]) itemPrice += opt.prices[val as string];
                         });
@@ -1240,7 +1244,7 @@ export default function CartManager({
                         if (lastOpt.prices?.[flavor]) itemPrice += lastOpt.prices[flavor];
 
                         // Create options object for this specific item
-                        const itemOptions = { ...prefixOptions };
+                        const itemOptions = { ...options };
                         if (flavor) itemOptions[lastOpt.name || 'Sabor'] = flavor;
 
                         // Add as separate cart item
