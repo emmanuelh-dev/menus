@@ -207,3 +207,13 @@ por query params de `/menus`.
 - Caja auditada, NO reescrita: arqueo legado guarda sesiones en content y suma por created_at, sin libro de pagos. No se considera validada la contabilidad ni se habilita cobrar al mesero. Pendiente sustituir ese modelo antes de confiar en cierres contables.
 - Admin desplegado en Cloudflare y verificado en producción: Usuarios, Comanda, editor 2343 y portal del mesero; bloqueo 403 de pedidos generales/place/insights. Capturas escritorio/teléfono claro/oscuro; cuenta y sesiones temporales eliminadas. Sitio público enviado a su despliegue automático tras build correcto.
 - A pedido del usuario: AGENTS.md del panel (`9d3ae01`), Go (`0f79997`) y /root exigen próximos despliegues blue-green y borrar contenedores descartados tras ventana de rollback. Este despliegue de Go usó recreación Compose antes de esa instrucción, no fue blue-green. No quedaron contenedores antiguos del proyecto; imagen previa retenida para reversión.
+
+
+## 2026-10-20 — Tamaños e ingredientes en el carrito público
+
+- Causa: el carrito interpretaba el último grupo como cantidades aunque Go ya guardara Tamaño con max_choices=1.
+- Público: elección única o múltiple según max_choices, grupos obligatorios según required, recargos por unidad y cantidad de platos separada. Se mantiene el surtido de paquetes; Tamaño y Cantidad / presentación no se interpretan como piezas.
+- Panel: nuevo acceso Ingredientes, creación de ingredientes/extras opcionales múltiples, selector explícito Una opción / Varias opciones y límite configurable. Reutiliza required/max_choices/prices; sin migraciones ni cambios de API o secretos.
+- Validación: builds Astro y Next; astro check sin errores; autochecks de ambos repositorios; ESLint de archivos del panel sin errores (3 warnings previos). Playwright sobre el menú 2343: tamaño único S/17, dos platos S/34, ingredientes con recargo S/21.50, máximo de elecciones y paquete de dos sabores. Guardado del panel interceptado y contenido resultante probado en carrito; no se modificó el menú real.
+- Capturas antes/después de selector y panel, móvil/escritorio y panel claro/oscuro, en /tmp/chifa-*.png. Publicación automática por push pendiente al escribir esta entrada; falta verificar ambos despliegues en producción.
+- Alcance: editor y carrito del sitio público. Modo mesero y su cálculo de precios en Go conservan el configurador anterior; su unificación queda pendiente.

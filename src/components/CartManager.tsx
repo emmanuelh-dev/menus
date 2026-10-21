@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, X, Trash2, Send, MapPin, User, Phone, Search, Truck, CreditCard, Coins, Landmark, Copy, Check } from 'lucide-react';
 import GooglePlacesAutocomplete from './GooglePlacesAutocomplete';
 import { formatMoney } from '../lib/money';
+import ProductOptions from './ProductOptions';
+import { packageLimit } from '../lib/product-options';
 
 declare global {
   interface Window {
@@ -121,14 +123,7 @@ export default function CartManager({
   const [showSuccess, setShowSuccess] = useState(false);
   const [orderNotes, setOrderNotes] = useState('');
 
-  // Helper to detect package size from name or description
-  const detectLimit = (item: any) => {
-    if (item.options?.at(-1)?.name === 'Cantidad / presentación') return null;
-    const text = `${item.name} ${item.description}`.toLowerCase();
-    const match = text.match(/(?:paquete|combo|pqt|ord[en]+|pzs|piezas|ítems)\s*(?:de|:)?\s*(\d+)/i) ||
-      text.match(/(\d+)\s*(?:piezas|pzs|pazas|ítems|items|pzas)/i);
-    return match ? parseInt(match[1]) : null;
-  };
+  const detectLimit = packageLimit;
 
   // Helper to generate a key for a specific combination of prefix options
   const getCombinationKey = (prefixOptions: { [key: string]: string }, flavor: string) => {
@@ -1079,6 +1074,18 @@ export default function CartManager({
                 <p className="text-2xl font-black text-[var(--m-accent)] mt-4">{money(configuringItem.price)}</p>
               </div>
 
+              {!detectLimit(configuringItem) ? (
+                <ProductOptions
+                  key={configuringItem.id}
+                  item={configuringItem}
+                  money={money}
+                  onConfirm={(options, quantity, price) => {
+                    addToCart(configuringItem, options, quantity, price);
+                    setConfiguringItem(null);
+                  }}
+                />
+              ) : (
+              <>
               <div className="px-5 sm:px-6 py-2 space-y-4">
 
 
@@ -1305,6 +1312,8 @@ export default function CartManager({
                   </p>
                 )}
               </div>
+              </>
+              )}
             </div>
           </div>
         </div>
