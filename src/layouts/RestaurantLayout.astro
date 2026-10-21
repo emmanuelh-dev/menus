@@ -36,6 +36,7 @@ interface OpeningHoursSpecification {
 }
 
 export interface Props {
+	restaurantHeader?: boolean;
 	title: string;
 	description: string;
 	image?: string;
@@ -68,6 +69,7 @@ export interface Props {
 }
 
 const {
+	restaurantHeader = false,
 	title,
 	description,
 	image,
@@ -567,7 +569,14 @@ if (schemaEnrichment.suitableForDiet) {
 		</script>
 	</head>
 	<body class="restaurant-typography">
-		<Header textWhite={textWhite} backgroundColor={backgroundColor} />
+		{restaurantHeader ? (
+			<nav aria-label="Menús BySMax" class="px-4 sm:px-6 py-3 border-b border-neutral-200 bg-white text-neutral-700 text-xs">
+				<div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+					<a href="/menus" class="font-semibold min-h-6 inline-flex items-center">BySMax · Menús</a>
+					<span>Carta digital</span>
+				</div>
+			</nav>
+		) : <Header textWhite={textWhite} backgroundColor={backgroundColor} />}
 		<slot />
 		<ScrollTopAndComment client:load />
 		<Footer textWhite={textWhite} backgroundColor={backgroundColor} />

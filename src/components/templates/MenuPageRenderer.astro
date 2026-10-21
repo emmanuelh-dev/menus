@@ -1,6 +1,5 @@
 ---
 import RestaurantLayout from "../../layouts/RestaurantLayout.astro";
-import Gallery from "../Gallery.astro";
 import { Image } from "astro:assets";
 import CartManager from "../CartManager.tsx";
 import FavoritesManager from "../FavoritesManager.tsx";
@@ -8,7 +7,7 @@ import Carousel from "../Carousel.tsx";
 import CategoryNav from "../CategoryNav.tsx";
 import CategoryCards from "../CategoryCards.tsx";
 import MenuItem from "./restaurant/MenuItem.astro";
-import InfoChips from "../InfoChips.astro";
+import RestaurantHeader from "../RestaurantHeader.astro";
 import MarkdownBlock from "../MarkdownBlock.tsx";
 import Breadcrumbs from "../Breadcrumbs.astro";
 
@@ -348,9 +347,6 @@ const config: Record<string, any> = {
 	showCategoryCards: template === "tienda",
 };
 
-const justifyClass = config.headerClass?.includes("text-left")
-	? "justify-start"
-	: "justify-center";
 const isTiendaTemplate = template === "tienda";
 const sectionBlocks = blocks.filter((block: any) => block.type === "section");
 const menuImageBlocks = blocks.filter(
@@ -364,23 +360,6 @@ const showCategoriesAtStart =
 	isTiendaTemplate && Boolean(view_settings.show_categories_at_start);
 const hideCategoryImages =
 	isTiendaTemplate && Boolean(view_settings.hide_category_images);
-const shouldShowHero =
-	!isTiendaTemplate ||
-	(!showCategoriesAtStart &&
-		heroCarousel &&
-		heroCarousel.data?.items?.length > 0);
-// Sólo el primer bloque de galería, no la suma de todos.
-//
-// Antes se concatenaban con flatMap, y un lugar con dos bloques (La Santa: uno
-// curado de 5 fotos y otro con las 30 de producto) terminaba con una galería
-// que era en realidad dos pegadas, sin que nadie la hubiera pedido así. Cuál
-// se ve es decisión del editor —el bloque que ponga primero—, no del renderer.
-// Los demás bloques de galería siguen existiendo en el contenido; simplemente
-// no se dibujan.
-const heroGalleryImages =
-	place.content?.semantic_data?.gallery?.length > 0
-		? place.content.semantic_data.gallery
-		: galleryBlocks[0]?.data?.images || [];
 const toCategorySlug = (value: string) =>
 	(value || "")
 		.toString()
@@ -395,6 +374,7 @@ const toCategorySlug = (value: string) =>
 ---
 
 <RestaurantLayout
+	restaurantHeader
 	description={place?.content?.semantic_data?.description ||
 		place?.description ||
 		place.name}
@@ -424,6 +404,7 @@ const toCategorySlug = (value: string) =>
 			`--m-border:color-mix(in srgb, ${themeColors.text} 14%, transparent)`,
 		].join(";")}
 	>
+		<RestaurantHeader place={place} gallery={sd.gallery?.length ? sd.gallery : galleryBlocks[0]?.data?.images || []} />
 		{
 			menuImageBlocks.length > 0 && (
 				<div class="max-w-7xl mx-auto xl:px-4 sm:px-6">
@@ -457,120 +438,12 @@ const toCategorySlug = (value: string) =>
 				</div>
 			)
 		}
-		{
-			showCategoriesAtStart && (
-				<section class="relative min-h-[44dvh] bg-[#111111] overflow-hidden">
-					{place.image?.trim() ? (
-						<Image
-							src={place.image}
-							alt={`${place.name} fondo`}
-							width={800}
-							height={450}
-							class="w-full h-full object-cover"
-							loading="lazy"
-							format="webp"
-							quality={90}
-						/>
-					) : (
-						<div class="inset-0 bg-gradient-to-b from-[#181818] to-[#0f0f0f]" />
-					)}
-
-					<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-10">
-						<h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white drop-shadow-xl">
-							{place.name}
-						</h1>
-					</div>
-
-					<div>
-						<CategoryCards
-							client:load
-							blocks={blocks}
-							variant="carousel"
-							placeSlug={name}
-						/>
-					</div>
-				</section>
-			)
-		}
-
-		{/* Hero Section with Carousel or Image */}
-		{
-			shouldShowHero && !showCategoriesAtStart && (
-				<div>
-					{template === "elegante" ? (
-						// "Mobile App" Style Header for Premium/Dark Templates
-						<header class="pb-4 flex flex-col xl:flex-row items-center justify-center text-center z-10 transition-all">
-							<div class="w-full mb-4 xl:w-1/2">
-								{place.image?.trim() ? (
-									<Image
-										src={place.image}
-										alt={place.name}
-										width={500}
-										height={500}
-										class="w-full h-full object-cover"
-										loading="eager"
-										format="webp"
-										quality={90}
-									/>
-								) : (
-									<div class="w-full h-full flex items-center justify-center text-4xl font-bold text-white/20">
-										{place.name.substring(0, 1)}
-									</div>
-								)}
-							</div>
-
-							<div class="xl:w-1/2 flex flex-col">
-								<h1 class={config.titleClass}>{place.name}</h1>
-
-								{place.content?.semantic_data?.description && (
-									<div class="mt-4 max-w-lg mx-auto">
-										<p class="text-sm sm:text-base text-neutral-400 font-light leading-relaxed">
-											{place.content?.semantic_data?.description}
-										</p>
-									</div>
-								)}
-								{place.content?.semantic_data && !isTiendaTemplate && (
-									<section
-										class="mb-12"
-										aria-label="Información del restaurante"
-									>
-										<InfoChips place={place} className={justifyClass} />
-
-																{heroGalleryImages.length > 0 && (
-																	<div class="mt-6">
-																		<Gallery images={heroGalleryImages} />
-																	</div>
-																)}
-									</section>
-								)}
-							</div>
-						</header>
-					) : // Default Hero Image/Carousel
-					heroCarousel && heroCarousel.data.items?.length > 0 ? (
-						<Carousel
-							client:load
-							items={heroCarousel.data.items}
-							className="w-full max-w-3xl mx-auto"
-						/>
-					) : place.image?.trim() ? (
-						<div class="w-full h-40 sm:h-56 md:h-72 xl:max-h-[60dvh] overflow-hidden">
-							<Image
-								src={place.image}
-								alt={`${place.name} - ${place.content?.semantic_data?.description || place.description || "Restaurante"}`}
-								width={800}
-								height={450}
-								class="w-full h-full object-cover"
-								loading="eager"
-								format="webp"
-								quality={90}
-							/>
-						</div>
-					) : (
-						<div class="h-32 bg-neutral-900" />
-					)}
-				</div>
-			)
-		}
+		{heroCarousel?.data?.items?.length > 0 && (
+			<Carousel client:load items={heroCarousel.data.items} className="w-full max-w-3xl mx-auto" />
+		)}
+		{showCategoriesAtStart && (
+			<CategoryCards client:load blocks={blocks} variant="carousel" placeSlug={name} />
+		)}
 
 		{
 			useImageCategoryCarousel && (
@@ -596,21 +469,7 @@ const toCategorySlug = (value: string) =>
 			)
 		}
 
-		{
-			template !== "elegante" && (
-				<div
-					class:list={[
-						"max-w-2xl mx-auto px-4 sm:px-6 pt-4 pb-2",
-						config.headerClass,
-						showCategoriesAtStart ? "hidden" : "",
-					]}
-				>
-					<h1 class={config.titleClass}>{place.name}</h1>
-				</div>
-			)
-		}
-
-		<div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 mt-4 sm:mt-8">
+		<div id="restaurant-menu" class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 mt-4 sm:mt-8 scroll-mt-4">
 			{/* Info compacta en una sola línea de chips */}
 
 			{/* Favorites Manager - Always visible */}
