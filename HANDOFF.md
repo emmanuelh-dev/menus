@@ -249,3 +249,12 @@ por query params de `/menus`.
 - La navegación comercial superior se sustituye por atribución compacta sólo en el renderer compartido. Se conservan carruseles configurados y galerías (estas últimas dentro de más información). El encabezado precede también las cartas en imágenes.
 - Validación local: capturas de Novacafé, Chifa y Starbucks a 390, 768 y 1440 px; enlace a carta y ausencia de desbordamiento horizontal. Selector de producto comprobado tras hidratar las islas React (sin enviar pedidos). Astro check y build registrados en /tmp/restaurant-header-final-{check,build}.log. No se editaron datos reales ni enviaron pedidos.
 - Publicación: push a `master` para activar el despliegue automático de Cloudflare; no se ejecuta Wrangler manual. Pendiente confirmar despliegue y verificar producción y completar datos de negocios que aún no tienen dirección, descripción u horarios (Chifa). No se incorporó cálculo de abierto/cerrado: requiere horarios estructurados y zona horaria.
+
+
+## Registro 2026-10-20 — Estados y acceso al menú desde usuarios
+
+- Go `6fa9164`: `GET /api/admin/users` agrega `place_links[{id,name}]` sin cambiar `places`. Solo admin; IDs reales, sin búsquedas por nombre.
+- Panel `93b9558`: etiquetas Activo (verde), Reciente (ámbar), Inactivo (rojo), Sin datos (neutro), en tabla y tarjetas. Chips «Ver menú» abren `/place/{id}/menu`; tres visibles y resto desplegable.
+- Código y push completados en ambos repositorios; Go publicado primero por blue-green: candidato en 8093, salud y listado autenticado comprobados, proxy 8092 → 8093 verificado en producción. Activa `6fa9164` (`menus-api-users-6fa9164`); rollback `ad63277` (`menus-api-selector-ad63277`, 8092), conservado durante verificación.
+- Validación: build Next, ESLint del componente, go vet y go test ./... correctos. Lint global mantiene 157 errores / 93 advertencias anteriores. Comprobación de 583 IDs/nombres y rechazo 401 sin sesión. Playwright local: enlaces reales, búsqueda, filtros, orden, móvil, errores/reintento, sin overflow. Cuatro estados comprobados con datos simulados solo en navegador. Sin cambios de precios/pedidos ni consumidores públicos.
+- Cloudflare: panel final `4fd2277` desplegado y comprobado con capturas reales en teléfono/computadora, claro/oscuro. A petición del usuario, chips de 32 px con nombre/icono y etiquetas de estado compactas; navegación a editor, filtros, búsqueda, orden y ausencia de overflow comprobados en producción. Sesiones temporales borradas. Rollback de Go conservado, sin contenedores descartados creados por este trabajo.
