@@ -38,7 +38,7 @@ export default function ProductOptions({ item, money, onConfirm }: {
                   className="h-5 w-5 accent-neutral-900 shrink-0"
                 />
                 <span className="flex-1 text-sm font-semibold text-neutral-800">{value}</span>
-                {!!group.prices?.[value] && <span className="text-sm text-neutral-600">+{money(group.prices[value])}</span>}
+                {!!group.prices?.[value] && <span className="text-sm text-neutral-600">+{money(group.prices[value])} <span className="block text-xs">({money(configuredProduct(item, { ...selection, [group.name]: max === 1 ? [value] : selected.includes(value) ? selected : [...selected, value] }).price)} total c/u)</span></span>}
               </label>
             ))}
             {!group.required && selected.length > 0 && (
