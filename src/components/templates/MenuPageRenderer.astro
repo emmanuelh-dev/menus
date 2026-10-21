@@ -229,14 +229,9 @@ const corners: "redondo" | "cuadrado" =
 // 300. El item gana porque es el nivel más específico.
 const effect: string = view_settings.effect || "ninguno";
 
-// Quinto eje: cómo llena la foto su marco. No hay un default bueno para todos.
-// Medido sobre el catálogo real: hay lugares con producto recortado sobre
-// blanco (El Pollo Loco), donde `cover` corta el plato, y lugares con
-// fotografía a sangre (Spikes), donde `contain` deja bandas y desperdicia el
-// marco. Elegible por lugar; `contain` de default porque nunca corta comida,
-// que es el error más caro de los dos.
+// Rellenar por defecto; respetar Completa cuando el lugar la elige.
 const imageFit: "contain" | "cover" =
-	view_settings.image_fit === "cover" ? "cover" : "contain";
+	view_settings.image_fit === "contain" ? "contain" : "cover";
 
 // El tema son tokens de color, no clases. Cuando las nueve plantillas se
 // redujeron a tres quedó claro que entre ellas sólo cambiaba el color: repetir

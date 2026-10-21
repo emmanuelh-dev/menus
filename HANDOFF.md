@@ -195,3 +195,14 @@ por query params de `/menus`.
 - Público: el carrito respeta el precio de cada combinación y evita interpretar variantes de precio como paquetes de piezas. Cambiar presentación de un paquete reinicia sus sabores para evitar mezclas.
 - Validación: builds de Next/Astro, astro check sin errores, autocheck de precios y prueba Playwright del carrito ($22 y combinaciones $13/$24). Capturas reales del editor en claro, oscuro y móvil; guardado interceptado, sin modificar el menú real. Lint general del admin conserva deuda previa (161 errores); archivos tocados sin errores.
 - Publicación: menus `ef25edc` y admin-menus `11bd75d` enviados por push (público primero). Go no requiere deploy. Tras ~6 minutos, capturas reales de producción en claro/oscuro/móvil siguen mostrando la versión anterior; verificación visual del nuevo deploy PENDIENTE. No se intervino en Cloudflare ni se ejecutó deploy manual.
+
+
+## 2026-10-20 — Usuarios del restaurante, mozos y fotos
+
+- Go `3d2e7d6`: cuentas dedicadas rol `waiter`, asignación a un restaurante, alta/listado/retiro por dueño; `/api/waiter` expone menú/mesas y últimos 50 pedidos propios abiertos. Denegación por defecto al resto del API, precios calculados desde menú y pedidos siempre pendientes, sin confirmar pagos. Se corrigió también el filtro de dueño en listado de pedidos con place_id.
+- Go publicado y desplegado manualmente en VPS; migración 0010 aplicada; healthz público OK. Imagen previa conservada como `adminm-waiter-rollback:20261020`.
+- Admin `dda8054` publicado para despliegue automático: sección Usuarios dentro del restaurante, primer permiso Modo mesero; se conserva Comanda dentro de admin. Mesero inicia sesión habitual y entra a /mozos. Comanda móvil con búsqueda/categorías separadas, errores conservan carrito. Fotos sin preferencia explícita usan Rellenar, respetando Completa guardada.
+- Sitio público: mismo default Rellenar en renderer y componente; build Astro correcto. Menú 2343 ya guardaba cover al inspeccionarlo; no se sobrescribió su contenido.
+- Validación: build Next y Astro; go test ./...; integración con PostgreSQL aislado para permisos, precios, revocación y atribución. Playwright: alta de usuario, bloqueos, envío real en DB aislada en escritorio/teléfono, falla simulada y reintento, capturas claro/oscuro. ESLint global sigue bloqueado por deuda previa (159 errores); archivos nuevos sin errores.
+- Caja auditada, NO reescrita: arqueo legado guarda sesiones en content y suma por created_at, sin libro de pagos. No se considera validada la contabilidad ni se habilita cobrar al mesero. Pendiente sustituir ese modelo antes de confiar en cierres contables.
+- Front enviado a Cloudflare; verificación posterior del despliegue en curso al escribir esta entrada.
