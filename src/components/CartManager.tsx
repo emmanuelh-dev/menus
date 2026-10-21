@@ -688,12 +688,12 @@ export default function CartManager({
 
       {showCart && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowCart(false);
           }}
         >
-          <div className="bg-white rounded-2xl w-full sm:max-w-md max-h-[90dvh] flex flex-col shadow-2xl">
+          <div className="bg-white rounded-2xl w-full sm:max-w-lg mx-auto my-4 flex flex-col shadow-2xl">
             <div className="p-4 border-b border-neutral-100 flex items-center justify-between bg-white sticky top-0 z-10 rounded-t-2xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[var(--m-bg)] rounded-xl flex items-center justify-center text-[var(--m-accent)]">
@@ -731,7 +731,7 @@ export default function CartManager({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6">
+            <div className="px-6">
               {activeTab === 'cart' ? (
                 <div className="py-2">
                   {cart.length === 0 ? (
@@ -1054,9 +1054,9 @@ export default function CartManager({
         </div>
       )}
       {configuringItem && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div className="bg-white w-full sm:max-w-md max-h-[85dvh] flex flex-col rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="relative h-40 sm:h-64 overflow-hidden shrink-0">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] overflow-y-auto p-4 animate-in fade-in duration-300">
+          <div className="bg-white w-full sm:max-w-lg mx-auto my-4 flex flex-col rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="relative h-32 sm:h-40 overflow-hidden shrink-0">
               {configuringItem.image ? (
                 <img src={configuringItem.image} className="w-full h-full object-cover" alt="" />
               ) : (
@@ -1072,14 +1072,14 @@ export default function CartManager({
               </button>
             </div>
 
-            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-              <div className="p-6 sm:p-8 pb-4 shrink-0">
+            <div className="flex flex-col">
+              <div className="p-5 sm:p-6 pb-3">
                 <h3 className="text-2xl font-black uppercase text-neutral-900 tracking-tight leading-none mb-2">{configuringItem.name}</h3>
                 <p className="text-neutral-500 text-sm font-medium leading-relaxed">{configuringItem.description}</p>
                 <p className="text-2xl font-black text-[var(--m-accent)] mt-4">{money(configuringItem.price)}</p>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-2 space-y-6 custom-scrollbar">
+              <div className="px-5 sm:px-6 py-2 space-y-4">
 
 
                 {configuringItem.options?.length > 0 && (
@@ -1118,7 +1118,7 @@ export default function CartManager({
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 block mb-1">
                               {opt.name}:
                             </label>
-                            <p className="text-[9px] text-neutral-400 font-medium italic">Especifica la cantidad de cada uno</p>
+                            <p className="text-sm text-neutral-500">Elige cuántos de cada opción</p>
                           </div>
                           {detectLimit(configuringItem) && (
                             <div className={`text-right px-3 py-1.5 rounded-xl border-2 transition-all ${Object.values(tempCounts).reduce((a, b) => a + (b as number), 0) === detectLimit(configuringItem)
@@ -1176,7 +1176,7 @@ export default function CartManager({
                 )}
               </div>
 
-              <div className="p-6 sm:p-8 border-t border-neutral-100 space-y-4 shrink-0 bg-white">
+              <div className="p-5 sm:p-6 border-t border-neutral-100 space-y-4 bg-white">
                 {configuringItem.options?.length !== 1 && (
                   <div className="flex items-center justify-between bg-neutral-50 p-4 rounded-2xl mb-4">
                     <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Cantidad Total:</span>
