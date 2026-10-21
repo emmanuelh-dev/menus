@@ -1,4 +1,5 @@
 ---
+import { BookOpen, MapPin, MessageCircle, Phone, ChevronDown, Clock, CreditCard } from "lucide-react";
 import Gallery from "./Gallery.astro";
 interface Props { place: any; gallery?: any[]; }
 const { place, gallery = [] } = Astro.props;
@@ -25,25 +26,25 @@ const payments = Array.isArray(sd.payment_options) ? sd.payment_options.filter(B
   </div>
   {description && <p class="mt-4 text-sm sm:text-base leading-relaxed max-w-3xl line-clamp-2">{description}</p>}
   <div class="flex flex-wrap gap-2 mt-4 text-sm">
-    <a href="#restaurant-menu" class="header-action primary">Ver carta</a>
-    {hasLocation && <a href={maps} target="_blank" rel="noopener noreferrer" class="header-action">Ver en Maps</a>}
-    {whatsapp && <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" class="header-action">WhatsApp</a>}
-    {phone && <a href={`tel:${phone}`} class="header-action">Llamar</a>}
+    <a href="#restaurant-menu" class="header-action primary"><BookOpen size={16} aria-hidden="true" />Ver carta</a>
+    {hasLocation && <a href={maps} target="_blank" rel="noopener noreferrer" class="header-action"><MapPin size={16} aria-hidden="true" />Ver en Maps</a>}
+    {whatsapp && <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" class="header-action"><MessageCircle size={16} aria-hidden="true" />WhatsApp</a>}
+    {phone && <a href={`tel:${phone}`} class="header-action"><Phone size={16} aria-hidden="true" />Llamar</a>}
   </div>
   <p class="mt-3 text-xs opacity-80">{orders ? (delivery ? 'Pedidos en línea · Delivery disponible' : 'Pedidos en línea') : 'Carta informativa'}</p>
   {(sd.hours || payments.length > 0 || description || gallery.length > 0) && <details class="mt-3 text-sm">
-    <summary class="cursor-pointer min-h-11 flex items-center underline underline-offset-4">{sd.hours ? "Horarios y más información" : "Más información"} <span aria-hidden="true" class="ml-2">⌄</span></summary>
+    <summary class="cursor-pointer min-h-11 flex items-center underline underline-offset-4">{sd.hours ? "Horarios y más información" : "Más información"} <ChevronDown size={16} aria-hidden="true" className="ml-2 shrink-0" /></summary>
     <div class="space-y-3 pt-2 pb-1 max-w-3xl">
-      {sd.hours && <p class="whitespace-pre-line"><strong>Horario:</strong> {sd.hours}</p>}
+      {sd.hours && <p class="whitespace-pre-line"><Clock size={16} aria-hidden="true" className="inline-block mr-1 align-text-bottom" /><strong>Horario:</strong> {sd.hours}</p>}
       {description && <p class="leading-relaxed">{description}</p>}
       {gallery.length > 0 && <Gallery images={gallery} />}
-      {payments.length > 0 && <p><strong>Formas de pago:</strong> {payments.join(' · ')}</p>}
+      {payments.length > 0 && <p><CreditCard size={16} aria-hidden="true" className="inline-block mr-1 align-text-bottom" /><strong>Formas de pago:</strong> {payments.join(' · ')}</p>}
     </div>
   </details>}
 </header>
 <style>
   .restaurant-header { color: var(--m-text); }
-  .header-action { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 16px; border:1px solid var(--m-border); border-radius:999px; background:var(--m-surface); font-weight:600; }
+  .header-action { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 16px; border:1px solid var(--m-border); border-radius:999px; background:var(--m-surface); font-weight:600; }
   .header-action.primary { background:var(--m-text); color:var(--m-bg); border-color:var(--m-text); }
   .header-action:hover { opacity:.85; }
   .header-action:focus-visible, summary:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
