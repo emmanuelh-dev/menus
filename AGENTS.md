@@ -78,3 +78,10 @@ configuración externa, actualiza `HANDOFF.md` en el mismo commit. Debe indicar
 qué se hizo, por qué era necesario, qué se validó y qué sigue pendiente (incluidos
 secretos, despliegue o verificación en producción). No declares una tarea
 terminada si sólo quedó compilada o subida: distingue código, push y deploy.
+
+## Funciones compartidas: revisar el flujo completo
+
+- Una función se revisa de extremo a extremo: panel/editor → carrito público → modo mesero → comanda → pedidos → validación y cálculo en Go. Antes de modificarla, localizar todos sus consumidores en los tres repositorios y determinar cuáles afecta.
+- Mantener las mismas reglas de tamaños, ingredientes/extras, cantidades, recargos, totales y estados en todos los puntos afectados. Actualizar contratos, persistencia y presentación cuando corresponda; Go valida los datos y precios.
+- Validar el recorrido completo con un mismo caso representativo: configurar el producto, seleccionarlo, crear el pedido y comprobar su contenido y total en mesero, comanda y pedidos. No basta con compilar o probar una pantalla aislada.
+- No dar la función por terminada si quedan consumidores afectados sin adaptar o verificar. Registrar en `menus/HANDOFF.md` qué se cubrió, qué se probó y cualquier pendiente o incompatibilidad; informar al usuario de los límites.

@@ -217,3 +217,8 @@ por query params de `/menus`.
 - Validación: builds Astro y Next; astro check sin errores; autochecks de ambos repositorios; ESLint de archivos del panel sin errores (3 warnings previos). Playwright sobre el menú 2343: tamaño único S/17, dos platos S/34, ingredientes con recargo S/21.50, máximo de elecciones y paquete de dos sabores. Guardado del panel interceptado y contenido resultante probado en carrito; no se modificó el menú real.
 - Publicación: menus a9921bf y admin-menus b555208 enviados por push; ambos despliegues automáticos verificados en producción. Capturas antes/después en /tmp/chifa-*.png, incluido panel claro/oscuro en escritorio y teléfono. Sesión temporal de revisión eliminada.
 - Alcance: editor y carrito del sitio público. Modo mesero y su cálculo de precios en Go conservan el configurador anterior; su unificación queda pendiente.
+
+## 2026-10-20 — Regla de revisión integral de funciones
+
+- Se añadió a los AGENTS.md de menus, admin-menus y menus-backend la revisión conjunta de editor, carrito, modo mesero, comanda, pedidos y Go, para evitar entregar cambios parciales de una función compartida.
+- Validación: revisión del texto y diff sin errores de formato. Sólo documentación; no requiere cambios de runtime ni despliegue de Go. La unificación pendiente del selector de mesero sigue sin implementarse en este trabajo.
