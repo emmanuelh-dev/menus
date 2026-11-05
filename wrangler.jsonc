@@ -18,6 +18,9 @@
   "vars": {
     "GO_API_URL": "https://adminm.bysmax.com"
   },
+  "secrets": {
+    "required": ["GO_MENU_API_KEY"]
+  },
   "observability": {
     "enabled": true
   }

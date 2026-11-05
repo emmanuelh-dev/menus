@@ -39,10 +39,14 @@ cliente Next contiene la clave. No se crearon pedidos ni se modificaron menús.
 Estado: Go subido a origin/main; candidato `menus-api-private-9fc739c` en
 127.0.0.1:8094 sano y validado contra DB real. Tráfico aún a
 `menus-api-users-6fa9164` en 8093; esa es la versión de rollback.
-Pendiente: confirmar secretos Cloudflare, push y despliegues de los frontends,
-cambiar proxy al candidato y verificar API bloqueada y sitios/panel funcionando
-en producción. GET se conserva autenticado entre servidores; HTML público sigue
-siendo extraíble. No declarar protección activa hasta verificar ese cambio.
+Usuario confirmó secretos guardados en Cloudflare. Frontends subidos:
+`menus` a3de47e y `admin-menus` 5702e8a; builds automáticos en curso.
+Wrangler declara sólo el nombre `GO_MENU_API_KEY` en `secrets.required`,
+sin valor en Git; `wrangler deploy --dry-run` valida la configuración.
+Pendiente: confirmar despliegues de los frontends, cambiar proxy al candidato
+y verificar API bloqueada y sitios/panel funcionando en producción.
+GET se conserva autenticado entre servidores; HTML público sigue siendo
+extraíble. No declarar protección activa hasta verificar ese cambio.
 
 ## Control del ecosistema
 
