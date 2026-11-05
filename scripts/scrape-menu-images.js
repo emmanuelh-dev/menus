@@ -22,6 +22,7 @@
 // .html a este script — el HTML guardado trae el mismo JSON embebido y el
 // resto del proceso es idéntico. Rappi sí responde a curl.
 
+import { menuHeaders } from "./lib/places-go.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -135,7 +136,7 @@ async function traer(destino) {
 }
 
 async function menuDeLaBase(shortName) {
-	const res = await fetch(`${API_PUBLICA}/api/public/places/${shortName}`);
+	const res = await fetch(`${API_PUBLICA}/api/public/places/${encodeURIComponent(shortName)}`, { headers: menuHeaders() });
 	if (!res.ok) throw new Error(`API pública ${res.status} para ${shortName}`);
 	const body = await res.json();
 	const place = body.data || body;

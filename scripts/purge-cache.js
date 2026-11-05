@@ -17,6 +17,7 @@
 //
 // Requiere WEBHOOK_SECRET en el entorno (o en .env, que es de donde lo lee).
 
+import { menuHeaders } from "./lib/places-go.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -47,7 +48,7 @@ function leerSecreto() {
 const tagDeFicha = (shortName) => `place-${shortName}`;
 
 async function todosLosShortNames() {
-	const res = await fetch(`${API_PUBLICA}/api/public/places`);
+	const res = await fetch(`${API_PUBLICA}/api/public/places`, { headers: menuHeaders() });
 	if (!res.ok) throw new Error(`API pública ${res.status}`);
 	const body = await res.json();
 	return (body.data || body || [])

@@ -4,6 +4,46 @@
 **Estado:** purga por URL lista; el intento de caché ISR en el Worker fue
 retirado por incompatibilidad con Astro.
 
+## Registro 2026-11-05 — API de fichas privada entre servidores
+
+Se cierra la descarga anónima de listados y menús JSON sin cambiar los datos
+renderizados ni las reglas de carrito, pedidos o precios.
+
+- Go (`9fc739c`): `/api/public/places` y descendientes exigen
+  `X-Menu-API-Key` = `GO_MENU_API_KEY`, con comparación en tiempo constante.
+  Se comprueban todos los métodos, incluidos HEAD/OPTIONS, antes de CORS.
+  Sin clave válida: 401; sin configuración: 503. Si llega Origin, sólo se
+  aceptan `https://menus.bysmax.com` y
+  `https://www.menusdigitalesmonterrey.com`; Origin nunca autentica.
+- Astro: `astro:env/server` resuelve el secreto del Worker en runtime y del
+  entorno durante prerender. Fichas y paginación envían la clave; scripts
+  internos también. La configuración ausente y los errores de autorización
+  fallan visibles en lugar de generar páginas vacías.
+- Panel: `goFetch` agrega la clave sólo al catálogo; se conserva la cookie.
+  `/api/servicios` valida sesión real antes de usarla (una cookie inventada
+  ya no abre un proxy anónimo del catálogo).
+- Configuración: mismo secreto privado en Go y runtime de ambos frontends;
+  también variable secreta de build en `menus`. Nunca PUBLIC_/NEXT_PUBLIC_.
+  Clave generada en `.env` ignorado, fuera de Git. Usuario configura
+  Cloudflare manualmente; este entorno no tiene autenticación de Wrangler.
+
+Validado: Go test/vet/build; 19 casos de middleware; lector de scripts;
+Astro build contra candidato protegido y producción; build con clave inválida
+falla; astro check 0 errores/0 warnings. Next build y lint de archivos tocados
+pasan. Lint global del panel conserva 157 errores y 93 warnings heredados.
+Worker local: ficha Campomar, listado, tienda, manifest y sitemap con contenido.
+Panel local: sin cookie y cookie inventada 401; sesión real temporal 200 con
+catálogo no vacío; sesión eliminada después. Ningún artefacto Astro ni asset
+cliente Next contiene la clave. No se crearon pedidos ni se modificaron menús.
+
+Estado: Go subido a origin/main; candidato `menus-api-private-9fc739c` en
+127.0.0.1:8094 sano y validado contra DB real. Tráfico aún a
+`menus-api-users-6fa9164` en 8093; esa es la versión de rollback.
+Pendiente: confirmar secretos Cloudflare, push y despliegues de los frontends,
+cambiar proxy al candidato y verificar API bloqueada y sitios/panel funcionando
+en producción. GET se conserva autenticado entre servidores; HTML público sigue
+siendo extraíble. No declarar protección activa hasta verificar ese cambio.
+
 ## Control del ecosistema
 
 Este es el registro canónico del trabajo que cruza los tres repositorios:

@@ -35,11 +35,16 @@ function baseGo(env) {
   return (env.PUBLIC_GO_API_URL || "https://adminm.bysmax.com").replace(/\/+$/, "");
 }
 
-// Lee la ficha por el endpoint público: no necesita sesión y devuelve el
+// Lee la ficha con clave privada de servidor y devuelve el
 // content completo, que es lo que hace falta para no pisar lo que el scraper
 // no toca (view_settings, el resto de semantic_data).
+export function menuHeaders(env = cargarEnv()) {
+  if (!env.GO_MENU_API_KEY) throw new Error("falta GO_MENU_API_KEY para leer fichas de Go");
+  return { "X-Menu-API-Key": env.GO_MENU_API_KEY };
+}
+
 export async function leerPlace(slug, env = cargarEnv()) {
-  const res = await fetch(`${baseGo(env)}/api/public/places/${encodeURIComponent(slug)}`);
+  const res = await fetch(`${baseGo(env)}/api/public/places/${encodeURIComponent(slug)}`, { headers: menuHeaders(env) });
   if (!res.ok) throw new Error(`no existe el place ${slug} (${res.status})`);
   return res.json();
 }

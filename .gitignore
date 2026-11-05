@@ -31,3 +31,6 @@ scripts/data/*.json
 !package.json
 !tsconfig.json
 !package-lock.json
+
+# Local Cloudflare runtime state
+.wrangler/

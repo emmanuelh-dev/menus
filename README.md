@@ -270,3 +270,14 @@ src/content/config.ts                  esquema del blog; `audiencia` separa
 scripts/lib/places-go.js               leer/escribir fichas por Go
 scripts/purge-cache.js                 purge manual del borde
 ```
+
+### Lectura privada del catálogo Go
+
+Las fichas y listados de `/api/public/places*` requieren `GO_MENU_API_KEY`
+compartida con Go. Configurar como secreto de runtime del Worker y variable
+secreta de build (las páginas prerenderizadas también leen Go). Astro la lee
+con `astro:env/server`; nunca usar un prefijo `PUBLIC_`. Los scripts internos
+la leen del entorno o `.env`. El navegador sólo recibe el contenido renderizado.
+
+La API conserva GET para los servidores autenticados; las consultas directas
+sin clave reciben 401. Origin/CORS por sí solos no autentican.

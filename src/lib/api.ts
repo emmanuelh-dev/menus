@@ -1,13 +1,30 @@
+import { getSecret } from 'astro:env/server';
+
 // Cliente contra el API público de Go (doc 11).
 // El sitio entero lee datos desde aquí; ya no se usa Supabase.
 // Fallback para no romper el build/deploy si olvidan definir la variable.
 const API_URL =
   import.meta.env.PUBLIC_GO_API_URL || 'https://adminm.bysmax.com';
 
+// Se resuelve en runtime: el adapter lee el binding privado de Cloudflare.
+function menuHeaders(): HeadersInit {
+  const key = getSecret('GO_MENU_API_KEY');
+  if (!key) throw new Error('GO_MENU_API_KEY no está configurada');
+  return { 'X-Menu-API-Key': key };
+}
+
 async function fetchJSON<T>(path: string): Promise<T | null> {
+  const headers = path.startsWith('/api/public/places/') || path.startsWith('/api/public/places?')
+    ? menuHeaders() : undefined;
+  const res = await fetch(`${API_URL}${path}`, { headers }).catch((err) => {
+    console.error(`Error fetching ${path}:`, err);
+    return null;
+  });
+  if (headers && res && [401, 403, 503].includes(res.status)) {
+    throw new Error(`Go rechazó el acceso privado al catálogo (${res.status})`);
+  }
+  if (!res?.ok) return null;
   try {
-    const res = await fetch(`${API_URL}${path}`);
-    if (!res.ok) return null;
     return (await res.json()) as T;
   } catch (err) {
     console.error(`Error fetching ${path}:`, err);
@@ -86,9 +103,16 @@ export async function getPlacesPage(params: {
   qs.set('limit', String(params.limit));
   qs.set('offset', String(params.offset));
 
+  const headers = menuHeaders();
+  const res = await fetch(`${API_URL}/api/public/places?${qs.toString()}`, { headers }).catch((err) => {
+    console.error('Error fetching places page:', err);
+    return null;
+  });
+  if (res && [401, 403, 503].includes(res.status)) {
+    throw new Error(`Go rechazó el acceso privado al catálogo (${res.status})`);
+  }
+  if (!res?.ok) return { data: [], total: 0 };
   try {
-    const res = await fetch(`${API_URL}/api/public/places?${qs.toString()}`);
-    if (!res.ok) return { data: [], total: 0 };
     const data = (await res.json()) as any[];
     const total = Number(res.headers.get('X-Total-Count') || data.length);
     return { data: data.map(enrichPlace), total };
